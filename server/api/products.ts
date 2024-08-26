@@ -1,8 +1,13 @@
-import { serverMedusaClient } from '#medusa/server'
+import { serverMedusaClient } from "#medusa/server"
 
 export default eventHandler(async (event) => {
-    const client = serverMedusaClient(event)
-    const { products } = await client.products.list()
+    try {
+        const client = serverMedusaClient(event)
+        const { products } = await client.products.list()
 
-    return { products }
+        return { products }
+    } catch (error) {
+        console.error("Error fetching products:", error)
+        return { error: "Failed to fetch products" }
+    }
 })
