@@ -3,6 +3,7 @@ import AppHeader from "~/components/Header/AppHeader.vue"
 import { useProductStore } from "~/stores/product"
 const store = useProductStore()
 await callOnce(() => store.fetchData())
+await callOnce(() => store.fetchLinks())
 </script>
 <template>
     <NuxtLoadingIndicator />

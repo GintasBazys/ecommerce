@@ -11,11 +11,11 @@ export default defineNuxtConfig({
             meta: [{ name: "description", content: "..." }]
         }
     },
-    css: ["@/assets/css/fonts.css"],
+    css: ["@/assets/css/fonts.css", "@/assets/scss/main.scss"],
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
-    modules: ["@nuxtjs/tailwindcss", "@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image"],
+    modules: ["@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image", "@nuxtjs/sitemap"],
     medusa: {
         server: true
     },

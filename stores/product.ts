@@ -1,33 +1,93 @@
-export const useProductStore = defineStore("product", () => {
-    const products = ref([])
-    const collections = ref([])
+// Define the structure of a PricedProduct
+interface PricedProduct {
+    id: string
+    title: string
+    thumbnail: string
+    variants: {
+        title: string
+        size: string
+        color: string
+        inventoryQuantity: number
+        prices: {
+            amount: number
+            currency_code: string
+        }[]
+    }[]
+}
 
-    const setProducts = (newProducts) => {
+interface Collection {
+    id: string
+    title: string
+    handle: string
+}
+
+interface ProductResponse {
+    products: PricedProduct[]
+    count: number
+    productLimit: number
+    productOffset: number
+}
+
+interface CollectionResponse {
+    collections: Collection[]
+}
+
+export const useProductStore = defineStore("product", () => {
+    const products = ref<PricedProduct[]>([])
+    const collections = ref<Collection[]>([])
+    const limit = ref(2)
+    const offset = ref(0)
+    const totalCount = ref(0)
+
+    const setProducts = (newProducts: PricedProduct[]) => {
         if (Array.isArray(newProducts)) {
             products.value = newProducts
         }
     }
 
-    const setCollections = (newCollections) => {
+    const setTotalCount = (count: number) => {
+        totalCount.value = count
+    }
+
+    const setCollections = (newCollections: Collection[]) => {
         if (Array.isArray(newCollections)) {
             collections.value = newCollections
         }
     }
 
+    const route = useRoute()
+    const pageNumber = parseInt(route.query.page as string, 10) || 1
+    offset.value = (pageNumber - 1) * limit.value
+
     const fetchData = async () => {
         try {
-            const { products: apiProducts } = await $fetch("/api/products")
-            const { collections: apiCollections } = await $fetch("/api/collections")
-            setProducts(apiProducts)
-            setCollections(apiCollections)
+            const response = await $fetch<ProductResponse>("/api/products", {
+                params: { limit: limit.value, offset: offset.value }
+            })
+            if ("count" in response && "products" in response) {
+                const { products: apiProducts, count, productLimit, productOffset } = response
+                limit.value = productLimit
+                offset.value = productOffset
+                setProducts(apiProducts)
+                setTotalCount(count)
+            }
         } catch (error) {
             console.error("Failed to fetch data:", error)
         }
     }
 
+    const fetchLinks = async () => {
+        const collectionsResponse = await $fetch<CollectionResponse>("/api/collections")
+        setCollections(collectionsResponse.collections)
+    }
+
     return {
         products,
         collections,
-        fetchData
+        limit,
+        offset,
+        totalCount,
+        fetchData,
+        fetchLinks
     }
 })

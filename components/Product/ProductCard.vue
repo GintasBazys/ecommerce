@@ -2,6 +2,7 @@
 import { defineProps } from "vue"
 const { product } = defineProps<{
     product: {
+        id: string
         title: string
         thumbnail: string
         variants: {
@@ -9,7 +10,10 @@ const { product } = defineProps<{
             size: string
             color: string
             inventoryQuantity: number
-            price: string
+            prices: {
+                amount: number
+                currency_code: string
+            }[]
         }[]
     }
 }>()
@@ -51,7 +55,7 @@ const computedPrice = computed(() => {
                     v-model="selectedSize"
                     class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
                 >
-                    <option v-for="size in availableSizes" :key="size">{{ size.title }}</option>
+                    <option v-for="size in availableSizes" :key="size.title">{{ size.title }}</option>
                 </select>
             </div>
 
