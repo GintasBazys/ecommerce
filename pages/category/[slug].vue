@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface CollectionInterface {
-    title: string
+    name: string
     metadata: { [x: string]: never }
     id: string
     handle: string
@@ -23,7 +23,7 @@ if (!collection.value) {
     <main>
         <section class="container mx-auto px-4">
             <h1 class="font-bold text-2xl whitespace-nowrap">
-                {{ collection?.title }}
+                {{ collection?.name }}
             </h1>
         </section>
     </main>

@@ -1,4 +1,6 @@
 // Define the structure of a PricedProduct
+import { LIMIT } from "~/utils/consts"
+
 interface PricedProduct {
     id: string
     title: string
@@ -17,7 +19,7 @@ interface PricedProduct {
 
 interface Collection {
     id: string
-    title: string
+    name: string
     handle: string
 }
 
@@ -29,13 +31,13 @@ interface ProductResponse {
 }
 
 interface CollectionResponse {
-    collections: Collection[]
+    product_categories: Collection[]
 }
 
 export const useProductStore = defineStore("product", () => {
     const products = ref<PricedProduct[]>([])
     const collections = ref<Collection[]>([])
-    const limit = ref(2)
+    const limit = ref(LIMIT)
     const offset = ref(0)
     const totalCount = ref(0)
 
@@ -78,7 +80,7 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchLinks = async () => {
         const collectionsResponse = await $fetch<CollectionResponse>("/api/collections")
-        setCollections(collectionsResponse.collections)
+        setCollections(collectionsResponse["product_categories"])
     }
 
     return {

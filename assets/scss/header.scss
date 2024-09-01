@@ -1,0 +1,14 @@
+.navbar-nav .nav-link {
+  font-size: 18px;
+  @include  media-breakpoint-up((lg)) {
+    padding-top: 0;
+  }
+}
+.navbar-toggler:focus,.btn-close:focus {
+  box-shadow: none;
+}
+@include  media-breakpoint-down(lg) {
+  .navbar-nav .nav-link {
+    border-bottom: 1px solid $primary;
+  }
+}

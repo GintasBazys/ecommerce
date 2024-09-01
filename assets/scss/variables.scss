@@ -1,0 +1,22 @@
+$primary: #010C80;
+$secondary: #0080FF;
+$accent: #0023FF;
+
+$grid-gutter-width: 32px;
+
+$container-max-widths: (
+        sm: 540px,
+        md: 767px,
+        lg: 992px,
+        xl: 1140px,
+        xxl: 1224px,
+);
+
+$grid-breakpoints: (
+        xs: 0,
+        sm: 540px,
+        md: 767px,
+        lg: 992px,
+        xl: 1140px,
+        xxl: 1224px,
+);
