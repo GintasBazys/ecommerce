@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AppHeader from "~/components/Header/AppHeader.vue"
 import { useProductStore } from "~/stores/product"
+import AppHeader from "~/components/Header/AppHeader.vue"
 const store = useProductStore()
 await callOnce(() => store.fetchData())
 await callOnce(() => store.fetchLinks())
@@ -15,7 +15,7 @@ useHead({
 })
 </script>
 <template>
-    <NuxtLoadingIndicator color="#0080FF" />
+    <NuxtLoadingIndicator />
     <AppHeader />
     <NuxtPage />
 </template>
