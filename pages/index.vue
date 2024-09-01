@@ -1,7 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import MainBanner from "~/components/Banner/MainBanner.vue"
+</script>
 
 <template>
     <main>
-        <section class="container" />
+        <MainBanner />
     </main>
 </template>

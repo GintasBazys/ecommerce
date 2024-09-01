@@ -20,6 +20,7 @@ useHead({
     <NuxtPage />
 </template>
 
+<!--suppress CssUnusedSymbol -->
 <style>
 .page-enter-active,
 .page-leave-active {

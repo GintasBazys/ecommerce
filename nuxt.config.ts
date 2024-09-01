@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
-    modules: ["@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image", "@nuxtjs/sitemap"],
+    modules: ["@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "nuxt-swiper"],
     medusa: {
         server: true
     },

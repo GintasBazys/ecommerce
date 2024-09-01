@@ -46,7 +46,7 @@ const isHidden = ref(false)
             <div
                 id="navbarNavAltMarkup"
                 tabindex="-1"
-                class="offcanvas-lg offcanvas-start w-100 justify-content-lg-center d-flex justify-content-lg-center py-4 px-3 py-lg-0 px-lg-0"
+                class="offcanvas-lg offcanvas-start w-lg-100 justify-content-lg-center d-flex justify-content-lg-center py-4 px-3 py-lg-0 px-lg-0"
             >
                 <button
                     type="button"

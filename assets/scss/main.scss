@@ -1,9 +1,23 @@
 @import "variables";
 @import '../../node_modules/bootstrap/scss/bootstrap';
 @import "header";
+@import "swiper";
 :root {
   --bs-body-font-family: Archivo, sans-serif;
 }
 .max-w-520 {
   max-width: 520px;
+}
+.btn-primary{
+  transition: all 0.5s;
+  &:hover, &:focus {
+    background: transparent;
+    border: 1px solid $primary;
+    color: #000000;
+  }
+}
+.w-lg-100 {
+  @include  media-breakpoint-up(lg) {
+    width: 100%;
+  }
 }
