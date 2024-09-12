@@ -1,0 +1,10 @@
+.faq-cards {
+  margin: 2rem 0;
+  .faq-card {
+    background: transparent;
+    border: .0625rem solid $primary;
+    border-radius: .5rem;
+    height: 100%;
+    padding: 1.5rem;
+  }
+}
