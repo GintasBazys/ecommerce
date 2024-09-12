@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useProductStore } from "~/stores/product"
 import AppHeader from "~/components/Header/AppHeader.vue"
+import AppFooter from "~/components/Footer/AppFooter.vue"
 const store = useProductStore()
 await callOnce(() => store.fetchData())
 await callOnce(() => store.fetchLinks())
+await callOnce(() => store.fetchBestSellers())
 
 useHead({
     link: [
@@ -18,6 +20,7 @@ useHead({
     <NuxtLoadingIndicator />
     <AppHeader />
     <NuxtPage />
+    <AppFooter />
 </template>
 
 <!--suppress CssUnusedSymbol -->

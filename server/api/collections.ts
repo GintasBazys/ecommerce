@@ -4,9 +4,9 @@ export default defineCachedEventHandler(
     async (event) => {
         try {
             const client = serverMedusaClient(event)
-            const { product_categories } = await client.productCategories.list()
-
-            return { product_categories }
+            const { collections } = await client.collections.list()
+            console.log(collections)
+            return { collections }
         } catch (error) {
             console.error("Error fetching collections:", error)
             return { error: "Failed to fetch collections" }

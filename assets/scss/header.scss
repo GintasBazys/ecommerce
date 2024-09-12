@@ -1,5 +1,6 @@
 .navbar-nav .nav-link {
-  font-size: 18px;
+  font-size: 1.125rem;
+  color: #000000;
   @include  media-breakpoint-up((lg)) {
     padding-top: 0;
   }
@@ -7,8 +8,37 @@
 .navbar-toggler:focus,.btn-close:focus {
   box-shadow: none;
 }
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23010C80' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
 @include  media-breakpoint-down(lg) {
   .navbar-nav .nav-link {
     border-bottom: 1px solid rgba(0, 0, 0, 0.125);
   }
+}
+.sign-in-btn {
+  border: 1px solid $primary;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0;
+  color: $primary;
+  font-weight: 500;
+  @include  media-breakpoint-down(lg) {
+    padding: 0;
+    border: none;
+  }
+}
+
+.cart-counter {
+  position: absolute;
+  left: 100%;
+  font-size: 0.75rem;
+  top: 0;
+  transform: translate(-50%, -50%);
+  font-weight: 500;
+  background-color: $primary;
+}
+.header-label {
+  color: $accent;
+  font-weight: 500;
+  font-size: 1rem;
 }

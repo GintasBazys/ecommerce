@@ -1,6 +1,7 @@
 @import "variables";
 @import '../../node_modules/bootstrap/scss/bootstrap';
 @import "header";
+@import "footer";
 @import "swiper";
 :root {
   --bs-body-font-family: Archivo, sans-serif;
@@ -16,8 +17,110 @@
     color: #000000;
   }
 }
+.btn:hover {
+  border-color: currentColor;
+}
 .w-lg-100 {
   @include  media-breakpoint-up(lg) {
     width: 100%;
   }
+}
+.spacer {
+  padding: 5rem 0;
+  @include  media-breakpoint-down(lg) {
+    padding: 3rem 0;
+  }
+}
+
+.h1,h1 {
+  font-size: 3.5rem;
+  letter-spacing: -.07rem;
+  line-height: 3.75rem
+}
+
+.h2,h2 {
+  font-size: 3rem;
+  letter-spacing: -.06rem;
+  line-height: 3.25rem
+}
+
+.h2,.h3,h2,h3 {
+  font-style: normal
+}
+
+.h3,h3 {
+  font-size: 2rem;
+  letter-spacing: -.04rem;
+  line-height: 2.5rem
+}
+
+.h4,h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem
+}
+
+.h5,h5 {
+  font-size: 1.25rem;
+  font-style: normal;
+  line-height: 1.75rem
+}
+
+@include media-breakpoint-down(lg){
+  .h1,h1 {
+    font-size: 2.625rem;
+    letter-spacing: -.0525rem;
+    line-height: 3rem
+  }
+
+  .h2,h2 {
+    font-size: 2.25rem;
+    letter-spacing: -.045rem;
+    line-height: 2.625rem
+  }
+}
+
+@include media-breakpoint-down(md){
+  .h1,h1 {
+    font-size: 2rem;
+    letter-spacing: -.04rem;
+    line-height: 2.5rem
+  }
+
+  .h2,h2 {
+    font-size: 1.75rem;
+    letter-spacing: -.035rem;
+    line-height: 2.25rem
+  }
+
+  .h3,h3 {
+    font-size: 1.5rem;
+    letter-spacing: -.03rem;
+    line-height: 2rem
+  }
+
+  .h4,h4 {
+    font-size: 1.25rem
+  }
+
+  .h4,.h5,h4,h5 {
+    line-height: 1.75rem
+  }
+
+  .h5,h5 {
+    font-size: 1.125rem
+  }
+}
+.bg-gradient-primary {
+  background: linear-gradient(to right, #010C80, #0023FF, #0080FF);
+}
+
+body, #__nuxt {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+img {
+  max-width: 100%;
+  height: auto;
 }

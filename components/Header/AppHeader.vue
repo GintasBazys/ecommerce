@@ -3,6 +3,22 @@ import { useProductStore } from "~/stores/product"
 
 const store = useProductStore()
 const isHidden = ref(false)
+
+const { $bootstrap } = useNuxtApp()
+
+onMounted(() => {
+    const offcanvasElement = document.getElementById("navbarNavAltMarkup")
+    const offcanvas = new $bootstrap.Offcanvas(offcanvasElement)
+
+    const hideOffcanvas = () => {
+        if (offcanvasElement?.classList.contains("show")) {
+            offcanvas.hide()
+        }
+    }
+
+    const router = useRouter()
+    router.afterEach(hideOffcanvas)
+})
 </script>
 
 <template>
@@ -29,7 +45,17 @@ const isHidden = ref(false)
                 <NuxtLink class="navbar-brand p-0" href="/">
                     <NuxtImg class="img-fluid" src="/images/logo.svg" width="200" height="40" alt="Ecommerce logo" loading="eager" />
                 </NuxtLink>
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-3 align-items-center">
+                    <NuxtLink href="/cart" class="me-2 position-relative">
+                        <NuxtImg src="/images/shopping_cart.svg" width="24" height="24" alt="Shopping icon" loading="eager" />
+                        <span class="badge rounded-pill cart-counter">0</span>
+                    </NuxtLink>
+                    <NuxtLink class="btn sign-in-btn" href="/signin">
+                        <div class="d-flex align-items-center">
+                            <NuxtImg src="/images/person.svg" width="24" height="24" alt="person icon" loading="eager" />
+                            <span class="ms-2 d-none d-lg-inline-block">Sign In</span>
+                        </div>
+                    </NuxtLink>
                     <button
                         class="navbar-toggler p-0 border-0"
                         type="button"
@@ -58,7 +84,7 @@ const isHidden = ref(false)
                 <div class="navbar-nav">
                     <NuxtLink class="nav-link ps-lg-0 text-danger fw-bold" href="#">Special offers</NuxtLink>
                     <template v-for="collection in store.collections" :key="collection.id">
-                        <NuxtLink :href="'/category/' + collection.handle" class="nav-link">{{ collection.name }}</NuxtLink>
+                        <NuxtLink :href="'/collection/' + collection.handle" class="nav-link">{{ collection.title }}</NuxtLink>
                     </template>
                     <NuxtLink class="nav-link" href="/blog">Blog</NuxtLink>
                     <NuxtLink class="nav-link" href="/about">About us</NuxtLink>

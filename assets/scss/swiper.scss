@@ -1,11 +1,13 @@
 .swiper-pagination-bullet {
-  width: 20px !important;
+  width: 16px !important;
   height: 4px !important;
   background: #fff !important;
   opacity: 1 !important;
   border-radius: 4px !important;
+  transition: all .5s;
   &.swiper-pagination-bullet-active {
     background: $secondary !important;
+    width: 24px !important;
   }
 }
 .swiper-slide {

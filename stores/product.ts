@@ -19,7 +19,7 @@ interface PricedProduct {
 
 interface Collection {
     id: string
-    name: string
+    title: string
     handle: string
 }
 
@@ -31,7 +31,7 @@ interface ProductResponse {
 }
 
 interface CollectionResponse {
-    product_categories: Collection[]
+    collections: Collection[]
 }
 
 export const useProductStore = defineStore("product", () => {
@@ -40,11 +40,15 @@ export const useProductStore = defineStore("product", () => {
     const limit = ref(LIMIT)
     const offset = ref(0)
     const totalCount = ref(0)
+    const bestSellers = ref<PricedProduct[]>([])
 
     const setProducts = (newProducts: PricedProduct[]) => {
         if (Array.isArray(newProducts)) {
             products.value = newProducts
         }
+    }
+    const setBestSellers = (newProducts: PricedProduct[]) => {
+        bestSellers.value = newProducts
     }
 
     const setTotalCount = (count: number) => {
@@ -80,16 +84,22 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchLinks = async () => {
         const collectionsResponse = await $fetch<CollectionResponse>("/api/collections")
-        setCollections(collectionsResponse["product_categories"])
+        setCollections(collectionsResponse["collections"])
+    }
+    const fetchBestSellers = async () => {
+        const bestSellersResponse = await $fetch<ProductResponse>("http://localhost:9000/store/best-selling")
+        setBestSellers(bestSellersResponse["products"])
     }
 
     return {
         products,
         collections,
+        bestSellers,
         limit,
         offset,
         totalCount,
         fetchData,
-        fetchLinks
+        fetchLinks,
+        fetchBestSellers
     }
 })
