@@ -46,6 +46,9 @@ onMounted(() => {
                     <NuxtImg class="img-fluid" src="/images/logo.svg" width="200" height="40" alt="Ecommerce logo" loading="eager" />
                 </NuxtLink>
                 <div class="d-flex gap-3 align-items-center">
+                    <NuxtLink href="/search">
+                        <NuxtImg src="/images/search.svg" width="24" height="24" alt="Search icon" loading="eager" />
+                    </NuxtLink>
                     <NuxtLink href="/cart" class="me-2 position-relative">
                         <NuxtImg src="/images/shopping_cart.svg" width="24" height="24" alt="Shopping icon" loading="eager" />
                         <span class="badge rounded-pill cart-counter">0</span>

@@ -83,12 +83,20 @@ export const useProductStore = defineStore("product", () => {
     }
 
     const fetchLinks = async () => {
-        const collectionsResponse = await $fetch<CollectionResponse>("/api/collections")
-        setCollections(collectionsResponse["collections"])
+        try {
+            const collectionsResponse = await $fetch<CollectionResponse>("/api/collections")
+            setCollections(collectionsResponse["collections"])
+        } catch (error) {
+            console.error("Failed to fetch data:", error)
+        }
     }
     const fetchBestSellers = async () => {
-        const bestSellersResponse = await $fetch<ProductResponse>("http://localhost:9000/store/best-selling")
-        setBestSellers(bestSellersResponse["products"])
+        try {
+            const bestSellersResponse = await $fetch<ProductResponse>("http://localhost:9000/store/best-selling")
+            setBestSellers(bestSellersResponse["products"])
+        } catch (error) {
+            console.error("Failed to fetch data:", error)
+        }
     }
 
     return {
