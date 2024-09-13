@@ -16,9 +16,19 @@
     align-items: center;
     border-bottom: 1px solid;
     padding-bottom: 0.25rem;
+    position: relative;
+    &::after {
+      border: none;
+      content: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' fill='none'%3E%3Cpath d='m1 1.25 4.5 4.5 4.5-4.5' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      float: right;
+      position: absolute;
+      right: 0;
+      top: -4px;
+    }
     &[aria-expanded="true"] {
       &::after {
         transform: rotate(180deg);
+        transform-origin: 5px 16px;
       }
     }
   }
