@@ -4,7 +4,6 @@ import AppFooter from "~/components/Footer/AppFooter.vue"
 import { type CollectionResponse, useProductStore } from "~/stores/product"
 
 const store = useProductStore()
-
 const { data } = await useFetch<CollectionResponse>("/api/collections")
 if (data.value) {
     store.collections = data.value["collections"]

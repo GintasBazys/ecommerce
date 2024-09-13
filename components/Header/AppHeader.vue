@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useProductStore } from "~/stores/product"
+import { useCustomerStore } from "~/stores/customer"
 
 const store = useProductStore()
+const customerStore = useCustomerStore()
 const isHidden = ref(false)
 
 const { $bootstrap } = useNuxtApp()
@@ -53,12 +55,22 @@ onMounted(() => {
                         <NuxtImg src="/images/shopping_cart.svg" width="24" height="24" alt="Shopping icon" loading="eager" />
                         <span class="badge rounded-pill cart-counter">0</span>
                     </NuxtLink>
-                    <NuxtLink class="btn sign-in-btn" href="/signin">
-                        <div class="d-flex align-items-center">
-                            <NuxtImg src="/images/person.svg" width="24" height="24" alt="person icon" loading="eager" />
-                            <span class="ms-2 d-none d-lg-inline-block">Sign In</span>
-                        </div>
-                    </NuxtLink>
+                    <template v-if="customerStore?.customer?.id">
+                        <NuxtLink class="btn sign-in-btn" href="/account">
+                            <div class="d-flex align-items-center">
+                                <NuxtImg src="/images/person.svg" width="24" height="24" alt="person icon" loading="eager" />
+                                <span class="ms-2 d-none d-lg-inline-block">{{ customerStore?.customer?.first_name }}</span>
+                            </div>
+                        </NuxtLink>
+                    </template>
+                    <template v-else>
+                        <NuxtLink class="btn sign-in-btn" href="/signin">
+                            <div class="d-flex align-items-center">
+                                <NuxtImg src="/images/person.svg" width="24" height="24" alt="person icon" loading="eager" />
+                                <span class="ms-2 d-none d-lg-inline-block">Sign In</span>
+                            </div>
+                        </NuxtLink>
+                    </template>
                     <button
                         class="navbar-toggler p-0 border-0"
                         type="button"

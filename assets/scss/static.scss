@@ -8,3 +8,15 @@
     padding: 1.5rem;
   }
 }
+.external-login-block-no-shop {
+  display: flex;
+  border: 1px solid #e2ecff;
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  p {
+    margin: 0;
+  }
+}
+.external-login-link {
+  text-decoration: none;
+}

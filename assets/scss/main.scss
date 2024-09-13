@@ -126,6 +126,11 @@ img {
   max-width: 100%;
   height: auto;
 }
+.form-control {
+  min-height: 3rem;
+  margin: 1rem 0;
+  padding: 1rem 0.75rem;
+}
 .form-control:focus {
   box-shadow: none;
 }
