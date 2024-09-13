@@ -30,7 +30,7 @@ interface ProductResponse {
     productOffset: number
 }
 
-interface CollectionResponse {
+export interface CollectionResponse {
     collections: Collection[]
 }
 

@@ -17,7 +17,6 @@ const handleSearch = async (e: Event) => {
         })
 
         searchCounter.value = response.count
-        console.log(response)
     } catch (error) {
         console.error("Error during search:", error)
     }

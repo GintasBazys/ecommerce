@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { useProductStore } from "~/stores/product"
 import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
-const store = useProductStore()
-await callOnce(() => store.fetchData())
-await callOnce(() => store.fetchLinks())
-await callOnce(() => store.fetchBestSellers())
+import { type CollectionResponse, useProductStore } from "~/stores/product"
 
+const store = useProductStore()
+
+const { data } = await useFetch<CollectionResponse>("/api/collections")
+if (data.value) {
+    store.collections = data.value["collections"]
+}
 useHead({
     link: [
         { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
