@@ -35,7 +35,7 @@ const handleSearch = async (e: Event) => {
                         id="search-input"
                         v-model="searchQuery"
                         required
-                        class="form-control py-3 px-4 border-end-0 border"
+                        class="form-control my-0 py-3 px-4 border-end-0 border"
                         type="search"
                         placeholder="Search..."
                     />

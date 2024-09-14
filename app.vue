@@ -21,6 +21,7 @@ useHead({
     <NuxtLoadingIndicator />
     <AppHeader />
     <NuxtPage />
+    <NewsletterComponent />
     <AppFooter />
 </template>
 

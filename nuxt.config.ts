@@ -41,6 +41,10 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             MEDUSA_URL: process.env.MEDUSA_URL
+        },
+        secret: {
+            mailchimpApiKey: process.env.MAILCHIMP_API_KEY,
+            mailchimpAudienceId: process.env.MAILCHIMP_AUDIENCE_ID
         }
     }
 })
