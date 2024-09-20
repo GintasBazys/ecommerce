@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+    layout: "account"
+})
+
 const handleError = () => clearError({ redirect: "/" })
 </script>
 

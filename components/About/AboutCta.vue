@@ -1,8 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{
+    linkShown?: boolean
+    extraSpacerClass?: string
+}>()
+</script>
 
 <template>
     <section class="container">
-        <div class="spacer">
+        <div class="spacer" :class="extraSpacerClass">
             <div class="row flex-xl-row flex-column-reverse gy-4">
                 <div class="col-xl-6 col-md-9">
                     <NuxtImg
@@ -36,9 +41,11 @@
                             any questions or need assistance, our friendly customer support team is here to help.
                         </p>
                         <p class="m-0">Speak to us today to find out more.</p>
-                        <NuxtLink class="btn btn-outline-primary mt-3 px-4" href="/about">
-                            <span role="button" class="read-more-btn-text">Read more</span>
-                        </NuxtLink>
+                        <template v-if="linkShown">
+                            <NuxtLink class="btn btn-outline-primary mt-3 px-4" href="/about">
+                                <span role="button" class="read-more-btn-text">Read more</span>
+                            </NuxtLink>
+                        </template>
                     </div>
                 </div>
             </div>

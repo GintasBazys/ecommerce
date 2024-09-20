@@ -7,7 +7,7 @@ export default defineEventHandler(async (event: H3Event) => {
         const email = body.email
 
         if (!email) {
-            throw new Error("Email is required.")
+            return sendError(event, createError({ statusCode: 400, statusMessage: "Email is required." }))
         }
 
         const config = useRuntimeConfig()
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event: H3Event) => {
         const response = await fetch(url, {
             method: "POST",
             headers: {
-                Authorization: `Basic ${Buffer.from(`anystring:${apiKey}`).toString("base64")}`,
+                Authorization: `Basic ${Buffer.from(`string:${apiKey}`).toString("base64")}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
         if (!response.ok) {
             const errorDetail = await response.json()
-            throw new Error(`Mailchimp error: ${errorDetail.detail}`)
+            return sendError(event, createError({ statusCode: 400, statusMessage: `Mailchimp error: ${errorDetail.title}` }))
         }
 
         const result = await response.json()
@@ -46,6 +46,8 @@ export default defineEventHandler(async (event: H3Event) => {
             data: result
         }
     } catch (error) {
-        sendError(event, createError({ statusCode: 400, statusMessage: error.message }))
+        if (error instanceof Error) {
+            sendError(event, createError({ statusCode: 400, statusMessage: error.message }))
+        }
     }
 })

@@ -6,6 +6,6 @@ import AboutCta from "~/components/About/AboutCta.vue"
 <template>
     <main>
         <MainBanner />
-        <AboutCta />
+        <AboutCta :link-shown="true" />
     </main>
 </template>

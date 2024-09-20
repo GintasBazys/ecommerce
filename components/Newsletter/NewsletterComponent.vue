@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const errorMessage = ref<string | null>(null)
+const loading = ref(false)
+
 const handleSubscribe = async (e: Event) => {
     e.preventDefault()
 
@@ -7,6 +10,7 @@ const handleSubscribe = async (e: Event) => {
     const email = formData.get("email") as string
 
     try {
+        loading.value = true
         const response = await $fetch("/api/subscribe", {
             method: "POST",
             headers: {
@@ -18,17 +22,17 @@ const handleSubscribe = async (e: Event) => {
         if (response.success) {
             alert(response.message)
             form.reset()
-        } else {
-            throw new Error(response.message)
         }
     } catch (error) {
-        console.log(`Error: ${error.message}`)
+        errorMessage.value = error.statusMessage
+    } finally {
+        loading.value = false
     }
 }
 </script>
 
 <template>
-    <section class="spacer shadow-lg bg-white">
+    <section class="spacer border-top">
         <div class="container-md">
             <div class="intro">
                 <h2 class="text-center newsletter">Subscribe to our Newsletter</h2>
@@ -47,10 +51,12 @@ const handleSubscribe = async (e: Event) => {
                         placeholder="Enter your email"
                         aria-label="Enter your email"
                         aria-describedby="cta-addon"
+                        @input="errorMessage = null"
                     />
-                    <button id="cta-addon" class="btn btn-primary">Submit</button>
+                    <button id="cta-addon" :disabled="loading" class="btn btn-primary">Submit</button>
                 </div>
             </form>
+            <div class="invalid-feedback d-block">{{ errorMessage }}</div>
         </div>
     </section>
 </template>

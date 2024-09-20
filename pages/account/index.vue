@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useCustomerStore } from "~/stores/customer"
 
+definePageMeta({
+    layout: "account"
+})
+
 const router = useRouter()
 const customerStore = useCustomerStore()
 

@@ -1,10 +1,10 @@
 <script setup lang="ts"></script>
 
 <template>
-    <section>
+    <section class="spacer">
         <div class="container mx-auto">
             <h1>About page</h1>
-            <NuxtLink to="/">Home page</NuxtLink>
         </div>
+        <AboutCta :extra-spacer-class="'pb-0'" />
     </section>
 </template>

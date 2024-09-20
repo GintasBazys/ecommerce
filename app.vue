@@ -20,8 +20,9 @@ useHead({
 <template>
     <NuxtLoadingIndicator />
     <AppHeader />
-    <NuxtPage />
-    <NewsletterComponent />
+    <NuxtLayout>
+        <NuxtPage />
+    </NuxtLayout>
     <AppFooter />
 </template>
 

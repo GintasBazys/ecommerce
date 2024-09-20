@@ -2,6 +2,10 @@
 import { ref } from "vue"
 import { useRoute, useFetch, navigateTo } from "nuxt/app"
 
+definePageMeta({
+    layout: "default"
+})
+
 interface CollectionInterface {
     name: string
     metadata: { [x: string]: never }
@@ -24,7 +28,7 @@ if (data.value && "error" in data.value) {
 </script>
 
 <template>
-    <main>
+    <main class="spacer">
         <section class="container mx-auto px-4">
             <h1 class="font-bold text-2xl whitespace-nowrap">
                 {{ collection?.title }}
