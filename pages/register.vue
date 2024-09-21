@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import { useCustomerStore } from "~/stores/customer"
+import type { CustomerResponseInterface } from "~/utils/interfaces"
 
 definePageMeta({
     layout: "account"
@@ -20,7 +21,7 @@ const handleRegister = async (e: Event) => {
     const last_name = formData.get("lastName") as string
 
     try {
-        const response = await $fetch("/api/register", {
+        const response = await $fetch<CustomerResponseInterface>("/api/register", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -46,17 +47,17 @@ const handleRegister = async (e: Event) => {
                     <div class="signin-form">
                         <form id="loginForm" @submit="handleRegister">
                             <div class="form-group">
-                                <input id="firstName" type="text" class="form-control" placeholder="First name*" name="firstName" />
+                                <input id="firstName" type="text" class="form-control" placeholder="First name*" name="firstName" >
                             </div>
                             <div class="form-group">
-                                <input id="registerSurname" type="text" class="form-control" placeholder="Last name*" name="lastName" />
+                                <input id="registerSurname" type="text" class="form-control" placeholder="Last name*" name="lastName" >
                             </div>
                             <div class="form-group">
-                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" />
+                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" >
                             </div>
 
                             <div class="form-group">
-                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" />
+                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" >
                             </div>
                             <button type="submit" class="btn btn-primary w-100 text-center mt-4">Register</button>
                         </form>

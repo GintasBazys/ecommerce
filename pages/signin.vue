@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import { useCustomerStore } from "~/stores/customer"
+import type { CustomerResponseInterface } from "~/utils/interfaces"
 
 definePageMeta({
     layout: "account"
@@ -18,7 +19,7 @@ const handleLogin = async (e: Event) => {
     const password = formData.get("password") as string
 
     try {
-        const response = await $fetch("/api/login", {
+        const response = await $fetch<CustomerResponseInterface>("/api/login", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -62,11 +63,11 @@ const handleLogin = async (e: Event) => {
                     <div class="signin-form">
                         <form id="loginForm" @submit="handleLogin">
                             <div class="form-group">
-                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" />
+                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" >
                             </div>
 
                             <div class="form-group">
-                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" />
+                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" >
                             </div>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
                             <button type="submit" class="btn btn-primary w-100 text-center mt-4">Log in</button>
@@ -110,7 +111,7 @@ const handleLogin = async (e: Event) => {
                                                             type="email"
                                                             required
                                                             name="email"
-                                                        />
+                                                        >
                                                     </div>
                                                     <button class="btn go-back-btn mt-3" type="submit">Send password reset link</button>
                                                 </form>

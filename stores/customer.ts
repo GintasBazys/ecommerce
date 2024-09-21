@@ -1,12 +1,11 @@
 export const useCustomerStore = defineStore("customer", () => {
-    const customer = ref(null)
+    const customer = ref<CustomerInterface | null>(null)
 
     const fetchCustomer = async () => {
         try {
-            const customerResponse = await $fetch("/api/auth", {
+            customer.value = await $fetch<CustomerInterface>("/api/auth", {
                 credentials: "include"
             })
-            customer.value = customerResponse
         } catch (error) {
             console.error("Failed to fetch data:", error)
         }

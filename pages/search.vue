@@ -38,7 +38,7 @@ const handleSearch = async (e: Event) => {
                         class="form-control my-0 py-3 px-4 border-end-0 border"
                         type="search"
                         placeholder="Search..."
-                    />
+                    >
                     <span class="input-group-append">
                         <button class="btn p-3 bg-white border-start-0 border" type="submit">
                             <NuxtImg src="/images/search.svg" alt="Search" width="24" height="24" loading="lazy" />

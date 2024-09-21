@@ -52,7 +52,7 @@ const handleSubscribe = async (e: Event) => {
                         aria-label="Enter your email"
                         aria-describedby="cta-addon"
                         @input="errorMessage = null"
-                    />
+                    >
                     <button id="cta-addon" :disabled="loading" class="btn btn-primary">Submit</button>
                 </div>
             </form>
