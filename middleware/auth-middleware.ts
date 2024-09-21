@@ -1,3 +1,4 @@
+// middleware/auth.ts
 import { useCustomerStore } from "~/stores/customer"
 import { useCartStore } from "~/stores/cartStore"
 import type { Cart } from "@medusajs/medusa"
@@ -7,11 +8,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const cartStore = useCartStore()
 
     if (!customerStore.customer) {
-        const { data: customerData } = await useAsyncData<CustomerInterface>("auth", () => $fetch("/api/auth"))
+        const { data: customerData } = await useFetch<CustomerInterface>("/api/auth")
 
         if (customerData.value) {
             customerStore.customer = customerData.value
-            const { data: cartData } = await useAsyncData("cart", () => $fetch<Cart>("/api/cart"))
+            const { data: cartData } = await useFetch<Cart>("/api/cart")
             if (cartData.value) {
                 cartStore.cart = cartData.value
             }

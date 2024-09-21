@@ -4,5 +4,7 @@ export default eventHandler(async (event) => {
     await client.auth.deleteSession({
         Cookie: event.node.req.headers.cookie
     })
+    deleteCookie(event, "cart_id")
+    deleteCookie(event, "connect.sid")
     return { redirectUrl: "/" }
 })
