@@ -29,6 +29,16 @@ const handleSubmit = (e: Event): void => {
             loading.value = false
         })
 }
+const getFormatedDate = () => {
+    return new Date().toLocaleString("lt-LT", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    })
+}
 </script>
 
 <template>
@@ -89,6 +99,7 @@ const handleSubmit = (e: Event): void => {
                 </template>
                 <template v-else> Send message </template>
             </button>
+            <input type="hidden" name="_subject" :value="getFormatedDate() + ' - New submission'" >
         </form>
         <div class="invalid-feedback d-block">{{ errorMessage }}</div>
         <div class="valid-feedback d-block">{{ successMessage }}</div>
