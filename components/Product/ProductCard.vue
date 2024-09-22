@@ -1,21 +1,8 @@
 <script setup lang="ts">
 import { defineProps } from "vue"
+import type { Product } from "@medusajs/medusa"
 const { product } = defineProps<{
-    product: {
-        id: string
-        title: string
-        thumbnail: string
-        variants: {
-            title: string
-            size: string
-            color: string
-            inventoryQuantity: number
-            prices: {
-                amount: number
-                currency_code: string
-            }[]
-        }[]
-    }
+    product: Product
 }>()
 
 const availableSizes = computed(() => {
@@ -37,7 +24,7 @@ const computedPrice = computed(() => {
                 <NuxtImg
                     class="mx-auto h-full"
                     format="webp"
-                    :src="product.thumbnail"
+                    :src="product.thumbnail ?? ''"
                     alt="Product Image"
                     width="250"
                     height="224"

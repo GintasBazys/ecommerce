@@ -9,9 +9,9 @@ useHead({
 </script>
 
 <template>
-    <main>
+    <section>
         <MainBanner />
         <AboutCta :link-shown="true" />
         <BestSellers />
-    </main>
+    </section>
 </template>

@@ -1,9 +1,11 @@
+import type { Customer } from "@medusajs/medusa"
+
 export const useCustomerStore = defineStore("customer", () => {
-    const customer = ref<CustomerInterface | null>(null)
+    const customer = ref<Customer | null>(null)
 
     const fetchCustomer = async () => {
         try {
-            customer.value = await $fetch<CustomerInterface>("/api/auth", {
+            customer.value = await $fetch<Customer>("/api/auth", {
                 credentials: "include"
             })
         } catch (error) {

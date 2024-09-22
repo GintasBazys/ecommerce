@@ -28,11 +28,11 @@ if (data.value && "error" in data.value) {
 </script>
 
 <template>
-    <main class="spacer">
+    <section class="spacer">
         <section class="container mx-auto px-4">
             <h1 class="font-bold text-2xl whitespace-nowrap">
                 {{ collection?.title }}
             </h1>
         </section>
-    </main>
+    </section>
 </template>

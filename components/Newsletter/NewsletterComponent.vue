@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FetchError } from "ofetch"
+
 const errorMessage = ref<string | null>(null)
 const loading = ref(false)
 
@@ -23,8 +25,9 @@ const handleSubscribe = async (e: Event) => {
             alert(response.message)
             form.reset()
         }
-    } catch (error) {
-        errorMessage.value = error.statusMessage
+    } catch (error: unknown) {
+        const err = error as FetchError
+        errorMessage.value = err.statusMessage || err.message || "An unknown error occurred"
     } finally {
         loading.value = false
     }

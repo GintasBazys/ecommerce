@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <main>
         <div>
             <slot />
         </div>
         <NewsletterComponent />
-    </div>
+    </main>
 </template>

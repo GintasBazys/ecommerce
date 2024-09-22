@@ -2,6 +2,8 @@
 import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
 import { type CollectionResponse, useProductStore } from "~/stores/product"
+import BaseHeader from "~/components/Header/BaseHeader.vue"
+import NavigationLinks from "~/components/Header/NavigationLinks.vue"
 
 const store = useProductStore()
 const { data } = await useFetch<CollectionResponse>("/api/collections")
@@ -19,7 +21,17 @@ useHead({
 </script>
 <template>
     <NuxtLoadingIndicator />
-    <AppHeader />
+    <BaseHeader>
+        <HeaderBanner />
+        <AppHeader>
+            <template #header-icons>
+                <HeaderIcons />
+            </template>
+            <template #navigation-links>
+                <NavigationLinks />
+            </template>
+        </AppHeader>
+    </BaseHeader>
     <NuxtLayout>
         <NuxtPage />
     </NuxtLayout>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useProductStore } from "~/stores/product"
-import { debounce } from "lodash-es/lodash"
+import { debounce } from "lodash"
 
 const store = useProductStore()
 
