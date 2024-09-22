@@ -10,5 +10,7 @@ useHead({
             <h1>About page</h1>
         </div>
         <AboutCta :extra-spacer-class="'pb-0'" />
+        <AboutCards />
+        <AboutColumns />
     </section>
 </template>
