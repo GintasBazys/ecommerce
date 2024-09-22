@@ -1,53 +1,31 @@
-// Define the structure of a PricedProduct
 import { LIMIT } from "~/utils/consts"
-
-interface PricedProduct {
-    id: string
-    title: string
-    thumbnail: string
-    variants: {
-        title: string
-        size: string
-        color: string
-        inventoryQuantity: number
-        prices: {
-            amount: number
-            currency_code: string
-        }[]
-    }[]
-}
-
-interface Collection {
-    id: string
-    title: string
-    handle: string
-}
+import type { Product, ProductCollection } from "@medusajs/medusa"
 
 interface ProductResponse {
-    products: PricedProduct[]
+    products: Product[]
     count: number
     productLimit: number
     productOffset: number
 }
 
 export interface CollectionResponse {
-    collections: Collection[]
+    collections: ProductCollection[]
 }
 
 export const useProductStore = defineStore("product", () => {
-    const products = ref<PricedProduct[]>([])
-    const collections = ref<Collection[]>([])
+    const products = ref<Product[]>([])
+    const collections = ref<ProductCollection[]>([])
     const limit = ref(LIMIT)
     const offset = ref(0)
     const totalCount = ref(0)
-    const bestSellers = ref<PricedProduct[]>([])
+    const bestSellers = ref<Product[]>([])
 
-    const setProducts = (newProducts: PricedProduct[]) => {
+    const setProducts = (newProducts: Product[]) => {
         if (Array.isArray(newProducts)) {
             products.value = newProducts
         }
     }
-    const setBestSellers = (newProducts: PricedProduct[]) => {
+    const setBestSellers = (newProducts: Product[]) => {
         bestSellers.value = newProducts
     }
 
@@ -55,7 +33,7 @@ export const useProductStore = defineStore("product", () => {
         totalCount.value = count
     }
 
-    const setCollections = (newCollections: Collection[]) => {
+    const setCollections = (newCollections: ProductCollection[]) => {
         if (Array.isArray(newCollections)) {
             collections.value = newCollections
         }
@@ -92,7 +70,7 @@ export const useProductStore = defineStore("product", () => {
     }
     const fetchBestSellers = async () => {
         try {
-            const bestSellersResponse = await $fetch<ProductResponse>("http://localhost:9000/store/best-selling")
+            const bestSellersResponse = await $fetch<ProductResponse>(`${process.env.MEDUSA_URL}/store/best-selling`)
             setBestSellers(bestSellersResponse["products"])
         } catch (error) {
             console.error("Failed to fetch data:", error)

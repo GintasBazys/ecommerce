@@ -20,3 +20,26 @@
 .external-login-link {
   text-decoration: none;
 }
+.contact-divider {
+  margin: 1.5rem auto 2rem;
+  max-width: 26.5rem;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  span {
+    background: #fff;
+    padding: 0 .75rem;
+    position: relative;
+    z-index: 1;
+  }
+  &::before {
+    background: #eaebf0;
+    content: "";
+    height: .0625rem;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+  }
+}
