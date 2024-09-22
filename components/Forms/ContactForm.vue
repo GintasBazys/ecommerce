@@ -28,19 +28,19 @@ const handleSubmit = (e: Event): void => {
                         type="text"
                         class="form-control"
                         placeholder="Example: customer service"
-                    />
+                    >
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="form-group mb-3">
                     <label class="form-label" for="contactEmailInput">Email</label>
-                    <input id="contactEmailInput" required name="email" type="email" class="form-control" placeholder="name@example.com" />
+                    <input id="contactEmailInput" required name="email" type="email" class="form-control" placeholder="name@example.com" >
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="form-group mb-3">
                     <label class="form-label" for="contactPhoneInput">Phone number</label>
-                    <input id="contactPhoneInput" name="phone" type="tel" class="form-control" placeholder="+370" />
+                    <input id="contactPhoneInput" name="phone" type="tel" class="form-control" placeholder="+370" >
                 </div>
             </div>
             <div class="col-12">

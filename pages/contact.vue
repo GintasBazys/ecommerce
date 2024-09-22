@@ -13,19 +13,19 @@ import ContactForm from "~/components/Forms/ContactForm.vue"
                 <div class="row justify-content-center g-2">
                     <div class="col-lg-4 col-md-8">
                         <div class="faq-card">
-                            <p class="h4 d-flex align-items-center gap-3">
+                            <p class="h4 d-flex align-items-center gap-2">
                                 <NuxtImg src="/images/messenger.svg" width="24" height="24" alt="Messenger icon" />
                                 Messenger
                             </p>
                             <p class="mb-0">
-                                Work hours: I-V: 09:00 am - 17:00 pm <br />
+                                Work hours: I-V: 09:00 am - 17:00 pm <br >
                                 (Closed for Holidays)
                             </p>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-8">
                         <div class="faq-card">
-                            <p class="h4 d-flex align-items-center gap-3">
+                            <p class="h4 d-flex align-items-center gap-2">
                                 <NuxtImg src="/images/email.svg" width="24" height="24" alt="Email icon" />
                                 Email us
                             </p>
@@ -34,7 +34,7 @@ import ContactForm from "~/components/Forms/ContactForm.vue"
                     </div>
                     <div class="col-lg-4 col-md-8">
                         <div class="faq-card">
-                            <p class="h4 d-flex align-items-center gap-3">
+                            <p class="h4 d-flex align-items-center gap-2">
                                 <NuxtImg src="/images/phone.svg" width="24" height="24" alt="Phone icon" />
                                 Call us
                             </p>

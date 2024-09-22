@@ -63,12 +63,12 @@ const handleLogin = async (e: Event) => {
                     </NuxtLink>
                     <div class="signin-form">
                         <form id="loginForm" @submit="handleLogin">
-                            <div class="form-group">
-                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" />
+                            <div class="form-group mb-3">
+                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" >
                             </div>
 
-                            <div class="form-group">
-                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" />
+                            <div class="form-group mb-3">
+                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" >
                             </div>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
                             <button type="submit" class="btn btn-primary w-100 text-center mt-4">Log in</button>

@@ -46,13 +46,13 @@ const handleRegister = async (e: Event) => {
                     <h4 class="mb-4 mb-lg-5">Register</h4>
                     <div class="signin-form">
                         <form id="loginForm" @submit="handleRegister">
-                            <div class="form-group">
+                            <div class="form-group mb-3">
                                 <input id="firstName" type="text" class="form-control" placeholder="First name*" name="firstName" >
                             </div>
-                            <div class="form-group">
+                            <div class="form-group mb-3">
                                 <input id="registerSurname" type="text" class="form-control" placeholder="Last name*" name="lastName" >
                             </div>
-                            <div class="form-group">
+                            <div class="form-group mb-3">
                                 <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" >
                             </div>
 

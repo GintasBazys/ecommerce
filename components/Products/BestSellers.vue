@@ -5,6 +5,7 @@ const { bestSellers } = storeToRefs(store)
 onServerPrefetch(async () => {
     await store.fetchBestSellers()
 })
+console.log(bestSellers)
 </script>
 
 <template>

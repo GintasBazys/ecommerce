@@ -70,7 +70,7 @@ const handleReset = async (e: Event) => {
                                             type="email"
                                             required
                                             name="resetEmail"
-                                        />
+                                        >
                                     </div>
                                     <button class="btn btn-primary w-100 mt-3" type="submit">Send password reset link</button>
                                 </form>
