@@ -1,3 +1,9 @@
+<script setup lang="ts">
+useHead({
+    title: "Shipping | Ecommerce"
+})
+</script>
+
 <template>
     <section class="spacer">
         <div class="container">
@@ -81,4 +87,3 @@
         </div>
     </section>
 </template>
-<script setup lang="ts"></script>

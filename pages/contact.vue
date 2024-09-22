@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import ContactForm from "~/components/Forms/ContactForm.vue"
+useHead({
+    title: "Contact us | Ecommerce"
+})
 </script>
 <template>
     <section class="spacer">

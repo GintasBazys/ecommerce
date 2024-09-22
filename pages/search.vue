@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useHead({
+    title: "Search | Ecommerce"
+})
+
 const searchCounter = ref(0)
 const searchQuery = ref("")
 

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useHead({
+    title: "404 | Ecommerce"
+})
 definePageMeta({
     layout: "account"
 })

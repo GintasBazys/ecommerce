@@ -3,6 +3,10 @@ import { useRouter } from "vue-router"
 import { useCustomerStore } from "~/stores/customer"
 import type { CustomerResponseInterface } from "~/utils/interfaces"
 
+useHead({
+    title: "Register | Ecommerce"
+})
+
 definePageMeta({
     layout: "account"
 })

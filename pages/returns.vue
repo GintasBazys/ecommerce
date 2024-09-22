@@ -1,3 +1,9 @@
+<script setup lang="ts">
+useHead({
+    title: "Returns | Ecommerce"
+})
+</script>
+
 <template>
     <section class="spacer">
         <div class="container">

@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useHead({
+    title: "About | Ecommerce"
+})
+</script>
 
 <template>
     <section class="spacer">

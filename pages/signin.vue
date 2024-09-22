@@ -4,6 +4,10 @@ import { useCustomerStore } from "~/stores/customer"
 import type { CustomerResponseInterface } from "~/utils/interfaces"
 import PasswordResetModal from "~/components/Modals/PasswordResetModal.vue"
 
+useHead({
+    title: "Signin | Ecommerce"
+})
+
 definePageMeta({
     layout: "account"
 })
