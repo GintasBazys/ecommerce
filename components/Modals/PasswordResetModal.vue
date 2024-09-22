@@ -35,8 +35,6 @@ const handleReset = async (e: Event) => {
     <div
         id="forgotPasswordModal"
         class="modal fade"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
         tabindex="-1"
         aria-labelledby="staticBackdropLabel"
         style="display: none"
@@ -44,13 +42,13 @@ const handleReset = async (e: Event) => {
     >
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
-                <div class="modal-header">
+                <div class="modal-header pt-0 pe-0">
                     <NuxtImg
                         loading="lazy"
                         role="button"
                         src="/images/close_icon.svg"
-                        width="20"
-                        height="20"
+                        width="24"
+                        height="24"
                         alt="Close icon"
                         data-bs-dismiss="modal"
                         aria-hidden="true"
