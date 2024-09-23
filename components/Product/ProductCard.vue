@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { defineProps } from "vue"
-import type { Product } from "@medusajs/medusa"
+import type { ProductInterface } from "~/utils/interfaces"
 const { product } = defineProps<{
-    product: Product
+    product: ProductInterface
 }>()
 
 const availableSizes = computed(() => {
@@ -20,7 +20,7 @@ const computedPrice = computed(() => {
 <template>
     <article class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm h-full">
         <div class="w-full">
-            <a href="#">
+            <NuxtLink href="#">
                 <NuxtImg
                     class="mx-auto h-full"
                     format="webp"
@@ -30,12 +30,12 @@ const computedPrice = computed(() => {
                     height="224"
                     :placeholder="[250, 224, 75, 5]"
                 />
-            </a>
+            </NuxtLink>
         </div>
         <div class="pt-6">
-            <a href="#" class="text-lg font-semibold leading-tight text-gray-900 hover:underline">
+            <NuxtLink href="#" class="text-lg font-semibold leading-tight text-gray-900 hover:underline">
                 {{ product.title }}
-            </a>
+            </NuxtLink>
             <div class="mt-4">
                 <select
                     :id="product.title"
