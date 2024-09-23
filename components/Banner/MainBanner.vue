@@ -10,6 +10,7 @@
                 delay: 8000,
                 disableOnInteraction: true
             }"
+            class="bannerSwiper"
         >
             <SwiperSlide v-for="slide in 4" :key="slide">
                 <NuxtImg

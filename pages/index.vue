@@ -2,6 +2,7 @@
 import MainBanner from "~/components/Banner/MainBanner.vue"
 import AboutCta from "~/components/About/AboutCta.vue"
 import BestSellers from "~/components/Products/BestSellers.vue"
+import LatestProducts from "~/components/Products/LatestProducts.vue"
 
 useHead({
     title: "Shop | Ecommerce"
@@ -11,7 +12,8 @@ useHead({
 <template>
     <section>
         <MainBanner />
-        <AboutCta :link-shown="true" />
+        <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
         <BestSellers />
+        <LatestProducts />
     </section>
 </template>

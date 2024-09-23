@@ -12,7 +12,7 @@ onServerPrefetch(async () => {
 <template>
     <section class="spacer showcase-section position-relative">
         <div class="container">
-            <h2 class="text-center mb-4">Bestsellers</h2>
+            <h2 class="text-center mb-4">Latest Offers</h2>
             <p class="text-center mb-4 mb-lg-5">
                 Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris vel
                 sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
