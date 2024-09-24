@@ -7,7 +7,7 @@ const { customer } = storeToRefs(customerStore)
 </script>
 
 <template v-slot:header-icons>
-    <div class="d-flex gap-3 align-items-center">
+    <div class="d-flex gap-3 align-items-center header-icons">
         <NuxtLink href="/search">
             <NuxtImg src="/images/search.svg" width="24" height="24" alt="Search icon" loading="eager" />
         </NuxtLink>
