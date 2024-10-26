@@ -13,7 +13,7 @@ useHead({
     <section>
         <MainBanner />
         <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
-        <BestSellers />
         <LatestProducts />
+        <BestSellers />
     </section>
 </template>

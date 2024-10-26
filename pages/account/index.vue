@@ -10,8 +10,8 @@ const customerStore = useCustomerStore()
 
 const handleLogout = async () => {
     const response = await $fetch("/api/logout")
-    customerStore.$patch({ customer: null })
     await router.push(response.redirectUrl)
+    customerStore.$patch({ customer: null })
 }
 </script>
 

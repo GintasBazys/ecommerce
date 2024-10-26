@@ -2,10 +2,10 @@
 import type { Product } from "@medusajs/medusa"
 
 const store = useProductStore()
-const { bestSellers } = storeToRefs(store)
+const { products } = storeToRefs(store)
 
 onServerPrefetch(async () => {
-    await store.fetchBestSellers()
+    await store.fetchData()
 })
 </script>
 
@@ -33,7 +33,7 @@ onServerPrefetch(async () => {
                     }
                 }"
             >
-                <SwiperSlide v-for="product in bestSellers" :key="product.id">
+                <SwiperSlide v-for="product in products" :key="product.id">
                     <ProductCard :product="product as Product" />
                 </SwiperSlide>
             </Swiper>
