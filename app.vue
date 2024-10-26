@@ -1,15 +1,31 @@
 <script setup lang="ts">
 import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
-import { type CollectionResponse, useProductStore } from "~/stores/product"
+import { type CartResponse, type CollectionResponse, useProductStore } from "~/stores/product"
 import BaseHeader from "~/components/Header/BaseHeader.vue"
 import NavigationLinks from "~/components/Header/NavigationLinks.vue"
 
 const store = useProductStore()
+const cartStore = useCartStore()
+
+const cartIdCookie = useCookie("cart_id")
+
 const { data } = await useFetch<CollectionResponse>("/api/collections")
 if (data.value) {
     store.collections = data.value["collections"]
 }
+
+await useFetch<CartResponse>("/api/cart", {
+    onResponse({ response }) {
+        if (response._data?.cart) {
+            cartStore.cart = response._data.cart
+            if (response._data.cart.id && !cartIdCookie.value) {
+                cartIdCookie.value = response._data.cart.id
+            }
+        }
+    }
+})
+
 useHead({
     link: [
         { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },

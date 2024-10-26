@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import { useCustomerStore } from "~/stores/customer"
-import type { CustomerResponseInterface } from "~/utils/interfaces"
 import PasswordResetModal from "~/components/Modals/PasswordResetModal.vue"
 
 useHead({
@@ -68,11 +67,11 @@ const handleLogin = async (e: Event) => {
                     <div class="signin-form">
                         <form id="loginForm" @submit="handleLogin">
                             <div class="form-group mb-3">
-                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" >
+                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" />
                             </div>
 
                             <div class="form-group mb-3">
-                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" >
+                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" />
                             </div>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
                             <button type="submit" class="btn btn-primary w-100 text-center mt-4">Log in</button>

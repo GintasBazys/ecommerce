@@ -1,5 +1,5 @@
 import { LIMIT } from "~/utils/consts"
-import type { Product, ProductCollection } from "@medusajs/medusa"
+import type { Product, ProductCollection, Cart } from "@medusajs/medusa"
 
 interface ProductResponse {
     products: Product[]
@@ -10,6 +10,10 @@ interface ProductResponse {
 
 export interface CollectionResponse {
     collections: ProductCollection[]
+}
+
+export interface CartResponse {
+    cart: Cart
 }
 
 export const useProductStore = defineStore("product", () => {

@@ -1,11 +1,8 @@
-// middleware/auth.ts
 import { useCustomerStore } from "~/stores/customer"
-import { useCartStore } from "~/stores/cartStore"
-import type { Cart, Customer } from "@medusajs/medusa"
+import type { Customer } from "@medusajs/medusa"
 
 export default defineNuxtRouteMiddleware(async (to) => {
     const customerStore = useCustomerStore()
-    const cartStore = useCartStore()
 
     if (!customerStore.customer) {
         const { data: customerData } = await useFetch<Customer>("/api/auth")
@@ -13,12 +10,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
         if (customerData.value) {
             customerStore.customer = customerData.value
         }
-    }
-
-    const { data: cartData } = await useFetch<Cart>("/api/cart")
-
-    if (cartData.value) {
-        cartStore.cart = cartData.value
     }
 
     const isLoggedIn = !!customerStore.customer

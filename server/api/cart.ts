@@ -8,7 +8,6 @@ export default eventHandler(async (event) => {
         return { cart }
     } else {
         const { cart } = await client.carts.retrieve(cartId)
-        setCookie(event, "cart_id", cart.id)
         return { cart }
     }
 })
