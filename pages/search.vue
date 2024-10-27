@@ -62,7 +62,6 @@ const handleSearch = async (e: Event) => {
                 <template v-if="products.length > 0">
                     <ProductCard v-for="product in products" :key="product.id" :product="product as Product" />
                 </template>
-                <p v-else>No products found.</p>
             </div>
         </div>
     </section>
