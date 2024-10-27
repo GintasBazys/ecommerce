@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Product } from "@medusajs/medusa"
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import { formatCurrency } from "@/utils/formatCurrency"
 
 const { product } = defineProps<{
@@ -14,7 +14,9 @@ interface SimpleProductVariant {
     inventory_quantity: number
 }
 
-const selectedVariant = ref<SimpleProductVariant | null>(product?.variants ? product.variants[0] : null)
+// Set up a ref for selectedVariantId to use with the select element
+const selectedVariantId = ref<string>(product.variants[0]?.id || "")
+const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
 
 const computedPrice = computed(() => {
     if (selectedVariant.value && selectedVariant.value.prices.length > 0) {
@@ -26,9 +28,13 @@ const computedPrice = computed(() => {
 const cartStore = useCartStore()
 const isLoading = ref(false)
 
-const setVariant = (variant: SimpleProductVariant): void => {
-    selectedVariant.value = variant
-}
+// Watch selectedVariantId and update selectedVariant based on the selected ID
+watch(selectedVariantId, (newId) => {
+    const variant = product.variants.find((v) => v.id === newId)
+    if (variant) {
+        selectedVariant.value = variant
+    }
+})
 
 const addToCart = async () => {
     if (!cartStore.cart || !selectedVariant.value) {
@@ -75,19 +81,17 @@ const addToCart = async () => {
             </NuxtLink>
             <p class="description">{{ product.description }}</p>
 
-            <div class="variant-buttons">
-                <div class="d-flex gap-1 text-nowrap">
-                    <div v-for="variant in product.variants.slice(0, 4)" :key="variant.id">
-                        <button
-                            type="button"
-                            :class="{ btn: true, selected: selectedVariant?.id === variant.id }"
-                            :disabled="variant.inventory_quantity <= 0"
-                            @click="setVariant(variant)"
-                        >
-                            {{ variant.title }}
-                        </button>
-                    </div>
-                </div>
+            <div class="variant-select">
+                <select v-model="selectedVariantId" class="form-control">
+                    <option
+                        v-for="variant in product.variants"
+                        :key="variant.id"
+                        :value="variant.id"
+                        :disabled="variant.inventory_quantity <= 0"
+                    >
+                        {{ variant.title }}
+                    </option>
+                </select>
             </div>
 
             <div class="price-wrapper">

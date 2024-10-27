@@ -26,6 +26,20 @@ export const useCartStore = defineStore("cart", () => {
         }
     }
 
+    const removeLineItem = async (cartId: string, lineItemId: string) => {
+        try {
+            const response = await $fetch<CartResponse>("/api/cart/delete-line-item", {
+                method: "DELETE",
+                body: { cartId, lineItemId }
+            })
+            if (response) {
+                cart.value = response.cart
+            }
+        } catch (error) {
+            console.error("Failed to remove line item:", error)
+        }
+    }
+
     const itemCount = computed(() => {
         return cart.value?.items.reduce((total, item) => total + item.quantity, 0) || 0
     })
@@ -33,6 +47,7 @@ export const useCartStore = defineStore("cart", () => {
     return {
         fetchCart,
         updateLineItem,
+        removeLineItem,
         itemCount,
         cart
     }

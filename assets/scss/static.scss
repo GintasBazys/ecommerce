@@ -54,23 +54,3 @@
         grid-template-columns: repeat(1, 1fr);
     }
 }
-.variant-buttons {
-    margin-top: 1rem;
-    overflow-x: auto;
-}
-
-.variant-buttons button {
-    margin-right: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid;
-}
-
-.variant-buttons .selected {
-    background-color: $primary;
-    color: white;
-}
-
-.variant-buttons button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
