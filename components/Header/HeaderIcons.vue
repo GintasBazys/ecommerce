@@ -2,8 +2,10 @@
 import { useCustomerStore } from "~/stores/customer"
 
 const customerStore = useCustomerStore()
+const cartStore = useCartStore()
 
 const { customer } = storeToRefs(customerStore)
+const { itemCount } = storeToRefs(cartStore)
 </script>
 
 <template v-slot:header-icons>
@@ -13,7 +15,7 @@ const { customer } = storeToRefs(customerStore)
         </NuxtLink>
         <NuxtLink href="/cart" class="me-2 position-relative">
             <NuxtImg src="/images/shopping_cart.svg" width="24" height="24" alt="Shopping icon" loading="eager" />
-            <span class="badge rounded-pill cart-counter">0</span>
+            <span class="badge rounded-pill cart-counter">{{ itemCount }}</span>
         </NuxtLink>
         <template v-if="customer && customer.id">
             <NuxtLink class="btn sign-in-btn" href="/account">

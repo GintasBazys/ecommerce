@@ -1,16 +1,46 @@
 <script setup lang="ts">
 import type { Product } from "@medusajs/medusa"
+import { ref, computed } from "vue"
+import { formatCurrency } from "@/utils/formatCurrency"
+
 const { product } = defineProps<{
     product: Product
 }>()
 
 const firstVariant = computed(() => {
-    return product.variants[0] || null
+    return product?.variants ? product.variants[0] : null
 })
 
 const computedPrice = computed(() => {
-    return firstVariant.value ? formatCurrency(firstVariant.value.prices[0].amount, firstVariant.value.prices[0].currency_code) : "N/A"
+    if (firstVariant.value && firstVariant.value.prices.length > 0) {
+        return formatCurrency(firstVariant.value.prices[0].amount, firstVariant.value.prices[0].currency_code)
+    }
+    return "N/A"
 })
+
+const cartStore = useCartStore()
+const isLoading = ref(false)
+
+const addToCart = async () => {
+    if (!cartStore.cart || !firstVariant.value) {
+        console.error("Cart or variant not available.")
+        return
+    }
+
+    isLoading.value = true
+    try {
+        const existingItem = cartStore.cart.items?.find((item) => item.variant_id === firstVariant?.value?.id)
+
+        const quantityToUpdate = existingItem?.quantity ? existingItem.quantity + 1 : 1
+
+        await cartStore.updateLineItem(cartStore.cart.id, firstVariant.value.id, quantityToUpdate)
+    } catch (error) {
+        console.error("Error updating cart:", error)
+    } finally {
+        isLoading.value = false
+        window.scrollTo(0, 0)
+    }
+}
 </script>
 
 <template>
@@ -20,7 +50,7 @@ const computedPrice = computed(() => {
                 <NuxtImg
                     class="w-100 object-fit-cover max-h-236"
                     format="webp"
-                    :src="product.thumbnail ?? ''"
+                    :src="product.thumbnail || '/images/placeholder.png'"
                     alt="Product Image"
                     width="236"
                     height="236"
@@ -41,9 +71,12 @@ const computedPrice = computed(() => {
                     <div class="inner-price">
                         <p class="price fw-bold mb-0">{{ computedPrice }}</p>
                     </div>
-                    <span class="text-small-2">Option: {{ firstVariant.title }}</span>
+                    <span class="text-small-2">Option: {{ firstVariant?.title || "No options available" }}</span>
                 </div>
-                <button type="button" class="btn quick-add-btn" />
+                <button type="button" class="btn quick-add-btn" :disabled="isLoading" @click="addToCart">
+                    <span v-if="isLoading" class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true" />
+                    <span v-if="!isLoading" class="cart-btn-icon" />
+                </button>
             </div>
         </div>
     </article>

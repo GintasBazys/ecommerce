@@ -1,26 +1,34 @@
 <script setup lang="ts">
+import type { Product } from "@medusajs/medusa"
+
 useHead({
     title: "Search | Ecommerce"
 })
 
-const searchCounter = ref(0)
-const searchQuery = ref("")
+const searchCounter = ref<number>(0)
+const searchQuery = ref<string>("")
+const products = ref<Product[]>([])
+
+interface SearchResponse {
+    hits: Product[]
+}
 
 const handleSearch = async (e: Event) => {
     e.preventDefault()
     try {
-        const response = await $fetch("/api/search", {
+        const response = await $fetch<SearchResponse>("/api/search", {
             method: "POST",
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json"
             },
             body: {
-                q: searchQuery.value
+                q: searchQuery.value,
+                limit: 20
             }
         })
-
-        searchCounter.value = response.count
+        searchCounter.value = response.hits.length
+        products.value = response.hits
     } catch (error) {
         console.error("Error during search:", error)
     }
@@ -42,7 +50,7 @@ const handleSearch = async (e: Event) => {
                         class="form-control my-0 py-3 px-4 border-end-0 border"
                         type="search"
                         placeholder="Search..."
-                    >
+                    />
                     <span class="input-group-append">
                         <button class="btn p-3 bg-white border-start-0 border" type="submit">
                             <NuxtImg src="/images/search.svg" alt="Search" width="24" height="24" loading="lazy" />
@@ -50,6 +58,12 @@ const handleSearch = async (e: Event) => {
                     </span>
                 </div>
             </form>
+            <div class="search-results">
+                <template v-if="products.length > 0">
+                    <ProductCard v-for="product in products" :key="product.id" :product="product as Product" />
+                </template>
+                <p v-else>No products found.</p>
+            </div>
         </div>
     </section>
 </template>
