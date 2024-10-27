@@ -59,7 +59,7 @@ const addToCart = async () => {
             </NuxtLink>
         </div>
         <div class="pt-6">
-            <NuxtLink :to="product.handle ? '/product/' + product.handle : '#'">
+            <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
                 <strong>
                     {{ product.title }}
                 </strong>
@@ -74,8 +74,8 @@ const addToCart = async () => {
                     <span class="text-small-2">Option: {{ firstVariant?.title || "No options available" }}</span>
                 </div>
                 <button type="button" class="btn quick-add-btn" :disabled="isLoading" @click="addToCart">
-                    <span v-if="isLoading" class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true" />
-                    <span v-if="!isLoading" class="cart-btn-icon" />
+                    <span v-if="isLoading" class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
+                    <span v-if="!isLoading" class="cart-btn-icon"></span>
                 </button>
             </div>
         </div>
