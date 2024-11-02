@@ -9,9 +9,15 @@ const router = useRouter()
 const customerStore = useCustomerStore()
 
 const handleLogout = async () => {
-    const response = await $fetch("/api/logout")
-    await router.push(response.redirectUrl)
-    customerStore.$patch({ customer: null })
+    try {
+        const response = await $fetch("/api/logout")
+        if (response) {
+            await router.push("/")
+        }
+        customerStore.$patch({ customer: null })
+    } catch (error) {
+        console.error("Logout failed:", error)
+    }
 }
 </script>
 

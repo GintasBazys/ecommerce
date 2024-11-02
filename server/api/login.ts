@@ -1,38 +1,46 @@
-import { serverMedusaClient } from "#medusa/server"
 import { defineEventHandler, readBody } from "h3"
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
-
     const { email, password } = body
+
+    const config = useRuntimeConfig()
 
     if (!email || !password) {
         event.node.res.statusCode = 400
-        return {
-            message: "Email and password are required"
-        }
+        return { message: "Email and password are required" }
     }
 
-    const medusa = serverMedusaClient(event)
     try {
-        const response = await medusa.auth.authenticate({
-            email,
-            password
+        const authResponse = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ email, password })
         })
 
-        const headers = response.response.headers
-        for (const [key, value] of Object.entries(headers)) {
-            event.node.res.setHeader(key, value)
-        }
+        if (!authResponse.ok) throw new Error("Failed to login: Authentication error")
+
+        const { token } = await authResponse.json()
+
+        const customerResponse = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+            },
+            credentials: "include"
+        })
+
+        if (!customerResponse.ok) throw new Error("Failed to fetch customer profile")
+
+        const { customer } = await customerResponse.json()
 
         event.node.res.statusCode = 200
-        return {
-            customer: response.customer
-        }
+        return { customer }
     } catch {
         event.node.res.statusCode = 401
-        return {
-            message: "Invalid email or password"
-        }
+        return { message: "Login failed" }
     }
 })

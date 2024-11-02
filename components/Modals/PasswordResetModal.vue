@@ -12,7 +12,8 @@ const handleReset = async (e: Event) => {
     try {
         errorMessage.value = null
         successMessage.value = null
-        const { message } = await $fetch("/api/password-reset", {
+
+        await $fetch("/api/password-reset", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -20,14 +21,11 @@ const handleReset = async (e: Event) => {
             body: JSON.stringify({ email })
         })
 
-        successMessage.value = message
-    } catch (error: { data: { message: string } }) {
-        if (error.data && error.data.message) {
-            errorMessage.value = error.data.message
-        } else {
-            errorMessage.value = "An unexpected error occurred. Please try again."
-        }
+        successMessage.value = "Password reset email sent"
+    } catch {
+        errorMessage.value = "An unexpected error occurred. Please try again."
     }
+
     form.reset()
 }
 </script>
@@ -68,7 +66,7 @@ const handleReset = async (e: Event) => {
                                             type="email"
                                             required
                                             name="resetEmail"
-                                        >
+                                        />
                                     </div>
                                     <button class="btn btn-primary w-100 mt-3" type="submit">Send password reset link</button>
                                 </form>
