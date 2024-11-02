@@ -1,9 +1,11 @@
+import { LIMIT } from "~/utils/consts"
+
 export default defineCachedEventHandler(
     async (event) => {
         const config = useRuntimeConfig()
         const query = getQuery(event)
 
-        const limit = query.limit !== undefined && query.limit !== null ? String(query.limit) : "2"
+        const limit = query.limit !== undefined && query.limit !== null ? String(query.limit) : LIMIT
         const offset = query.offset !== undefined && query.offset !== null ? String(query.offset) : "0"
 
         const queryParams = new URLSearchParams({

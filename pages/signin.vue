@@ -33,6 +33,7 @@ const handleLogin = async (e: Event) => {
             body: JSON.stringify({ email, password })
         })
         customerStore.customer = response.customer
+
         await router.push("/")
     } catch (error) {
         console.error("Login failed:", error)

@@ -3,8 +3,9 @@ import type { Product } from "@medusajs/medusa"
 const store = useProductStore()
 const { bestSellers } = storeToRefs(store)
 
-onServerPrefetch(async () => {
+await useAsyncData("product", async () => {
     await store.fetchBestSellers()
+    return store.bestSellers ?? null
 })
 </script>
 
@@ -17,26 +18,27 @@ onServerPrefetch(async () => {
                     Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris
                     vel sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
                 </p>
-                <Swiper
-                    class="showcaseSwiper"
-                    :space-between="20"
-                    :grab-cursor="true"
-                    :breakpoints="{
-                        '576': {
-                            slidesPerView: 2
-                        },
-                        '768': {
-                            slidesPerView: 3
-                        },
-                        '992': {
-                            slidesPerView: 4
-                        }
-                    }"
-                >
-                    <SwiperSlide v-for="product in bestSellers" :key="product.id">
-                        <ProductCard :product="product as Product" />
-                    </SwiperSlide>
-                </Swiper>
+                <ClientOnly>
+                    <Swiper
+                        class="showcaseSwiper"
+                        :space-between="20"
+                        :grab-cursor="true"
+                        :breakpoints="{
+                            '576': {
+                                slidesPerView: 2
+                            },
+                            '768': {
+                                slidesPerView: 3
+                            },
+                            '992': {
+                                slidesPerView: 4
+                            }
+                        }"
+                    >
+                        <SwiperSlide v-for="product in bestSellers" :key="product.id">
+                            <ProductCard :product="product as Product" />
+                        </SwiperSlide> </Swiper
+                ></ClientOnly>
             </div>
         </section>
     </template>
