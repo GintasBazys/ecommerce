@@ -6,7 +6,9 @@ export const useCartStore = defineStore("cart", () => {
 
     const fetchCart = async () => {
         try {
-            cart.value = await $fetch("/api/cart", { credentials: "include" })
+            cart.value = await $fetch("/api/cart", {
+                credentials: "include"
+            })
         } catch (error) {
             console.error("Failed to fetch cart:", error)
         }

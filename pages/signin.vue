@@ -13,6 +13,7 @@ definePageMeta({
 
 const router = useRouter()
 const customerStore = useCustomerStore()
+const config = useRuntimeConfig()
 
 const handleLogin = async (e: Event) => {
     e.preventDefault()
@@ -38,6 +39,11 @@ const handleLogin = async (e: Event) => {
         alert("Login failed. Please check your credentials or try again later.")
     }
 }
+
+const handleSocialLogin = (provider: "google") => {
+    const backendUrl = config.public.BACKEND_URL || "http://localhost:9000"
+    window.location.href = `${backendUrl}/store/auth/${provider}`
+}
 </script>
 
 <template>
@@ -46,12 +52,12 @@ const handleLogin = async (e: Event) => {
             <div class="col-12">
                 <div class="mx-auto" style="max-width: 24.625rem; width: 100%">
                     <h4 class="mb-4 mb-lg-5">Log in</h4>
-                    <NuxtLink class="external-login-link" href="/google">
+                    <button class="external-login-link w-100 border-0 bg-transparent" @click="handleSocialLogin('google')">
                         <div class="external-login-block-no-shop">
                             <NuxtImg src="/images/google_login_icon.svg" width="24" height="24" alt="Google login icon" loading="lazy" />
                             <p class="ps-3">Log in with Google</p>
                         </div>
-                    </NuxtLink>
+                    </button>
                     <NuxtLink class="external-login-link" href="/facebook">
                         <div class="external-login-block-no-shop my-4">
                             <NuxtImg

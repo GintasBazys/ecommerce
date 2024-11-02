@@ -52,7 +52,7 @@ export const useProductStore = defineStore("product", () => {
             const response = await $fetch<ProductResponse>("/api/products", {
                 params: { limit: limit.value, offset: offset.value }
             })
-            if ("count" in response && "products" in response) {
+            if (response) {
                 const { products: apiProducts, count, productLimit, productOffset } = response
                 limit.value = productLimit
                 offset.value = productOffset
@@ -74,8 +74,8 @@ export const useProductStore = defineStore("product", () => {
     }
     const fetchBestSellers = async () => {
         try {
-            const bestSellersResponse = await $fetch<ProductResponse>(`${process.env.MEDUSA_URL}/store/best-selling`)
-            setBestSellers(bestSellersResponse["products"])
+            const bestSellersResponse = await $fetch(`/api/best-selling`)
+            setBestSellers(bestSellersResponse)
         } catch (error) {
             console.error("Failed to fetch data:", error)
         }

@@ -10,10 +10,10 @@ const cartStore = useCartStore()
 
 const cartIdCookie = useCookie("cart_id")
 
-const { data } = await useFetch<CollectionResponse>("/api/collections")
-if (data.value) {
-    store.collections = data.value["collections"]
-}
+// const { data } = await useFetch<CollectionResponse>("/api/collections")
+// if (data.value) {
+//     store.collections = data.value["collections"]
+// }
 
 await useFetch<CartResponse>("/api/cart", {
     onResponse({ response }) {
