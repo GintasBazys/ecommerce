@@ -40,9 +40,11 @@ export default defineEventHandler(async (event) => {
 
         if (!customerResponse.ok) throw new Error("Failed to create customer")
 
+        event.node.res.setHeader("Set-Cookie", [`jwtToken=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
+
         const { customer } = await customerResponse.json()
         event.node.res.statusCode = 200
-        return { customer }
+        return { customer, token }
     } catch {
         event.node.res.statusCode = 401
         return { message: "Registration failed" }

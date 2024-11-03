@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
         const authResponse = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
             body: JSON.stringify({ email, password })
         })
 
@@ -36,6 +35,8 @@ export default defineEventHandler(async (event) => {
         if (!customerResponse.ok) throw new Error("Failed to fetch customer profile")
 
         const { customer } = await customerResponse.json()
+
+        event.node.res.setHeader("Set-Cookie", [`jwtToken=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
 
         event.node.res.statusCode = 200
         return { customer }

@@ -3,6 +3,7 @@ import { defineEventHandler, deleteCookie } from "h3"
 export default defineEventHandler(async (event) => {
     try {
         deleteCookie(event, "connect.sid")
+        deleteCookie(event, "jwtToken")
         event.node.res.statusCode = 200
         return { message: "Logged out successfully", redirectUrl: "/" }
     } catch (error) {

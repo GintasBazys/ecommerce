@@ -16,7 +16,7 @@ interface SimpleProductVariant {
     }
     inventory_quantity: number
 }
-
+//@ts-expect-error recently released medusa 2.0 with breaking changes
 const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
 
 const computedPrice = computed(() => {
@@ -59,7 +59,7 @@ const addToCart = async () => {
 <template>
     <article class="product-card">
         <div class="w-full">
-            <NuxtLink href="#">
+            <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
                 <NuxtImg
                     class="w-100 object-fit-cover max-h-236"
                     format="webp"

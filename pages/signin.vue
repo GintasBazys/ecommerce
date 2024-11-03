@@ -28,7 +28,8 @@ const handleLogin = async (e: Event) => {
             method: "POST",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
             },
             body: JSON.stringify({ email, password })
         })

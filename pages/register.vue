@@ -34,6 +34,7 @@ const handleRegister = async (e: Event) => {
             body: JSON.stringify({ email, password, first_name, last_name })
         })
         customerStore.customer = response.customer
+
         await router.push("/")
     } catch (error) {
         console.error("Register failed:", error)

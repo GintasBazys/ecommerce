@@ -1,30 +1,35 @@
 <script setup lang="ts">
+import { useCustomerStore } from "~/stores/customer"
+import { useCartStore } from "~/stores/cartStore.js"
 import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
-import { type CartResponse, type CollectionResponse, useProductStore } from "~/stores/product"
 import BaseHeader from "~/components/Header/BaseHeader.vue"
 import NavigationLinks from "~/components/Header/NavigationLinks.vue"
 
-const store = useProductStore()
+const customerStore = useCustomerStore()
 const cartStore = useCartStore()
-
 const cartIdCookie = useCookie("cart_id")
 
-// const { data } = await useFetch<CollectionResponse>("/api/collections")
-// if (data.value) {
-//     store.collections = data.value["collections"]
-// }
-
-await useFetch<CartResponse>("/api/cart", {
-    onResponse({ response }) {
-        if (response._data?.cart) {
-            cartStore.cart = response._data.cart
-            if (response._data.cart.id && !cartIdCookie.value) {
-                cartIdCookie.value = response._data.cart.id
-            }
-        }
+const { data: customerData } = await useFetch<CustomerAuthResponseInterface>("/api/auth", {
+    credentials: "include",
+    headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY
     }
 })
+
+const { data: cartData } = await useFetch<CartResponse>("/api/cart")
+
+if (customerData.value?.customer) {
+    customerStore.customer = customerData.value.customer
+}
+
+if (cartData.value?.cart) {
+    cartStore.cart = cartData.value.cart
+    if (cartData.value.cart.id && !cartIdCookie.value) {
+        cartIdCookie.value = cartData.value.cart.id
+    }
+}
 
 useHead({
     link: [
@@ -35,6 +40,7 @@ useHead({
     ]
 })
 </script>
+
 <template>
     <NuxtLoadingIndicator />
     <BaseHeader>

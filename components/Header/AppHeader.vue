@@ -23,7 +23,7 @@ onMounted(() => {
                 <NuxtLink class="navbar-brand p-0" href="/">
                     <NuxtImg class="img-fluid" src="/images/logo.svg" width="200" height="40" alt="Ecommerce logo" loading="eager" />
                 </NuxtLink>
-                <slot name="header-icons" />
+                <slot name="header-icons"></slot>
             </div>
             <div
                 id="navbarNavAltMarkup"
@@ -36,8 +36,8 @@ onMounted(() => {
                     data-bs-target="#navbarNavAltMarkup"
                     data-bs-dismiss="offcanvas"
                     aria-label="Close"
-                />
-                <slot name="navigation-links" />
+                ></button>
+                <slot name="navigation-links"></slot>
             </div>
         </div>
     </nav>
