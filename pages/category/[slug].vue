@@ -6,32 +6,33 @@ definePageMeta({
     layout: "default"
 })
 
-interface CollectionInterface {
-    name: string
+interface CategoryInterface {
+    category: string
     metadata: { [x: string]: never }
     id: string
     handle: string
-    title: string
-    deleted_at: string | null
-    created_at: string
-    updated_at: string
+    name: string
 }
 
 const route = useRoute()
-const collection = ref<CollectionInterface | null>(null)
-const { data } = await useFetch<CollectionInterface>(`/api/${route.params.slug}`)
+const category = ref<CategoryInterface | null>(null)
+const { data } = await useFetch<CategoryInterface>(`/api/${route.params.slug}`)
 if (data.value && "error" in data.value) {
     await navigateTo("/page-not-found")
 } else {
-    collection.value = data.value || null
+    category.value = data.value || null
 }
+
+useHead({
+    title: `${category.value?.name} | Ecommerce`
+})
 </script>
 
 <template>
     <section class="spacer">
         <section class="container mx-auto px-4">
             <h1 class="font-bold text-2xl whitespace-nowrap">
-                {{ collection?.title }}
+                {{ category?.name }}
             </h1>
         </section>
     </section>

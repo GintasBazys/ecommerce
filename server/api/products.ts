@@ -7,10 +7,11 @@ export default defineCachedEventHandler(
 
         const limit = query.limit !== undefined && query.limit !== null ? String(query.limit) : LIMIT
         const offset = query.offset !== undefined && query.offset !== null ? String(query.offset) : "0"
+        const regionId = String(query.region_id)
 
         const queryParams = new URLSearchParams({
             fields: `*variants.calculated_price,*variants.inventory_quantity`,
-            region_id: "reg_01JBNVS7SMJCEP18P40WB9PXZV"
+            region_id: regionId
         })
 
         try {

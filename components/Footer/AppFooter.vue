@@ -53,13 +53,13 @@ onUnmounted(() => {
                         aria-expanded="false"
                         aria-controls="collapseFooter2"
                     >
-                        Collections
+                        Categories
                     </p>
                     <div id="collapseFooter2" class="collapse" :class="{ show: isLargeScreen }" data-bs-parent=".footer-main">
                         <ul>
-                            <template v-for="collection in store.collections" :key="collection.id">
+                            <template v-for="category in store.categories" :key="category.id">
                                 <li>
-                                    <NuxtLink :href="'/collection/' + collection.handle">{{ collection.title }}</NuxtLink>
+                                    <NuxtLink :href="`${CATEGORY_HANDLE}/` + category.handle">{{ category.name }}</NuxtLink>
                                 </li>
                             </template>
                         </ul>

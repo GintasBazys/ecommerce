@@ -1,5 +1,5 @@
 import { LIMIT } from "~/utils/consts"
-import type { Product, ProductCollection, Cart } from "@medusajs/medusa"
+import type { Product, ProductCollection, Cart, ProductCategory } from "@medusajs/medusa"
 
 interface ProductResponse {
     products: Product[]
@@ -18,7 +18,6 @@ export interface CartResponse {
 
 export const useProductStore = defineStore("product", () => {
     const products = ref<Product[]>([])
-    const collections = ref<ProductCollection[]>([])
     const limit = ref(LIMIT)
     const offset = ref(0)
     const totalCount = ref(0)
@@ -37,9 +36,11 @@ export const useProductStore = defineStore("product", () => {
         totalCount.value = count
     }
 
-    const setCollections = (newCollections: ProductCollection[]) => {
-        if (Array.isArray(newCollections)) {
-            collections.value = newCollections
+    const categories = ref<ProductCategory[]>([])
+
+    const setCategories = (newCategories: ProductCategory[]) => {
+        if (Array.isArray(newCategories)) {
+            categories.value = newCategories
         }
     }
 
@@ -47,10 +48,14 @@ export const useProductStore = defineStore("product", () => {
     const pageNumber = parseInt(route.query.page as string, 10) || 1
     offset.value = (pageNumber - 1) * limit.value
 
-    const fetchData = async () => {
+    const fetchData = async (regionId?: string) => {
         try {
             const response = await $fetch<ProductResponse>("/api/products", {
-                params: { limit: limit.value, offset: offset.value }
+                params: {
+                    limit: limit.value,
+                    offset: offset.value,
+                    ...(regionId ? { region_id: regionId } : {})
+                }
             })
             if (response) {
                 const { products: apiProducts, count, productLimit, productOffset } = response
@@ -66,10 +71,10 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchLinks = async () => {
         try {
-            const collectionsResponse = await $fetch<CollectionResponse>("/api/collections")
-            setCollections(collectionsResponse["collections"])
+            const categoriesResponse = await $fetch("/api/categories")
+            setCategories(categoriesResponse["product_categories"])
         } catch (error) {
-            console.error("Failed to fetch data:", error)
+            console.error("Failed to fetch categories:", error)
         }
     }
     const fetchBestSellers = async () => {
@@ -83,8 +88,8 @@ export const useProductStore = defineStore("product", () => {
 
     return {
         products,
-        collections,
         bestSellers,
+        categories,
         limit,
         offset,
         totalCount,

@@ -8,9 +8,17 @@ import NavigationLinks from "~/components/Header/NavigationLinks.vue"
 
 const customerStore = useCustomerStore()
 const cartStore = useCartStore()
-const cartIdCookie = useCookie("cart_id")
+const productStore = useProductStore()
 
 const { data: customerData } = await useFetch<CustomerAuthResponseInterface>("/api/auth", {
+    credentials: "include",
+    headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY
+    }
+})
+
+const { data: categoryData } = await useFetch("/api/categories", {
     credentials: "include",
     headers: {
         "Content-Type": "application/json",
@@ -24,11 +32,12 @@ if (customerData.value?.customer) {
     customerStore.customer = customerData.value.customer
 }
 
+if (categoryData.value) {
+    productStore.categories = categoryData.value
+}
+
 if (cartData.value?.cart) {
     cartStore.cart = cartData.value.cart
-    if (cartData.value.cart.id && !cartIdCookie.value) {
-        cartIdCookie.value = cartData.value.cart.id
-    }
 }
 
 useHead({

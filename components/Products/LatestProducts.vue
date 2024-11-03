@@ -4,8 +4,11 @@ import type { Product } from "@medusajs/medusa"
 const store = useProductStore()
 const { products } = storeToRefs(store)
 
+const cartStore = useCartStore()
+const { cart } = storeToRefs(cartStore)
+
 await useAsyncData("product", async () => {
-    await store.fetchData()
+    await store.fetchData(cart?.value?.region_id ?? "")
     return store.products ?? null
 })
 </script>

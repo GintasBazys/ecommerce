@@ -1,16 +1,31 @@
-import { serverMedusaClient } from "#medusa/server"
-
 export default eventHandler(async (event) => {
+    const config = useRuntimeConfig()
+    const handle = event.context.params?.handle || ""
+
     try {
-        const client = serverMedusaClient(event)
-        const handle = event.context.params?.handle ?? ""
-        const collection = await client.collections.list({ handle: [handle] }).then(({ collections }) => collections[0])
-        if (!collection) {
-            return { error: "No collection found for event" }
+        const response = await fetch(`${config.public.MEDUSA_URL}/store/product-categories?handle=${handle}`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+                "Content-Type": "application/json"
+            }
+        })
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch product category: ${response.statusText}`)
         }
 
-        return collection
-    } catch {
-        return { error: "No collection found for event" }
+        const data = await response.json()
+        const category = data.product_categories?.[0]
+
+        if (!category) {
+            return { error: "No category found for the specified handle" }
+        }
+
+        return category
+    } catch (error) {
+        console.error("Error fetching category:", error)
+        return { error: "Failed to fetch category" }
     }
 })

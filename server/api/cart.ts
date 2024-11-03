@@ -4,6 +4,7 @@ export default eventHandler(async (event) => {
 
     try {
         let cart
+        let regionId
 
         if (!cartId) {
             const regionResponse = await fetch(`${config.public.MEDUSA_URL}/store/regions`, {
@@ -19,7 +20,7 @@ export default eventHandler(async (event) => {
             }
 
             const regionsData = await regionResponse.json()
-            const regionId = regionsData?.regions?.[0]?.id
+            regionId = regionsData?.regions?.[0]?.id
 
             if (!regionId) {
                 throw new Error("No valid region ID found")
@@ -60,7 +61,7 @@ export default eventHandler(async (event) => {
             cart = data.cart
         }
 
-        return { cart }
+        return { cart, regionId }
     } catch (error) {
         console.error("Error in cart operation:", error)
         throw error
