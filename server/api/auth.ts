@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
 
     const cookies = parseCookies(event)
-    const token = cookies.jwtToken
+    const token = cookies["connect.sid"]
 
     try {
         const response = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {

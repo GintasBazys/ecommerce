@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 
         const { customer } = await customerResponse.json()
 
-        event.node.res.setHeader("Set-Cookie", [`jwtToken=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
+        event.node.res.setHeader("Set-Cookie", [`connect.sid=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
 
         event.node.res.statusCode = 200
         return { customer }

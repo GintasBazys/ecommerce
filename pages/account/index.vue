@@ -10,11 +10,15 @@ const customerStore = useCustomerStore()
 
 const handleLogout = async () => {
     try {
-        const response = await $fetch("/api/logout")
+        const response = await fetch("/api/logout", {
+            method: "DELETE",
+            credentials: "include"
+        })
+
         if (response) {
+            customerStore.$patch({ customer: null })
             await router.push("/")
         }
-        customerStore.$patch({ customer: null })
     } catch (error) {
         console.error("Logout failed:", error)
     }

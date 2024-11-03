@@ -1,5 +1,3 @@
-import { defineEventHandler, readBody } from "h3"
-
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { email, password, first_name, last_name } = body
@@ -46,11 +44,21 @@ export default defineEventHandler(async (event) => {
             throw new Error("Failed to create customer")
         }
 
-        event.node.res.setHeader("Set-Cookie", [`jwtToken=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
+        const loginResponse = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        })
+
+        if (!loginResponse.ok) throw new Error("Failed to login after registration")
+
+        const { token: loginToken } = await loginResponse.json()
+
+        event.node.res.setHeader("Set-Cookie", [`connect.sid=${loginToken}; HttpOnly; Secure; SameSite=Lax; Path=/`])
 
         const { customer } = await customerResponse.json()
         event.node.res.statusCode = 200
-        return { customer, token }
+        return { customer, token: loginToken }
     } catch (error) {
         console.error("Registration error:", error)
         event.node.res.statusCode = 401
