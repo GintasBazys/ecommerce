@@ -13,6 +13,7 @@ definePageMeta({
 
 const router = useRouter()
 const customerStore = useCustomerStore()
+const config = useRuntimeConfig()
 
 const handleRegister = async (e: Event) => {
     e.preventDefault()
@@ -29,7 +30,8 @@ const handleRegister = async (e: Event) => {
             method: "POST",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
             },
             body: JSON.stringify({ email, password, first_name, last_name })
         })

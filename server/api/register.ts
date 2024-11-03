@@ -19,7 +19,10 @@ export default defineEventHandler(async (event) => {
             body: JSON.stringify({ email, password })
         })
 
-        if (!authResponse.ok) throw new Error("Failed to register: Authentication error")
+        if (!authResponse.ok) {
+            console.error("Authentication failed:", await authResponse.text())
+            throw new Error("Failed to register: Authentication error")
+        }
 
         const { token } = await authResponse.json()
 
@@ -38,14 +41,18 @@ export default defineEventHandler(async (event) => {
             })
         })
 
-        if (!customerResponse.ok) throw new Error("Failed to create customer")
+        if (!customerResponse.ok) {
+            console.error("Customer creation failed:", await customerResponse.text())
+            throw new Error("Failed to create customer")
+        }
 
         event.node.res.setHeader("Set-Cookie", [`jwtToken=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
 
         const { customer } = await customerResponse.json()
         event.node.res.statusCode = 200
         return { customer, token }
-    } catch {
+    } catch (error) {
+        console.error("Registration error:", error)
         event.node.res.statusCode = 401
         return { message: "Registration failed" }
     }
