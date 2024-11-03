@@ -1,33 +1,38 @@
-import { serverMedusaClient } from "#medusa/server"
+import { defineEventHandler, readBody } from "h3"
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { cartId, variant_id, quantity } = body
 
     if (!cartId || !variant_id || quantity == null) {
+        event.node.res.statusCode = 400
         return {
             success: false,
-            error: "Invalid parameters: cartId, variantId, and quantity are required."
+            error: "Invalid parameters: cartId, variant_id, and quantity are required."
         }
     }
 
-    const client = serverMedusaClient(event)
-
+    const config = useRuntimeConfig()
     try {
-        const { cart } = await client.carts.retrieve(cartId)
-        const existingItem = cart.items.find((item) => item.variant_id === variant_id)
+        const cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/line-items`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+            },
+            body: JSON.stringify({ variant_id, quantity })
+        })
 
-        let updatedCartData
-        if (existingItem) {
-            updatedCartData = await client.carts.lineItems.update(cartId, existingItem.id, { quantity })
-        } else {
-            updatedCartData = await client.carts.lineItems.create(cartId, { variant_id, quantity })
+        if (!cartResponse.ok) {
+            const errorText = await cartResponse.text()
+            throw new Error(`Failed to update cart: ${cartResponse.status} ${errorText}`)
         }
 
-        const { items, total, subtotal, ...rest } = updatedCartData.cart
-        return { success: true, cart: { items, total, subtotal, ...rest } }
+        const updatedCart = await cartResponse.json()
+        return { success: true, cart: updatedCart.cart }
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
-        return { success: false, error: errorMessage }
+        console.error("Error updating cart:", error)
+        event.node.res.statusCode = 500
+        return { success: false, error: "An unknown error occurred" }
     }
 })

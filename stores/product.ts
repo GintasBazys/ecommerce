@@ -13,6 +13,7 @@ export interface CollectionResponse {
 }
 
 export interface CartResponse {
+    success: Cart
     cart: Cart
 }
 

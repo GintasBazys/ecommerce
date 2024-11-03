@@ -4,14 +4,25 @@ useHead({
 })
 
 const cartStore = useCartStore()
+const { cart } = storeToRefs(cartStore)
+
+const { removeLineItem } = cartStore
 
 const formatPrice = (amount: number) => {
-    return `${(amount / 100).toFixed(2)} €`
+    return `${amount.toFixed(2)} €`
 }
 
 const removeItem = async (lineItemId: string) => {
-    if (cartStore.cart?.id) {
-        await cartStore.removeLineItem(cartStore.cart.id, lineItemId)
+    if (!cart.value?.id) {
+        throw new Error("No active cart found")
+    }
+
+    try {
+        await removeLineItem(lineItemId)
+        return
+    } catch (err) {
+        console.error("Failed to remove item:", err)
+        return
     }
 }
 </script>
@@ -25,21 +36,21 @@ const removeItem = async (lineItemId: string) => {
                 <h1 class="h4 mb-3 mb-lg-0 text-inter fw-bolder">Shopping cart</h1>
 
                 <div class="w-100 mt-3 d-block d-lg-none">
-                    <p class="mb-0"><strong>Total: </strong>63.10 €</p>
+                    <p class="mb-0"><strong>Total: </strong>{{ formatPrice(cart?.total || 0) }}</p>
                 </div>
             </div>
             <div class="row cart-row gx-5">
                 <div class="cart-items col-lg-7">
                     <div class="order-products-grid">
-                        <div v-for="item in cartStore.cart?.items" :key="item.id" class="search-product px-0">
+                        <div v-for="item in cart?.items || []" :key="item.id" class="search-product px-0">
                             <div class="search-img-wrapper mt-1">
-                                <a :href="`/product/${item.variant.product.handle}`">
+                                <a :href="`/product/${item.product_handle}`">
                                     <NuxtImg
-                                        :src="item.variant.product.thumbnail || '/images/placeholder.png'"
+                                        :src="item.thumbnail || '/images/placeholder.png'"
                                         width="67"
                                         height="93"
-                                        :alt="item.title"
-                                        :title="item.title"
+                                        :alt="item.product_title ?? ''"
+                                        :title="item.product_title"
                                         loading="lazy"
                                     />
                                 </a>
@@ -48,12 +59,11 @@ const removeItem = async (lineItemId: string) => {
                                 <div class="d-flex align-items-start gap-3 justify-content-between">
                                     <div class="search-product-description">
                                         <p class="cart-description-title">
-                                            <a :href="`/product/${item.variant.product.handle}`">{{ item.title }}</a>
+                                            <a :href="`/product/${item.product_handle}`">{{ item.product_title }}</a>
                                         </p>
-                                        <span class="description">{{ item.variant.product.description }}</span>
-                                        <span class="text-small-2 d-block">Option: {{ item.variant.title }}</span>
-
-                                        <span class="text-small-2">Code: {{ item.variant.sku ?? "N/A" }}</span>
+                                        <span class="description">{{ item.product_description }}</span>
+                                        <span class="text-small-2 d-block">Option: {{ item.variant_title }}</span>
+                                        <span class="text-small-2">Code: {{ item.variant_sku ?? "N/A" }}</span>
                                     </div>
                                     <div class="side-content m-0">
                                         <button type="button" class="btn p-0 cart-remove" aria-label="Remove" @click="removeItem(item.id)">
@@ -64,7 +74,7 @@ const removeItem = async (lineItemId: string) => {
                                 <div class="cart-item-bottom">
                                     <div class="text-end">
                                         <p>
-                                            <b>{{ formatPrice(item.total) }}</b>
+                                            <b>{{ formatPrice((item.unit_price || 0) * (item.quantity || 1)) }}</b>
                                         </p>
                                     </div>
                                 </div>
@@ -96,11 +106,11 @@ const removeItem = async (lineItemId: string) => {
                             </div>
                             <div class="subtotal-item">
                                 <span><b>Subtotal:</b></span>
-                                <span>30,00 €</span>
+                                <span>{{ formatPrice(cart?.subtotal || 0) }}</span>
                             </div>
                             <div class="subtotal-item mt-3">
                                 <span class="total"><strong>Total:</strong></span>
-                                <span>33,00 €</span>
+                                <span>{{ formatPrice(cart?.total || 0) }}</span>
                             </div>
                         </div>
                     </div>

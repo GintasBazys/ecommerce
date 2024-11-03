@@ -10,7 +10,7 @@ await useAsyncData("product", async () => {
 </script>
 
 <template>
-    <template v-if="bestSellers">
+    <template v-if="bestSellers && bestSellers.length">
         <section class="spacer showcase-section position-relative">
             <div class="container">
                 <h2 class="text-center mb-4">Bestsellers</h2>
