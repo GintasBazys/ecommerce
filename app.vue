@@ -1,44 +1,42 @@
 <script setup lang="ts">
+import { onMounted } from "vue"
 import { useCustomerStore } from "~/stores/customer"
-import { useCartStore } from "~/stores/cartStore.js"
 import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
 import BaseHeader from "~/components/Header/BaseHeader.vue"
 import NavigationLinks from "~/components/Header/NavigationLinks.vue"
 
 const customerStore = useCustomerStore()
-const cartStore = useCartStore()
 const productStore = useProductStore()
+const cartStore = useCartStore()
 
-const { data: customerData } = await useFetch<CustomerAuthResponseInterface>("/api/auth", {
+const data = await useFetch("/api/categories", {
     credentials: "include",
     headers: {
         "Content-Type": "application/json",
         "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY
     }
 })
+productStore.categories = data.data.value
 
-const { data: categoryData } = await useFetch("/api/categories", {
-    credentials: "include",
-    headers: {
-        "Content-Type": "application/json",
-        "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY
+const cartData = await useFetch<CartResponse>("/api/cart")
+
+cartStore.cart = cartData.data.value?.cart ?? null
+
+onMounted(async () => {
+    const jwtToken = import.meta.client ? localStorage.getItem("jwtToken") : null
+    if (jwtToken) {
+        const data = await $fetch<CustomerAuthResponseInterface>("/api/auth", {
+            headers: {
+                "Content-Type": "application/json",
+                "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY,
+                Authorization: `Bearer ${jwtToken}`
+            },
+            credentials: "include"
+        })
+        customerStore.customer = data.customer
     }
 })
-
-const { data: cartData } = await useFetch<CartResponse>("/api/cart")
-
-if (customerData.value?.customer) {
-    customerStore.customer = customerData.value.customer
-}
-
-if (categoryData.value) {
-    productStore.categories = categoryData.value
-}
-
-if (cartData.value?.cart) {
-    cartStore.cart = cartData.value.cart
-}
 
 useHead({
     link: [

@@ -54,8 +54,6 @@ export default defineEventHandler(async (event) => {
 
         const { token: loginToken } = await loginResponse.json()
 
-        event.node.res.setHeader("Set-Cookie", [`connect.sid=${loginToken}; HttpOnly; Secure; SameSite=Lax; Path=/`])
-
         const { customer } = await customerResponse.json()
         event.node.res.statusCode = 200
         return { customer, token: loginToken }

@@ -72,7 +72,9 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchLinks = async () => {
         try {
-            const categoriesResponse = await $fetch("/api/categories")
+            const categoriesResponse = await $fetch("/api/categories", {
+                credentials: "include"
+            })
             setCategories(categoriesResponse["product_categories"])
         } catch (error) {
             console.error("Failed to fetch categories:", error)

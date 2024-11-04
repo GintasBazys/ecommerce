@@ -26,7 +26,6 @@ const handleLogin = async (e: Event) => {
     try {
         const response = await $fetch<CustomerResponseInterface>("/api/login", {
             method: "POST",
-            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY
@@ -34,6 +33,7 @@ const handleLogin = async (e: Event) => {
             body: JSON.stringify({ email, password })
         })
         customerStore.customer = response.customer
+        localStorage.setItem("jwtToken", response.token)
 
         await router.push("/")
     } catch (error) {

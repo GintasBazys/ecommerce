@@ -5,7 +5,6 @@ export default eventHandler(async (event) => {
     try {
         const response = await fetch(`${config.public.MEDUSA_URL}/store/product-categories?handle=${handle}`, {
             method: "GET",
-            credentials: "include",
             headers: {
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
                 "Content-Type": "application/json"

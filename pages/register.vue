@@ -28,7 +28,6 @@ const handleRegister = async (e: Event) => {
     try {
         const response = await $fetch<CustomerResponseInterface>("/api/register", {
             method: "POST",
-            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY
@@ -36,6 +35,7 @@ const handleRegister = async (e: Event) => {
             body: JSON.stringify({ email, password, first_name, last_name })
         })
         customerStore.customer = response.customer
+        localStorage.setItem("jwtToken", response.token)
 
         await router.push("/")
     } catch (error) {

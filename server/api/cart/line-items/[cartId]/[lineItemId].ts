@@ -16,8 +16,7 @@ export default defineEventHandler(async (event) => {
             headers: {
                 "Content-Type": "application/json",
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-            },
-            credentials: "include"
+            }
         })
 
         const result = await response.json()

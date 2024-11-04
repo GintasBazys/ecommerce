@@ -36,10 +36,8 @@ export default defineEventHandler(async (event) => {
 
         const { customer } = await customerResponse.json()
 
-        event.node.res.setHeader("Set-Cookie", [`connect.sid=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`])
-
         event.node.res.statusCode = 200
-        return { customer }
+        return { customer, token }
     } catch {
         event.node.res.statusCode = 401
         return { message: "Login failed" }

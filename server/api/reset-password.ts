@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
         const response = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass/update`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
             body: JSON.stringify({ email, password, token })
         })
 

@@ -10,7 +10,8 @@ const searchQuery = ref<string>("")
 const products = ref<Product[]>([])
 
 interface SearchResponse {
-    hits: Product[]
+    products: Product[]
+    count: number
 }
 
 const handleSearch = async (e: Event) => {
@@ -23,12 +24,11 @@ const handleSearch = async (e: Event) => {
                 "Content-Type": "application/json"
             },
             body: {
-                q: searchQuery.value,
-                limit: 20
+                q: searchQuery.value
             }
         })
-        searchCounter.value = response.hits.length
-        products.value = response.hits
+        searchCounter.value = response.count
+        products.value = response.products
     } catch (error) {
         console.error("Error during search:", error)
     }
