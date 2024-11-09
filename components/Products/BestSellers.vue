@@ -5,12 +5,13 @@ const { bestSellers } = storeToRefs(store)
 
 await useAsyncData("product", async () => {
     await store.fetchBestSellers()
-    return store.bestSellers ?? null
+    return bestSellers ?? null
 })
 </script>
 
 <template>
     <template v-if="bestSellers && bestSellers.length">
+        {{ console.log(bestSellers) }}
         <section class="spacer showcase-section position-relative">
             <div class="container">
                 <h2 class="text-center mb-4">Bestsellers</h2>

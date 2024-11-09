@@ -16,8 +16,8 @@ export default defineCachedEventHandler(
             }
 
             const data = await response.json()
-            const { products } = data
-            return products
+            const { bestsellers } = data
+            return bestsellers
         } catch (error) {
             console.error("Error fetching products:", error)
             return { error: "Failed to fetch products" }
