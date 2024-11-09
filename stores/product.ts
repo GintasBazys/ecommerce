@@ -83,7 +83,6 @@ export const useProductStore = defineStore("product", () => {
     const fetchBestSellers = async () => {
         try {
             const bestSellersResponse = await $fetch(`/api/best-selling`)
-            console.log(bestSellersResponse)
             setBestSellers(bestSellersResponse)
         } catch (error) {
             console.error("Failed to fetch data:", error)

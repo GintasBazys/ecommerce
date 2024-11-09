@@ -70,7 +70,6 @@ const addToCart = async () => {
                     :placeholder="[236, 236, 75, 5]"
                 />
             </NuxtLink>
-            {{ console.log(typeof product.thumbnail) }}
         </div>
         <div class="pt-6">
             <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
