@@ -31,6 +31,9 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    img {
+        min-height: 236px;
+    }
 }
 .showcaseSwiper {
     margin: -1rem;

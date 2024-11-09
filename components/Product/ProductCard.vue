@@ -61,9 +61,9 @@ const addToCart = async () => {
         <div class="w-full">
             <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
                 <NuxtImg
-                    class="w-100 object-fit-cover max-h-236"
+                    class="w-100 object-fit-cover"
                     format="webp"
-                    :src="product.thumbnail || '/images/placeholder.png'"
+                    :src="product.images[0].url || '/images/placeholder.png'"
                     alt="Product Image"
                     width="236"
                     height="236"
