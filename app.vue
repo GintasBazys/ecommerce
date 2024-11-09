@@ -23,6 +23,10 @@ const cartData = await useFetch<CartResponse>("/api/cart")
 
 cartStore.cart = cartData.data.value?.cart ?? null
 
+useCookie("cart_id", {
+    default: () => cartStore.cart?.id
+})
+
 onMounted(async () => {
     const jwtToken = import.meta.client ? localStorage.getItem("jwtToken") : null
     if (jwtToken) {

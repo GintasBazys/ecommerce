@@ -42,9 +42,8 @@ export default eventHandler(async (event) => {
 
             const data = await response.json()
             cart = data.cart
-            setCookie(event, "cart_id", cart.id)
         } else {
-            const response = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
+            const response = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}?fields=*items`, {
                 method: "GET",
                 credentials: "include",
                 headers: {

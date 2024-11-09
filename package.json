@@ -16,6 +16,7 @@
     "@nuxt/image": "^1.7.0",
     "@nuxtjs/sitemap": "^6.0.0-beta.4",
     "@pinia/nuxt": "^0.5.4",
+    "@unlok-co/nuxt-stripe": "^4.0.1",
     "lodash": "^4.17.21",
     "nuxt": "^3.12.4",
     "nuxt-swiper": "^1.2.2",

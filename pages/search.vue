@@ -9,10 +9,15 @@ const searchCounter = ref<number>(0)
 const searchQuery = ref<string>("")
 const products = ref<Product[]>([])
 
+const cartStore = useCartStore()
+const { cart } = storeToRefs(cartStore)
+
 interface SearchResponse {
     products: Product[]
     count: number
 }
+
+const regionId = cart?.value?.region_id ?? ""
 
 const handleSearch = async (e: Event) => {
     e.preventDefault()
@@ -22,6 +27,9 @@ const handleSearch = async (e: Event) => {
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json"
+            },
+            params: {
+                ...(regionId ? { region_id: regionId } : {})
             },
             body: {
                 q: searchQuery.value

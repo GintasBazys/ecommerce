@@ -112,6 +112,7 @@ const removeItem = async (lineItemId: string) => {
                                 <span class="total"><strong>Total:</strong></span>
                                 <span>{{ formatPrice(cart?.total || 0) }}</span>
                             </div>
+                            <NuxtLink href="/checkout">checkout</NuxtLink>
                         </div>
                     </div>
                 </div>

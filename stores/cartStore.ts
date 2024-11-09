@@ -68,7 +68,20 @@ export const useCartStore = defineStore("cart", () => {
         try {
             const cartId = cart.value?.id
 
+            const itemToRemove = cart.value.items.find((item) => item.id === lineItemId)
+            if (!itemToRemove) {
+                console.warn("Item not found in cart")
+                return
+            }
+
+            const itemTotal = itemToRemove.unit_price * itemToRemove.quantity || 0
+
             cart.value.items = cart.value.items.filter((item) => item.id !== lineItemId)
+
+            if (cart.value.total && cart.value.subtotal) {
+                cart.value.total -= itemTotal
+                cart.value.subtotal -= itemTotal
+            }
 
             const response = await fetch(`/api/cart/line-items/${cartId}/${lineItemId}`, {
                 method: "DELETE",

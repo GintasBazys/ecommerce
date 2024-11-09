@@ -20,7 +20,17 @@ export default defineNuxtConfig({
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
-    modules: ["@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "nuxt-swiper"],
+    modules: ["@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "nuxt-swiper", "@unlok-co/nuxt-stripe"],
+    stripe: {
+        server: {
+            key: process.env.STRIPE_SECRET_KEY,
+            options: {}
+        },
+        client: {
+            key: process.env.STRIPE_PUBLIC_KEY,
+            options: {}
+        }
+    },
     medusa: {
         server: true
     },
@@ -30,7 +40,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             MEDUSA_URL: process.env.MEDUSA_URL,
-            PUBLISHABLE_KEY: process.env.PUBLISHABLE_KEY
+            PUBLISHABLE_KEY: process.env.PUBLISHABLE_KEY,
+            STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY
         },
         secret: {
             mailchimpApiKey: process.env.MAILCHIMP_API_KEY,
