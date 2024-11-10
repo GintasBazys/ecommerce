@@ -3,8 +3,11 @@ import type { Product } from "@medusajs/medusa"
 const store = useProductStore()
 const { bestSellers } = storeToRefs(store)
 
+const cartStore = useCartStore()
+const { cart } = storeToRefs(cartStore)
+
 await useAsyncData("product", async () => {
-    await store.fetchBestSellers()
+    await store.fetchBestSellers(cart?.value?.region_id ?? "")
     return store.bestSellers ?? null
 })
 </script>

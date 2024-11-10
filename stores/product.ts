@@ -80,10 +80,16 @@ export const useProductStore = defineStore("product", () => {
             console.error("Failed to fetch categories:", error)
         }
     }
-    const fetchBestSellers = async () => {
+    const fetchBestSellers = async (regionId?: string) => {
         try {
-            const bestSellersResponse = await $fetch(`/api/best-selling`)
-            setBestSellers(bestSellersResponse)
+            const { products } = await $fetch(`/api/best-selling`, {
+                params: {
+                    limit: limit.value,
+                    offset: offset.value,
+                    ...(regionId ? { region_id: regionId } : {})
+                }
+            })
+            setBestSellers(products)
         } catch (error) {
             console.error("Failed to fetch data:", error)
         }
