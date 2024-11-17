@@ -1,4 +1,4 @@
-export const formatCurrency = (amount, currencyCode) => {
+export const formatCurrency = (amount: number | bigint, currencyCode: string) => {
     const formatter = new Intl.NumberFormat("lt-LT", {
         style: "currency",
         currency: currencyCode.toUpperCase()

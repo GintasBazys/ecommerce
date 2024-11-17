@@ -1,5 +1,4 @@
 import { defineEventHandler } from "h3"
-import { useRuntimeConfig } from "#imports"
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
@@ -10,24 +9,27 @@ export default defineEventHandler(async (event) => {
             "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
             cookie: event.req.headers.cookie || ""
         }
-
-        const response = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
-            headers: forwardedHeaders,
-            credentials: "include"
+        const response = await fetch(`${config.public.MEDUSA_URL}/auth/session`, {
+            method: "DELETE",
+            credentials: "include",
+            headers: forwardedHeaders
         })
 
-        const data = await response.json()
+        if (!response.ok) {
+            throw new Error(`Logout failed: ${response.statusText}`)
+        }
+
         return {
             success: true,
-            customer: data.customer
+            message: "Logout successful"
         }
     } catch (error) {
-        console.error("Error fetching customer data:", error)
+        console.error("Error during logout:", error)
 
         event.node.res.statusCode = 500
         return {
             success: false,
-            message: "Error fetching customer data"
+            message: "Error during logout"
         }
     }
 })

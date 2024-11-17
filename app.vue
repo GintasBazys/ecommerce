@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from "vue"
 import { useCustomerStore } from "~/stores/customer"
+import { useCartStore } from "~/stores/cartStore"
+import { useProductStore } from "~/stores/product"
 import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
 import BaseHeader from "~/components/Header/BaseHeader.vue"
@@ -10,36 +11,39 @@ const customerStore = useCustomerStore()
 const productStore = useProductStore()
 const cartStore = useCartStore()
 
-const data = await useFetch("/api/categories", {
+const runtimeConfig = useRuntimeConfig()
+
+const { data: categoriesData } = await useFetch("/api/categories", {
     credentials: "include",
     headers: {
         "Content-Type": "application/json",
-        "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY
+        "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
     }
 })
-productStore.categories = data.data.value
+productStore.categories = categoriesData.value
 
-const cartData = await useFetch<CartResponse>("/api/cart")
+const { data: cartData } = await useFetch<CartResponse>("/api/cart", {
+    credentials: "include",
+    headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
+    }
+})
+cartStore.cart = cartData.value?.cart ?? null
 
-cartStore.cart = cartData.data.value?.cart ?? null
+const { data: customerData, error: customerError } = await useFetch<CustomerAuthResponseInterface>("/api/auth", {
+    headers: useRequestHeaders(["cookie"])
+})
+
+if (!customerError.value) {
+    customerStore.customer = customerData.value?.customer ?? null
+} else {
+    console.error("Error fetching customer data:", customerError.value)
+}
+customerStore.customer = customerData.value?.customer ?? null
 
 useCookie("cart_id", {
     default: () => cartStore.cart?.id
-})
-
-onMounted(async () => {
-    const jwtToken = import.meta.client ? localStorage.getItem("jwtToken") : null
-    if (jwtToken) {
-        const data = await $fetch<CustomerAuthResponseInterface>("/api/auth", {
-            headers: {
-                "Content-Type": "application/json",
-                "x-publishable-api-key": useRuntimeConfig().public.PUBLISHABLE_KEY,
-                Authorization: `Bearer ${jwtToken}`
-            },
-            credentials: "include"
-        })
-        customerStore.customer = data.customer
-    }
 })
 
 useHead({

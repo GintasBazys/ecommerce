@@ -35,7 +35,6 @@ const handleRegister = async (e: Event) => {
             body: JSON.stringify({ email, password, first_name, last_name })
         })
         customerStore.customer = response.customer
-        localStorage.setItem("jwtToken", response.token)
 
         await router.push("/")
     } catch (error) {

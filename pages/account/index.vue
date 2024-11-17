@@ -7,9 +7,11 @@ const router = useRouter()
 const customerStore = useCustomerStore()
 
 const handleLogout = async () => {
-    window.localStorage.removeItem("jwtToken")
-    customerStore.$patch({ customer: null })
-    await router.push("/")
+    const response = await $fetch("/api/logout", { method: "POST" })
+    if (response.success) {
+        customerStore.$patch({ customer: null })
+        await router.push("/")
+    }
 }
 </script>
 

@@ -28,8 +28,7 @@ export default eventHandler(async (event) => {
         })
 
         return response
-    } catch (error) {
-        console.error("Error fetching search results:", error)
+    } catch {
         throw createError({ statusCode: 500, message: "Failed to fetch search results" })
     }
 })

@@ -23,23 +23,38 @@ const handleLogin = async (e: Event) => {
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
-    try {
-        const response = await $fetch<CustomerResponseInterface>("/api/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-            },
-            body: JSON.stringify({ email, password })
+    const { token } = await fetch(`http://localhost:9000/auth/customer/emailpass`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email,
+            password
         })
-        customerStore.customer = response.customer
-        localStorage.setItem("jwtToken", response.token)
+    }).then((res) => res.json())
 
-        await router.push("/")
-    } catch (error) {
-        console.error("Login failed:", error)
-        alert("Login failed. Please check your credentials or try again later.")
-    }
+    // set session
+    await fetch(`http://localhost:9000/auth/session`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+    }).then((res) => res.json())
+    const { customer } = await fetch(`http://localhost:9000/store/customers/me`, {
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+        }
+    }).then((res) => res.json())
+
+    customerStore.customer = customer
+
+    await router.push("/")
 }
 
 const handleSocialLogin = (provider: "google") => {
