@@ -69,7 +69,7 @@ const handleRegister = async (e: Event) => {
                         </form>
                     </div>
                     <p class="mb-0 mt-4 tag-14 text-lg-center text-left">
-                        Already hav an account an account? Login <NuxtLink href="/signin">here</NuxtLink>
+                        Already have an account an account? Login <NuxtLink href="/signin">here</NuxtLink>
                     </p>
                 </div>
             </div>

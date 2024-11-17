@@ -1,34 +1,37 @@
 {
-  "name": "nuxt-app",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
-  },
-  "dependencies": {
-    "@nuxt/eslint": "^0.5.0",
-    "@nuxt/image": "^1.7.0",
-    "@nuxtjs/sitemap": "^6.0.0-beta.4",
-    "@pinia/nuxt": "^0.5.4",
-    "@unlok-co/nuxt-stripe": "^4.0.1",
-    "lodash": "^4.17.21",
-    "nuxt": "^3.12.4",
-    "nuxt-swiper": "^1.2.2",
-    "vue": "latest"
-  },
-  "devDependencies": {
-    "@types/lodash-es": "^4.17.12",
-    "bootstrap": "^5.3.3",
-    "eslint": "^8.57.0",
-    "nuxt-medusa": "^0.5.0",
-    "prettier": "3.3.3",
-    "sass": "^1.77.8",
-    "sass-loader": "^16.0.1"
-  }
+    "name": "nuxt-app",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
+    },
+    "dependencies": {
+        "@nuxt/eslint": "^0.5.0",
+        "@nuxt/image": "^1.7.0",
+        "@nuxtjs/sitemap": "^6.0.0-beta.4",
+        "@pinia/nuxt": "^0.5.4",
+        "@unlok-co/nuxt-stripe": "^4.0.1",
+        "@vueuse/core": "^11.2.0",
+        "@vueuse/integrations": "^11.2.0",
+        "jwt-decode": "^4.0.0",
+        "lodash": "^4.17.21",
+        "nuxt": "^3.12.4",
+        "nuxt-swiper": "^1.2.2",
+        "vue": "latest"
+    },
+    "devDependencies": {
+        "@types/lodash-es": "^4.17.12",
+        "bootstrap": "^5.3.3",
+        "eslint": "^8.57.0",
+        "nuxt-medusa": "^0.5.0",
+        "prettier": "3.3.3",
+        "sass": "^1.77.8",
+        "sass-loader": "^16.0.1"
+    }
 }

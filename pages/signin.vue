@@ -13,7 +13,6 @@ definePageMeta({
 
 const router = useRouter()
 const customerStore = useCustomerStore()
-const config = useRuntimeConfig()
 
 const handleLogin = async (e: Event) => {
     e.preventDefault()
@@ -41,9 +40,26 @@ const handleLogin = async (e: Event) => {
     }
 }
 
-const handleSocialLogin = (provider: "google") => {
-    const backendUrl = config.public.BACKEND_URL || "http://localhost:9000"
-    window.location.href = `${backendUrl}/store/auth/${provider}`
+const handleSocialLogin = async () => {
+    try {
+        const result = await fetch(`/api/social/google`, {
+            credentials: "include",
+            method: "POST"
+        }).then((res) => res.json())
+
+        if (result.location) {
+            window.location.href = result.location
+            return
+        }
+
+        if (!result.token) {
+            alert("Authentication failed")
+            return
+        }
+    } catch (error) {
+        console.error("Social login failed:", error)
+        alert("An error occurred during social login")
+    }
 }
 </script>
 
@@ -53,7 +69,7 @@ const handleSocialLogin = (provider: "google") => {
             <div class="col-12">
                 <div class="mx-auto" style="max-width: 24.625rem; width: 100%">
                     <h4 class="mb-4 mb-lg-5">Log in</h4>
-                    <button class="external-login-link w-100 border-0 bg-transparent" @click="handleSocialLogin('google')">
+                    <button class="external-login-link w-100 border-0 bg-transparent" @click="handleSocialLogin">
                         <div class="external-login-block-no-shop">
                             <NuxtImg src="/images/google_login_icon.svg" width="24" height="24" alt="Google login icon" loading="lazy" />
                             <p class="ps-3">Log in with Google</p>
