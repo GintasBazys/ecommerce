@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
         const forwardedHeaders = {
             "Content-Type": "application/json",
             "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            cookie: event.req.headers.cookie || ""
+            cookie: event.node.req.headers.cookie || ""
         }
         const response = await fetch(`${config.public.MEDUSA_URL}/auth/session`, {
             method: "DELETE",

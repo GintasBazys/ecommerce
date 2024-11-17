@@ -23,38 +23,22 @@ const handleLogin = async (e: Event) => {
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
-    const { token } = await fetch(`http://localhost:9000/auth/customer/emailpass`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email,
-            password
+    try {
+        const { success, customer, message } = await $fetch<CustomerLoginResponseInterface>("/api/login", {
+            method: "POST",
+            body: { email, password }
         })
-    }).then((res) => res.json())
 
-    // set session
-    await fetch(`http://localhost:9000/auth/session`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+        if (!success) {
+            alert(message || "Login failed")
         }
-    }).then((res) => res.json())
-    const { customer } = await fetch(`http://localhost:9000/store/customers/me`, {
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-        }
-    }).then((res) => res.json())
+        customerStore.customer = customer
 
-    customerStore.customer = customer
-
-    await router.push("/")
+        await router.push("/")
+    } catch (error) {
+        alert("Login failed. Try again later")
+        console.error("Error during login:", error)
+    }
 }
 
 const handleSocialLogin = (provider: "google") => {

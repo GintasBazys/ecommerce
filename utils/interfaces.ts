@@ -8,3 +8,9 @@ export interface CustomerAuthResponseInterface {
     customer: Customer
     success: boolean
 }
+
+export interface CustomerLoginResponseInterface {
+    customer: Customer
+    success: boolean
+    message: string
+}
