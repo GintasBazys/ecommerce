@@ -69,10 +69,7 @@ const handleSubmit = async () => {
 
         if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "requires_capture")) {
             await completeCart()
-            const cartCookie = useCookie("cart_id")
-            cartCookie.value = null
-            cartStore.$patch({ cart: null })
-            router.push("/order-completed")
+            await router.push("/order-completed")
         } else {
             console.error("Payment was not successful.")
         }
@@ -80,6 +77,33 @@ const handleSubmit = async () => {
         console.error("Error processing payment:", error)
     } finally {
         isLoading.value = false
+    }
+}
+
+const createNewCart = async () => {
+    const runtimeConfig = useRuntimeConfig()
+    try {
+        const response = await fetch(`/api/cart?regionId=${useRegionStore().regionStoreId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
+            },
+            credentials: "include"
+        })
+
+        if (!response.ok) {
+            console.error("Error creating new cart:", await response.text())
+            return null
+        }
+
+        const newCart = await response.json()
+        cartStore.$patch({ cart: newCart.cart })
+        const cartCookie = useCookie("cart_id")
+        cartCookie.value = newCart.id
+    } catch (error) {
+        console.error("Error initializing new cart:", error)
+        return null
     }
 }
 
@@ -103,6 +127,10 @@ const completeCart = async () => {
         const { type, order, error } = await response.json()
 
         if (type === "order" && order) {
+            const cartCookie = useCookie("cart_id")
+            cartCookie.value = null
+            cartStore.$patch({ cart: null })
+            await createNewCart()
             alert("Order placed.")
         } else {
             console.error("Order completion issue:", error)

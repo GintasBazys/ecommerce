@@ -4,11 +4,11 @@ import type { Product } from "@medusajs/medusa"
 const store = useProductStore()
 const { products } = storeToRefs(store)
 
-const cartStore = useCartStore()
-const { cart } = storeToRefs(cartStore)
+const regionStore = useRegionStore()
+const { regionStoreId } = storeToRefs(regionStore)
 
 await useAsyncData("product", async () => {
-    await store.fetchData(cart?.value?.region_id ?? "")
+    await store.fetchData(regionStoreId.value ?? "")
     return store.products ?? null
 })
 </script>
@@ -27,8 +27,8 @@ await useAsyncData("product", async () => {
                     :space-between="20"
                     :grab-cursor="true"
                     :breakpoints="{
-                        '576': {
-                            slidesPerView: 2
+                        '280': {
+                            slidesPerView: 1.5
                         },
                         '768': {
                             slidesPerView: 3

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { useFetch } from "#app"
+import { useRoute } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
 
-const token = (route.query.token as string) || ""
-const email = (route.query.email as string) || ""
+const token = encodeURIComponent((route.query.token as string) || "")
+const email = encodeURIComponent((route.query.email as string) || "")
 const password = ref("")
 
 const handleSubmit = async (e: Event) => {
@@ -18,26 +17,30 @@ const handleSubmit = async (e: Event) => {
         return
     }
 
-    try {
-        const { error } = await useFetch("/api/reset-password", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token,
-                email,
-                password: password.value
-            })
+    fetch(`http://localhost:9000/auth/customer/emailpass/update?token=${token}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email,
+            password: password.value
         })
-        if (error.value) {
-            alert("Couldn't reset password")
-            return
-        }
-
-        alert("Password reset successfully!")
-        router.push("/signin")
-    } catch {
-        alert("Error resetting password. Please try again.")
-    }
+    })
+        .then((res) => {
+            if (!res.ok) {
+                throw new Error("Failed to reset password")
+            }
+            return res.json()
+        })
+        .then(({ success }) => {
+            alert(success ? "Password reset successfully!" : "Couldn't reset password")
+            router.push("/signin")
+        })
+        .catch((err) => {
+            console.error(err)
+            alert("Error resetting password. Please try again.")
+        })
 }
 </script>
 

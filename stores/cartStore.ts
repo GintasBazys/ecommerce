@@ -1,5 +1,5 @@
 import { ref, computed } from "vue"
-import type { Cart as MedusaCart, LineItem } from "@medusajs/medusa"
+import type { Cart as MedusaCart, LineItem, Product } from "@medusajs/medusa"
 
 interface CartItemExtension {
     product_description?: string | null
@@ -29,33 +29,104 @@ interface CartResponseInterface {
 export const useCartStore = defineStore("cart", () => {
     const cart = ref<ExtendedCart | null>(null)
 
-    const fetchCart = async () => {
-        try {
-            cart.value = await $fetch("/api/cart", {
-                credentials: "include"
-            })
-        } catch (error) {
-            console.error("Failed to fetch cart:", error)
+    const updateLineItem = async (
+        product: Product,
+        selectedVariant: {
+            inventory_quantity: number
+            id: string | null
+            title: string
+            calculated_price: { calculated_amount: number }
+        },
+        quantityToAdd: number = 1
+    ) => {
+        console.log(cart.value)
+        if (!cart.value) {
+            console.warn("Cart is not initialized")
+            return
         }
-    }
 
-    const updateLineItem = async (cartId: string, variant_id: string, quantity: number) => {
+        if (selectedVariant.inventory_quantity <= 0) {
+            console.warn("Selected variant is out of stock")
+            return
+        }
+
+        const previousCart = JSON.parse(JSON.stringify(cart.value))
+
         try {
-            const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: { cartId, variant_id, quantity }
-            })
+            const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id)
 
-            if (response && response.success) {
-                cart.value = response.cart
+            const newQuantity = existingItem ? existingItem.quantity + quantityToAdd : quantityToAdd
+
+            if (existingItem) {
+                existingItem.quantity = newQuantity
+
+                const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: {
+                        quantity: newQuantity
+                    }
+                })
+
+                if (response && response.success) {
+                    const updatedItem = response.cart.items.find((item) => item.id === existingItem.id)
+                    if (updatedItem) {
+                        Object.assign(existingItem, updatedItem)
+                    }
+
+                    cart.value.total = response.cart.total
+                    cart.value.subtotal = response.cart.subtotal
+                    cart.value.updated_at = response.cart.updated_at
+                } else {
+                    throw new Error(response.error || "Unknown error")
+                }
             } else {
-                throw new Error("Unknown error")
+                const tempItem = {
+                    id: `temp-${selectedVariant.id}`,
+                    product_description: product.description,
+                    variant_id: selectedVariant.id,
+                    product_title: product.title,
+                    variant_title: selectedVariant.title,
+                    thumbnail: product.thumbnail,
+                    unit_price: selectedVariant.calculated_price.calculated_amount,
+                    quantity: quantityToAdd
+                } as ExtendedCartItem
+                cart.value.items.push(tempItem)
+
+                const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: {
+                        cartId: cart.value.id,
+                        variant_id: selectedVariant.id,
+                        quantity: quantityToAdd
+                    }
+                })
+
+                if (response && response.success) {
+                    const updatedItem = response.cart.items.find(
+                        (item) => item.variant_id === selectedVariant.id && item.quantity === quantityToAdd
+                    )
+                    if (updatedItem) {
+                        const tempItemIndex = cart.value.items.findIndex((item) => item.id === `temp-${selectedVariant.id}`)
+                        if (tempItemIndex !== -1) {
+                            cart.value.items.splice(tempItemIndex, 1, updatedItem)
+                        }
+                    }
+                    cart.value.total = response.cart.total
+                    cart.value.subtotal = response.cart.subtotal
+                    cart.value.updated_at = response.cart.updated_at
+                } else {
+                    throw new Error(response.error || "Unknown error")
+                }
             }
         } catch (error) {
             console.error("Failed to update line item:", error)
+            cart.value = previousCart
         }
     }
 
@@ -65,49 +136,48 @@ export const useCartStore = defineStore("cart", () => {
             return
         }
 
-        try {
-            const cartId = cart.value?.id
+        const previousCart = JSON.parse(JSON.stringify(cart.value))
 
-            const itemToRemove = cart.value.items.find((item) => item.id === lineItemId)
-            if (!itemToRemove) {
+        try {
+            const cartId = cart.value.id
+
+            const itemIndex = cart.value.items.findIndex((item) => item.id === lineItemId)
+            if (itemIndex === -1) {
                 console.warn("Item not found in cart")
                 return
             }
 
+            const itemToRemove = cart.value.items[itemIndex]
+
+            cart.value.items.splice(itemIndex, 1)
+
             const itemTotal = itemToRemove.unit_price * itemToRemove.quantity || 0
+            cart.value.total = (cart.value.total ?? 0) - itemTotal
+            cart.value.subtotal = (cart.value.subtotal ?? 0) - itemTotal
 
-            cart.value.items = cart.value.items.filter((item) => item.id !== lineItemId)
-
-            if (cart.value.total && cart.value.subtotal) {
-                cart.value.total -= itemTotal
-                cart.value.subtotal -= itemTotal
-            }
-
-            const response = await fetch(`/api/cart/line-items/${cartId}/${lineItemId}`, {
+            const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cartId}/${lineItemId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
-
-            const data = await response.json()
-            if (data.success && data.cart) {
-                cart.value = data.cart
-                return data.cart
+            if (response && response.success) {
+                cart.value.total = response.cart.total
+                cart.value.subtotal = response.cart.subtotal
+                cart.value.updated_at = response.cart.updated_at
             } else {
-                throw new Error("Failed to remove item")
+                throw new Error(response.error || "Unknown error")
             }
         } catch (error) {
             console.error("Failed to remove item:", error)
+            cart.value = previousCart
         }
     }
-
     const itemCount = computed(() => {
         return cart.value?.items.reduce((total, item) => total + item.quantity, 0) || 0
     })
 
     return {
-        fetchCart,
         updateLineItem,
         removeLineItem,
         itemCount,

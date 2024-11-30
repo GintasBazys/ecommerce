@@ -21,7 +21,7 @@ useHead({
                                 Messenger
                             </p>
                             <p class="mb-0">
-                                Work hours: I-V: 09:00 am - 17:00 pm <br >
+                                Work hours: I-V: 09:00 am - 17:00 pm <br />
                                 (Closed for Holidays)
                             </p>
                         </div>
@@ -59,7 +59,7 @@ useHead({
                 allowfullscreen
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
-            />
+            ></iframe>
         </div>
     </section>
 </template>

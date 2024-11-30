@@ -2,10 +2,14 @@
 import type { Product } from "@medusajs/medusa"
 import { ref, computed } from "vue"
 import { formatCurrency } from "@/utils/formatCurrency"
+import { debounce } from "lodash"
 
 const { product } = defineProps<{
     product: Product
 }>()
+
+const cartStore = useCartStore()
+const loading = ref<boolean>(false)
 
 interface SimpleProductVariant {
     id: string
@@ -31,29 +35,16 @@ const computedPrice = computed(() => {
     return "N/A"
 })
 
-const cartStore = useCartStore()
-const isLoading = ref(false)
-
-const addToCart = async () => {
-    if (!cartStore.cart || !selectedVariant.value) {
+const addToCart = () => {
+    loading.value = true
+    if (!selectedVariant.value) {
         return
     }
-    if (selectedVariant.value.inventory_quantity <= 0) {
-        return
-    }
-
-    isLoading.value = true
-    try {
-        const existingItem = cartStore.cart.items?.find((item) => item.variant_id === selectedVariant.value?.id)
-        const quantityToUpdate = existingItem?.quantity ? existingItem.quantity + 1 : 1
-        await cartStore.updateLineItem(cartStore.cart.id, selectedVariant.value.id, quantityToUpdate)
-    } catch (error) {
-        console.error("Error updating cart:", error)
-    } finally {
-        isLoading.value = false
-        window.scrollTo(0, 0)
-    }
+    cartStore.updateLineItem(product, selectedVariant.value)
+    loading.value = false
 }
+
+const debouncedAddToCart = debounce(addToCart, 300)
 </script>
 
 <template>
@@ -88,11 +79,10 @@ const addToCart = async () => {
                 <button
                     type="button"
                     class="btn quick-add-btn"
-                    :disabled="isLoading || (selectedVariant?.inventory_quantity ?? 0) <= 0"
-                    @click="addToCart"
+                    :disabled="!Boolean(selectedVariant?.inventory_quantity) ?? loading"
+                    @click="debouncedAddToCart"
                 >
-                    <span v-if="isLoading" class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
-                    <span v-if="!isLoading" class="cart-btn-icon"></span>
+                    <span class="cart-btn-icon"></span>
                 </button>
             </div>
         </div>

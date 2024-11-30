@@ -5,19 +5,19 @@ useHead({
     title: "Search | Ecommerce"
 })
 
-const searchCounter = ref<number>(0)
-const searchQuery = ref<string>("")
-const products = ref<Product[]>([])
-
-const cartStore = useCartStore()
-const { cart } = storeToRefs(cartStore)
-
 interface SearchResponse {
     products: Product[]
     count: number
 }
 
-const regionId = cart?.value?.region_id ?? ""
+const searchCounter = ref<number>(0)
+const searchQuery = ref<string>("")
+const products = ref<Product[]>([])
+
+const regionStore = useRegionStore()
+const { regionStoreId } = storeToRefs(regionStore)
+
+const regionId = regionStoreId.value ?? ""
 
 const handleSearch = async (e: Event) => {
     e.preventDefault()

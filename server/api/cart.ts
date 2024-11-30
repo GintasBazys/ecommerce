@@ -1,31 +1,18 @@
 export default eventHandler(async (event) => {
     const cartId = getCookie(event, "cart_id") || null
     const config = useRuntimeConfig()
+    const query = getQuery(event)
 
     try {
+        const regionId = query.regionId || null
+
+        if (!regionId) {
+            throw new Error("Region ID is required")
+        }
+
         let cart
-        let regionId
 
         if (!cartId) {
-            const regionResponse = await fetch(`${config.public.MEDUSA_URL}/store/regions`, {
-                method: "GET",
-                headers: {
-                    "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                    "Content-Type": "application/json"
-                }
-            })
-
-            if (!regionResponse.ok) {
-                throw new Error(`Failed to fetch regions: ${regionResponse.statusText}`)
-            }
-
-            const regionsData = await regionResponse.json()
-            regionId = regionsData?.regions?.[0]?.id
-
-            if (!regionId) {
-                throw new Error("No valid region ID found")
-            }
-
             const response = await fetch(`${config.public.MEDUSA_URL}/store/carts`, {
                 method: "POST",
                 credentials: "include",

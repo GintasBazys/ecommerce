@@ -13,6 +13,10 @@ const cartStore = useCartStore()
 
 const runtimeConfig = useRuntimeConfig()
 
+const { fetchRegion } = useRegionStore()
+
+await fetchRegion()
+
 const { data: categoriesData } = await useFetch("/api/categories", {
     credentials: "include",
     headers: {
@@ -22,13 +26,14 @@ const { data: categoriesData } = await useFetch("/api/categories", {
 })
 productStore.categories = categoriesData.value
 
-const { data: cartData } = await useFetch<CartResponse>("/api/cart", {
+const { data: cartData } = await useFetch(`/api/cart?regionId=${useRegionStore().regionStoreId}`, {
     credentials: "include",
     headers: {
         "Content-Type": "application/json",
         "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
     }
 })
+//@ts-expect-error need to pass regionID as query param
 cartStore.cart = cartData.value?.cart ?? null
 
 const { data: customerData, error: customerError } = await useFetch<CustomerAuthResponseInterface>("/api/auth", {

@@ -19,10 +19,8 @@ const removeItem = async (lineItemId: string) => {
 
     try {
         await removeLineItem(lineItemId)
-        return
     } catch (err) {
         console.error("Failed to remove item:", err)
-        return
     }
 }
 </script>
@@ -66,7 +64,7 @@ const removeItem = async (lineItemId: string) => {
                                         <span class="text-small-2">Code: {{ item.variant_sku ?? "N/A" }}</span>
                                     </div>
                                     <div class="side-content m-0">
-                                        <button type="button" class="btn p-0 cart-remove" aria-label="Remove" @click="removeItem(item.id)">
+                                        <button type="button" class="btn p-0 cart-ve" aria-label="Remove" @click="removeItem(item.id)">
                                             Remove
                                         </button>
                                     </div>

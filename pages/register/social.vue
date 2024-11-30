@@ -125,7 +125,7 @@ const validateCallback = async () => {
             const { authIdentity } = await identityResponse.json()
 
             if (shouldCreateCustomer) {
-                email.value = authIdentity.entity_id
+                email.value = authIdentity.user_metadata?.email
                 firstName.value = authIdentity.user_metadata?.given_name || ""
                 lastName.value = authIdentity.user_metadata?.family_name || ""
 

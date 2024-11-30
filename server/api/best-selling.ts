@@ -12,7 +12,7 @@ export default defineCachedEventHandler(
         const queryParams = new URLSearchParams({
             fields: `*variants.calculated_price,*variants.inventory_quantity`,
             region_id: regionId,
-            tag_id: "ptag_01JCADJH1ZW7Q25KY1F8D9F1KV" //test tag id - "bestseller"
+            tag_id: process.env.MEDUSA_API_TAG || ""
         })
 
         try {

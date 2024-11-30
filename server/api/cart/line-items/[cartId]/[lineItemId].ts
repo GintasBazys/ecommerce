@@ -1,39 +1,50 @@
-export default defineEventHandler(async (event) => {
-    const cartId = getRouterParam(event, "cartId")
-    const lineItemId = getRouterParam(event, "lineItemId")
-    const config = useRuntimeConfig()
+import { defineEventHandler, readBody } from "h3"
 
-    if (!cartId || !lineItemId) {
-        throw createError({
-            statusCode: 400,
-            message: "Missing required parameters: cartId and lineItemId"
-        })
+export default defineEventHandler(async (event) => {
+    const params = event.context.params as Record<string, string> | undefined
+
+    if (!params || !params.cartId || !params.lineItemId) {
+        event.node.res.statusCode = 400
+        return {
+            success: false,
+            error: "Invalid parameters: cartId and lineItemId are required."
+        }
     }
 
+    const { cartId, lineItemId } = params
+
+    const body = await readBody(event)
+    const { quantity } = body
+
+    if (quantity == null) {
+        event.node.res.statusCode = 400
+        return {
+            success: false,
+            error: "Invalid parameters: quantity is required."
+        }
+    }
+
+    const config = useRuntimeConfig()
     try {
-        const response = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/line-items/${lineItemId}`, {
-            method: "DELETE",
+        const cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/line-items/${lineItemId}`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-            }
+            },
+            body: JSON.stringify({ quantity })
         })
 
-        const result = await response.json()
-
-        if (!result.deleted) {
-            throw new Error(result.message || "Failed to delete line item")
+        if (!cartResponse.ok) {
+            const errorText = await cartResponse.text()
+            throw new Error(`Failed to update cart: ${cartResponse.status} ${errorText}`)
         }
 
-        return {
-            success: true,
-            cart: result.parent
-        }
+        const updatedCart = await cartResponse.json()
+        return { success: true, cart: updatedCart.cart }
     } catch (error) {
-        console.error("Error deleting line item:", error)
-        throw createError({
-            statusCode: 500,
-            message: "Failed to remove item from cart"
-        })
+        console.error("Error updating cart:", error)
+        event.node.res.statusCode = 500
+        return { success: false, error: "An unknown error occurred" }
     }
 })
