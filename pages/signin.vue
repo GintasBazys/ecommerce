@@ -13,6 +13,7 @@ definePageMeta({
 
 const router = useRouter()
 const customerStore = useCustomerStore()
+const cartStore = useCartStore()
 const runtimeConfig = useRuntimeConfig()
 
 const handleLogin = async (e: Event) => {
@@ -22,7 +23,7 @@ const handleLogin = async (e: Event) => {
     const password = formData.get("password") as string
 
     e.preventDefault()
-    const { token } = await fetch(`http://localhost:9000/auth/customer/emailpass`, {
+    const { token } = await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -34,7 +35,7 @@ const handleLogin = async (e: Event) => {
         })
     }).then((res) => res.json())
 
-    await fetch(`http://localhost:9000/auth/session`, {
+    await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/session`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -43,7 +44,7 @@ const handleLogin = async (e: Event) => {
         }
     }).then((res) => res.json())
 
-    const { customer } = await fetch(`http://localhost:9000/store/customers/me`, {
+    const { customer } = await fetch(`${runtimeConfig.public.MEDUSA_URL}/store/customers/me`, {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
@@ -52,6 +53,8 @@ const handleLogin = async (e: Event) => {
     }).then((res) => res.json())
 
     customerStore.customer = customer
+
+    await assignCustomerToCart(cartStore)
 
     await router.push("/")
 }

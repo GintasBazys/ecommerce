@@ -5,10 +5,12 @@ definePageMeta({
 const router = useRouter()
 
 const customerStore = useCustomerStore()
+const cartStore = useCartStore()
 
 const handleLogout = async () => {
     const response = await $fetch("/api/logout", { method: "POST" })
     if (response.success) {
+        await createNewCart(cartStore)
         customerStore.$patch({ customer: null })
         await router.push("/")
     }

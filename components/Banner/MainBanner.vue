@@ -3,7 +3,6 @@
         <Swiper
             :modules="[SwiperAutoplay, SwiperPagination]"
             :slides-per-view="1"
-            :loop="true"
             :grab-cursor="true"
             :pagination="{ clickable: true }"
             :autoplay="{

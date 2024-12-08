@@ -1,7 +1,7 @@
 <template>
     <main>
         <div>
-            <slot />
+            <slot></slot>
         </div>
         <NewsletterComponent />
     </main>

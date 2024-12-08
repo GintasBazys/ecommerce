@@ -4,6 +4,10 @@ import type { Stripe, StripeElements } from "@stripe/stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import { useRuntimeConfig } from "#app"
 
+definePageMeta({
+    layout: "checkout"
+})
+
 const isLoading = ref(false)
 let stripe: Stripe | null = null
 let elements: StripeElements | null = null
@@ -80,33 +84,6 @@ const handleSubmit = async () => {
     }
 }
 
-const createNewCart = async () => {
-    const runtimeConfig = useRuntimeConfig()
-    try {
-        const response = await fetch(`/api/cart?regionId=${useRegionStore().regionStoreId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
-            },
-            credentials: "include"
-        })
-
-        if (!response.ok) {
-            console.error("Error creating new cart:", await response.text())
-            return null
-        }
-
-        const newCart = await response.json()
-        cartStore.$patch({ cart: newCart.cart })
-        const cartCookie = useCookie("cart_id")
-        cartCookie.value = newCart.id
-    } catch (error) {
-        console.error("Error initializing new cart:", error)
-        return null
-    }
-}
-
 const completeCart = async () => {
     try {
         const response = await fetch("/api/complete-cart", {
@@ -127,10 +104,7 @@ const completeCart = async () => {
         const { type, order, error } = await response.json()
 
         if (type === "order" && order) {
-            const cartCookie = useCookie("cart_id")
-            cartCookie.value = null
-            cartStore.$patch({ cart: null })
-            await createNewCart()
+            await createNewCart(cartStore)
             alert("Order placed.")
         } else {
             console.error("Order completion issue:", error)
@@ -143,12 +117,16 @@ const completeCart = async () => {
 
 <template>
     <main>
-        <h1>Payment</h1>
-        <form id="payment-form" @submit.prevent="handleSubmit">
-            <div id="link-authentication-element"></div>
-            <div id="payment-element"></div>
-            <button id="submit" :disabled="isLoading">{{ isLoading ? "Processing..." : "Pay now" }}</button>
-        </form>
+        <div class="container py-5">
+            <h1 class="mb-4">Payment</h1>
+            <form id="payment-form" @submit.prevent="handleSubmit">
+                <div id="link-authentication-element"></div>
+                <div id="payment-element"></div>
+                <button id="submit" class="btn btn-primary mt-4" :disabled="isLoading">
+                    {{ isLoading ? "Processing..." : "Pay now" }}
+                </button>
+            </form>
+        </div>
     </main>
 </template>
 

@@ -37,9 +37,8 @@ export const useCartStore = defineStore("cart", () => {
             title: string
             calculated_price: { calculated_amount: number }
         },
-        quantityToAdd: number = 1
+        quantityToAdd = 1
     ) => {
-        console.log(cart.value)
         if (!cart.value) {
             console.warn("Cart is not initialized")
             return
@@ -53,11 +52,16 @@ export const useCartStore = defineStore("cart", () => {
         const previousCart = JSON.parse(JSON.stringify(cart.value))
 
         try {
-            const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id)
+            const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id && !item.id.startsWith("temp-"))
 
             const newQuantity = existingItem ? existingItem.quantity + quantityToAdd : quantityToAdd
 
             if (existingItem) {
+                const previousItemTotal = existingItem.unit_price * existingItem.quantity || 0
+                const newItemTotal = existingItem.unit_price * newQuantity || 0
+                cart.value.total = (cart.value.total ?? 0) - previousItemTotal + newItemTotal
+                cart.value.subtotal = (cart.value.subtotal ?? 0) - previousItemTotal + newItemTotal
+
                 existingItem.quantity = newQuantity
 
                 const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
@@ -71,6 +75,10 @@ export const useCartStore = defineStore("cart", () => {
                 })
 
                 if (response && response.success) {
+                    response.cart.items.forEach((item) => {
+                        item.variant_id = item.variant_id || item.variant?.id
+                    })
+
                     const updatedItem = response.cart.items.find((item) => item.id === existingItem.id)
                     if (updatedItem) {
                         Object.assign(existingItem, updatedItem)
@@ -93,6 +101,7 @@ export const useCartStore = defineStore("cart", () => {
                     unit_price: selectedVariant.calculated_price.calculated_amount,
                     quantity: quantityToAdd
                 } as ExtendedCartItem
+
                 cart.value.items.push(tempItem)
 
                 const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
@@ -108,15 +117,21 @@ export const useCartStore = defineStore("cart", () => {
                 })
 
                 if (response && response.success) {
+                    response.cart.items.forEach((item) => {
+                        item.variant_id = item.variant_id || item.variant?.id
+                    })
+
                     const updatedItem = response.cart.items.find(
                         (item) => item.variant_id === selectedVariant.id && item.quantity === quantityToAdd
                     )
+
                     if (updatedItem) {
                         const tempItemIndex = cart.value.items.findIndex((item) => item.id === `temp-${selectedVariant.id}`)
                         if (tempItemIndex !== -1) {
                             cart.value.items.splice(tempItemIndex, 1, updatedItem)
                         }
                     }
+
                     cart.value.total = response.cart.total
                     cart.value.subtotal = response.cart.subtotal
                     cart.value.updated_at = response.cart.updated_at
@@ -139,8 +154,6 @@ export const useCartStore = defineStore("cart", () => {
         const previousCart = JSON.parse(JSON.stringify(cart.value))
 
         try {
-            const cartId = cart.value.id
-
             const itemIndex = cart.value.items.findIndex((item) => item.id === lineItemId)
             if (itemIndex === -1) {
                 console.warn("Item not found in cart")
@@ -149,18 +162,18 @@ export const useCartStore = defineStore("cart", () => {
 
             const itemToRemove = cart.value.items[itemIndex]
 
-            cart.value.items.splice(itemIndex, 1)
-
             const itemTotal = itemToRemove.unit_price * itemToRemove.quantity || 0
             cart.value.total = (cart.value.total ?? 0) - itemTotal
             cart.value.subtotal = (cart.value.subtotal ?? 0) - itemTotal
+            cart.value.items.splice(itemIndex, 1)
 
-            const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cartId}/${lineItemId}`, {
+            const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cart.value.id}/${lineItemId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
+
             if (response && response.success) {
                 cart.value.total = response.cart.total
                 cart.value.subtotal = response.cart.subtotal
@@ -173,6 +186,7 @@ export const useCartStore = defineStore("cart", () => {
             cart.value = previousCart
         }
     }
+
     const itemCount = computed(() => {
         return cart.value?.items.reduce((total, item) => total + item.quantity, 0) || 0
     })

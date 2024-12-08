@@ -4,6 +4,7 @@ import { useRoute } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
+const runtimeConfig = useRuntimeConfig()
 
 const token = encodeURIComponent((route.query.token as string) || "")
 const email = encodeURIComponent((route.query.email as string) || "")
@@ -17,7 +18,7 @@ const handleSubmit = async (e: Event) => {
         return
     }
 
-    fetch(`http://localhost:9000/auth/customer/emailpass/update?token=${token}`, {
+    fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass/update?token=${token}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
