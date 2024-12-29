@@ -36,7 +36,16 @@ export default defineNuxtConfig({
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
-    modules: ["@nuxt/eslint", "nuxt-medusa", "@pinia/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "nuxt-swiper", "@unlok-co/nuxt-stripe"],
+    modules: [
+      "@nuxt/eslint",
+      "nuxt-medusa",
+      "@pinia/nuxt",
+      "@nuxt/image",
+      "@nuxtjs/sitemap",
+      "nuxt-swiper",
+      "@unlok-co/nuxt-stripe",
+      "@nuxt/content"
+    ],
     stripe: {
         server: {
             key: process.env.STRIPE_SECRET_KEY,
