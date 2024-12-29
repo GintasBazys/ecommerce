@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
     try {
         const config = useRuntimeConfig()
         const queryParams = new URLSearchParams({
-            fields: `*variants.calculated_price`,
+            fields: `*variants.calculated_price,*variants.inventory_quantity`,
             region_id: regionId,
             q: q
         })

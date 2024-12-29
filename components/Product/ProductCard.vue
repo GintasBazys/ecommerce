@@ -35,13 +35,14 @@ const computedPrice = computed(() => {
     return "N/A"
 })
 
-const addToCart = () => {
+const addToCart = async () => {
     loading.value = true
     if (!selectedVariant.value) {
         return
     }
-    cartStore.updateLineItem(product, selectedVariant.value)
+    await cartStore.updateLineItem(selectedVariant.value)
     loading.value = false
+    window.scrollTo(0, 0)
 }
 
 const debouncedAddToCart = debounce(addToCart, 300)
@@ -79,10 +80,13 @@ const debouncedAddToCart = debounce(addToCart, 300)
                 <button
                     type="button"
                     class="btn quick-add-btn"
-                    :disabled="!Boolean(selectedVariant?.inventory_quantity) ?? loading"
+                    :disabled="!Boolean(selectedVariant?.inventory_quantity) || loading"
                     @click="debouncedAddToCart"
                 >
-                    <span class="cart-btn-icon"></span>
+                    <div v-if="loading" class="spinner-border spiner-border-sm text-white" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span v-else class="cart-btn-icon"></span>
                 </button>
             </div>
         </div>

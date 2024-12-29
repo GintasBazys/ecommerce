@@ -1,5 +1,5 @@
 import { ref, computed } from "vue"
-import type { Cart as MedusaCart, LineItem, Product } from "@medusajs/medusa"
+import type { Cart as MedusaCart, LineItem } from "@medusajs/medusa"
 
 interface CartItemExtension {
     product_description?: string | null
@@ -30,7 +30,6 @@ export const useCartStore = defineStore("cart", () => {
     const cart = ref<ExtendedCart | null>(null)
 
     const updateLineItem = async (
-        product: Product,
         selectedVariant: {
             inventory_quantity: number
             id: string | null
@@ -49,20 +48,11 @@ export const useCartStore = defineStore("cart", () => {
             return
         }
 
-        const previousCart = JSON.parse(JSON.stringify(cart.value))
-
         try {
             const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id && !item.id.startsWith("temp-"))
 
-            const newQuantity = existingItem ? existingItem.quantity + quantityToAdd : quantityToAdd
-
             if (existingItem) {
-                const previousItemTotal = existingItem.unit_price * existingItem.quantity || 0
-                const newItemTotal = existingItem.unit_price * newQuantity || 0
-                cart.value.total = (cart.value.total ?? 0) - previousItemTotal + newItemTotal
-                cart.value.subtotal = (cart.value.subtotal ?? 0) - previousItemTotal + newItemTotal
-
-                existingItem.quantity = newQuantity
+                const newQuantity = existingItem.quantity + quantityToAdd
 
                 const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
                     method: "POST",
@@ -75,35 +65,11 @@ export const useCartStore = defineStore("cart", () => {
                 })
 
                 if (response && response.success) {
-                    response.cart.items.forEach((item) => {
-                        item.variant_id = item.variant_id || item.variant?.id
-                    })
-
-                    const updatedItem = response.cart.items.find((item) => item.id === existingItem.id)
-                    if (updatedItem) {
-                        Object.assign(existingItem, updatedItem)
-                    }
-
-                    cart.value.total = response.cart.total
-                    cart.value.subtotal = response.cart.subtotal
-                    cart.value.updated_at = response.cart.updated_at
+                    cart.value = response.cart
                 } else {
                     throw new Error(response.error || "Unknown error")
                 }
             } else {
-                const tempItem = {
-                    id: `temp-${selectedVariant.id}`,
-                    product_description: product.description,
-                    variant_id: selectedVariant.id,
-                    product_title: product.title,
-                    variant_title: selectedVariant.title,
-                    thumbnail: product.thumbnail,
-                    unit_price: selectedVariant.calculated_price.calculated_amount,
-                    quantity: quantityToAdd
-                } as ExtendedCartItem
-
-                cart.value.items.push(tempItem)
-
                 const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
                     method: "POST",
                     headers: {
@@ -117,31 +83,13 @@ export const useCartStore = defineStore("cart", () => {
                 })
 
                 if (response && response.success) {
-                    response.cart.items.forEach((item) => {
-                        item.variant_id = item.variant_id || item.variant?.id
-                    })
-
-                    const updatedItem = response.cart.items.find(
-                        (item) => item.variant_id === selectedVariant.id && item.quantity === quantityToAdd
-                    )
-
-                    if (updatedItem) {
-                        const tempItemIndex = cart.value.items.findIndex((item) => item.id === `temp-${selectedVariant.id}`)
-                        if (tempItemIndex !== -1) {
-                            cart.value.items.splice(tempItemIndex, 1, updatedItem)
-                        }
-                    }
-
-                    cart.value.total = response.cart.total
-                    cart.value.subtotal = response.cart.subtotal
-                    cart.value.updated_at = response.cart.updated_at
+                    cart.value = response.cart
                 } else {
                     throw new Error(response.error || "Unknown error")
                 }
             }
         } catch (error) {
             console.error("Failed to update line item:", error)
-            cart.value = previousCart
         }
     }
 
