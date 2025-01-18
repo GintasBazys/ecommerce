@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { useRuntimeConfig } from "#imports"
+import { ref, onMounted } from "vue"
+import { useRuntimeConfig, type CustomJwtPayload } from "#imports"
 import { jwtDecode } from "jwt-decode"
 import { useRouter, useRoute } from "vue-router"
+import { useCustomerStore } from "@/stores/customer"
+
+definePageMeta({
+    layout: "account"
+})
 
 const config = useRuntimeConfig()
 const router = useRouter()
@@ -14,11 +20,15 @@ const lastName = ref<string>("")
 
 const { customer } = storeToRefs(customerStore)
 
+const isLoading = ref<boolean>(true)
+const loadingMessage = ref<string>("Initializing...")
+
 const sendCallback = async () => {
     const searchParams = new URLSearchParams(window.location.search)
     const queryParams = Object.fromEntries(searchParams.entries())
 
     try {
+        loadingMessage.value = "Contacting authentication server..."
         const response = await fetch(
             `${config.public.MEDUSA_URL}/auth/customer/google/callback?${new URLSearchParams(queryParams).toString()}`,
             {
@@ -44,6 +54,7 @@ const sendCallback = async () => {
 
 const createCustomer = async (token: string, email: string, first_name: string, last_name: string) => {
     try {
+        loadingMessage.value = "Creating customer account..."
         const response = await fetch(`${config.public.MEDUSA_URL}/store/customers`, {
             credentials: "include",
             method: "POST",
@@ -68,6 +79,7 @@ const createCustomer = async (token: string, email: string, first_name: string, 
 
 const refreshToken = async (token: string) => {
     try {
+        loadingMessage.value = "Refreshing session token..."
         const response = await fetch(`${config.public.MEDUSA_URL}/auth/token/refresh`, {
             credentials: "include",
             method: "POST",
@@ -95,6 +107,7 @@ const refreshToken = async (token: string) => {
 
 const validateCallback = async () => {
     try {
+        loadingMessage.value = "Validating callback..."
         const state = route.query.state as string
 
         if (!state) {
@@ -109,15 +122,15 @@ const validateCallback = async () => {
         let currentToken = token
 
         try {
-            const decodedToken = jwtDecode<CustomJwtPayload>(currentToken)
+            const decodedToken = jwtDecode<CustomJwtPayload>(currentToken) // Replace 'any' with your CustomJwtPayload interface if available
             const shouldCreateCustomer = !decodedToken.actor_id
-
             const authIdentityId = decodedToken.auth_identity_id
 
             if (!authIdentityId) {
                 throw new Error("No auth_identity_id found in token")
             }
 
+            loadingMessage.value = "Retrieving identity information..."
             const identityResponse = await fetch(`${config.public.MEDUSA_URL}/store/identity`, {
                 method: "POST",
                 headers: {
@@ -143,6 +156,7 @@ const validateCallback = async () => {
                 currentToken = newToken
             }
 
+            loadingMessage.value = "Establishing session..."
             const sessionResponse = await fetch(`${config.public.MEDUSA_URL}/auth/session`, {
                 credentials: "include",
                 method: "POST",
@@ -156,6 +170,7 @@ const validateCallback = async () => {
                 throw new Error(`Failed to set session: ${sessionResponse.status}`)
             }
 
+            loadingMessage.value = "Fetching customer details..."
             const response = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
                 credentials: "include",
                 method: "GET",
@@ -173,6 +188,7 @@ const validateCallback = async () => {
             const { customer: customerData } = await response.json()
             customer.value = customerData
 
+            isLoading.value = false
             alert(`Welcome, ${customer.value?.email}!`)
             router.push("/")
         } catch (decodeError) {
@@ -181,6 +197,7 @@ const validateCallback = async () => {
         }
     } catch (error) {
         console.error("Authentication error:", error)
+        isLoading.value = false
         if (error instanceof Error) {
             alert(`Authentication failed: ${error.message}`)
         } else {
@@ -196,20 +213,66 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex min-h-screen items-center justify-center">
-        <form class="w-full max-w-lg">
-            <div class="mb-4">
-                <label for="email"> Email </label>
-                <input id="email" v-model="email" type="email" readonly />
+    <main>
+        <div v-if="isLoading" class="loading-overlay">
+            <div class="loading-container">
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <p class="loading-message">{{ loadingMessage }}</p>
             </div>
-            <div class="mb-4">
-                <label for="first_name"> First Name </label>
-                <input id="first_name" v-model="firstName" type="text" />
-            </div>
-            <div class="mb-4">
-                <label for="last_name"> Last Name </label>
-                <input id="last_name" v-model="lastName" type="text" />
-            </div>
-        </form>
-    </div>
+        </div>
+    </main>
 </template>
+
+<style scoped>
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-container {
+    text-align: center;
+    max-width: 400px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 0;
+    height: 100%;
+    background-color: #010c80;
+    animation: progressAnimation 2s infinite;
+}
+
+@keyframes progressAnimation {
+    0% {
+        width: 0%;
+    }
+    50% {
+        width: 100%;
+    }
+    100% {
+        width: 0%;
+    }
+}
+
+.loading-message {
+    font-size: 1.2em;
+}
+</style>
