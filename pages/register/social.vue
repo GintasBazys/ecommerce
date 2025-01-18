@@ -14,12 +14,18 @@ const lastName = ref<string>("")
 
 const { customer } = storeToRefs(customerStore)
 
-const sendCallback = async (code: string) => {
+const sendCallback = async () => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
     try {
-        const response = await fetch(`${config.public.MEDUSA_URL}/auth/customer/google/callback?code=${code}`, {
-            credentials: "include",
-            method: "POST"
-        })
+        const response = await fetch(
+            `${config.public.MEDUSA_URL}/auth/customer/google/callback?${new URLSearchParams(queryParams).toString()}`,
+            {
+                credentials: "include",
+                method: "POST"
+            }
+        )
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
@@ -89,13 +95,13 @@ const refreshToken = async (token: string) => {
 
 const validateCallback = async () => {
     try {
-        const code = route.query.code as string
+        const state = route.query.state as string
 
-        if (!code) {
-            throw new Error("No code found in query parameters.")
+        if (!state) {
+            throw new Error("No state found in query parameters.")
         }
 
-        const token = await sendCallback(code)
+        const token = await sendCallback()
 
         if (!token) {
             throw new Error("Failed to obtain token")
