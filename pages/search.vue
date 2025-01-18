@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue"
 import type { Product } from "@medusajs/medusa"
 
 useHead({
@@ -13,6 +14,9 @@ interface SearchResponse {
 const searchCounter = ref<number>(0)
 const searchQuery = ref<string>("")
 const products = ref<Product[]>([])
+const isLoading = ref<boolean>(false)
+const hasSearched = ref<boolean>(false)
+const lastSearchQuery = ref<string>("")
 
 const regionStore = useRegionStore()
 const { regionStoreId } = storeToRefs(regionStore)
@@ -21,6 +25,14 @@ const regionId = regionStoreId.value ?? ""
 
 const handleSearch = async (e: Event) => {
     e.preventDefault()
+
+    if (searchQuery.value === lastSearchQuery.value) {
+        return
+    }
+
+    lastSearchQuery.value = searchQuery.value
+
+    isLoading.value = true
     try {
         const response = await $fetch<SearchResponse>("/api/search", {
             method: "POST",
@@ -39,6 +51,9 @@ const handleSearch = async (e: Event) => {
         products.value = response.products
     } catch (error) {
         console.error("Error during search:", error)
+    } finally {
+        isLoading.value = false
+        hasSearched.value = true
     }
 }
 </script>
@@ -60,16 +75,23 @@ const handleSearch = async (e: Event) => {
                         placeholder="Search..."
                     />
                     <span class="input-group-append">
-                        <button class="btn p-3 bg-white border-start-0 border" type="submit">
+                        <button class="btn p-3 bg-white border-start-0 border" type="submit" :disabled="isLoading">
                             <NuxtImg src="/images/search.svg" alt="Search" width="24" height="24" loading="lazy" />
                         </button>
                     </span>
                 </div>
             </form>
+            <div v-if="isLoading" class="text-center my-4 d-flex flex-column gap-3 align-items-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span>Loading results...</span>
+            </div>
             <div class="search-results">
-                <template v-if="products.length > 0">
+                <template v-if="!isLoading && products.length > 0">
                     <ProductCard v-for="product in products" :key="product.id" :product="product as Product" />
                 </template>
+                <p v-if="!isLoading && hasSearched && !products.length">No results found.</p>
             </div>
         </div>
     </section>

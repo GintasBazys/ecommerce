@@ -3,13 +3,25 @@ import type { QueryBuilderParams } from "@nuxt/content"
 
 const route = useRoute()
 const currentSlug = route.path
-
+const { data: currentPost } = useAsyncData(() => queryContent().where({ _path: currentSlug }).findOne())
 const query: QueryBuilderParams = { path: "/", where: [{ _path: { $ne: currentSlug } }], limit: 5, sort: [{ date: -1 }] }
 </script>
 <template>
     <main class="spacer">
         <section class="container blog-row">
-            <ContentDoc />
+            <h1>{{ currentPost?.title }}</h1>
+            <div class="blog-additional">
+                <span class="date"
+                    ><i>{{ currentPost?.date }}</i></span
+                >
+                <span class="author"> {{ currentPost?.author }}</span>
+            </div>
+            <picture class="d-block text-center">
+                <NuxtImg class="main-blog-image" :src="currentPost?.image" :alt="currentPost?.title" width="800" height="400" />
+            </picture>
+            <article>
+                <ContentDoc />
+            </article>
         </section>
         <section class="container mt-5">
             <h2 class="text-center mb-4">Related Posts</h2>

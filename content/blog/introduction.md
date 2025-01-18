@@ -2,9 +2,9 @@
 title: "Introduction to E-Commerce"
 description: "Explore the fundamentals of e-commerce and how it is transforming the retail industry."
 image: "/images/blog/about_banner.webp"
+author: "Admin"
+date: "2025-01-01"
 ---
-
-# Welcome to the World of E-Commerce
 
 E-commerce has revolutionized the way we shop and conduct business. In this article, we delve into the basics, its impact, and how you can start your journey.
 
