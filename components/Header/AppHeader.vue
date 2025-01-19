@@ -2,7 +2,10 @@
 const { $bootstrap } = useNuxtApp()
 
 onMounted(() => {
-    const offcanvasElement = document.getElementById("navbarNavAltMarkup")
+    const offcanvasElement = document.getElementById("navbarNav")
+    if (!offcanvasElement) {
+        return
+    }
     const offcanvas = new $bootstrap.Offcanvas(offcanvasElement)
 
     const hideOffcanvas = () => {
@@ -26,14 +29,14 @@ onMounted(() => {
                 <slot name="header-icons"></slot>
             </div>
             <div
-                id="navbarNavAltMarkup"
+                id="navbarNav"
                 tabindex="-1"
                 class="offcanvas-lg offcanvas-start w-lg-100 justify-content-lg-center d-flex justify-content-lg-center py-4 px-3 py-lg-0 px-lg-0"
             >
                 <button
                     type="button"
                     class="btn-close d-lg-none ms-auto"
-                    data-bs-target="#navbarNavAltMarkup"
+                    data-bs-target="#navbarNav"
                     data-bs-dismiss="offcanvas"
                     aria-label="Close"
                 ></button>

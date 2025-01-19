@@ -127,7 +127,7 @@ onUnmounted(() => {
             </div>
             <div class="copyright">
                 <div class="copyright-wrapper">
-                    <p>© Copyright Gintas Bazys 2024. All rights reserved.</p>
+                    <p>© Copyright Gintas Bazys {{ new Date().getFullYear() }}. All rights reserved.</p>
                     <div class="copyright-links">
                         <NuxtLink href="/privacy" target="_blank" rel="noopener noreferrer">Privacy policy</NuxtLink>
                     </div>

@@ -37,8 +37,8 @@ const { itemCount } = storeToRefs(cartStore)
             class="navbar-toggler p-0 border-0"
             type="button"
             data-bs-toggle="offcanvas"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
             aria-expanded="false"
             aria-label="Toggle navigation"
         >
