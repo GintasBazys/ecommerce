@@ -13,6 +13,7 @@ const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
 const customerStore = useCustomerStore()
+const cartStore = useCartStore()
 
 const email = ref<string>("")
 const firstName = ref<string>("")
@@ -189,6 +190,9 @@ const validateCallback = async () => {
             customer.value = customerData
 
             isLoading.value = false
+            customerStore.customer = customerData
+
+            await assignCustomerToCart(cartStore)
             alert(`Welcome, ${customer.value?.email}!`)
             router.push("/")
         } catch (decodeError) {

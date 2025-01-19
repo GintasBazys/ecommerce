@@ -37,14 +37,14 @@ export default defineNuxtConfig({
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
     modules: [
-      "@nuxt/eslint",
-      "nuxt-medusa",
-      "@pinia/nuxt",
-      "@nuxt/image",
-      "@nuxtjs/sitemap",
-      "nuxt-swiper",
-      "@unlok-co/nuxt-stripe",
-      "@nuxt/content"
+        "@nuxt/eslint",
+        "nuxt-medusa",
+        "@pinia/nuxt",
+        "@nuxt/image",
+        "@nuxtjs/sitemap",
+        "nuxt-swiper",
+        "@unlok-co/nuxt-stripe",
+        "@nuxt/content"
     ],
     stripe: {
         server: {
@@ -58,9 +58,6 @@ export default defineNuxtConfig({
     },
     medusa: {
         server: true
-    },
-    alias: {
-        pinia: "/node_modules/@pinia/nuxt/node_modules/pinia/dist/pinia.mjs"
     },
     runtimeConfig: {
         public: {

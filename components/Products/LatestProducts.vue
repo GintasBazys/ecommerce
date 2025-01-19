@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Product } from "@medusajs/medusa"
+import type { ProductDTO } from "@medusajs/types"
 
 const store = useProductStore()
 const { products } = storeToRefs(store)
@@ -10,6 +10,23 @@ const { regionStoreId } = storeToRefs(regionStore)
 await useAsyncData("product", async () => {
     await store.fetchData(regionStoreId.value ?? "")
     return store.products ?? null
+})
+
+const containerRef = ref(null)
+useSwiper(containerRef, {
+    breakpoints: {
+        "280": {
+            slidesPerView: 1.5
+        },
+        "768": {
+            slidesPerView: 3
+        },
+        "992": {
+            slidesPerView: 4
+        }
+    },
+    spaceBetween: 20,
+    grabCursor: true
 })
 </script>
 
@@ -22,27 +39,11 @@ await useAsyncData("product", async () => {
                 sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
             </p>
             <ClientOnly>
-                <Swiper
-                    class="showcaseSwiper"
-                    :space-between="20"
-                    :grab-cursor="true"
-                    :breakpoints="{
-                        '280': {
-                            slidesPerView: 1.5
-                        },
-                        '768': {
-                            slidesPerView: 3
-                        },
-                        '992': {
-                            slidesPerView: 4
-                        }
-                    }"
-                >
-                    <SwiperSlide v-for="product in products" :key="product.id">
-                        <ProductCard :product="product as Product" />
-                    </SwiperSlide>
-                </Swiper>
-            </ClientOnly>
+                <swiper-container ref="containerRef" class="showcaseSwiper">
+                    <swiper-slide v-for="product in products" :key="product.id">
+                        <ProductCard :product="product as ProductDTO" />
+                    </swiper-slide> </swiper-container
+            ></ClientOnly>
         </div>
     </section>
 </template>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Product } from "@medusajs/medusa"
+import type { ProductDTO } from "@medusajs/types"
 import { ref, computed } from "vue"
 import { formatCurrency } from "@/utils/formatCurrency"
 import { debounce } from "lodash"
 
 const { product } = defineProps<{
-    product: Product
+    product: ProductDTO
 }>()
 
 const cartStore = useCartStore()

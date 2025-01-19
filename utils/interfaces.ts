@@ -1,17 +1,17 @@
-import type { Customer } from "@medusajs/medusa"
+import type { CustomerDTO } from "@medusajs/types"
 import type { JwtPayload } from "jwt-decode"
 export interface CustomerResponseInterface {
-    customer: Customer
+    customer: CustomerDTO
     token: string
 }
 
 export interface CustomerAuthResponseInterface {
-    customer: Customer
+    customer: CustomerDTO
     success: boolean
 }
 
 export interface CustomerLoginResponseInterface {
-    customer: Customer
+    customer: CustomerDTO
     success: boolean
     message: string
 }

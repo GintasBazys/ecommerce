@@ -1,7 +1,7 @@
-import type { Customer } from "@medusajs/medusa"
+import type { CustomerDTO } from "@medusajs/types"
 
 export const useCustomerStore = defineStore("customer", () => {
-    const customer = ref<Customer | null>(null)
+    const customer = ref<CustomerDTO | null>(null)
     const config = useRuntimeConfig()
 
     const fetchCustomer = async () => {

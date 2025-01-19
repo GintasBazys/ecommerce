@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import type { Product } from "@medusajs/medusa"
+import type { ProductDTO } from "@medusajs/types"
 
 useHead({
     title: "Search | Ecommerce"
 })
 
 interface SearchResponse {
-    products: Product[]
+    products: ProductDTO[]
     count: number
 }
 
 const searchCounter = ref<number>(0)
 const searchQuery = ref<string>("")
-const products = ref<Product[]>([])
+const products = ref<ProductDTO[]>([])
 const isLoading = ref<boolean>(false)
 const hasSearched = ref<boolean>(false)
 const lastSearchQuery = ref<string>("")
@@ -89,7 +89,7 @@ const handleSearch = async (e: Event) => {
             </div>
             <div class="search-results">
                 <template v-if="!isLoading && products.length > 0">
-                    <ProductCard v-for="product in products" :key="product.id" :product="product as Product" />
+                    <ProductCard v-for="product in products" :key="product.id" :product="product as ProductDTO" />
                 </template>
                 <p v-if="!isLoading && hasSearched && !products.length">No results found.</p>
             </div>

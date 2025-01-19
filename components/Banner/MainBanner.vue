@@ -1,17 +1,25 @@
+M
+<script setup lang="ts">
+const containerRef = ref(null)
+const slides = ref(Array.from({ length: 4 }))
+useSwiper(containerRef, {
+    slidesPerView: 1,
+    loop: true,
+    autoplay: {
+        delay: 8000,
+        disableOnInteraction: true
+    },
+    grabCursor: true,
+    pagination: {
+        clickable: true
+    }
+})
+</script>
+
 <template>
     <section class="container-fluid px-0">
-        <Swiper
-            :modules="[SwiperAutoplay, SwiperPagination]"
-            :slides-per-view="1"
-            :grab-cursor="true"
-            :pagination="{ clickable: true }"
-            :autoplay="{
-                delay: 8000,
-                disableOnInteraction: true
-            }"
-            class="bannerSwiper"
-        >
-            <SwiperSlide v-for="slide in 4" :key="slide">
+        <swiper-container ref="containerRef" class="bannerSwiper">
+            <swiper-slide v-for="(slide, idx) in slides" :key="idx">
                 <NuxtImg
                     class="img-fluid"
                     format="webp"
@@ -23,7 +31,7 @@
                     :placeholder="[3840, 1316, 75, 5]"
                     :loading="slide === 1 ? 'eager' : 'lazy'"
                 />
-            </SwiperSlide>
-        </Swiper>
+            </swiper-slide>
+        </swiper-container>
     </section>
 </template>

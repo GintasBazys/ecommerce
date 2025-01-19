@@ -1,5 +1,5 @@
 import { ref, computed } from "vue"
-import type { Cart as MedusaCart, LineItem } from "@medusajs/medusa"
+import type { CartDTO as MedusaCart, CartLineItemDTO } from "@medusajs/types"
 
 interface CartItemExtension {
     product_description?: string | null
@@ -13,11 +13,13 @@ interface CartItemExtension {
     variant_id?: string | null
 }
 
-type ExtendedCartItem = LineItem & CartItemExtension
+type ExtendedCartItem = CartLineItemDTO & CartItemExtension
 
 type ExtendedCart = Omit<MedusaCart, "items"> & {
     readonly object: "cart"
     items: ExtendedCartItem[]
+    total: number
+    subtotal: number
 }
 
 interface CartResponseInterface {

@@ -1,35 +1,31 @@
 import { LIMIT } from "~/utils/consts"
-import type { Product, ProductCollection, Cart, ProductCategory } from "@medusajs/medusa"
+import type { ProductDTO, ProductCategoryDTO, CartDTO } from "@medusajs/types"
 
 interface ProductResponse {
-    products: Product[]
+    products: ProductDTO[]
     count: number
     productLimit: number
     productOffset: number
 }
 
-export interface CollectionResponse {
-    collections: ProductCollection[]
-}
-
 export interface CartResponse {
-    success: Cart
-    cart: Cart
+    success: CartDTO
+    cart: CartDTO
 }
 
 export const useProductStore = defineStore("product", () => {
-    const products = ref<Product[]>([])
+    const products = ref<ProductDTO[]>([])
     const limit = ref(LIMIT)
     const offset = ref(0)
     const totalCount = ref(0)
-    const bestSellers = ref<Product[]>([])
+    const bestSellers = ref<ProductDTO[]>([])
 
-    const setProducts = (newProducts: Product[]) => {
+    const setProducts = (newProducts: ProductDTO[]) => {
         if (Array.isArray(newProducts)) {
             products.value = newProducts
         }
     }
-    const setBestSellers = (newProducts: Product[]) => {
+    const setBestSellers = (newProducts: ProductDTO[]) => {
         bestSellers.value = newProducts
     }
 
@@ -37,9 +33,9 @@ export const useProductStore = defineStore("product", () => {
         totalCount.value = count
     }
 
-    const categories = ref<ProductCategory[]>([])
+    const categories = ref<ProductCategoryDTO[]>([])
 
-    const setCategories = (newCategories: ProductCategory[]) => {
+    const setCategories = (newCategories: ProductCategoryDTO[]) => {
         if (Array.isArray(newCategories)) {
             categories.value = newCategories
         }
