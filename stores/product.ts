@@ -9,7 +9,7 @@ interface ProductResponse {
 }
 
 export interface CartResponse {
-    success: CartDTO
+    success: boolean
     cart: CartDTO
 }
 

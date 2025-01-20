@@ -1,35 +1,13 @@
 import { ref, computed } from "vue"
-import type { CartDTO as MedusaCart, CartLineItemDTO } from "@medusajs/types"
-
-interface CartItemExtension {
-    product_description?: string | null
-    product_title?: string | null
-    product_handle?: string | null
-    thumbnail?: string | null
-    variant_title?: string | null
-    variant_sku?: string | null
-    unit_price?: number | null
-    quantity?: number | null
-    variant_id?: string | null
-}
-
-type ExtendedCartItem = CartLineItemDTO & CartItemExtension
-
-type ExtendedCart = Omit<MedusaCart, "items"> & {
-    readonly object: "cart"
-    items: ExtendedCartItem[]
-    total: number
-    subtotal: number
-}
-
+import type { CartDTO as MedusaCart } from "@medusajs/types"
 interface CartResponseInterface {
-    cart: ExtendedCart
+    cart: MedusaCart
     success?: boolean
     error?: string
 }
 
 export const useCartStore = defineStore("cart", () => {
-    const cart = ref<ExtendedCart | null>(null)
+    const cart = ref<MedusaCart>()
 
     const updateLineItem = async (
         selectedVariant: {
@@ -40,8 +18,8 @@ export const useCartStore = defineStore("cart", () => {
         },
         quantityToAdd = 1
     ) => {
-        if (!cart.value) {
-            console.warn("Cart is not initialized")
+        if (!cart.value || !cart.value.items) {
+            console.warn("Cart or cart items are not initialized")
             return
         }
 
@@ -54,7 +32,7 @@ export const useCartStore = defineStore("cart", () => {
             const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id && !item.id.startsWith("temp-"))
 
             if (existingItem) {
-                const newQuantity = existingItem.quantity + quantityToAdd
+                const newQuantity = Number(existingItem.quantity) + quantityToAdd
 
                 const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
                     method: "POST",
@@ -96,8 +74,8 @@ export const useCartStore = defineStore("cart", () => {
     }
 
     const removeLineItem = async (lineItemId: string) => {
-        if (!cart.value) {
-            console.warn("No cart ID found")
+        if (!cart.value || !cart.value.items) {
+            console.warn("Cart or cart items are not initialized")
             return
         }
 
@@ -112,9 +90,14 @@ export const useCartStore = defineStore("cart", () => {
 
             const itemToRemove = cart.value.items[itemIndex]
 
-            const itemTotal = itemToRemove.unit_price * itemToRemove.quantity || 0
-            cart.value.total = (cart.value.total ?? 0) - itemTotal
-            cart.value.subtotal = (cart.value.subtotal ?? 0) - itemTotal
+            const unitPrice = Number(itemToRemove.unit_price ?? 0)
+            const quantity = Number(itemToRemove.quantity ?? 0)
+
+            const itemTotal = unitPrice * quantity
+
+            cart.value.total = Number(cart.value.total ?? 0) - itemTotal
+            cart.value.subtotal = Number(cart.value.subtotal ?? 0) - itemTotal
+
             cart.value.items.splice(itemIndex, 1)
 
             const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cart.value.id}/${lineItemId}`, {
@@ -138,7 +121,10 @@ export const useCartStore = defineStore("cart", () => {
     }
 
     const itemCount = computed(() => {
-        return cart.value?.items.reduce((total, item) => total + item.quantity, 0) || 0
+        if (!cart.value?.items) {
+            return
+        }
+        return cart.value?.items.reduce((total, item) => total + Number(item.quantity), 0) || 0
     })
 
     return {

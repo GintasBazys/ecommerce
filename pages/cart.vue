@@ -26,15 +26,15 @@ const removeItem = async (lineItemId: string) => {
 </script>
 
 <template>
-    <section>
+    <section class="pb-5">
         <div class="container overflow-x-hidden">
             <div
                 class="mt-4 mt-lg-5 d-flex flex-column flex-lg-row gap-0 gap-lg-0 align-items-start align-items-lg-center justify-content-between"
             >
-                <h1 class="h4 mb-3 mb-lg-0 text-inter fw-bolder">Shopping cart</h1>
+                <h1 class="h3 pb-3 mb-4 text-inter fw-bolder border-bottom w-100">Shopping cart</h1>
 
                 <div class="w-100 mt-3 d-block d-lg-none">
-                    <p class="mb-0"><strong>Total: </strong>{{ formatPrice(cart?.total || 0) }}</p>
+                    <p class="mb-0"><strong>Total: </strong>{{ formatPrice(Number(cart?.total || 0)) }}</p>
                 </div>
             </div>
             <div class="row cart-row gx-5">
@@ -72,7 +72,7 @@ const removeItem = async (lineItemId: string) => {
                                 <div class="cart-item-bottom">
                                     <div class="text-end">
                                         <p>
-                                            <b>{{ formatPrice((item.unit_price || 0) * (item.quantity || 1)) }}</b>
+                                            <b>{{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1)) }}</b>
                                         </p>
                                     </div>
                                 </div>
@@ -83,10 +83,10 @@ const removeItem = async (lineItemId: string) => {
                 <div class="col-lg-5">
                     <div class="price-date-details">
                         <div class="subtotal-card mw-100 w-100">
-                            <h2 class="mb-3 text-inter fw-600">Order summary</h2>
+                            <h2 class="h3 mb-3 text-inter fw-600">Order summary</h2>
 
                             <div class="w-100">
-                                <form id="couponForm" action="" class="needs-validation" novalidate>
+                                <form id="couponForm" class="needs-validation" novalidate>
                                     <div class="input-group">
                                         <input
                                             type="text"
@@ -102,15 +102,15 @@ const removeItem = async (lineItemId: string) => {
                                     </div>
                                 </form>
                             </div>
-                            <div class="subtotal-item">
-                                <span><b>Subtotal:</b></span>
-                                <span>{{ formatPrice(cart?.subtotal || 0) }}</span>
+                            <div class="subtotal-item mt-4">
+                                <span><b>Subtotal: </b></span>
+                                <span>{{ formatPrice(Number(cart?.subtotal || 0)) }}</span>
                             </div>
-                            <div class="subtotal-item mt-3">
-                                <span class="total"><strong>Total:</strong></span>
-                                <span>{{ formatPrice(cart?.total || 0) }}</span>
+                            <div class="total-item mt-3">
+                                <span class="total"><strong>Total: </strong></span>
+                                <span>{{ formatPrice(Number(cart?.total || 0)) }}</span>
                             </div>
-                            <NuxtLink href="/checkout">checkout</NuxtLink>
+                            <NuxtLink class="btn btn-primary btn-total w-100" href="/checkout">Checkout</NuxtLink>
                         </div>
                     </div>
                 </div>

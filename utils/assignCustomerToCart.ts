@@ -1,4 +1,6 @@
-export const assignCustomerToCart = async (cartStore: { cart: { id: string } | null }) => {
+import type { CartDTO } from "@medusajs/types"
+
+export const assignCustomerToCart = async (cartStore: { cart: CartDTO | undefined }) => {
     if (!cartStore.cart) {
         console.warn("Cart is null, cannot assign customer.")
         return

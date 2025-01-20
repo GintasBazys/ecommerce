@@ -45,8 +45,9 @@ const { data: cartData } = await useFetch<CartResponse>(`/api/cart?regionId=${us
         "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
     }
 })
-
-cartStore.cart = cartData.value?.cart ?? null
+if (cartData.value) {
+    cartStore.cart = cartData.value.cart
+}
 
 if (customerStore.customer && !cartStore.cart?.customer_id) {
     await assignCustomerToCart(cartStore)
