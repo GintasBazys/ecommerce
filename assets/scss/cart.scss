@@ -22,9 +22,8 @@
 }
 .btn-total {
     margin: 2rem 0 0;
-    padding-top: 0.85rem;
-    padding-bottom: 0.85rem;
-    text-transform: uppercase;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
     font-weight: 600;
 }
 #coupon-addon {
@@ -33,4 +32,9 @@
     font-weight: 600;
     border-radius: 0 1.875rem 1.875rem 0;
     padding: 0.8125rem 1.125rem;
+}
+.cart-disabled {
+    background: #cacaca;
+    border: none;
+    pointer-events: none;
 }

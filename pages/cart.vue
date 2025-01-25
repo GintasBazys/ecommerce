@@ -112,7 +112,12 @@ const removeItem = async (lineItemId: string) => {
                                 <span class="total"><strong>Total: </strong></span>
                                 <span>{{ formatPrice(Number(cart?.total || 0)) }}</span>
                             </div>
-                            <NuxtLink class="btn btn-primary btn-total w-100" to="/checkout">Checkout</NuxtLink>
+                            <NuxtLink
+                                :class="{ 'cart-disabled': !cart?.items?.length }"
+                                class="btn btn-primary btn-total w-100"
+                                to="/checkout"
+                                >Checkout</NuxtLink
+                            >
                         </div>
                     </div>
                 </div>
