@@ -16,14 +16,19 @@ interface SimpleProductVariant {
     title: string
     calculated_price: {
         calculated_amount: number
+        original_amount: number
         currency_code: string
+        calculated_price: {
+            price_list_type: string
+        }
     }
     inventory_quantity: number
 }
+
 //@ts-expect-error recently released medusa 2.0 with breaking changes
 const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
 
-const computedPrice = computed(() => {
+const computedPrice = computed<number | string>(() => {
     if (
         selectedVariant.value &&
         selectedVariant.value.calculated_price &&
@@ -33,6 +38,21 @@ const computedPrice = computed(() => {
         return formatCurrency(calculated_amount, currency_code)
     }
     return "N/A"
+})
+
+const isOnSale = computed<number | boolean>(() => {
+    return (
+        selectedVariant.value?.calculated_price.calculated_price.price_list_type === "sale" &&
+        selectedVariant.value?.calculated_price.original_amount
+    )
+})
+
+const originalPrice = computed<string | null>(() => {
+    if (selectedVariant.value?.calculated_price.original_amount) {
+        const { original_amount, currency_code } = selectedVariant.value.calculated_price
+        return formatCurrency(original_amount, currency_code)
+    }
+    return null
 })
 
 const addToCart = async () => {
@@ -62,6 +82,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     :placeholder="[236, 236, 75, 5]"
                 />
             </NuxtLink>
+            <div v-if="isOnSale" class="badge-sale top-right">Sale</div>
         </div>
         <div class="pt-6">
             <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
@@ -73,7 +94,12 @@ const debouncedAddToCart = debounce(addToCart, 300)
             <div class="price-wrapper">
                 <div class="d-flex flex-column">
                     <div class="inner-price">
-                        <p class="price fw-bold mb-0">{{ computedPrice }}</p>
+                        <p class="price fw-bold mb-0">
+                            {{ computedPrice }}
+                            <template v-if="isOnSale">
+                                <del class="text-danger">{{ originalPrice }}</del>
+                            </template>
+                        </p>
                     </div>
                     <span class="text-small-2">Option: {{ selectedVariant?.title || "No options available" }}</span>
                 </div>

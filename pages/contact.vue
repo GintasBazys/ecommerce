@@ -9,7 +9,7 @@ useHead({
         <div class="container">
             <h1 class="h3 text-center">Contact us</h1>
             <span class="d-block text-center"
-                >These help articles may solve the issue you're having. Go to <NuxtLink href="/faq">FAQ</NuxtLink>.</span
+                >These help articles may solve the issue you're having. Go to <NuxtLink to="/faq">FAQ</NuxtLink>.</span
             >
 
             <div class="faq-cards">

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NuxtLink } from "#components"
+
 useHead({
     title: "Shipping | Ecommerce"
 })
@@ -80,7 +82,7 @@ useHead({
                     <h3>Order Issues</h3>
                     <p>
                         If you experience any issues with your payment or have any questions regarding your order, please contact our
-                        customer support team at <a href="mailto:support@[yourcompany].com">support@[yourcompany].com</a>.
+                        customer support team at <NuxtLink to="mailto:support@[yourcompany].com">support@[yourcompany].com</NuxtLink>.
                     </p>
                 </div>
             </div>

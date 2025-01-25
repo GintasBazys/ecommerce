@@ -7,11 +7,11 @@ const { categories } = storeToRefs(store)
 
 <template v-slot:navigation-links>
     <div class="navbar-nav">
-        <NuxtLink class="nav-link ps-lg-0 text-danger fw-bold" href="#">Special offers</NuxtLink>
+        <NuxtLink class="nav-link ps-lg-0 text-danger fw-bold" to="#">Special offers</NuxtLink>
         <template v-for="category in categories" :key="category.id">
-            <NuxtLink :href="`${CATEGORY_HANDLE}/` + category.handle" class="nav-link">{{ category.name }}</NuxtLink>
+            <NuxtLink :to="`${CATEGORY_HANDLE}/` + category.handle" class="nav-link">{{ category.name }}</NuxtLink>
         </template>
-        <NuxtLink class="nav-link" href="/blog">Blog</NuxtLink>
-        <NuxtLink class="nav-link" href="/about">About us</NuxtLink>
+        <NuxtLink class="nav-link" :to="BLOG_HANDLE">Blog</NuxtLink>
+        <NuxtLink class="nav-link" to="/about">About us</NuxtLink>
     </div>
 </template>

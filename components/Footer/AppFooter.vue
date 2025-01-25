@@ -38,10 +38,10 @@ onUnmounted(() => {
                     </p>
                     <div id="collapseFooter1" class="collapse" :class="{ show: isLargeScreen }" data-bs-parent=".footer-main">
                         <ul>
-                            <li><NuxtLink href="/faq">FAQ</NuxtLink></li>
-                            <li><NuxtLink href="/returns"> Returns</NuxtLink></li>
-                            <li><NuxtLink href="/shipping">Payment &amp; shipping</NuxtLink></li>
-                            <li><NuxtLink href="/contact">Contact us</NuxtLink></li>
+                            <li><NuxtLink to="/faq">FAQ</NuxtLink></li>
+                            <li><NuxtLink to="/returns"> Returns</NuxtLink></li>
+                            <li><NuxtLink to="/shipping">Payment &amp; shipping</NuxtLink></li>
+                            <li><NuxtLink to="/contact">Contact us</NuxtLink></li>
                         </ul>
                     </div>
                 </div>
@@ -59,7 +59,7 @@ onUnmounted(() => {
                         <ul>
                             <template v-for="category in store.categories" :key="category.id">
                                 <li>
-                                    <NuxtLink :href="`${CATEGORY_HANDLE}/` + category.handle">{{ category.name }}</NuxtLink>
+                                    <NuxtLink :ro="`${CATEGORY_HANDLE}/` + category.handle">{{ category.name }}</NuxtLink>
                                 </li>
                             </template>
                         </ul>
@@ -77,11 +77,11 @@ onUnmounted(() => {
                     </p>
                     <div id="collapseFooter3" class="collapse" :class="{ show: isLargeScreen }" data-bs-parent=".footer-main">
                         <ul>
-                            <li><NuxtLink href="/about">About us</NuxtLink></li>
-                            <li><NuxtLink href="/blog"> Blog</NuxtLink></li>
-                            <li><NuxtLink href="/contact">Contact us</NuxtLink></li>
+                            <li><NuxtLink to="/about">About us</NuxtLink></li>
+                            <li><NuxtLink :to="BLOG_HANDLE"> Blog</NuxtLink></li>
+                            <li><NuxtLink to="/contact">Contact us</NuxtLink></li>
                             <li>
-                                <NuxtLink href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                                <NuxtLink to="https://facebook.com" target="_blank" rel="noopener noreferrer">
                                     <NuxtImg
                                         src="/images/facebook.svg"
                                         width="22"
@@ -94,7 +94,7 @@ onUnmounted(() => {
                                 </NuxtLink>
                             </li>
                             <li>
-                                <NuxtLink href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                                <NuxtLink to="https://instagram.com" target="_blank" rel="noopener noreferrer">
                                     <NuxtImg
                                         src="/images/instagram.svg"
                                         width="22"
@@ -115,11 +115,11 @@ onUnmounted(() => {
                         <NuxtImg src="/images/visa.png" width="80" loading="lazy" alt="Visa" />
                     </div>
                     <div class="extra-links d-flex flex-column gap-1">
-                        <NuxtLink class="text-white" href="mailto:info@ecommerce.com" target="_blank" rel="noopener noreferrer"
+                        <NuxtLink class="text-white" to="mailto:info@ecommerce.com" target="_blank" rel="noopener noreferrer"
                             >info@ecommerce.com</NuxtLink
                         >
 
-                        <NuxtLink class="text-white" href="tel:+370 600 00000" target="_blank" rel="noopener noreferrer"
+                        <NuxtLink class="text-white" to="tel:+370 600 00000" target="_blank" rel="noopener noreferrer"
                             >+370 600 00000</NuxtLink
                         >
                     </div>
@@ -129,7 +129,7 @@ onUnmounted(() => {
                 <div class="copyright-wrapper">
                     <p>© Copyright Gintas Bazys {{ new Date().getFullYear() }}. All rights reserved.</p>
                     <div class="copyright-links">
-                        <NuxtLink href="/privacy" target="_blank" rel="noopener noreferrer">Privacy policy</NuxtLink>
+                        <NuxtLink to="/privacy" target="_blank" rel="noopener noreferrer">Privacy policy</NuxtLink>
                     </div>
                 </div>
             </div>

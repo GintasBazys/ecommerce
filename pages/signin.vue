@@ -94,7 +94,7 @@ const handleSocialLogin = async () => {
                             <p class="ps-3">Log in with Google</p>
                         </div>
                     </button>
-                    <NuxtLink class="external-login-link" href="/facebook">
+                    <NuxtLink class="external-login-link" to="/facebook">
                         <div class="external-login-block-no-shop my-4">
                             <NuxtImg
                                 src="/images/facebook_login_icon.svg"
@@ -115,13 +115,13 @@ const handleSocialLogin = async () => {
                             <div class="form-group mb-3">
                                 <input type="password" class="form-control loginPassword" placeholder="Password" name="password" />
                             </div>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
+                            <NuxtLink to="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</NuxtLink>
                             <button type="submit" class="btn btn-primary w-100 text-center mt-4">Log in</button>
                         </form>
                     </div>
                     <PasswordResetModal />
                     <p class="mb-0 mt-4 tag-14 text-lg-center text-left">
-                        Don't have an account? Register <NuxtLink href="/register">here</NuxtLink>
+                        Don't have an account? Register <NuxtLink to="/register">here</NuxtLink>
                     </p>
                 </div>
             </div>

@@ -10,15 +10,15 @@ const { itemCount } = storeToRefs(cartStore)
 
 <template v-slot:header-icons>
     <div class="d-flex gap-3 align-items-center header-icons">
-        <NuxtLink href="/search">
+        <NuxtLink to="/search">
             <NuxtImg src="/images/search.svg" width="24" height="24" alt="Search icon" loading="eager" />
         </NuxtLink>
-        <NuxtLink href="/cart" class="me-2 position-relative">
+        <NuxtLink to="/cart" class="me-2 position-relative">
             <NuxtImg src="/images/shopping_cart.svg" width="24" height="24" alt="Shopping icon" loading="eager" />
             <span class="badge rounded-pill cart-counter">{{ itemCount }}</span>
         </NuxtLink>
         <template v-if="customer && customer.id">
-            <NuxtLink class="btn sign-in-btn" href="/account">
+            <NuxtLink class="btn sign-in-btn" to="/account">
                 <div class="d-flex align-items-center">
                     <NuxtImg src="/images/person.svg" width="24" height="24" alt="person icon" loading="eager" />
                     <span class="ms-2 d-none d-lg-inline-block">{{ customer.first_name }}</span>
@@ -26,7 +26,7 @@ const { itemCount } = storeToRefs(cartStore)
             </NuxtLink>
         </template>
         <template v-else>
-            <NuxtLink class="btn sign-in-btn" href="/signin">
+            <NuxtLink class="btn sign-in-btn" to="/signin">
                 <div class="d-flex align-items-center">
                     <NuxtImg src="/images/person.svg" width="24" height="24" alt="person icon" loading="eager" />
                     <span class="ms-2 d-none d-lg-inline-block">Sign In</span>

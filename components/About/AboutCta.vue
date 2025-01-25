@@ -42,7 +42,7 @@ defineProps<{
                         </p>
                         <p class="m-0">Speak to us today to find out more.</p>
                         <template v-if="linkShown">
-                            <NuxtLink class="btn btn-outline-primary mt-3 px-4" href="/about">
+                            <NuxtLink class="btn btn-outline-primary mt-3 px-4" to="/about">
                                 <span role="button" class="read-more-btn-text">Read more</span>
                             </NuxtLink>
                         </template>

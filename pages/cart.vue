@@ -42,7 +42,7 @@ const removeItem = async (lineItemId: string) => {
                     <div class="order-products-grid">
                         <div v-for="item in cart?.items || []" :key="item.id" class="search-product px-0">
                             <div class="search-img-wrapper mt-1">
-                                <a :href="`/product/${item.product_handle}`">
+                                <NuxtLink :to="`/product/${item.product_handle}`">
                                     <NuxtImg
                                         :src="item.thumbnail || '/images/placeholder.png'"
                                         width="67"
@@ -51,13 +51,13 @@ const removeItem = async (lineItemId: string) => {
                                         :title="item.product_title"
                                         loading="lazy"
                                     />
-                                </a>
+                                </NuxtLink>
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-start gap-3 justify-content-between">
                                     <div class="search-product-description">
                                         <p class="cart-description-title">
-                                            <a :href="`/product/${item.product_handle}`">{{ item.product_title }}</a>
+                                            <NuxtLink :to="`/product/${item.product_handle}`">{{ item.product_title }}</NuxtLink>
                                         </p>
                                         <span class="description">{{ item.product_description }}</span>
                                         <span class="text-small-2 d-block">Option: {{ item.variant_title }}</span>
@@ -110,7 +110,7 @@ const removeItem = async (lineItemId: string) => {
                                 <span class="total"><strong>Total: </strong></span>
                                 <span>{{ formatPrice(Number(cart?.total || 0)) }}</span>
                             </div>
-                            <NuxtLink class="btn btn-primary btn-total w-100" href="/checkout">Checkout</NuxtLink>
+                            <NuxtLink class="btn btn-primary btn-total w-100" to="/checkout">Checkout</NuxtLink>
                         </div>
                     </div>
                 </div>

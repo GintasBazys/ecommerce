@@ -99,3 +99,15 @@
         width: 100%;
     }
 }
+.badge-sale {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 10;
+}

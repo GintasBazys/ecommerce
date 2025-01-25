@@ -206,12 +206,12 @@ useHead({
                 </div>
                 <div class="col-lg-3">
                     <div class="contact-card">
-                        <p>Didn't find an answer? <br >Get in touch</p>
+                        <p>Didn't find an answer? <br />Get in touch</p>
                         <span>
-                            Working time<br >
+                            Working time<br />
                             I-VII 6 - 11 p.m.
                         </span>
-                        <NuxtLink href="/contact" class="btn btn-primary w-100 d-block mt-3">Get in touch</NuxtLink>
+                        <NuxtLink to="/contact" class="btn btn-primary w-100 d-block mt-3">Get in touch</NuxtLink>
                     </div>
                 </div>
             </div>
