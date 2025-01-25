@@ -59,9 +59,9 @@ const handleLogin = async (e: Event) => {
     await router.push("/")
 }
 
-const handleSocialLogin = async () => {
+const handleSocialLogin = async (provider: string) => {
     try {
-        const result = await fetch(`/api/social/google`, {
+        const result = await fetch(`/api/social/${provider}`, {
             credentials: "include",
             method: "POST"
         }).then((res) => res.json())
@@ -86,26 +86,14 @@ const handleSocialLogin = async () => {
     <section class="spacer">
         <div class="row justify-content-center m-0">
             <div class="col-12">
-                <div class="mx-auto" style="max-width: 24.625rem; width: 100%">
-                    <h4 class="mb-4 mb-lg-5">Log in</h4>
-                    <button class="external-login-link w-100 border-0 bg-transparent" @click="handleSocialLogin">
+                <div class="mx-auto form-wrapper">
+                    <h4 class="mb-4">Log in</h4>
+                    <button class="external-login-link w-100 border-0 bg-transparent mb-4" @click="handleSocialLogin('google')">
                         <div class="external-login-block-no-shop">
                             <NuxtImg src="/images/google_login_icon.svg" width="24" height="24" alt="Google login icon" loading="lazy" />
                             <p class="ps-3">Log in with Google</p>
                         </div>
                     </button>
-                    <NuxtLink class="external-login-link" to="/facebook">
-                        <div class="external-login-block-no-shop my-4">
-                            <NuxtImg
-                                src="/images/facebook_login_icon.svg"
-                                width="24"
-                                height="24"
-                                alt="Facebook login icon"
-                                loading="lazy"
-                            />
-                            <p class="ps-3">Log in with Facebook</p>
-                        </div>
-                    </NuxtLink>
                     <div class="signin-form">
                         <form id="loginForm" @submit="(e) => handleLogin(e)">
                             <div class="form-group mb-3">
