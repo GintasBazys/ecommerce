@@ -17,11 +17,25 @@ const products = ref<ProductDTO[]>([])
 const isLoading = ref<boolean>(false)
 const hasSearched = ref<boolean>(false)
 const lastSearchQuery = ref<string>("")
-
+const searchHistory = ref<string[]>([])
 const regionStore = useRegionStore()
 const { regionStoreId } = storeToRefs(regionStore)
 
 const regionId = regionStoreId.value ?? ""
+
+if (typeof window !== "undefined") {
+    searchHistory.value = JSON.parse(localStorage.getItem("searchHistory") || "[]")
+}
+
+const updateSearchHistory = (query: string) => {
+    if (!searchHistory.value.includes(query)) {
+        searchHistory.value.unshift(query)
+        if (searchHistory.value.length > 5) {
+            searchHistory.value.pop()
+        }
+        localStorage.setItem("searchHistory", JSON.stringify(searchHistory.value))
+    }
+}
 
 const handleSearch = async (e: Event) => {
     e.preventDefault()
@@ -31,6 +45,7 @@ const handleSearch = async (e: Event) => {
     }
 
     lastSearchQuery.value = searchQuery.value
+    updateSearchHistory(searchQuery.value)
 
     isLoading.value = true
     try {
@@ -55,6 +70,16 @@ const handleSearch = async (e: Event) => {
         isLoading.value = false
         hasSearched.value = true
     }
+}
+
+const reRunSearch = (query: string) => {
+    searchQuery.value = query
+    handleSearch(new Event("submit"))
+}
+
+const deleteHistoryItem = (index: number) => {
+    searchHistory.value.splice(index, 1)
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory.value))
 }
 </script>
 
@@ -81,6 +106,21 @@ const handleSearch = async (e: Event) => {
                     </span>
                 </div>
             </form>
+
+            <div v-if="searchHistory.length" class="search-history mb-4">
+                <h3>Recent Searches</h3>
+                <ul class="list-group">
+                    <li
+                        v-for="(query, index) in searchHistory"
+                        :key="index"
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                        <span class="text-primary cursor-pointer" @click="reRunSearch(query)">{{ query }}</span>
+                        <button class="btn btn-sm btn-danger" @click="deleteHistoryItem(index)">Delete</button>
+                    </li>
+                </ul>
+            </div>
+
             <div v-if="isLoading" class="text-center my-4 d-flex flex-column gap-3 align-items-center">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
