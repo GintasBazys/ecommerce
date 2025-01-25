@@ -42,7 +42,7 @@ const removeItem = async (lineItemId: string) => {
                     <div class="order-products-grid">
                         <div v-for="item in cart?.items || []" :key="item.id" class="search-product px-0">
                             <div class="search-img-wrapper mt-1">
-                                <NuxtLink :to="`/product/${item.product_handle}`">
+                                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`">
                                     <NuxtImg
                                         :src="item.thumbnail || '/images/placeholder.png'"
                                         width="67"
@@ -57,7 +57,9 @@ const removeItem = async (lineItemId: string) => {
                                 <div class="d-flex align-items-start gap-3 justify-content-between">
                                     <div class="search-product-description">
                                         <p class="cart-description-title">
-                                            <NuxtLink :to="`/product/${item.product_handle}`">{{ item.product_title }}</NuxtLink>
+                                            <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`">{{
+                                                item.product_title
+                                            }}</NuxtLink>
                                         </p>
                                         <span class="description">{{ item.product_description }}</span>
                                         <span class="text-small-2 d-block">Option: {{ item.variant_title }}</span>
