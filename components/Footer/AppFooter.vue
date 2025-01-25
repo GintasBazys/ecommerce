@@ -59,7 +59,7 @@ onUnmounted(() => {
                         <ul>
                             <template v-for="category in store.categories" :key="category.id">
                                 <li>
-                                    <NuxtLink :ro="`${CATEGORY_HANDLE}/` + category.handle">{{ category.name }}</NuxtLink>
+                                    <NuxtLink :to="`${CATEGORY_HANDLE}/` + category.handle">{{ category.name }}</NuxtLink>
                                 </li>
                             </template>
                         </ul>
