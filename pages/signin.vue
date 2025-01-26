@@ -52,6 +52,11 @@ const handleLogin = async (e: Event) => {
         }
     }).then((res) => res.json())
 
+    if (!customer) {
+        alert("Authentication failed")
+        return
+    }
+
     customerStore.customer = customer
 
     await assignCustomerToCart(cartStore)
