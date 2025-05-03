@@ -3,10 +3,8 @@ import { useCustomerStore } from "~/stores/customer"
 import { useCartStore } from "~/stores/cartStore"
 import { useProductStore } from "~/stores/product"
 import type { CartResponse } from "~/stores/product"
-import AppHeader from "~/components/Header/AppHeader.vue"
 import AppFooter from "~/components/Footer/AppFooter.vue"
 import BaseHeader from "~/components/Header/BaseHeader.vue"
-import NavigationLinks from "~/components/Header/NavigationLinks.vue"
 
 const customerStore = useCustomerStore()
 const productStore = useProductStore()
@@ -69,21 +67,13 @@ useHead({
 
 <template>
     <NuxtLoadingIndicator />
-    <BaseHeader>
-        <HeaderBanner />
-        <AppHeader>
-            <template #header-icons>
-                <HeaderIcons />
-            </template>
-            <template #navigation-links>
-                <NavigationLinks />
-            </template>
-        </AppHeader>
-    </BaseHeader>
-    <NuxtLayout>
-        <NuxtPage />
-    </NuxtLayout>
-    <AppFooter />
+    <VApp>
+        <BaseHeader />
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
+        <AppFooter
+    /></VApp>
 </template>
 
 <!--suppress CssUnusedSymbol -->
