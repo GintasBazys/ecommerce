@@ -87,4 +87,7 @@ useHead({
     opacity: 0;
     filter: blur(1rem);
 }
+html {
+    font-family: "Archivo", sans-serif;
+}
 </style>

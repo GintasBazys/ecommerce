@@ -7,8 +7,8 @@
         </template>
         Free shipping on 35 €
     </VBanner>
-    <VAppBar app color="white" elevate-on-scroll flat height="64">
-        <VContainer fluid>
+    <VAppBar app color="white" elevate-on-scroll elevation="1" flat height="64">
+        <VContainer>
             <VRow align="center" no-gutters>
                 <VCol cols="auto">
                     <NuxtLink to="/">
@@ -95,5 +95,25 @@ const { categories } = storeToRefs(productStore)
     position: absolute;
     top: -4px;
     right: -4px;
+}
+
+.v-banner.primary {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 32px;
+    background-color: #1976d2;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+}
+
+.v-application--wrap {
+    padding-top: 32px;
+}
+
+.v-app-bar {
+    top: 32px;
 }
 </style>

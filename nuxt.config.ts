@@ -16,7 +16,7 @@ export default defineNuxtConfig({
             meta: [{ name: "description", content: "..." }]
         }
     },
-    css: ["@/assets/css/fonts.css", "@/assets/scss/main.scss"],
+    css: ["@/assets/scss/main.scss"],
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
