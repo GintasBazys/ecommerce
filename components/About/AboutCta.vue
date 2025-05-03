@@ -6,25 +6,24 @@ defineProps<{
 </script>
 
 <template>
-    <section class="container">
+    <VContainer>
         <div class="spacer" :class="extraSpacerClass">
-            <div class="row flex-xl-row flex-column-reverse gy-4">
-                <div class="col-xl-6 col-md-9">
-                    <NuxtImg
+            <VRow justify="center" row-gap="6" col-gap="6">
+                <VCol cols="12" md="9" xl="6" order="2" order-xl="1">
+                    <VImg
                         src="/images/online_purchase.jpg"
-                        format="webp"
-                        densities="x1 x2"
-                        alt="..."
-                        class="rounded-3"
-                        width="800"
-                        height="534"
-                        :placeholder="[800, 534, 75, 5]"
-                        loading="lazy"
+                        alt="online purchase illustration"
+                        max-width="800"
+                        max-height="534"
+                        aspect-ratio="1.5"
+                        lazy-src="/images/online_purchase.jpg"
+                        class="rounded-lg"
                     />
-                </div>
-                <div class="col-xl-6 col-md-9">
+                </VCol>
+
+                <VCol cols="12" md="9" xl="6" order="2" order-xl="1">
                     <div class="about-us-inner-content">
-                        <span class="header-label d-inline-block pb-2">WHO WE ARE</span>
+                        <span class="header-label pb-2">WHO WE ARE</span>
                         <h2>About us</h2>
                         <p>
                             Welcome to our online store! Since our inception in 2012, we’ve been dedicated to providing top-quality products
@@ -41,14 +40,13 @@ defineProps<{
                             any questions or need assistance, our friendly customer support team is here to help.
                         </p>
                         <p class="m-0">Speak to us today to find out more.</p>
+
                         <template v-if="linkShown">
-                            <NuxtLink class="btn btn-outline-primary mt-3 px-4" to="/about">
-                                <span role="button" class="read-more-btn-text">Read more</span>
-                            </NuxtLink>
+                            <VBtn outlined class="mt-3" tag="nuxt-link" to="/about"> Read more </VBtn>
                         </template>
                     </div>
-                </div>
-            </div>
+                </VCol>
+            </VRow>
         </div>
-    </section>
+    </VContainer>
 </template>

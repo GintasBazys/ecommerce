@@ -6,7 +6,10 @@ const { bestSellers } = storeToRefs(store)
 const regionStore = useRegionStore()
 const { regionStoreId } = storeToRefs(regionStore)
 
-await useAsyncData(`product-bestsellers-${regionStoreId.value}`, () => store.fetchBestSellers(regionStoreId.value ?? ""))
+const { data: sellers } = await useAsyncData<ProductDTO[]>(`product-bestsellers`, async () => {
+    await store.fetchBestSellers(regionStoreId.value ?? "")
+    return store.bestSellers
+})
 
 const containerRef = ref(null)
 useSwiper(containerRef, {
@@ -27,21 +30,20 @@ useSwiper(containerRef, {
 </script>
 
 <template>
-    <template v-if="bestSellers">
+    <template v-if="sellers">
         <section class="spacer showcase-section position-relative">
-            <div class="container">
+            <VContainer>
                 <h2 class="text-center mb-4">Bestsellers</h2>
                 <p class="text-center mb-4 mb-lg-5">
                     Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris
                     vel sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
                 </p>
-                <ClientOnly>
-                    <swiper-container ref="containerRef" class="showcaseSwiper">
-                        <swiper-slide v-for="product in bestSellers" :key="product.id">
-                            <ProductCard :product="product as ProductDTO" />
-                        </swiper-slide> </swiper-container
-                ></ClientOnly>
-            </div>
+                <swiper-container ref="containerRef" class="showcaseSwiper">
+                    <swiper-slide v-for="product in bestSellers" :key="product.id">
+                        <ProductCard :product="product as ProductDTO" />
+                    </swiper-slide>
+                </swiper-container>
+            </VContainer>
         </section>
     </template>
 </template>

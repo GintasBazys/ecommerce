@@ -32,18 +32,17 @@ useSwiper(containerRef, {
 
 <template>
     <section class="spacer showcase-section position-relative">
-        <div class="container">
-            <h2 class="text-center mb-4">Latest Offers</h2>
-            <p class="text-center mb-4 mb-lg-5">
+        <VContainer>
+            <h2>Latest Offers</h2>
+            <p>
                 Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris vel
                 sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
             </p>
-            <ClientOnly>
-                <swiper-container ref="containerRef" class="showcaseSwiper">
-                    <swiper-slide v-for="product in products" :key="product.id">
-                        <ProductCard :product="product as ProductDTO" />
-                    </swiper-slide> </swiper-container
-            ></ClientOnly>
-        </div>
+            <swiper-container ref="containerRef" class="showcaseSwiper">
+                <swiper-slide v-for="product in products" :key="product.id">
+                    <ProductCard :product="product as ProductDTO" />
+                </swiper-slide>
+            </swiper-container>
+        </VContainer>
     </section>
 </template>

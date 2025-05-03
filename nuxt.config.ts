@@ -29,7 +29,8 @@ export default defineNuxtConfig({
         "@nuxtjs/sitemap",
         "nuxt-swiper",
         "@unlok-co/nuxt-stripe",
-        "@nuxt/content"
+        "@nuxt/content",
+        "vuetify-nuxt-module"
     ],
     stripe: {
         server: {

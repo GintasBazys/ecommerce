@@ -1,4 +1,3 @@
-M
 <script setup lang="ts">
 const containerRef = ref(null)
 const slides = ref(Array.from({ length: 4 }))
@@ -9,10 +8,7 @@ useSwiper(containerRef, {
         delay: 8000,
         disableOnInteraction: true
     },
-    grabCursor: true,
-    pagination: {
-        clickable: true
-    }
+    grabCursor: true
 })
 </script>
 

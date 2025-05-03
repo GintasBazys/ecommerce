@@ -1,16 +1,4 @@
-@import "variables";
-@import "../../node_modules/bootstrap/scss/bootstrap";
-@import "../../node_modules/swiper/swiper-bundle.css";
-@import "header";
-@import "footer";
-@import "static";
-@import "product";
-@import "cart";
-@import "accordion";
-@import "swiper";
-:root {
-    --bs-body-font-family: Archivo, sans-serif;
-}
+@use "swiper";
 .max-w-520 {
     max-width: 520px;
 }
@@ -19,7 +7,7 @@
     &:hover,
     &:focus {
         background: transparent;
-        border: 1px solid $primary;
+        border: 1px solid #010c80;
         color: #000000;
     }
 }
@@ -27,13 +15,13 @@
     border-color: currentColor;
 }
 .w-lg-100 {
-    @include media-breakpoint-up(lg) {
+    @media screen and (min-width: 1025px) {
         width: 100%;
     }
 }
 .spacer {
     padding: 5rem 0;
-    @include media-breakpoint-down(lg) {
+    @media screen and (max-width: 1024px) {
         padding: 3rem 0;
     }
 }
@@ -80,7 +68,7 @@ h5 {
     line-height: 1.75rem;
 }
 
-@include media-breakpoint-down(lg) {
+@media screen and (max-width: 1024px) {
     .h1,
     h1 {
         font-size: 2.625rem;
@@ -96,7 +84,7 @@ h5 {
     }
 }
 
-@include media-breakpoint-down(md) {
+@media screen and (max-width: 767px) {
     .h1,
     h1 {
         font-size: 2rem;

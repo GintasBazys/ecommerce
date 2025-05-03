@@ -1,24 +1,3 @@
-<script setup lang="ts">
-const { $bootstrap } = useNuxtApp()
-
-onMounted(() => {
-    const offcanvasElement = document.getElementById("navbarNav")
-    if (!offcanvasElement) {
-        return
-    }
-    const offcanvas = new $bootstrap.Offcanvas(offcanvasElement)
-
-    const hideOffcanvas = () => {
-        if (offcanvasElement?.classList.contains("show")) {
-            offcanvas.hide()
-        }
-    }
-
-    const router = useRouter()
-    router.afterEach(hideOffcanvas)
-})
-</script>
-
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-lg">
         <div class="container flex-column align-items-start">
