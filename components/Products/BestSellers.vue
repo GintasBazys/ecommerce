@@ -6,10 +6,7 @@ const { bestSellers } = storeToRefs(store)
 const regionStore = useRegionStore()
 const { regionStoreId } = storeToRefs(regionStore)
 
-await useAsyncData("product", async () => {
-    await store.fetchBestSellers(regionStoreId.value ?? "")
-    return store.bestSellers ?? null
-})
+await useAsyncData(`product-bestsellers-${regionStoreId.value}`, () => store.fetchBestSellers(regionStoreId.value ?? ""))
 
 const containerRef = ref(null)
 useSwiper(containerRef, {
