@@ -1,5 +1,3 @@
-import type { NuxtPage } from "nuxt/schema"
-
 export default defineNuxtConfig({
     compatibilityDate: "2024-04-03",
     app: {
@@ -18,20 +16,6 @@ export default defineNuxtConfig({
             meta: [{ name: "description", content: "..." }]
         }
     },
-    hooks: {
-        "pages:extend"(pages) {
-            function setMiddleware(pages: NuxtPage[]) {
-                for (const page of pages) {
-                    page.meta ||= {}
-                    page.meta.middleware = ["auth-middleware"]
-                    if (page.children) {
-                        setMiddleware(page.children)
-                    }
-                }
-            }
-            setMiddleware(pages)
-        }
-    },
     css: ["@/assets/css/fonts.css", "@/assets/scss/main.scss"],
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
@@ -40,6 +24,7 @@ export default defineNuxtConfig({
         "@nuxt/eslint",
         "nuxt-medusa",
         "@pinia/nuxt",
+        "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
         "@nuxtjs/sitemap",
         "nuxt-swiper",

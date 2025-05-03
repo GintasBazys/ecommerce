@@ -1,6 +1,11 @@
 <script setup lang="ts">
 definePageMeta({
-    layout: "account"
+    layout: "account",
+    middleware: ["auth"]
+})
+
+useHead({
+    title: "Orders | Ecommerce"
 })
 </script>
 

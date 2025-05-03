@@ -1,6 +1,11 @@
 <script setup lang="ts">
 definePageMeta({
-    layout: "account"
+    layout: "account",
+    middleware: ["auth"]
+})
+
+useHead({
+    title: "Account | Ecommerce"
 })
 const router = useRouter()
 
@@ -19,6 +24,7 @@ const handleLogout = async () => {
     <section class="spacer">
         <div class="container">
             <button class="btn btn-primary" @click="handleLogout">Log out</button>
+            <NuxtLink to="/account/orders">Orders</NuxtLink>
         </div>
     </section>
 </template>
