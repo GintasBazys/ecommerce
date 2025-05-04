@@ -89,5 +89,6 @@ useHead({
 }
 html {
     font-family: "Archivo", sans-serif;
+    scroll-behavior: smooth;
 }
 </style>
