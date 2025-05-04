@@ -3,8 +3,8 @@ import { useProductStore } from "~/stores/product"
 import { debounce } from "lodash"
 
 const store = useProductStore()
-
 const isLargeScreen = ref<boolean>(true)
+const expandedPanels = ref<number[][]>([[], [], []])
 
 const handleResize = () => {
     isLargeScreen.value = window.innerWidth > 767.98
@@ -20,119 +20,130 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener("resize", debouncedResize)
 })
+
+watch(
+    isLargeScreen,
+    (val) => {
+        expandedPanels.value = val ? [[0], [0], [0]] : [[], [], []]
+    },
+    { immediate: true }
+)
+
+const helpLinks = [
+    { label: "FAQ", to: "/faq" },
+    { label: "Returns", to: "/returns" },
+    { label: "Payment & Shipping", to: "/shipping" },
+    { label: "Contact Us", to: "/contact" }
+]
+
+const aboutLinks = [
+    { label: "About Us", to: "/about" },
+    { label: "Blog", to: BLOG_HANDLE },
+    { label: "Contact Us", to: "/contact" },
+    {
+        label: "Facebook",
+        to: "https://facebook.com",
+        icon: "/images/facebook.svg"
+    },
+    {
+        label: "Instagram",
+        to: "https://instagram.com",
+        icon: "/images/instagram.svg"
+    }
+]
 </script>
 
 <template>
-    <footer class="bg-gradient-primary spacer mt-auto">
-        <div class="container">
-            <div class="row footer-main gy-3">
-                <div class="col-lg-3 col-md-6">
-                    <p
-                        class="footer-collapse dropdown-toggle"
-                        href="#collapseFooter1"
-                        aria-expanded="false"
-                        data-bs-toggle="collapse"
-                        aria-controls="collapseFooter1"
-                    >
-                        Help &amp; Contact
-                    </p>
-                    <div id="collapseFooter1" class="collapse" :class="{ show: isLargeScreen }" data-bs-parent=".footer-main">
-                        <ul>
-                            <li><NuxtLink to="/faq">FAQ</NuxtLink></li>
-                            <li><NuxtLink to="/returns"> Returns</NuxtLink></li>
-                            <li><NuxtLink to="/shipping">Payment &amp; shipping</NuxtLink></li>
-                            <li><NuxtLink to="/contact">Contact us</NuxtLink></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <p
-                        class="footer-collapse dropdown-toggle"
-                        href="#collapseFooter2"
-                        data-bs-toggle="collapse"
-                        aria-expanded="false"
-                        aria-controls="collapseFooter2"
-                    >
-                        Categories
-                    </p>
-                    <div id="collapseFooter2" class="collapse" :class="{ show: isLargeScreen }" data-bs-parent=".footer-main">
-                        <ul>
-                            <template v-for="category in store.categories" :key="category.id">
-                                <li>
-                                    <NuxtLink :to="`${CATEGORY_HANDLE}/` + category.handle">{{ category.name }}</NuxtLink>
-                                </li>
-                            </template>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <p
-                        class="footer-collapse dropdown-toggle"
-                        href="#collapseFooter3"
-                        data-bs-toggle="collapse"
-                        aria-expanded="false"
-                        aria-controls="collapseFooter3"
-                    >
-                        About
-                    </p>
-                    <div id="collapseFooter3" class="collapse" :class="{ show: isLargeScreen }" data-bs-parent=".footer-main">
-                        <ul>
-                            <li><NuxtLink to="/about">About us</NuxtLink></li>
-                            <li><NuxtLink :to="BLOG_HANDLE"> Blog</NuxtLink></li>
-                            <li><NuxtLink to="/contact">Contact us</NuxtLink></li>
-                            <li>
-                                <NuxtLink to="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                                    <NuxtImg
-                                        src="/images/facebook.svg"
-                                        width="22"
-                                        height="22"
-                                        alt="facebook"
-                                        title="facebook"
-                                        loading="lazy"
-                                    />
-                                    Facebook
-                                </NuxtLink>
-                            </li>
-                            <li>
-                                <NuxtLink to="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                                    <NuxtImg
-                                        src="/images/instagram.svg"
-                                        width="22"
-                                        height="22"
-                                        alt="instagram"
-                                        title="instagram"
-                                        loading="lazy"
-                                    />
-                                    Instagram
-                                </NuxtLink>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 position-relative">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <NuxtImg src="/images/mastercard.svg" width="80" loading="lazy" alt="Mastercard" />
-                        <NuxtImg src="/images/visa.png" width="80" loading="lazy" alt="Visa" />
-                    </div>
-                    <div class="extra-links d-flex flex-column gap-1">
-                        <NuxtLink class="text-white" to="mailto:info@ecommerce.com" target="_blank" rel="noopener noreferrer"
-                            >info@ecommerce.com</NuxtLink
-                        >
+    <VFooter class="bg-primary text-white pa-6" padless>
+        <VContainer>
+            <VRow class="footer-main" dense>
+                <VCol cols="12" md="6" lg="3">
+                    <VExpansionPanels v-model="expandedPanels[0]" multiple flat tile class="bg-primary text-white">
+                        <VExpansionPanel>
+                            <VExpansionPanelTitle>Help & Contact</VExpansionPanelTitle>
+                            <VExpansionPanelText class="bg-primary text-white">
+                                <VList dense class="bg-primary">
+                                    <VListItem v-for="(item, i) in helpLinks" :key="i" class="pa-0">
+                                        <NuxtLink :to="item.to" class="text-white text-decoration-none">{{ item.label }}</NuxtLink>
+                                    </VListItem>
+                                </VList>
+                            </VExpansionPanelText>
+                        </VExpansionPanel>
+                    </VExpansionPanels>
+                </VCol>
 
-                        <NuxtLink class="text-white" to="tel:+370 600 00000" target="_blank" rel="noopener noreferrer"
-                            >+370 600 00000</NuxtLink
+                <VCol cols="12" md="6" lg="3">
+                    <VExpansionPanels v-model="expandedPanels[1]" multiple flat tile class="bg-primary text-white">
+                        <VExpansionPanel>
+                            <VExpansionPanelTitle>Categories</VExpansionPanelTitle>
+                            <VExpansionPanelText class="bg-primary text-white">
+                                <VList dense class="bg-primary">
+                                    <VListItem v-for="category in store.categories" :key="category.id" class="pa-0">
+                                        <NuxtLink :to="`${CATEGORY_HANDLE}/` + category.handle" class="text-white text-decoration-none">
+                                            {{ category.name }}
+                                        </NuxtLink>
+                                    </VListItem>
+                                </VList>
+                            </VExpansionPanelText>
+                        </VExpansionPanel>
+                    </VExpansionPanels>
+                </VCol>
+
+                <VCol cols="12" md="6" lg="3">
+                    <VExpansionPanels v-model="expandedPanels[2]" multiple flat tile class="bg-primary text-white">
+                        <VExpansionPanel>
+                            <VExpansionPanelTitle>About</VExpansionPanelTitle>
+                            <VExpansionPanelText class="bg-primary text-white">
+                                <VList dense class="bg-primary">
+                                    <VListItem v-for="(item, i) in aboutLinks" :key="i" class="pa-0">
+                                        <NuxtLink :to="item.to" class="text-white text-decoration-none">
+                                            <template v-if="item.icon">
+                                                <NuxtImg :src="item.icon" width="22" height="22" class="me-2" />
+                                            </template>
+                                            {{ item.label }}
+                                        </NuxtLink>
+                                    </VListItem>
+                                </VList>
+                            </VExpansionPanelText>
+                        </VExpansionPanel>
+                    </VExpansionPanels>
+                </VCol>
+
+                <VCol cols="12" md="6" lg="3">
+                    <VRow class="mb-4" align="center" dense>
+                        <VCol cols="6" class="d-flex justify-center">
+                            <NuxtImg src="/images/mastercard.svg" width="80" loading="lazy" alt="Mastercard" />
+                        </VCol>
+                        <VCol cols="6" class="d-flex justify-center">
+                            <NuxtImg src="/images/visa.png" width="80" loading="lazy" alt="Visa" />
+                        </VCol>
+                    </VRow>
+                    <div class="d-flex flex-column gap-2">
+                        <NuxtLink
+                            class="text-white text-decoration-none"
+                            to="mailto:info@ecommerce.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
                         >
+                            info@ecommerce.com
+                        </NuxtLink>
+                        <NuxtLink class="text-white text-decoration-none" to="tel:+37060000000" target="_blank" rel="noopener noreferrer">
+                            +370 600 00000
+                        </NuxtLink>
                     </div>
-                </div>
-            </div>
-            <div class="copyright">
-                <div class="copyright-wrapper">
-                    <p>© Copyright Gintas Bazys {{ new Date().getFullYear() }}. All rights reserved.</p>
-                    <div class="copyright-links">
-                        <NuxtLink to="/privacy" target="_blank" rel="noopener noreferrer">Privacy policy</NuxtLink>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+                </VCol>
+            </VRow>
+
+            <VDivider class="my-6" />
+
+            <VRow justify="space-between" align="center">
+                <VCol cols="12" md="6">
+                    <p class="mb-0">© Copyright Gintas Bazys {{ new Date().getFullYear() }}. All rights reserved.</p>
+                </VCol>
+                <VCol cols="12" md="6" class="d-flex justify-end">
+                    <NuxtLink to="/privacy" class="text-white text-decoration-none"> Privacy Policy </NuxtLink>
+                </VCol>
+            </VRow>
+        </VContainer>
+    </VFooter>
 </template>

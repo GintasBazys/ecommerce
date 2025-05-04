@@ -69,53 +69,58 @@ const debouncedAddToCart = debounce(addToCart, 300)
 </script>
 
 <template>
-    <article class="product-card">
-        <div>
+    <VCard class="pa-4" elevation="2" rounded>
+        <div class="position-relative">
             <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
-                <NuxtImg
-                    format="webp"
+                <VImg
                     :src="product.thumbnail || product.images[0]?.url || '/images/placeholder.png'"
                     alt="Product Image"
-                    width="236"
                     height="236"
-                    :placeholder="[236, 236, 75, 5]"
+                    width="236"
+                    cover
+                    class="mb-4"
                 />
             </NuxtLink>
-            <div v-if="isOnSale" class="badge-sale top-right">Sale</div>
+
+            <VChip v-if="isOnSale" color="red" text-color="white" class="position-absolute top-0 right-0 ma-2" label size="small">
+                Sale
+            </VChip>
         </div>
-        <div class="pt-6">
+
+        <div>
             <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
-                <strong>
-                    {{ product.title }}
-                </strong>
+                <div class="text-h6 font-weight-bold mb-2">{{ product.title }}</div>
             </NuxtLink>
-            <p class="description">{{ product.description }}</p>
-            <div class="price-wrapper">
-                <div class="d-flex flex-column">
-                    <div class="inner-price">
-                        <p class="price fw-bold mb-0">
-                            {{ computedPrice }}
-                            <template v-if="isOnSale">
-                                <del class="text-danger">{{ originalPrice }}</del>
-                            </template>
-                        </p>
+
+            <p class="text-truncate text-body-2 mb-2">{{ product.description }}</p>
+
+            <div class="d-flex justify-space-between align-start mt-4">
+                <div>
+                    <div class="text-subtitle-1 font-weight-bold">
+                        {{ computedPrice }}
+                        <template v-if="isOnSale">
+                            <del class="text-error ms-2">{{ originalPrice }}</del>
+                        </template>
                     </div>
-                    <span class="text-small-2">Option: {{ selectedVariant?.title || "No options available" }}</span>
+                    <div class="text-caption mt-1">Option: {{ selectedVariant?.title || "No options available" }}</div>
                 </div>
-                <button
-                    type="button"
-                    class="btn quick-add-btn"
-                    :disabled="!Boolean(selectedVariant?.inventory_quantity) || loading"
+
+                <VBtn
+                    icon
+                    color="black"
+                    :loading="loading"
+                    :disabled="!selectedVariant?.inventory_quantity"
+                    class="elevation-0"
                     @click="debouncedAddToCart"
                 >
-                    <div v-if="loading" class="spinner-border spiner-border-sm text-white" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <span v-else class="cart-btn-icon"></span>
-                </button>
+                    <template #loader>
+                        <VProgressCircular indeterminate color="white" size="20" />
+                    </template>
+                    <VIcon>mdi-cart</VIcon>
+                </VBtn>
             </div>
         </div>
-    </article>
+    </VCard>
 </template>
 
 <style lang="scss" scoped>

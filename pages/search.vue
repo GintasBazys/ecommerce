@@ -11,12 +11,12 @@ interface SearchResponse {
     count: number
 }
 
-const searchCounter = ref<number>(0)
-const searchQuery = ref<string>("")
+const searchCounter = ref(0)
+const searchQuery = ref("")
 const products = ref<ProductDTO[]>([])
-const isLoading = ref<boolean>(false)
-const hasSearched = ref<boolean>(false)
-const lastSearchQuery = ref<string>("")
+const isLoading = ref(false)
+const hasSearched = ref(false)
+const lastSearchQuery = ref("")
 const searchHistory = ref<string[]>([])
 const regionStore = useRegionStore()
 const { regionStoreId } = storeToRefs(regionStore)
@@ -84,55 +84,52 @@ const deleteHistoryItem = (index: number) => {
 </script>
 
 <template>
-    <section class="spacer">
-        <div class="container">
-            <h1 class="mb-4 pb-3">
-                Search <span class="text-primary fw-bold search-counter">({{ searchCounter }})</span>
-            </h1>
-            <form @submit="handleSearch">
-                <div class="input-group p-0 mt-3 my-5">
-                    <input
-                        id="search-input"
+    <VContainer class="py-10">
+        <VRow>
+            <VCol cols="12">
+                <h1 class="text-h4 font-weight-bold mb-6">
+                    Search
+                    <span class="text-primary">({{ searchCounter }})</span>
+                </h1>
+
+                <VForm @submit.prevent="handleSearch">
+                    <VTextField
                         v-model="searchQuery"
-                        required
-                        class="form-control my-0 py-3 px-4 border-end-0 border"
-                        type="search"
-                        placeholder="Search..."
+                        label="Search..."
+                        outlined
+                        dense
+                        clearable
+                        append-inner-icon="mdi-magnify"
+                        :loading="isLoading"
                     />
-                    <span class="input-group-append">
-                        <button class="btn p-3 bg-white border-start-0 border" type="submit" :disabled="isLoading">
-                            <NuxtImg src="/images/search.svg" alt="Search" width="24" height="24" loading="lazy" />
-                        </button>
-                    </span>
-                </div>
-            </form>
+                </VForm>
+            </VCol>
 
-            <div v-if="searchHistory.length" class="search-history mb-4">
-                <h3>Recent Searches</h3>
-                <ul class="list-group">
-                    <li
-                        v-for="(query, index) in searchHistory"
-                        :key="index"
-                        class="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                        <span class="text-primary cursor-pointer" @click="reRunSearch(query)">{{ query }}</span>
-                        <button class="btn btn-sm btn-danger" @click="deleteHistoryItem(index)">Delete</button>
-                    </li>
-                </ul>
-            </div>
+            <VCol v-if="searchHistory.length" cols="12" class="mt-4">
+                <h3 class="text-h6 mb-2">Recent Searches</h3>
+                <VList dense>
+                    <VListItem v-for="(query, index) in searchHistory" :key="index" class="d-flex justify-space-between align-center">
+                        <VBtn text color="primary" @click="reRunSearch(query)">
+                            {{ query }}
+                        </VBtn>
+                        <VBtn icon @click="deleteHistoryItem(index)">
+                            <VIcon color="red">mdi-delete</VIcon>
+                        </VBtn>
+                    </VListItem>
+                </VList>
+            </VCol>
 
-            <div v-if="isLoading" class="text-center my-4 d-flex flex-column gap-3 align-items-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <span>Loading results...</span>
-            </div>
-            <div class="search-results">
-                <template v-if="!isLoading && products.length > 0">
+            <VCol v-if="isLoading" cols="12" class="text-center py-6">
+                <VProgressCircular indeterminate color="primary" size="40" class="mb-3" />
+                <div>Loading results...</div>
+            </VCol>
+
+            <VCol cols="12" class="search-results">
+                <template v-if="!isLoading && products.length">
                     <ProductCard v-for="product in products" :key="product.id" :product="product as ProductDTO" />
                 </template>
-                <p v-if="!isLoading && hasSearched && !products.length">No results found.</p>
-            </div>
-        </div>
-    </section>
+                <p v-else-if="!isLoading && hasSearched">No results found.</p>
+            </VCol>
+        </VRow>
+    </VContainer>
 </template>
