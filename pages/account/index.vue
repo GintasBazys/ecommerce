@@ -12,7 +12,7 @@ const router = useRouter()
 const customerStore = useCustomerStore()
 
 const handleLogout = async () => {
-    const response = await $fetch("/api/logout", { method: "POST" })
+    const response = await $fetch("/api/account/logout", { method: "POST" })
     if (response.success) {
         customerStore.$patch({ customer: null })
         await router.push("/")

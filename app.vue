@@ -25,7 +25,7 @@ const { data: categoriesData } = await useFetch("/api/categories", {
 })
 productStore.categories = categoriesData.value
 
-const { data: customerData, error: customerError } = await useFetch<CustomerAuthResponseInterface>("/api/auth", {
+const { data: customerData, error: customerError } = await useFetch<CustomerAuthResponseInterface>("/api/account/auth", {
     headers: useRequestHeaders(["cookie"])
 })
 

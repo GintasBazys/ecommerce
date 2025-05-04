@@ -8,7 +8,7 @@ export const useCustomerStore = defineStore(
 
         const fetchCustomer = async () => {
             try {
-                const data = await $fetch<CustomerAuthResponseInterface>("/api/auth", {
+                const data = await $fetch<CustomerAuthResponseInterface>("/api/account/auth", {
                     credentials: "include",
                     headers: {
                         "Content-Type": "application/json",

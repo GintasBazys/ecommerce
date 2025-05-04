@@ -62,8 +62,16 @@ const { data: relatedPosts } = await useAsyncData(`related-${slug.value}`, () =>
 
             <VRow v-if="relatedPosts && relatedPosts.length > 0" class="gy-6">
                 <VCol v-for="article in relatedPosts" :key="article.path" cols="12" md="6" lg="4">
-                    <NuxtLink :to="BLOG_HANDLE + article.path" style="text-decoration: none">
-                        <VImg :src="article.image" :alt="article.title" width="700" height="400" class="mb-4 rounded-lg" cover />
+                    <NuxtLink :to="BLOG_HANDLE + article.path" style="text-decoration: none" class="d-flex justify-center">
+                        <VImg
+                            :src="article.image"
+                            :alt="article.title"
+                            class="mb-4 rounded-lg"
+                            height="300"
+                            width="700"
+                            cover
+                            aspect-ratio="16/9"
+                        />
                     </NuxtLink>
 
                     <NuxtLink :to="BLOG_HANDLE + article.path" class="text-decoration-none">
