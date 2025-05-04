@@ -9,9 +9,7 @@ useHead({
         <VContainer class="py-12">
             <VRow justify="center">
                 <VCol cols="12" md="10">
-                    <VCard flat class="pa-4">
-                        <VCardTitle class="text-h4 mb-6">About page</VCardTitle>
-                    </VCard>
+                    <h1 class="pb-3 text-h4 font-weight-bold">About page</h1>
                 </VCol>
             </VRow>
         </VContainer>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
@@ -9,49 +9,70 @@ const runtimeConfig = useRuntimeConfig()
 const token = encodeURIComponent((route.query.token as string) || "")
 const email = encodeURIComponent((route.query.email as string) || "")
 const password = ref("")
+const errorMessage = ref("")
+const successMessage = ref("")
+const formRef = ref()
 
-const handleSubmit = async (e: Event) => {
-    e.preventDefault()
-
+const handleSubmit = async () => {
     if (!password.value) {
-        alert("Password is required")
+        errorMessage.value = "Password is required"
         return
     }
 
-    fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass/update?token=${token}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email,
-            password: password.value
+    try {
+        const res = await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass/update`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                email,
+                password: password.value
+            })
         })
-    })
-        .then((res) => {
-            if (!res.ok) {
-                throw new Error("Failed to reset password")
-            }
-            return res.json()
-        })
-        .then(({ success }) => {
-            alert(success ? "Password reset successfully!" : "Couldn't reset password")
-            router.push("/signin")
-        })
-        .catch((err) => {
-            console.error(err)
-            alert("Error resetting password. Please try again.")
-        })
+
+        if (!res.ok) {
+            throw new Error("Failed to reset password")
+        }
+
+        const { success } = await res.json()
+
+        if (success) {
+            successMessage.value = "Password reset successfully!"
+            setTimeout(() => router.push("/signin"), 1500)
+        } else {
+            errorMessage.value = "Couldn't reset password"
+        }
+    } catch (err) {
+        console.error(err)
+        errorMessage.value = "Error resetting password. Please try again."
+    }
 }
 </script>
 
 <template>
-    <section>
-        <h2>Password Reset</h2>
-        <form @submit="handleSubmit">
-            <label for="password">New Password</label>
-            <input id="password" v-model="password" type="password" placeholder="Enter your new password" required />
-            <button type="submit">Reset Password</button>
-        </form>
+    <section class="py-10">
+        <VContainer>
+            <VRow justify="center">
+                <VCol cols="12" sm="8" md="6" lg="4">
+                    <h2 class="text-h5 mb-4 text-center">Reset Your Password</h2>
+                    <VForm ref="formRef" @submit.prevent="handleSubmit">
+                        <VTextField
+                            v-model="password"
+                            type="password"
+                            label="New Password"
+                            placeholder="Enter your new password"
+                            required
+                            variant="outlined"
+                            class="mb-4"
+                        />
+                        <VBtn color="primary" type="submit" block>Reset Password</VBtn>
+                    </VForm>
+                    <div v-if="errorMessage" class="text-error mt-4">{{ errorMessage }}</div>
+                    <div v-if="successMessage" class="text-success mt-4">{{ successMessage }}</div>
+                </VCol>
+            </VRow>
+        </VContainer>
     </section>
 </template>
