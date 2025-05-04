@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useCustomerStore } from "~/stores/customer"
-import { useCartStore } from "~/stores/cartStore"
-import { useProductStore } from "~/stores/product"
-import type { CartResponse } from "~/stores/product"
-import AppFooter from "~/components/Footer/AppFooter.vue"
-import BaseHeader from "~/components/Header/BaseHeader.vue"
+import { useCustomerStore } from "@/stores/customer"
+import { useCartStore } from "@/stores/cartStore"
+import { useProductStore } from "@/stores/product"
+import type { CartResponse } from "@/stores/product"
+import AppFooter from "@/components/Footer/AppFooter.vue"
+import BaseHeader from "@/components/Header/BaseHeader.vue"
 
 const customerStore = useCustomerStore()
 const productStore = useProductStore()

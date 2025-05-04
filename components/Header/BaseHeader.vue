@@ -49,26 +49,26 @@ const { categories } = storeToRefs(productStore)
                     <VToolbarItems class="flex-center">
                         <NuxtLink to="/search">
                             <VBtn icon>
-                                <VImg src="/images/search.svg" width="24" height="24" />
+                                <VIcon>mdi-magnify</VIcon>
                             </VBtn>
                         </NuxtLink>
 
                         <NuxtLink to="/cart" class="position-relative">
                             <VBtn icon>
-                                <VImg src="/images/shopping_cart.svg" width="24" height="24" />
+                                <VIcon>mdi-cart</VIcon>
                                 <VBadge :content="itemCount" color="error" overlap bordered class="cart-counter" />
                             </VBtn>
                         </NuxtLink>
 
                         <NuxtLink v-if="customer?.id" class="hidden-md-and-down" to="/account">
                             <VBtn text>
-                                <VImg src="/images/person.svg" width="24" height="24" />
+                                <VIcon>mdi-account</VIcon>
                                 <span class="ms-2">{{ customer.first_name }}</span>
                             </VBtn>
                         </NuxtLink>
                         <NuxtLink v-else class="hidden-md-and-down" to="/signin">
                             <VBtn text>
-                                <VImg src="/images/person.svg" width="24" height="24" />
+                                <VIcon>mdi-account</VIcon>
                                 <span class="ms-2">Sign In</span>
                             </VBtn>
                         </NuxtLink>
@@ -103,13 +103,13 @@ const { categories } = storeToRefs(productStore)
             <VListItem>
                 <NuxtLink v-if="customer?.id" to="/account">
                     <VBtn text>
-                        <VImg src="/images/person.svg" width="24" height="24" />
+                        <VIcon>mdi-account</VIcon>
                         <span class="ms-2">{{ customer.first_name }}</span>
                     </VBtn>
                 </NuxtLink>
                 <NuxtLink v-else to="/signin">
                     <VBtn text>
-                        <VImg src="/images/person.svg" width="24" height="24" />
+                        <VIcon>mdi-account</VIcon>
                         <span class="ms-2">Sign In</span>
                     </VBtn>
                 </NuxtLink>

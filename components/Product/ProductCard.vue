@@ -70,7 +70,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
 
 <template>
     <VCard class="pa-4" elevation="2" rounded>
-        <div class="position-relative">
+        <div class="d-flex justify-center align-center position-relative">
             <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
                 <VImg
                     :src="product.thumbnail || product.images[0]?.url || '/images/placeholder.png'"
