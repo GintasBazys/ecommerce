@@ -21,6 +21,19 @@ const showResetDialog = ref(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
+const snackbar = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+
+const loginFormRef = ref()
+const resetFormRef = ref()
+
+const resetEmail = ref("")
+const emailRules = [
+    (v: string) => !!v || "E-mail is required",
+    (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "E-mail must be valid"
+]
+
 const handleLogin = async (e: Event) => {
     e.preventDefault()
 
@@ -57,7 +70,9 @@ const handleLogin = async (e: Event) => {
         }).then((res) => res.json())
 
         if (!customer) {
-            alert("Authentication failed")
+            snackbarText.value = "Authentication failed"
+            snackbarColor.value = "error"
+            snackbar.value = true
             return
         }
 
@@ -66,7 +81,9 @@ const handleLogin = async (e: Event) => {
         await router.push("/")
     } catch (error) {
         console.error("Login failed:", error)
-        alert("Login failed. Please try again.")
+        snackbarText.value = "Login failed. Please try again."
+        snackbarColor.value = "error"
+        snackbar.value = true
     }
 }
 
@@ -83,20 +100,21 @@ const handleSocialLogin = async (provider: string) => {
         }
 
         if (!result.token) {
-            alert("Authentication failed")
+            snackbarText.value = "Authentication failed"
+            snackbarColor.value = "error"
+            snackbar.value = true
             return
         }
     } catch (error) {
         console.error("Social login failed:", error)
-        alert("An error occurred during social login")
+        snackbarText.value = "An error occurred during social login"
+        snackbarColor.value = "error"
+        snackbar.value = true
     }
 }
 
-const handleReset = async (e: Event) => {
-    e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const formData = new FormData(form)
-    const email = formData.get("resetEmail") as string
+const handleReset = async () => {
+    if (!resetEmail.value) return
 
     try {
         errorMessage.value = null
@@ -107,15 +125,22 @@ const handleReset = async (e: Event) => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email: resetEmail.value })
         })
 
         successMessage.value = "Password reset email sent"
+        snackbarText.value = successMessage.value
+        snackbarColor.value = "success"
+        snackbar.value = true
+
+        showResetDialog.value = false
+        resetEmail.value = ""
     } catch {
         errorMessage.value = "An unexpected error occurred. Please try again."
+        snackbarText.value = errorMessage.value
+        snackbarColor.value = "error"
+        snackbar.value = true
     }
-
-    form.reset()
 }
 </script>
 
@@ -130,15 +155,14 @@ const handleReset = async (e: Event) => {
                             <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
                             Log in with Google
                         </VBtn>
-                        <form @submit="handleLogin">
+                        <VForm ref="loginFormRef" @submit.prevent="handleLogin">
                             <VTextField name="email" label="E-mail" type="email" class="mb-3" variant="outlined" required />
                             <VTextField name="password" label="Password" type="password" class="mb-3" variant="outlined" required />
                             <div class="text-end mb-3">
-                                <VBtn variant="text" class="px-0 text-caption" @click="showResetDialog = true">Forgot password?</VBtn>
+                                <VBtn variant="text" class="px-0 text-caption" @click="showResetDialog = true"> Forgot password? </VBtn>
                             </div>
                             <VBtn type="submit" color="primary" block>Log in</VBtn>
-                        </form>
-
+                        </VForm>
                         <p class="mt-4 text-center">
                             Don't have an account?
                             <NuxtLink to="/register">Register here</NuxtLink>
@@ -157,15 +181,24 @@ const handleReset = async (e: Event) => {
                     </VCardTitle>
                     <VCardText>
                         <p>If you have forgotten your password you can reset it here.</p>
-                        <form @submit="handleReset">
-                            <VTextField name="resetEmail" label="E-mail Address" type="email" class="mt-3" variant="outlined" required />
-                            <VBtn type="submit" color="primary" class="mt-3" block> Send password reset link </VBtn>
-                        </form>
-                        <div v-if="errorMessage" class="text-error mt-2">{{ errorMessage }}</div>
-                        <div v-if="successMessage" class="text-success mt-2">{{ successMessage }}</div>
+                        <VForm ref="resetFormRef" @submit.prevent="handleReset">
+                            <VTextField
+                                v-model="resetEmail"
+                                :rules="emailRules"
+                                label="E-mail Address"
+                                type="email"
+                                class="mt-3"
+                                variant="outlined"
+                                required
+                            />
+                            <VBtn type="submit" color="primary" class="mt-3" block>Send password reset link</VBtn>
+                        </VForm>
                     </VCardText>
                 </VCard>
             </VDialog>
+            <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4000">
+                {{ snackbarText }}
+            </VSnackbar>
         </VContainer>
     </section>
 </template>
