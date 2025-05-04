@@ -35,31 +35,37 @@ const handleSubscribe = async (e: Event) => {
 </script>
 
 <template>
-    <section class="spacer border-top">
-        <div class="container-md">
-            <div class="intro">
-                <h2 class="text-center newsletter">Subscribe to our Newsletter</h2>
-                <p class="text-center">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    <section class="py-12 border-t">
+        <VContainer max-width="900">
+            <div class="text-center mb-8">
+                <h2 class="text-h4 font-weight-bold mb-2">Subscribe to our Newsletter</h2>
+                <p class="text-body-1 text-medium-emphasis">
+                    Get the latest updates, articles, and exclusive content straight to your inbox.
                 </p>
             </div>
-            <form class="d-flex gap-3 align-items-center w-100" @submit="handleSubscribe">
-                <div class="input-group">
-                    <input
-                        type="email"
-                        name="email"
-                        required
-                        class="form-control my-0"
-                        placeholder="Enter your email"
-                        aria-label="Enter your email"
-                        aria-describedby="cta-addon"
-                        @input="errorMessage = null"
-                    />
-                    <button id="cta-addon" :disabled="loading" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-            <div class="invalid-feedback d-block">{{ errorMessage }}</div>
-        </div>
+
+            <VForm @submit="handleSubscribe">
+                <VRow class="d-flex align-center" no-gutters>
+                    <VCol cols="12" sm="8">
+                        <VTextField
+                            name="email"
+                            type="email"
+                            placeholder="Enter your email"
+                            required
+                            variant="solo-filled"
+                            hide-details="auto"
+                            density="comfortable"
+                            class="rounded-l"
+                            :error-messages="errorMessage ? [errorMessage] : []"
+                            @input="errorMessage = null"
+                        />
+                    </VCol>
+
+                    <VCol cols="12" sm="4" class="mt-2 mt-sm-0">
+                        <VBtn type="submit" color="primary" :loading="loading" size="large" class="rounded-r" block> Subscribe </VBtn>
+                    </VCol>
+                </VRow>
+            </VForm>
+        </VContainer>
     </section>
 </template>

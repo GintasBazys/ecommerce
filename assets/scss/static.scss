@@ -1,96 +1,49 @@
-.faq-cards {
-    margin: 2rem 0;
-    .faq-card {
-        background: transparent;
-        border: 0.0625rem solid $primary;
-        border-radius: 0.5rem;
-        height: 100%;
-        padding: 1.5rem;
-    }
-}
-.external-login-block-no-shop {
-    display: flex;
-    border: 1px solid #e2ecff;
-    cursor: pointer;
-    padding: 0.75rem 1rem;
-    p {
-        margin: 0;
-    }
-}
-.external-login-link {
-    text-decoration: none;
-}
 .contact-divider {
     margin: 1.5rem auto 2rem;
     max-width: 26.5rem;
     position: relative;
     text-align: center;
     width: 100%;
-    span {
-        background: #fff;
-        padding: 0 0.75rem;
-        position: relative;
-        z-index: 1;
-    }
-    &::before {
-        background: #eaebf0;
-        content: "";
-        height: 0.0625rem;
-        left: 0;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 100%;
-    }
 }
-.search-results {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    @include media-breakpoint-down(lg) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    @include media-breakpoint-down(md) {
-        grid-template-columns: repeat(1, 1fr);
-    }
+
+.contact-divider span {
+    background: #fff;
+    padding: 0 0.75rem;
+    position: relative;
+    z-index: 1;
 }
-.blog-row {
-    h1 {
-        text-align: center;
-        margin-bottom: 1rem;
-        font-size: 2.5rem;
-    }
-    h2 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        line-height: 2rem;
-    }
-    a {
-        text-decoration: none;
-    }
-    @include media-breakpoint-down(md) {
-        h1 {
-            font-size: 2rem;
-            line-height: 1;
-        }
-    }
+
+.contact-divider::before {
+    background: #eaebf0;
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
 }
-.main-blog-image {
-    border-radius: 8px;
-    margin: 0 0 2rem;
+
+.blog-row h1 {
+    text-align: center;
+    margin: 1.2rem 0;
+    font-size: 2.5rem;
 }
-.blog-additional {
-    align-items: center;
-    column-gap: 1.5rem;
-    display: flex;
-    justify-content: center;
-    margin: 0 0 2.5rem;
-    .author {
-        background: $primary;
-        padding: 0.25rem 1rem;
-        border-radius: 4px;
-        color: $white;
-        display: inline-block;
-        font-weight: 600;
+
+.blog-row h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 2rem;
+    margin: 1.2rem 0;
+}
+
+.blog-row a {
+    text-decoration: none;
+}
+
+@media (max-width: 960px) {
+    .blog-row h1 {
+        font-size: 2rem;
+        line-height: 1;
     }
 }
