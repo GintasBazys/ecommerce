@@ -2,6 +2,7 @@
 useHead({
     title: "404 | Ecommerce"
 })
+
 definePageMeta({
     layout: "account"
 })
@@ -10,8 +11,12 @@ const handleError = () => clearError({ redirect: "/" })
 </script>
 
 <template>
-    <section class="container-md max-w-520 my-5 py-5 text-center">
-        <h1 class="mb-4">Sorry. The page you were looking for doesn't exist.</h1>
-        <button class="btn btn-primary px-4" @click="handleError">Go to homepage</button>
-    </section>
+    <VContainer class="py-16 text-center" max-width="520">
+        <VRow justify="center">
+            <VCol cols="12">
+                <h1 class="text-h5 mb-6">Sorry. The page you were looking for doesn't exist.</h1>
+                <VBtn color="primary" @click="handleError" class="px-6"> Go to homepage </VBtn>
+            </VCol>
+        </VRow>
+    </VContainer>
 </template>
