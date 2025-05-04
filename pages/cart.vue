@@ -1,16 +1,16 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia"
+import { useCartStore } from "@/stores/cartStore"
+
 useHead({
     title: "Cart | Ecommerce"
 })
 
 const cartStore = useCartStore()
 const { cart } = storeToRefs(cartStore)
-
 const { removeLineItem } = cartStore
 
-const formatPrice = (amount: number) => {
-    return `${amount.toFixed(2)} €`
-}
+const formatPrice = (amount: number) => `${amount.toFixed(2)} €`
 
 const removeItem = async (lineItemId: string) => {
     if (!cart.value?.id) {
@@ -26,102 +26,87 @@ const removeItem = async (lineItemId: string) => {
 </script>
 
 <template>
-    <section class="pb-5">
-        <div class="container overflow-x-hidden">
-            <div
-                class="mt-4 mt-lg-5 d-flex flex-column flex-lg-row gap-0 gap-lg-0 align-items-start align-items-lg-center justify-content-between"
-            >
-                <h1 class="h3 pb-3 mb-4 text-inter fw-bolder border-bottom w-100">Shopping cart</h1>
+    <section class="py-10">
+        <VContainer>
+            <VRow class="mb-6" align="center" justify="space-between">
+                <VCol cols="12" lg="6">
+                    <h1 class="text-h5 font-weight-bold">Shopping Cart</h1>
+                </VCol>
+                <VCol cols="12" lg="6" class="text-lg-end text-sm-start mt-2 mt-lg-0">
+                    <p class="mb-0"><strong>Total:</strong> {{ formatPrice(Number(cart?.total || 0)) }}</p>
+                </VCol>
+            </VRow>
 
-                <div class="w-100 mt-3 d-block d-lg-none">
-                    <p class="mb-0"><strong>Total: </strong>{{ formatPrice(Number(cart?.total || 0)) }}</p>
-                </div>
-            </div>
-            <div class="row cart-row gx-5">
-                <div class="cart-items col-lg-7">
-                    <div class="order-products-grid">
-                        <div v-for="item in cart?.items || []" :key="item.id" class="search-product px-0">
-                            <div class="search-img-wrapper mt-1">
-                                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`">
-                                    <NuxtImg
-                                        :src="item.thumbnail || '/images/placeholder.png'"
-                                        width="67"
-                                        height="93"
-                                        :alt="item.product_title ?? ''"
-                                        :title="item.product_title"
-                                        loading="lazy"
-                                    />
-                                </NuxtLink>
-                            </div>
+            <VRow>
+                <VCol cols="12" lg="7">
+                    <VCard v-for="item in cart?.items || []" :key="item.id" class="mb-4" flat>
+                        <VCardText class="d-flex flex-row gap-4">
+                            <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`">
+                                <VImg
+                                    :src="item.thumbnail || '/images/placeholder.png'"
+                                    :alt="item.product_title ?? ''"
+                                    width="80"
+                                    height="100"
+                                    class="rounded"
+                                    cover
+                                />
+                            </NuxtLink>
                             <div class="flex-grow-1">
-                                <div class="d-flex align-items-start gap-3 justify-content-between">
-                                    <div class="search-product-description">
-                                        <p class="cart-description-title">
-                                            <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`">{{
-                                                item.product_title
-                                            }}</NuxtLink>
+                                <div class="d-flex justify-space-between">
+                                    <div>
+                                        <p class="text-subtitle-1 mb-1">
+                                            <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`">
+                                                {{ item.product_title }}
+                                            </NuxtLink>
                                         </p>
-                                        <span class="description">{{ item.product_description }}</span>
-                                        <span class="text-small-2 d-block">Option: {{ item.variant_title }}</span>
-                                        <span class="text-small-2">Code: {{ item.variant_sku ?? "N/A" }}</span>
+                                        <p class="text-body-2">{{ item.product_description }}</p>
+                                        <p class="text-caption">Option: {{ item.variant_title }}</p>
+                                        <p class="text-caption">Code: {{ item.variant_sku ?? "N/A" }}</p>
                                     </div>
-                                    <div class="side-content m-0">
-                                        <button type="button" class="btn p-0 cart-ve" aria-label="Remove" @click="removeItem(item.id)">
-                                            Remove
-                                        </button>
-                                    </div>
+                                    <VBtn icon color="error" variant="text" @click="removeItem(item.id)" aria-label="Remove">
+                                        <VIcon>mdi-delete</VIcon>
+                                    </VBtn>
                                 </div>
-                                <div class="cart-item-bottom">
-                                    <div class="text-end">
-                                        <p>
-                                            <b>{{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1)) }}</b>
-                                        </p>
-                                    </div>
+                                <div class="text-end mt-2">
+                                    <strong>{{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1)) }}</strong>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="price-date-details">
-                        <div class="subtotal-card mw-100 w-100">
-                            <h2 class="h3 mb-3 text-inter fw-600">Order summary</h2>
+                        </VCardText>
+                    </VCard>
 
-                            <div class="w-100">
-                                <form id="couponForm" class="needs-validation" novalidate>
-                                    <div class="input-group">
-                                        <input
-                                            type="text"
-                                            name="couponTextInput"
-                                            required
-                                            class="form-control"
-                                            placeholder="Enter coupon code"
-                                            aria-label="Enter coupon code"
-                                            aria-describedby="coupon-addon"
-                                        />
-                                        <button id="coupon-addon" class="primary-btn" type="submit">Apply</button>
-                                        <div class="invalid-feedback">Please enter coupon code.</div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="subtotal-item mt-4">
-                                <span><b>Subtotal: </b></span>
-                                <span>{{ formatPrice(Number(cart?.subtotal || 0)) }}</span>
-                            </div>
-                            <div class="total-item mt-3">
-                                <span class="total"><strong>Total: </strong></span>
-                                <span>{{ formatPrice(Number(cart?.total || 0)) }}</span>
-                            </div>
-                            <NuxtLink
-                                :class="{ 'cart-disabled': !cart?.items?.length }"
-                                class="btn btn-primary btn-total w-100"
-                                to="/checkout"
-                                >Checkout</NuxtLink
-                            >
+                    <p v-if="!cart?.items?.length" class="text-center text-grey mt-6">Your cart is empty.</p>
+                </VCol>
+                <VCol cols="12" lg="5">
+                    <VCard class="pa-6" elevation="2">
+                        <h2 class="text-h6 mb-4">Order Summary</h2>
+                        <VForm id="couponForm">
+                            <VTextField
+                                name="couponTextInput"
+                                placeholder="Enter coupon code"
+                                prepend-inner-icon="mdi-ticket-percent"
+                                variant="outlined"
+                                hide-details
+                            />
+                            <VBtn class="mt-3" color="primary" block type="submit">Apply</VBtn>
+                        </VForm>
+
+                        <VDivider class="my-4" />
+
+                        <div class="d-flex justify-space-between mb-2">
+                            <span><strong>Subtotal:</strong></span>
+                            <span>{{ formatPrice(Number(cart?.subtotal || 0)) }}</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div class="d-flex justify-space-between mb-6">
+                            <span class="text-lg font-weight-bold">Total:</span>
+                            <span class="text-lg font-weight-bold">{{ formatPrice(Number(cart?.total || 0)) }}</span>
+                        </div>
+
+                        <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/checkout">
+                            <VBtn color="primary" block :disabled="!cart?.items?.length"> Checkout </VBtn>
+                        </NuxtLink>
+                    </VCard>
+                </VCol>
+            </VRow>
+        </VContainer>
     </section>
 </template>

@@ -20,10 +20,10 @@ const handleRegister = async (e: Event) => {
 
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-    const first_name = formData.get("firstName") as string
-    const last_name = formData.get("lastName") as string
+    const email = formData.get("email")
+    const password = formData.get("password")
+    const first_name = formData.get("firstName")
+    const last_name = formData.get("lastName")
 
     try {
         const response = await $fetch<CustomerResponseInterface>("/api/register", {

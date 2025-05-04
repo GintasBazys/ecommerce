@@ -27,16 +27,21 @@ const { data: relatedPosts } = await useAsyncData(`related-${slug.value}`, () =>
 
 <template>
     <main>
-        <VContainer class="py-8 blog-row">
+        <VContainer class="py-8 mt-10 blog-row">
             <VRow justify="center">
                 <VCol cols="12" md="10" lg="8">
                     <h1 class="text-h4 mb-2">{{ currentPost?.title }}</h1>
-                    <div class="d-flex align-center text-body-2 text-medium-emphasis mb-4">
-                        <span class="me-3">
-                            <i>{{ currentPost?.date }}</i>
-                        </span>
-                        <span>{{ currentPost?.author }}</span>
-                    </div>
+                    <VRow justify="center" class="mb-6" align="center" no-gutters>
+                        <VCol cols="auto" class="d-flex align-center text-body-2 text-medium-emphasis me-4">
+                            <VIcon icon="mdi-calendar-blank-outline" class="me-1" size="20" />
+                            <span>{{ currentPost?.date }}</span>
+                        </VCol>
+
+                        <VCol cols="auto" class="d-flex align-center text-body-2 text-medium-emphasis">
+                            <VIcon icon="mdi-account-outline" class="me-1" size="20" />
+                            <span>{{ currentPost?.author }}</span>
+                        </VCol>
+                    </VRow>
 
                     <VImg
                         v-if="currentPost?.image"

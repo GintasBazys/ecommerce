@@ -14,7 +14,6 @@ const panels2 = ref([0])
             <VRow>
                 <VCol cols="12" lg="9">
                     <div class="faq-blocks">
-                        <!-- First FAQ Section -->
                         <h2 class="text-h5 mb-4">Lorem ipsum</h2>
                         <VExpansionPanels v-model="panels1" multiple>
                             <VExpansionPanel>
@@ -38,8 +37,6 @@ const panels2 = ref([0])
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                         </VExpansionPanels>
-
-                        <!-- Second FAQ Section -->
                         <h2 class="text-h5 mt-10 mb-4">Lorem ipsum</h2>
                         <VExpansionPanels v-model="panels2" multiple>
                             <VExpansionPanel>
@@ -65,8 +62,6 @@ const panels2 = ref([0])
                         </VExpansionPanels>
                     </div>
                 </VCol>
-
-                <!-- Contact Card -->
                 <VCol cols="12" lg="3">
                     <VCard class="pa-4" elevation="2">
                         <VCardText>

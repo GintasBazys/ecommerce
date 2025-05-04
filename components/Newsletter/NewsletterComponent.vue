@@ -9,7 +9,7 @@ const handleSubscribe = async (e: Event) => {
 
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
-    const email = formData.get("email") as string
+    const email = formData.get("email")
 
     try {
         loading.value = true

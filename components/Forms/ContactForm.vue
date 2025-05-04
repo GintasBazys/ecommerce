@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from "vue"
+
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const loading = ref(false)
@@ -13,22 +15,26 @@ const handleSubmit = (e: Event): void => {
         method: "POST",
         body: formData
     })
-        .then((response) => response.json())
+        .then((res) => res.json())
         .then((data) => {
             if (data?.success === "true") {
-                successMessage.value = data?.message
+                successMessage.value = data.message
+                errorMessage.value = null
                 form.reset()
             } else {
-                errorMessage.value = "Unexpected error. Try again later"
+                errorMessage.value = "Unexpected error. Try again later."
+                successMessage.value = null
             }
         })
-        .catch((error) => {
-            errorMessage.value = error.message
+        .catch((err) => {
+            errorMessage.value = err.message
+            successMessage.value = null
         })
         .finally(() => {
             loading.value = false
         })
 }
+
 const getFormatedDate = () => {
     return new Date().toLocaleString("lt-LT", {
         year: "numeric",
@@ -42,66 +48,46 @@ const getFormatedDate = () => {
 </script>
 
 <template>
-    <div>
-        <form method="POST" enctype="multipart/form-data" @submit="handleSubmit">
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-group mb-3">
-                        <label class="form-label" for="contactSubjectInput">Subject</label>
-                        <input
-                            id="contactSubjectInput"
-                            required
-                            name="subject"
-                            type="text"
-                            class="form-control"
-                            placeholder="Example: customer service"
-                        >
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label" for="contactEmailInput">Email</label>
-                        <input
-                            id="contactEmailInput"
-                            required
-                            name="email"
-                            type="email"
-                            class="form-control"
-                            placeholder="name@example.com"
-                        >
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label" for="contactPhoneInput">Phone number</label>
-                        <input id="contactPhoneInput" name="phone" type="tel" class="form-control" placeholder="+370" >
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="form-group mb-3">
-                        <label class="form-label" for="contactMessageInput">Message</label>
-                        <textarea
-                            id="contactMessageInput"
-                            class="form-control"
-                            name="message"
-                            placeholder="How we can help? Your order number?"
-                            required
-                            style="height: 5.5rem"
-                        />
-                    </div>
-                </div>
-            </div>
-            <button :disabled="loading" type="submit" class="btn btn-primary w-100 py-2 text-uppercase">
-                <template v-if="loading">
-                    <div class="spinner-border white" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </template>
-                <template v-else> Send message </template>
-            </button>
-            <input type="hidden" name="_subject" :value="getFormatedDate() + ' - New submission'" >
-        </form>
-        <div class="invalid-feedback d-block">{{ errorMessage }}</div>
-        <div class="valid-feedback d-block">{{ successMessage }}</div>
-    </div>
+    <VForm @submit.prevent="handleSubmit">
+        <VRow dense>
+            <VCol cols="12">
+                <VTextField label="Subject" name="subject" placeholder="Example: Customer service" variant="outlined" required />
+            </VCol>
+
+            <VCol cols="12" md="6">
+                <VTextField label="Email" name="email" type="email" placeholder="name@example.com" variant="outlined" required />
+            </VCol>
+
+            <VCol cols="12" md="6">
+                <VTextField label="Phone number" name="phone" type="tel" placeholder="+370" variant="outlined" />
+            </VCol>
+
+            <VCol cols="12">
+                <VTextarea
+                    label="Message"
+                    name="message"
+                    placeholder="How can we help? Include your order number if applicable."
+                    variant="outlined"
+                    rows="5"
+                    auto-grow
+                    required
+                />
+            </VCol>
+
+            <input type="hidden" name="_subject" :value="getFormatedDate() + ' - New submission'" />
+
+            <VCol cols="12" class="mt-2">
+                <VBtn :loading="loading" :disabled="loading" type="submit" color="primary" block size="large"> Send Message </VBtn>
+            </VCol>
+
+            <VCol cols="12" class="mt-2">
+                <VAlert v-if="errorMessage" type="error" border="start" variant="tonal" dense>
+                    {{ errorMessage }}
+                </VAlert>
+                <VAlert v-if="successMessage" type="success" border="start" variant="tonal" dense>
+                    {{ successMessage }}
+                </VAlert>
+            </VCol>
+        </VRow>
+    </VForm>
 </template>

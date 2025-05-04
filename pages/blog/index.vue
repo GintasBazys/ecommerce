@@ -39,7 +39,7 @@ watch(page, (newPage) => {
 <template>
     <main>
         <VContainer>
-            <VRow justify="center" class="mb-6 blog-row">
+            <VRow justify="center" class="mb-6 mt-10 blog-row">
                 <VCol cols="12" md="8">
                     <h1 class="text-center">Explore Latest Blog Posts</h1>
                 </VCol>

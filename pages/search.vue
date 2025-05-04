@@ -84,7 +84,7 @@ const deleteHistoryItem = (index: number) => {
 </script>
 
 <template>
-    <VContainer class="py-10">
+    <VContainer class="py-10 mt-10">
         <VRow>
             <VCol cols="12">
                 <h1 class="text-h4 font-weight-bold mb-6">
@@ -126,7 +126,11 @@ const deleteHistoryItem = (index: number) => {
 
             <VCol cols="12" class="search-results">
                 <template v-if="!isLoading && products.length">
-                    <ProductCard v-for="product in products" :key="product.id" :product="product as ProductDTO" />
+                    <VRow>
+                        <VCol v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
+                            <ProductCard :product="product as ProductDTO" />
+                        </VCol>
+                    </VRow>
                 </template>
                 <p v-else-if="!isLoading && hasSearched">No results found.</p>
             </VCol>
