@@ -43,12 +43,12 @@ const aboutLinks = [
     {
         label: "Facebook",
         to: "https://facebook.com",
-        icon: "/images/facebook.svg"
+        icon: "mdi-facebook"
     },
     {
         label: "Instagram",
         to: "https://instagram.com",
-        icon: "/images/instagram.svg"
+        icon: "mdi-instagram"
     }
 ]
 </script>
@@ -97,9 +97,7 @@ const aboutLinks = [
                                 <VList dense class="bg-primary">
                                     <VListItem v-for="(item, i) in aboutLinks" :key="i" class="pa-0">
                                         <NuxtLink :to="item.to" class="text-white text-decoration-none">
-                                            <template v-if="item.icon">
-                                                <NuxtImg :src="item.icon" width="22" height="22" class="me-2" />
-                                            </template>
+                                            <VIcon v-if="item.icon" size="22" class="me-2">{{ item.icon }}</VIcon>
                                             {{ item.label }}
                                         </NuxtLink>
                                     </VListItem>
