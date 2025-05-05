@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
-import { useCartStore } from "@/stores/cartStore"
+import { useCartStore } from "~/stores/cart"
 
 useHead({
     title: "Cart | Ecommerce"
@@ -63,7 +63,7 @@ const removeItem = async (lineItemId: string) => {
                                         <p class="text-caption">Option: {{ item.variant_title }}</p>
                                         <p class="text-caption">Code: {{ item.variant_sku ?? "N/A" }}</p>
                                     </div>
-                                    <VBtn icon color="error" variant="text" @click="removeItem(item.id)" aria-label="Remove">
+                                    <VBtn icon color="error" variant="text" aria-label="Remove" @click="removeItem(item.id)">
                                         <VIcon>mdi-delete</VIcon>
                                     </VBtn>
                                 </div>

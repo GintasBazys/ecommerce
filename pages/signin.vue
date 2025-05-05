@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import { useCustomerStore } from "@/stores/customer"
-import { useCartStore } from "@/stores/cartStore"
+import { useCartStore } from "~/stores/cart"
 import { useRuntimeConfig } from "#app"
 
 useHead({
@@ -120,7 +120,7 @@ const handleReset = async () => {
         errorMessage.value = null
         successMessage.value = null
 
-        await $fetch("/api/password-reset", {
+        await $fetch("/api/account/password-reset", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -151,7 +151,7 @@ const handleReset = async () => {
                 <VCol cols="12" md="6">
                     <div class="form-wrapper mx-auto">
                         <h4 class="mb-4">Log in</h4>
-                        <VBtn class="mb-4" color="white" block @click="handleSocialLogin('google')" style="border: 1px solid #ccc">
+                        <VBtn class="mb-4" color="white" block style="border: 1px solid #ccc" @click="handleSocialLogin('google')">
                             <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
                             Log in with Google
                         </VBtn>

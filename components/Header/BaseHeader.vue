@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
 import { useCustomerStore } from "~/stores/customer"
-import { useCartStore } from "~/stores/cartStore"
+import { useCartStore } from "~/stores/cart"
 import { useProductStore } from "~/stores/product"
 
 const bannerHidden = ref(false)
@@ -18,10 +18,10 @@ const { categories } = storeToRefs(productStore)
 </script>
 
 <template>
-    <header :style="{ height: bannerHidden ? '96px' : '64px' }">
-        <VBanner v-if="!bannerHidden" class="primary-banner" density="comfortable" icon="mdi-truck-fast">
+    <header :style="{ height: !bannerHidden ? '96px' : '64px' }">
+        <VBanner v-if="!bannerHidden" class="primary-banner justify-center" density="comfortable" icon="mdi-truck-fast">
             <template #actions>
-                <VBtn icon @click="bannerHidden = true">
+                <VBtn height="16" icon @click="bannerHidden = true">
                     <VIcon>mdi-close</VIcon>
                 </VBtn>
             </template>
@@ -82,7 +82,7 @@ const { categories } = storeToRefs(productStore)
             </VContainer>
         </VAppBar>
 
-        <VNavigationDrawer v-model="drawer" app temporary width="250">
+        <VNavigationDrawer v-model="drawer" :style="{ paddingTop: !bannerHidden ? '32px' : '0' }" app temporary width="250">
             <VList nav>
                 <VListItem>
                     <NuxtLink class="nav-link" to="#">Special offers</NuxtLink>
@@ -137,6 +137,10 @@ const { categories } = storeToRefs(productStore)
     display: flex;
     align-items: center;
     padding-left: 16px;
+}
+
+:deep(.v-banner__prepend) {
+    align-self: auto;
 }
 
 .flex-center {

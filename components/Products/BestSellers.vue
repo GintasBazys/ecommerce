@@ -6,10 +6,16 @@ const { bestSellers } = storeToRefs(store)
 const regionStore = useRegionStore()
 const { regionStoreId } = storeToRefs(regionStore)
 
-const { data: sellers } = await useAsyncData<ProductDTO[]>(`product-bestsellers`, async () => {
-    await store.fetchBestSellers(regionStoreId.value ?? "")
-    return store.bestSellers
-})
+const { data: sellers } = await useAsyncData<ProductDTO[]>(
+    `product-bestsellers-${regionStoreId.value}`,
+    async () => {
+        await store.fetchBestSellers(regionStoreId.value ?? "")
+        return store.bestSellers ?? []
+    },
+    {
+        default: () => []
+    }
+)
 
 const containerRef = ref(null)
 useSwiper(containerRef, {

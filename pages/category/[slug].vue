@@ -16,7 +16,7 @@ interface CategoryInterface {
 
 const route = useRoute()
 const category = ref<CategoryInterface | null>(null)
-const { data } = await useFetch<CategoryInterface>(`/api/${route.params.slug}`)
+const { data } = await useFetch<CategoryInterface>(`/api/categories/${route.params.slug}`)
 if (data.value && "error" in data.value) {
     await navigateTo("/page-not-found")
 } else {

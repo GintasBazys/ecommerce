@@ -55,5 +55,11 @@ export default defineNuxtConfig({
             mailchimpApiKey: process.env.MAILCHIMP_API_KEY,
             mailchimpAudienceId: process.env.MAILCHIMP_AUDIENCE_ID
         }
+    },
+    plugins: ["~/plugins/init-data"],
+    vite: {
+        optimizeDeps: {
+            include: ["@stripe/stripe-js"]
+        }
     }
 })

@@ -47,7 +47,7 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchData = async (regionId?: string) => {
         try {
-            const response = await $fetch<ProductResponse>("/api/products", {
+            const response = await $fetch<ProductResponse>("/api/products/products", {
                 params: {
                     limit: limit.value,
                     offset: offset.value,
@@ -68,7 +68,7 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchLinks = async () => {
         try {
-            const categoriesResponse = await $fetch("/api/categories", {
+            const categoriesResponse = await $fetch("/api/categories/categories", {
                 credentials: "include"
             })
             setCategories(categoriesResponse["product_categories"])
@@ -78,7 +78,7 @@ export const useProductStore = defineStore("product", () => {
     }
     const fetchBestSellers = async (regionId?: string) => {
         try {
-            const { products } = await $fetch(`/api/best-selling`, {
+            const { products } = await $fetch(`/api/categories/best-selling`, {
                 params: {
                     limit: limit.value,
                     offset: offset.value,

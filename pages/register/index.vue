@@ -26,7 +26,7 @@ const handleRegister = async (e: Event) => {
     const last_name = formData.get("lastName")
 
     try {
-        const response = await $fetch<CustomerResponseInterface>("/api/register", {
+        const response = await $fetch<CustomerResponseInterface>("/api/account/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
