@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router"
-import { useCustomerStore } from "@/stores/customer"
-import { useCartStore } from "~/stores/cart"
-import { useRuntimeConfig } from "#app"
-
 useHead({
     title: "Signin | Ecommerce"
 })

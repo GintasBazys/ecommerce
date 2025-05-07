@@ -1,5 +1,3 @@
-import { useRuntimeConfig } from "#app"
-
 export const useRegionStore = defineStore("regionStore", () => {
     const regionStoreId = ref(null)
     const runtimeConfig = useRuntimeConfig()

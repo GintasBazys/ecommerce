@@ -1,8 +1,3 @@
-import { defineNuxtPlugin, useRequestHeaders, useCookie, useRuntimeConfig } from "#app"
-import { useRegionStore } from "@/stores/region"
-import { useProductStore } from "@/stores/product"
-import { useCustomerStore } from "@/stores/customer"
-import { useCartStore } from "@/stores/cart"
 import type { CartDTO, CustomerDTO } from "@medusajs/types"
 
 export default defineNuxtPlugin(async () => {

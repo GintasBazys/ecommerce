@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
-
 const limit = 12
 const page = ref<number>(1)
 const skip = computed(() => (page.value - 1) * limit)

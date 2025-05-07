@@ -1,4 +1,5 @@
 import type { CustomerDTO } from "@medusajs/types"
+import type { CustomerAuthResponseInterface } from "@/types/interfaces"
 
 export const useCustomerStore = defineStore(
     "customer",
@@ -6,7 +7,7 @@ export const useCustomerStore = defineStore(
         const customer = ref<CustomerDTO | null>(null)
         const config = useRuntimeConfig()
 
-        const fetchCustomer = async () => {
+        async function fetchCustomer() {
             try {
                 const data = await $fetch<CustomerAuthResponseInterface>("/api/account/auth", {
                     credentials: "include",
@@ -21,6 +22,7 @@ export const useCustomerStore = defineStore(
                 customer.value = null
             }
         }
+
         return {
             fetchCustomer,
             customer

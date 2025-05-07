@@ -1,5 +1,3 @@
-import { eventHandler, readBody } from "h3"
-
 export default eventHandler(async (event) => {
     const config = useRuntimeConfig()
     const { cartId } = await readBody(event)

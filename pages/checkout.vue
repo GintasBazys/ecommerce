@@ -1,24 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
 import type { Stripe, StripeElements } from "@stripe/stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-import { useRuntimeConfig } from "#app"
-import { useCartStore } from "~/stores/cart"
-import { storeToRefs } from "pinia"
-import { useRouter } from "vue-router"
-import { VSkeletonLoader } from "vuetify/components"
-
-interface Price {
-    amount: number
-    currency_code: string
-}
-
-interface ShippingOption {
-    id: string
-    name: string
-    calculated_price?: { calculated_amount: number }
-    prices: Price[]
-}
+import type { ShippingOption } from "@/types/interfaces"
 
 definePageMeta({ layout: "checkout" })
 

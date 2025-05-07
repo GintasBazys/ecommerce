@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
-import type { DataTableHeader } from "vuetify"
+import type { DataTableHeader, DataTableSortItem } from "vuetify"
 import type { OrderDTO } from "@medusajs/types"
-import type { SortItem } from "vuetify/lib/components/VDataTable/composables/sort.mjs"
+import { ORDER_STATUS } from "@/enumerators/order"
 
 definePageMeta({
     layout: "account",
     middleware: ["auth"]
 })
 
-const runtimeConfig = useRuntimeConfig()
 useHead({ title: "Orders | Ecommerce" })
+
+const runtimeConfig = useRuntimeConfig()
 
 interface OrdersResponse {
     orders: OrderDTO[]
@@ -50,11 +50,11 @@ const headers: DataTableHeader[] = [
     { title: "Date", value: "created_at" },
     { title: "Total", value: "total", align: "end" },
     { title: "Currency", value: "currency_code", align: "center" },
-    { title: "Status", value: "fulfillment_status", align: "center" },
+    { title: "Status", value: "status", align: "center" },
     { title: "Actions", value: "actions", sortable: false, align: "center" }
 ]
 
-const sortBy = ref<SortItem[]>([{ key: "created_at", order: "desc" }])
+const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
 </script>
 
 <template>
@@ -109,7 +109,7 @@ const sortBy = ref<SortItem[]>([{ key: "created_at", order: "desc" }])
 
                         <template #[`item.status`]="{ item }">
                             <VChip small text-color="white">
-                                {{ item.status }}
+                                {{ ORDER_STATUS[item.status as keyof typeof ORDER_STATUS] || item.status }}
                             </VChip>
                         </template>
                         <template #[`item.actions`]="{ item }">

@@ -1,5 +1,3 @@
-import { defineEventHandler, readBody } from "h3"
-
 export default defineEventHandler(async (event) => {
     const params = event.context.params as Record<string, string> | undefined
 

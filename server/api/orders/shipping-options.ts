@@ -1,5 +1,3 @@
-import { defineEventHandler, createError, readBody } from "h3"
-
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const { cart_id: cartId } = await readBody<{ cart_id?: string }>(event)

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue"
-import { useRoute, useFetch, navigateTo } from "nuxt/app"
-
 definePageMeta({
     layout: "default"
 })

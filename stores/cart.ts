@@ -1,4 +1,3 @@
-import { ref, computed } from "vue"
 import type { CartDTO as MedusaCart } from "@medusajs/types"
 interface CartResponseInterface {
     cart: MedusaCart
@@ -8,6 +7,25 @@ interface CartResponseInterface {
 
 export const useCartStore = defineStore("cart", () => {
     const cart = ref<MedusaCart>()
+
+    const loadCart = async () => {
+        try {
+            const response = await $fetch<CartResponseInterface>("/api/cart", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            if (response && response.success) {
+                cart.value = response.cart
+            } else {
+                throw new Error(response.error || "Failed to load cart")
+            }
+        } catch (error) {
+            console.error("Error loading cart:", error)
+        }
+    }
 
     const updateLineItem = async (
         selectedVariant: {
@@ -131,6 +149,7 @@ export const useCartStore = defineStore("cart", () => {
         updateLineItem,
         removeLineItem,
         itemCount,
-        cart
+        cart,
+        loadCart
     }
 })

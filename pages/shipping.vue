@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { NuxtLink } from "#components"
-
 useHead({
     title: "Shipping | Ecommerce"
 })

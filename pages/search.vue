@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue"
 import type { ProductDTO } from "@medusajs/types"
+import type { SearchResponse } from "@/types/interfaces"
 
 useHead({
     title: "Search | Ecommerce"
 })
-
-interface SearchResponse {
-    products: ProductDTO[]
-    count: number
-}
 
 const searchCounter = ref(0)
 const searchQuery = ref("")

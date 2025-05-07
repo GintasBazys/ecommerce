@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProductDTO } from "@medusajs/types"
+import type { SimpleProductVariant } from "@/types/interfaces"
 import { ref, computed } from "vue"
 import { formatCurrency } from "@/utils/formatCurrency"
 import { debounce } from "lodash"
@@ -10,20 +11,6 @@ const { product } = defineProps<{
 
 const cartStore = useCartStore()
 const loading = ref<boolean>(false)
-
-interface SimpleProductVariant {
-    id: string
-    title: string
-    calculated_price: {
-        calculated_amount: number
-        original_amount: number
-        currency_code: string
-        calculated_price: {
-            price_list_type: string
-        }
-    }
-    inventory_quantity: number
-}
 
 //@ts-expect-error recently released medusa 2.0 with breaking changes
 const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
@@ -91,7 +78,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                 <div class="text-h6 font-weight-bold mb-2">{{ product.title }}</div>
             </NuxtLink>
 
-            <p class="text-truncate text-body-2 mb-2">{{ product.description }}</p>
+            <p class="truncate text-body-2 mb-2">{{ product.description }}</p>
 
             <div class="d-flex justify-space-between align-start mt-4">
                 <div>
@@ -235,5 +222,16 @@ const debouncedAddToCart = debounce(addToCart, 300)
     font-weight: bold;
     border-radius: 5px;
     z-index: 10;
+}
+
+.truncate {
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: block;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: -o-ellipsis-lastline;
+    text-overflow: ellipsis;
+    min-height: 2.5rem;
 }
 </style>

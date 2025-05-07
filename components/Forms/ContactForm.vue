@@ -11,6 +11,13 @@ const handleSubmit = (e: Event): void => {
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
 
+    if (!validateForm(formData)) {
+        errorMessage.value = "Please correct the errors below."
+        successMessage.value = null
+        loading.value = false
+        return
+    }
+
     fetch("https://formsubmit.co/ajax/ea50e93bb59d60512a0ab63ded1f9169", {
         method: "POST",
         body: formData
@@ -45,17 +52,69 @@ const getFormatedDate = () => {
         second: "2-digit"
     })
 }
+
+const formErrors = ref({
+    subject: "",
+    email: "",
+    message: ""
+})
+
+const validateForm = (formData: FormData) => {
+    let isValid = true
+    formErrors.value = { subject: "", email: "", message: "" }
+
+    const subject = formData.get("subject")?.toString().trim() || ""
+    const email = formData.get("email")?.toString().trim() || ""
+    const message = formData.get("message")?.toString().trim() || ""
+
+    if (!subject) {
+        formErrors.value.subject = "Subject is required."
+        isValid = false
+    }
+
+    if (!email) {
+        formErrors.value.email = "Email is required."
+        isValid = false
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        formErrors.value.email = "Please enter a valid email."
+        isValid = false
+    }
+
+    if (!message) {
+        formErrors.value.message = "Message is required."
+        isValid = false
+    }
+
+    return isValid
+}
 </script>
 
 <template>
     <VForm @submit.prevent="handleSubmit">
         <VRow dense>
             <VCol cols="12">
-                <VTextField label="Subject" name="subject" placeholder="Example: Customer service" variant="outlined" required />
+                <VTextField
+                    label="Subject"
+                    name="subject"
+                    placeholder="Example: Customer service"
+                    variant="outlined"
+                    required
+                    :error="!!formErrors.subject"
+                    :error-messages="formErrors.subject"
+                />
             </VCol>
 
             <VCol cols="12" md="6">
-                <VTextField label="Email" name="email" type="email" placeholder="name@example.com" variant="outlined" required />
+                <VTextField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    variant="outlined"
+                    required
+                    :error="!!formErrors.email"
+                    :error-messages="formErrors.email"
+                />
             </VCol>
 
             <VCol cols="12" md="6">
@@ -71,6 +130,8 @@ const getFormatedDate = () => {
                     rows="5"
                     auto-grow
                     required
+                    :error="!!formErrors.message"
+                    :error-messages="formErrors.message"
                 />
             </VCol>
 

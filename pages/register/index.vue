@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router"
-import { useCustomerStore } from "~/stores/customer"
-import type { CustomerResponseInterface } from "~/utils/interfaces"
+import type { CustomerResponseInterface } from "~/types/interfaces"
 
 useHead({
     title: "Register | Ecommerce"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ClientOnly } from "#components"
 import type { ProductDTO } from "@medusajs/types"
 
 const store = useProductStore()
@@ -38,11 +39,12 @@ useSwiper(containerRef, {
                 Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris vel
                 sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
             </p>
-            <swiper-container ref="containerRef" class="showcaseSwiper">
-                <swiper-slide v-for="product in products" :key="product.id">
-                    <ProductCard :product="product as ProductDTO" />
-                </swiper-slide>
-            </swiper-container>
+            <ClientOnly>
+                <swiper-container ref="containerRef" class="showcaseSwiper">
+                    <swiper-slide v-for="product in products" :key="product.id">
+                        <ProductCard :product="product as ProductDTO" />
+                    </swiper-slide> </swiper-container
+            ></ClientOnly>
         </VContainer>
     </section>
 </template>
