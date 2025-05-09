@@ -25,7 +25,6 @@ export default defineEventHandler(async (event) => {
 
         if (!response.ok) {
             const errorResponse = await response.json()
-            console.error("Error from Medusa:", errorResponse)
             event.node.res.statusCode = response.status
             return { message: errorResponse.message || "Failed to send password reset email" }
         }

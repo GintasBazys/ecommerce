@@ -2,14 +2,14 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
 
     try {
-        const forwardedHeaders = {
+        const headers = {
             "Content-Type": "application/json",
             "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
             cookie: event.node.req.headers.cookie || ""
         }
 
         const response = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
-            headers: forwardedHeaders,
+            headers: headers,
             credentials: "include"
         })
 

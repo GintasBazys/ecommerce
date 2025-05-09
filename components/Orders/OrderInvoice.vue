@@ -97,7 +97,7 @@ async function downloadPdf() {
                     class="mb-6"
                 >
                     <template #[`item.product`]="{ item }">
-                        <NuxtImg :src="item.thumbnail ?? ''" width="40" class="mr-2" />
+                        <VImg :src="item.thumbnail ?? ''" width="40" class="mr-2" />
                         {{ item.product }}
                     </template>
                     <template #[`item.unit_price`]="{ item }">

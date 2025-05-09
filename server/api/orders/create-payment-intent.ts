@@ -1,3 +1,5 @@
+import { STRIPE_PAYMENT_PROVIDER } from "@/utils/consts"
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const { cartId } = await readBody(event)
@@ -54,7 +56,7 @@ export default defineEventHandler(async (event) => {
             "Content-Type": "application/json"
         },
         credentials: "include",
-        body: JSON.stringify({ provider_id: "pp_stripe_stripe" })
+        body: JSON.stringify({ provider_id: STRIPE_PAYMENT_PROVIDER })
     })
 
     cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
@@ -69,7 +71,7 @@ export default defineEventHandler(async (event) => {
     cart = (await cartResponse.json()).cart
 
     const paymentSessions = cart.payment_collection.payment_sessions
-    const stripeSession = paymentSessions.find((session: { provider_id: string }) => session.provider_id === "pp_stripe_stripe")
+    const stripeSession = paymentSessions.find((session: { provider_id: string }) => session.provider_id === STRIPE_PAYMENT_PROVIDER)
 
     if (!stripeSession || !stripeSession.data.client_secret) {
         throw new Error("Client secret not available for Stripe payment session.")

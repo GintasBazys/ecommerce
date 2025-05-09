@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: "Not authenticated" })
     }
 
-    const forwardedHeaders = {
+    const headers = {
         "Content-Type": "application/json",
         "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
         Authorization: `Bearer ${accessToken}`,
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
     return await $fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
         method: "POST",
-        headers: forwardedHeaders,
+        headers: headers,
         credentials: "include",
         body
     })

@@ -12,7 +12,7 @@
 
                 <VRow align="center" class="flex-column-reverse flex-lg-row">
                     <VCol cols="12" lg="6" md="8">
-                        <NuxtImg
+                        <VImg
                             src="/images/about_banner.webp"
                             width="570"
                             height="440"

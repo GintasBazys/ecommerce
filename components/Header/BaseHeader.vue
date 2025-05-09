@@ -41,7 +41,7 @@ const { categories } = storeToRefs(productStore)
                 <VRow align="center" justify="space-between" no-gutters class="w-100">
                     <VCol class="logo-container" cols="auto">
                         <NuxtLink class="flex-center logo-link" to="/">
-                            <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
+                            <VImg src="/images/logo.svg" alt="Ecommerce logo" />
                         </NuxtLink>
                     </VCol>
 

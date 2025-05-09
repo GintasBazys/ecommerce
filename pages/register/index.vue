@@ -43,34 +43,23 @@ const handleRegister = async (e: Event) => {
 </script>
 
 <template>
-    <section class="spacer">
-        <div class="row justify-content-center m-0">
-            <div class="col-12">
-                <div class="mx-auto" style="max-width: 24.625rem; width: 100%">
-                    <h4 class="mb-4 mb-lg-5">Register</h4>
-                    <div class="signin-form">
-                        <form id="loginForm" @submit="handleRegister">
-                            <div class="form-group mb-3">
-                                <input id="firstName" type="text" class="form-control" placeholder="First name*" name="firstName" />
-                            </div>
-                            <div class="form-group mb-3">
-                                <input id="registerSurname" type="text" class="form-control" placeholder="Last name*" name="lastName" />
-                            </div>
-                            <div class="form-group mb-3">
-                                <input id="loginEmail" type="email" class="form-control" placeholder="E-mail" name="email" />
-                            </div>
-
-                            <div class="form-group">
-                                <input type="password" class="form-control loginPassword" placeholder="Password" name="password" />
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 text-center mt-4">Register</button>
-                        </form>
+    <section class="py-10">
+        <VContainer>
+            <VRow justify="center">
+                <VCol cols="12" md="6">
+                    <div class="form-wrapper mx-auto">
+                        <h4 class="mb-4">Register</h4>
+                        <VForm ref="registerFormRef" @submit.prevent="handleRegister">
+                            <VTextField name="firstName" label="First name" required class="mb-3" variant="outlined" />
+                            <VTextField name="lastName" label="Last name" required class="mb-3" variant="outlined" />
+                            <VTextField name="email" label="E-mail" type="email" required class="mb-3" variant="outlined" />
+                            <VTextField name="password" label="Password" type="password" required class="mb-3" variant="outlined" />
+                            <VBtn type="submit" color="primary" block> Register </VBtn>
+                        </VForm>
+                        <p class="mt-4 text-center">Already have an account? <NuxtLink to="/signin">Login here</NuxtLink></p>
                     </div>
-                    <p class="mb-0 mt-4 tag-14 text-lg-center text-left">
-                        Already have an account an account? Login <NuxtLink to="/signin">here</NuxtLink>
-                    </p>
-                </div>
-            </div>
-        </div>
+                </VCol>
+            </VRow>
+        </VContainer>
     </section>
 </template>

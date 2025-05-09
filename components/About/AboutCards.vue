@@ -13,7 +13,7 @@
                 <VRow dense class="mt-6">
                     <VCol cols="12" md="4">
                         <VCard class="d-flex flex-column align-center pa-6 h-100" flat>
-                            <NuxtImg src="/images/about_icon1.webp" width="150" height="150" alt="" />
+                            <VImg src="/images/about_icon1.webp" width="150" height="150" alt="" />
                             <p class="text-center mt-4 mb-1"><strong>Lorem De Dorus</strong></p>
                             <p class="text-center">
                                 Nullam aliquet vestibulum augue non varius. Cras cosmo congue an melitos. Duis tristique del maliquam.
@@ -22,7 +22,7 @@
                     </VCol>
                     <VCol cols="12" md="4">
                         <VCard class="d-flex flex-column align-center pa-6 h-100" flat>
-                            <NuxtImg src="/images/about_icon2.webp" width="150" height="150" alt="" />
+                            <VImg src="/images/about_icon2.webp" width="150" height="150" alt="" />
                             <p class="text-center mt-4 mb-1"><strong>Lorem De Dorus</strong></p>
                             <p class="text-center">
                                 Nullam aliquet vestibulum augue non varius. Cras cosmo congue an melitos. Duis tristique del maliquam.
@@ -31,7 +31,7 @@
                     </VCol>
                     <VCol cols="12" md="4">
                         <VCard class="d-flex flex-column align-center pa-6 h-100" flat>
-                            <NuxtImg src="/images/about_icon3.webp" width="150" height="150" alt="" />
+                            <VImg src="/images/about_icon3.webp" width="150" height="150" alt="" />
                             <p class="text-center mt-4 mb-1"><strong>Lorem De Dorus</strong></p>
                             <p class="text-center">
                                 Nullam aliquet vestibulum augue non varius. Cras cosmo congue an melitos. Duis tristique del maliquam.
