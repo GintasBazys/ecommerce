@@ -1,4 +1,4 @@
-import { LIMIT } from "~/utils/consts"
+import { LIMIT } from "@/utils/consts"
 
 export default defineCachedEventHandler(
     async (event) => {

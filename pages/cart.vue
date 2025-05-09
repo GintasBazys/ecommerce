@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { formatPrice } from "@/utils/formatPrice"
-import { DEFAULT_CURENCY } from "~/utils/consts"
+import { DEFAULT_CURENCY } from "@/utils/consts"
 
 useHead({
     title: "Cart | Ecommerce"

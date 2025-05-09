@@ -1,5 +1,3 @@
-import { useCustomerStore } from "~/stores/customer"
-
 export default defineNuxtRouteMiddleware(async (to) => {
     const customerStore = useCustomerStore()
 

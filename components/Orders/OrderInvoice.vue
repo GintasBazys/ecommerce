@@ -179,7 +179,7 @@ async function downloadPdf() {
     </VContainer>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 @media print {
     body {
         margin: 0;

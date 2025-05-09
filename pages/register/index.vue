@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { CustomerResponseInterface } from "~/types/interfaces"
+import { ref } from "vue"
+import type { CustomerResponseInterface } from "@/types/interfaces"
+import type { VForm } from "vuetify/components"
 
 useHead({
     title: "Register | Ecommerce"
@@ -13,15 +15,24 @@ const router = useRouter()
 const customerStore = useCustomerStore()
 const config = useRuntimeConfig()
 
-const handleRegister = async (e: Event) => {
-    e.preventDefault()
+const registerFormRef = ref<VForm | null>(null)
 
-    const form = e.target as HTMLFormElement
-    const formData = new FormData(form)
-    const email = formData.get("email")
-    const password = formData.get("password")
-    const first_name = formData.get("firstName")
-    const last_name = formData.get("lastName")
+const firstName = ref("")
+const lastName = ref("")
+const email = ref("")
+const password = ref("")
+
+const requiredRule = (field: string) => (v: string) => !!v || `${field} is required`
+const nameRules = [requiredRule("First name"), requiredRule("Last name")]
+const emailRules = [requiredRule("E-mail"), (v: string) => /.+@.+\..+/.test(v) || "E-mail must be valid"]
+const passwordRules = [
+    (v: string) => !!v || "Password is required",
+    (v: string) => (v && v.length >= 6) || "Password must be at least 6 characters"
+]
+
+const handleRegister = async () => {
+    const result = await registerFormRef.value?.validate()
+    if (result && !result.valid) return
 
     try {
         const response = await $fetch<CustomerResponseInterface>("/api/account/register", {
@@ -30,10 +41,14 @@ const handleRegister = async (e: Event) => {
                 "Content-Type": "application/json",
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY
             },
-            body: JSON.stringify({ email, password, first_name, last_name })
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value,
+                first_name: firstName.value,
+                last_name: lastName.value
+            })
         })
         customerStore.customer = response.customer
-
         await router.push("/")
     } catch (error) {
         console.error("Register failed:", error)
@@ -50,13 +65,50 @@ const handleRegister = async (e: Event) => {
                     <div class="form-wrapper mx-auto">
                         <h4 class="mb-4">Register</h4>
                         <VForm ref="registerFormRef" @submit.prevent="handleRegister">
-                            <VTextField name="firstName" label="First name" required class="mb-3" variant="outlined" />
-                            <VTextField name="lastName" label="Last name" required class="mb-3" variant="outlined" />
-                            <VTextField name="email" label="E-mail" type="email" required class="mb-3" variant="outlined" />
-                            <VTextField name="password" label="Password" type="password" required class="mb-3" variant="outlined" />
-                            <VBtn type="submit" color="primary" block> Register </VBtn>
+                            <VTextField
+                                v-model="firstName"
+                                name="firstName"
+                                label="First name"
+                                :rules="[nameRules[0]]"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VTextField
+                                v-model="lastName"
+                                name="lastName"
+                                label="Last name"
+                                :rules="[nameRules[1]]"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VTextField
+                                v-model="email"
+                                name="email"
+                                label="E-mail"
+                                type="email"
+                                :rules="emailRules"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VTextField
+                                v-model="password"
+                                name="password"
+                                label="Password"
+                                type="password"
+                                :rules="passwordRules"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VBtn type="submit" color="primary" block>Register</VBtn>
                         </VForm>
-                        <p class="mt-4 text-center">Already have an account? <NuxtLink to="/signin">Login here</NuxtLink></p>
+                        <p class="mt-4 text-center">
+                            Already have an account?
+                            <NuxtLink to="/signin">Login here</NuxtLink>
+                        </p>
                     </div>
                 </VCol>
             </VRow>

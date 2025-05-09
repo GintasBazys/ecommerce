@@ -228,7 +228,7 @@ onMounted(() => {
     </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .loading-overlay {
     position: fixed;
     top: 0;

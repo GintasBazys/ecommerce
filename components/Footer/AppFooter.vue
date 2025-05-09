@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useProductStore } from "~/stores/product"
-import { debounce } from "lodash"
+import debounce from "lodash/debounce"
 
 const store = useProductStore()
 const isLargeScreen = ref<boolean>(true)
