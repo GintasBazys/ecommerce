@@ -108,15 +108,13 @@ const aboutLinks = [
                 </VCol>
 
                 <VCol cols="12" md="6" lg="3">
-                    <VRow class="mb-4" align="center" dense>
-                        <VCol cols="6" class="d-flex justify-center">
-                            <NuxtImg src="/images/mastercard.svg" width="80" loading="lazy" alt="Mastercard" />
-                        </VCol>
-                        <VCol cols="6" class="d-flex justify-center">
-                            <NuxtImg src="/images/visa.png" width="80" loading="lazy" alt="Visa" />
-                        </VCol>
+                    <VRow class="mb-4 ml-4" align="center" dense>
+                        <div class="d-flex justify-center">
+                            <VImg src="/images/mastercard.svg" width="80" loading="lazy" alt="Mastercard" />
+                            <VImg src="/images/visa.png" width="80" loading="lazy" alt="Visa" class="" />
+                        </div>
                     </VRow>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="d-flex flex-column gap-2 ml-4">
                         <NuxtLink
                             class="text-white text-decoration-none"
                             to="mailto:info@ecommerce.com"
