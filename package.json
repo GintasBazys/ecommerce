@@ -20,6 +20,7 @@
         "@unlok-co/nuxt-stripe": "^5.0.0",
         "@vueuse/core": "^13.1.0",
         "@vueuse/integrations": "^13.1.0",
+        "html2pdf.js": "^0.10.3",
         "jwt-decode": "^4.0.0",
         "lodash": "^4.17.21",
         "nuxt": "^3.17.1",

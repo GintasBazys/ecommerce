@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue"
-import { storeToRefs } from "pinia"
-import { useCustomerStore } from "~/stores/customer"
-import { useCartStore } from "~/stores/cart"
-import { useProductStore } from "~/stores/product"
-
 const bannerHidden = ref(false)
 const drawer = ref(false)
 
@@ -18,8 +12,15 @@ const { categories } = storeToRefs(productStore)
 </script>
 
 <template>
-    <header :style="{ height: !bannerHidden ? '96px' : '64px' }">
-        <VBanner v-if="!bannerHidden" color="white" class="primary-banner justify-center" density="comfortable" icon="mdi-truck-fast">
+    <header>
+        <VBanner
+            v-if="!bannerHidden"
+            style="position: sticky"
+            color="white"
+            class="primary-banner justify-center"
+            density="comfortable"
+            icon="mdi-truck-fast"
+        >
             <template #actions>
                 <VBtn height="16" icon @click="bannerHidden = true">
                     <VIcon>mdi-close</VIcon>
@@ -27,7 +28,15 @@ const { categories } = storeToRefs(productStore)
             </template>
             Free shipping on 35 €
         </VBanner>
-        <VAppBar :style="{ top: bannerHidden ? '0px' : '32px' }" app color="white" elevate-on-scroll elevation="1" height="64">
+        <VAppBar
+            style="position: sticky"
+            :style="{ top: bannerHidden ? '0px' : '32px' }"
+            app
+            color="white"
+            elevate-on-scroll
+            elevation="1"
+            height="64"
+        >
             <VContainer>
                 <VRow align="center" justify="space-between" no-gutters class="w-100">
                     <VCol class="logo-container" cols="auto">
@@ -182,5 +191,11 @@ const { categories } = storeToRefs(productStore)
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: bottom;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 </style>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { watch, reactive } from "vue"
 import type { CustomerAddressDTO } from "@medusajs/types"
 
 const model = defineModel<boolean>()

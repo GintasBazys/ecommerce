@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue"
 import type { CustomerAddressDTO } from "@medusajs/types"
 import AddressCard from "@/components/Adress/AddressCard.vue"
 import AddressForm from "@/components/Adress/AddressForm.vue"
@@ -10,7 +9,7 @@ definePageMeta({
 })
 useHead({ title: "Addresses | Ecommerce" })
 
-const LIMIT = 2
+const LIMIT = 3
 const page = ref(1)
 const limit = ref(LIMIT)
 const offset = computed(() => (page.value - 1) * limit.value)
@@ -108,6 +107,10 @@ function onDelete(id: string) {
 
 <template>
     <VContainer class="py-10">
+        <VBtn text to="/account" class="my-8">
+            <VIcon left>mdi-arrow-left</VIcon>
+            Back to Account Dashboard
+        </VBtn>
         <VCard elevation="2" class="pa-6 mb-6">
             <VCardTitle class="text-h5 mb-2">Your Addresses</VCardTitle>
             <VRow v-if="loading" justify="center" class="my-6">

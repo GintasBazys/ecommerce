@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import { useRuntimeConfig, type CustomJwtPayload } from "#imports"
+import type { CustomJwtPayload } from "@/types/interfaces"
 import { jwtDecode } from "jwt-decode"
 import { useRouter, useRoute } from "vue-router"
 import { useCustomerStore } from "@/stores/customer"

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { formatPrice } from "@/utils/formatPrice"
+import { DEFAULT_CURENCY } from "~/utils/consts"
+
 useHead({
     title: "Cart | Ecommerce"
 })
@@ -6,8 +9,6 @@ useHead({
 const cartStore = useCartStore()
 const { cart } = storeToRefs(cartStore)
 const { removeLineItem } = cartStore
-
-const formatPrice = (amount: number) => `${amount.toFixed(2)} €`
 
 const removeItem = async (lineItemId: string) => {
     if (!cart.value?.id) {
@@ -30,15 +31,13 @@ const applyCoupon = async () => {
     }
 
     try {
-        const response = await $fetch("/api/cart/apply-promotion", {
+        await $fetch("/api/cart/apply-promotion", {
             method: "POST",
             body: {
                 cartId: cart.value.id,
                 promoCode: couponCode.value
             }
         })
-
-        console.log("Coupon applied:", response)
     } catch (err) {
         console.error("Coupon application error:", err)
     }
@@ -52,6 +51,8 @@ onMounted(async () => {
     }
     isCartLoading.value = false
 })
+
+const currencyCode = computed(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
 </script>
 
 <template>
@@ -67,7 +68,7 @@ onMounted(async () => {
                         <h1 class="text-h5 font-weight-bold">Shopping Cart</h1>
                     </VCol>
                     <VCol cols="12" lg="6" class="text-lg-end text-sm-start mt-2 mt-lg-0">
-                        <p class="mb-0"><strong>Total:</strong> {{ formatPrice(Number(cart?.total || 0)) }}</p>
+                        <p class="mb-0"><strong>Total:</strong> {{ formatPrice(Number(cart?.total || 0), currencyCode) }}</p>
                     </VCol>
                 </VRow>
 
@@ -109,7 +110,7 @@ onMounted(async () => {
                                     </div>
                                     <div class="text-end">
                                         <strong class="text-subtitle-1">{{
-                                            formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1))
+                                            formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1), currencyCode)
                                         }}</strong>
                                     </div>
                                 </div>
@@ -137,14 +138,14 @@ onMounted(async () => {
 
                             <div class="d-flex justify-space-between mb-2">
                                 <span><strong>Subtotal:</strong></span>
-                                <span>{{ formatPrice(Number(cart?.subtotal || 0)) }}</span>
+                                <span>{{ formatPrice(Number(cart?.subtotal || 0), currencyCode) }}</span>
                             </div>
                             <div class="d-flex justify-space-between mb-6">
                                 <span class="text-lg font-weight-bold">Total:</span>
-                                <span class="text-lg font-weight-bold">{{ formatPrice(Number(cart?.total || 0)) }}</span>
+                                <span class="text-lg font-weight-bold">{{ formatPrice(Number(cart?.total || 0), currencyCode) }}</span>
                             </div>
 
-                            <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/checkout">
+                            <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/address">
                                 <VBtn color="primary" block :disabled="!cart?.items?.length"> Checkout </VBtn>
                             </NuxtLink>
                         </VCard>

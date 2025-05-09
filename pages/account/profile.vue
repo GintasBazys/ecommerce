@@ -65,6 +65,10 @@ async function onSubmit() {
 
 <template>
     <VContainer class="py-10">
+        <VBtn text to="/account" class="my-8">
+            <VIcon left>mdi-arrow-left</VIcon>
+            Back to Account Dashboard
+        </VBtn>
         <VCard elevation="2" class="pa-6">
             <VCardTitle class="text-h5 mb-2">Profile Information</VCardTitle>
             <VCardSubtitle class="mb-6"> Update your personal and company details. Make sure everything is accurate. </VCardSubtitle>

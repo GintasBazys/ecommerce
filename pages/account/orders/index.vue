@@ -50,7 +50,7 @@ const headers: DataTableHeader[] = [
     { title: "Date", value: "created_at" },
     { title: "Total", value: "total", align: "end" },
     { title: "Currency", value: "currency_code", align: "center" },
-    { title: "Status", value: "status", align: "center" },
+    { title: "Status", value: "fulfillment_status", align: "center" },
     { title: "Actions", value: "actions", sortable: false, align: "center" }
 ]
 
@@ -59,6 +59,10 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
 
 <template>
     <VContainer class="py-6">
+        <VBtn text to="/account" class="my-8">
+            <VIcon left>mdi-arrow-left</VIcon>
+            Back to Account Dashboard
+        </VBtn>
         <VRow justify="center">
             <VCol cols="12" md="10" lg="8">
                 <VCard elevation="2">
@@ -107,9 +111,9 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                             }}
                         </template>
 
-                        <template #[`item.status`]="{ item }">
+                        <template #[`item.fulfillment_status`]="{ item }">
                             <VChip small text-color="white">
-                                {{ ORDER_STATUS[item.status as keyof typeof ORDER_STATUS] || item.status }}
+                                {{ ORDER_STATUS[item.fulfillment_status as keyof typeof ORDER_STATUS] || item.fulfillment_status }}
                             </VChip>
                         </template>
                         <template #[`item.actions`]="{ item }">

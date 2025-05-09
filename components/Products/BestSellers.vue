@@ -26,31 +26,32 @@ useSwiper(containerRef, {
         "768": {
             slidesPerView: 3
         },
-        "992": {
+        "1024": {
             slidesPerView: 4
         }
     },
-    spaceBetween: 20,
+    spaceBetween: 0,
     grabCursor: true
 })
 </script>
 
 <template>
-    <template v-if="sellers">
-        <section class="spacer showcase-section position-relative">
-            <VContainer>
-                <h2 class="text-center mb-4">Bestsellers</h2>
-                <p class="text-center mb-4 mb-lg-5">
-                    Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris
-                    vel sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
+    <section v-if="sellers" class="spacer position-relative">
+        <VContainer class="max-w-4xl mx-auto px-4">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold mb-2">Bestsellers</h2>
+                <p class="text-gray-600 mb-6">
+                    Discover our most popular picks, chosen by customers for their quality and value. These products are flying off the
+                    shelves!
                 </p>
-                <ClientOnly>
-                    <swiper-container ref="containerRef" class="showcaseSwiper">
-                        <swiper-slide v-for="product in bestSellers" :key="product.id">
-                            <ProductCard :product="product as ProductDTO" />
-                        </swiper-slide> </swiper-container
-                ></ClientOnly>
-            </VContainer>
-        </section>
-    </template>
+            </div>
+            <ClientOnly>
+                <swiper-container ref="containerRef" class="px-2">
+                    <swiper-slide v-for="product in bestSellers" :key="product.id">
+                        <ProductCard :product="product" />
+                    </swiper-slide>
+                </swiper-container>
+            </ClientOnly>
+        </VContainer>
+    </section>
 </template>
