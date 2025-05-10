@@ -113,7 +113,7 @@ const aboutLinks = [
                             <VImg src="/images/visa.png" width="80" loading="lazy" alt="Visa" class="" />
                         </div>
                     </VRow>
-                    <div class="d-flex flex-column gap-2 ml-4">
+                    <div class="d-flex flex-column ml-4">
                         <NuxtLink
                             class="text-white text-decoration-none"
                             to="mailto:info@ecommerce.com"

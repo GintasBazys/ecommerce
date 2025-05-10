@@ -56,7 +56,7 @@ export default defineNuxtConfig({
             mailchimpAudienceId: process.env.MAILCHIMP_AUDIENCE_ID
         }
     },
-    plugins: ["~/plugins/init-data"],
+    plugins: ["~/plugins/init-app"],
     vite: {
         optimizeDeps: {
             include: ["@stripe/stripe-js"]

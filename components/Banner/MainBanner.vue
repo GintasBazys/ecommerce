@@ -1,23 +1,22 @@
 <script setup lang="ts">
 import { ClientOnly } from "#components"
 
-const containerRef = ref(null)
 const slides = ref(Array.from({ length: 4 }))
-useSwiper(containerRef, {
-    slidesPerView: 1,
-    loop: true,
-    autoplay: {
-        delay: 8000,
-        disableOnInteraction: true
-    },
-    grabCursor: true
-})
 </script>
 
 <template>
     <section class="container-fluid px-0">
         <ClientOnly>
-            <swiper-container ref="containerRef" class="bannerSwiper">
+            <swiper-container
+                class="bannerSwiper"
+                :slides-per-view="1"
+                :loop="true"
+                :grab-cursor="true"
+                :autoplay="{
+                    delay: 8000,
+                    disableOnInteraction: true
+                }"
+            >
                 <swiper-slide v-for="(slide, idx) in slides" :key="idx">
                     <NuxtImg
                         class="img-fluid"

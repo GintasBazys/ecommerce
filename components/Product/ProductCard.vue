@@ -54,7 +54,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
 </script>
 
 <template>
-    <div class="pa-4">
+    <div class="py-4 px-2 px-md-4">
         <VCard class="pa-4" elevation="2" rounded>
             <div class="d-flex justify-center align-center position-relative">
                 <NuxtLink style="width: 100%" :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">

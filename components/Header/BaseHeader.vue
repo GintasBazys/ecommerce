@@ -41,7 +41,7 @@ const { categories } = storeToRefs(productStore)
                 <VRow align="center" justify="space-between" no-gutters class="w-100">
                     <VCol class="logo-container" cols="auto">
                         <NuxtLink class="flex-center logo-link" to="/">
-                            <VImg src="/images/logo.svg" alt="Ecommerce logo" />
+                            <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
                         </NuxtLink>
                     </VCol>
 
@@ -66,7 +66,14 @@ const { categories } = storeToRefs(productStore)
                                 <VBtn icon>
                                     <VIcon>mdi-cart</VIcon>
                                     <ClientOnly>
-                                        <VBadge v-if="itemCount" :content="itemCount" color="error" overlap bordered class="cart-counter" />
+                                        <VBadge
+                                            v-if="itemCount"
+                                            :content="itemCount < 99 ? itemCount : '99+'"
+                                            color="error"
+                                            overlap
+                                            bordered
+                                            class="cart-counter"
+                                        />
                                     </ClientOnly>
                                 </VBtn>
                             </NuxtLink>

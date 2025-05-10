@@ -34,7 +34,8 @@ export const useCartStore = defineStore("cart", () => {
             title: string
             calculated_price: { calculated_amount: number }
         },
-        quantityToAdd = 1
+        quantityToAdd = 1,
+        updateItem = false
     ) => {
         if (!cart.value || !cart.value.items) {
             console.warn("Cart or cart items are not initialized")
@@ -50,7 +51,7 @@ export const useCartStore = defineStore("cart", () => {
             const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id && !item.id.startsWith("temp-"))
 
             if (existingItem) {
-                const newQuantity = Number(existingItem.quantity) + quantityToAdd
+                const newQuantity = Number(!updateItem ? existingItem.quantity : 0) + quantityToAdd
 
                 const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
                     method: "POST",

@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { OrderDTO, OrderAddressDTO, ProductVariantDTO } from "@medusajs/types"
+import { OrderDTO, OrderAddressDTO, ProductVariantDTO, CartLineItemDTO } from "@medusajs/types"
 
 declare module "@medusajs/types" {
     interface OrderDTO {
@@ -21,5 +21,8 @@ declare module "@medusajs/types" {
             }
         }
         inventory_quantity: number
+    }
+    interface CartLineItemDTO {
+        stocked_quantity: number
     }
 }

@@ -11,23 +11,6 @@ await useAsyncData("product", async () => {
     await store.fetchData(regionStoreId.value ?? "")
     return store.products ?? null
 })
-
-const containerRef = ref(null)
-useSwiper(containerRef, {
-    breakpoints: {
-        "280": {
-            slidesPerView: 1.5
-        },
-        "768": {
-            slidesPerView: 3
-        },
-        "1024": {
-            slidesPerView: 4
-        }
-    },
-    spaceBetween: 0,
-    grabCursor: true
-})
 </script>
 
 <template>
@@ -40,7 +23,16 @@ useSwiper(containerRef, {
                 </p>
             </div>
             <ClientOnly>
-                <swiper-container ref="containerRef" class="px-2">
+                <swiper-container
+                    class="px-2"
+                    :breakpoints="{
+                        280: { slidesPerView: 1.5 },
+                        768: { slidesPerView: 3 },
+                        1024: { slidesPerView: 4 }
+                    }"
+                    :space-between="0"
+                    :grab-cursor="true"
+                >
                     <swiper-slide v-for="product in products" :key="product.id">
                         <ProductCard :product="product" />
                     </swiper-slide>
