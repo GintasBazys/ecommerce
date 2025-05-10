@@ -209,12 +209,12 @@ const currencyCode = computed(() => cart.value?.currency_code ?? DEFAULT_CURENCY
                         </VCard>
 
                         <VBtn
-                            v-if="isCartDirty"
+                            v-if="cart?.items?.length"
                             class="mt-4"
                             color="primary"
                             block
                             :loading="Object.values(updating).some(Boolean)"
-                            :disabled="Object.values(updating).some(Boolean)"
+                            :disabled="!isCartDirty || Object.values(updating).some(Boolean)"
                             @click="cart?.items?.forEach((item) => updateCount(item))"
                         >
                             Update Cart

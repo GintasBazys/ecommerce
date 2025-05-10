@@ -7,22 +7,7 @@ export default defineNuxtPlugin(async () => {
     const customerStore = useCustomerStore()
     const cartStore = useCartStore()
 
-    const regionsRes = await fetch(`${config.public.MEDUSA_URL}/store/regions`, {
-        method: "GET",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        }
-    })
-    if (!regionsRes.ok) {
-        console.error("Failed to fetch regions:", regionsRes.statusText)
-        throw new Error(`Failed to fetch regions: ${regionsRes.statusText}`)
-    }
-    const { regions } = await regionsRes.json()
-    if (!regions?.length) {
-        throw new Error("No regions returned from Medusa")
-    }
-    regionStore.regionStoreId = regions[0].id
+    await regionStore.fetchRegion()
 
     const categories = await $fetch("/api/categories/categories", {
         credentials: "include",
@@ -40,6 +25,10 @@ export default defineNuxtPlugin(async () => {
         headers: useRequestHeaders(["cookie"])
     }).catch(() => ({ customer: null }))
     customerStore.customer = customer
+
+    if (!regionStore.$state.regionStoreId) {
+        return
+    }
 
     const { cart } = await $fetch<{ cart: CartDTO }>(`/api/cart/cart?regionId=${regionStore.regionStoreId}`, {
         credentials: "include",
