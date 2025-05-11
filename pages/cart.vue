@@ -276,7 +276,7 @@ const removePromotion = async (promoCode: string | undefined) => {
                                     <li
                                         v-for="promo in cart?.promotions"
                                         :key="promo.id"
-                                        class="d-flex justify-space-between align-center border px-3"
+                                        class="d-flex justify-space-between align-center border px-3 mb-3"
                                     >
                                         <span>
                                             <strong>{{ promo.code }}&nbsp;</strong>
