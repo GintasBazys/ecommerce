@@ -20,6 +20,10 @@ const relatedQuery = queryCollection("content")
 const { data: relatedPosts } = await useAsyncData(`related-${slug.value}`, () => {
     return relatedQuery.all()
 })
+
+useHead({
+    title: `${currentPost.value?.title ?? "Shop"} | Ecommerce`
+})
 </script>
 
 <template>

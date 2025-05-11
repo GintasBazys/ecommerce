@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ClientOnly } from "#components"
-
 const store = useProductStore()
 const { products } = storeToRefs(store)
 

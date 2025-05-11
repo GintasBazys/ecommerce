@@ -6,16 +6,21 @@ export default defineEventHandler(async (event) => {
 
     const limit = query.limit !== undefined && query.limit !== null ? String(query.limit) : LIMIT
     const offset = query.offset !== undefined && query.offset !== null ? String(query.offset) : "0"
+    const categoryId = query.category_id !== undefined && query.category_id !== null ? String(query.category_id) : null
     const regionId = String(query.region_id)
     const handle = query.handle ? String(query.handle) : null
 
     const queryParams = new URLSearchParams({
         fields: `*variants.calculated_price,*variants.inventory_quantity`,
-        region_id: regionId
+        region_id: regionId,
+        order: "-created_at"
     })
 
     if (handle) {
         queryParams.set("handle", handle)
+    }
+    if (categoryId) {
+        queryParams.set("category_id", categoryId)
     }
 
     try {

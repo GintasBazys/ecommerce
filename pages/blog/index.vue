@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useHead({
+    title: `Blog | Ecommerce`
+})
+
 const limit = 12
 const page = ref<number>(1)
 const skip = computed(() => (page.value - 1) * limit)
