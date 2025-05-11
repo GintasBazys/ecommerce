@@ -9,6 +9,7 @@ const { product } = defineProps<{
 }>()
 
 const cartStore = useCartStore()
+const { openCartDrawer } = storeToRefs(cartStore)
 const loading = ref<boolean>(false)
 
 const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
@@ -47,7 +48,7 @@ const addToCart = async () => {
     }
     await cartStore.updateLineItem(selectedVariant.value)
     loading.value = false
-    window.scrollTo(0, 0)
+    openCartDrawer.value = true
 }
 
 const debouncedAddToCart = debounce(addToCart, 300)
@@ -111,6 +112,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
 
 <style lang="scss" scoped>
 .truncate {
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     display: block;

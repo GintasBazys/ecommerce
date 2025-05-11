@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
 import { ORDER_STATUS } from "@/enumerators/order"
+import { NuxtImg } from "#components"
 
 const route = useRoute()
 const orderId = route.params.id
@@ -97,7 +98,7 @@ async function downloadPdf() {
                     class="mb-6"
                 >
                     <template #[`item.product`]="{ item }">
-                        <VImg :src="item.thumbnail ?? ''" width="40" class="mr-2" />
+                        <NuxtImg :src="item.thumbnail ?? ''" width="40" class="mr-2" />
                         {{ item.product }}
                     </template>
                     <template #[`item.unit_price`]="{ item }">

@@ -14,6 +14,7 @@ const { removeLineItem, updateLineItem, loadCart } = cartStore
 
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
+const isApplyingCoupon = ref(false)
 
 watch(
     cart,
@@ -99,7 +100,7 @@ const applyCoupon = async () => {
         console.error("Cart not found")
         return
     }
-
+    isApplyingCoupon.value = true
     try {
         await $fetch("/api/cart/apply-promotion", {
             method: "POST",
@@ -108,12 +109,34 @@ const applyCoupon = async () => {
                 promoCode: couponCode.value
             }
         })
+        await loadCart()
+        couponCode.value = ""
     } catch (err) {
         console.error("Coupon application error:", err)
+    } finally {
+        isApplyingCoupon.value = false
     }
 }
 
 const currencyCode = computed(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
+
+const removePromotion = async (promoCode: string | undefined) => {
+    if (!cart.value?.id || !promoCode) return
+
+    try {
+        await $fetch("/api/cart/remove-promotion", {
+            method: "DELETE",
+            body: {
+                cartId: cart.value.id,
+                promo_codes: [promoCode]
+            }
+        })
+
+        await loadCart()
+    } catch (err) {
+        console.error("Failed to remove promotion:", err)
+    }
+}
 </script>
 
 <template>
@@ -235,9 +258,39 @@ const currencyCode = computed(() => cart.value?.currency_code ?? DEFAULT_CURENCY
                                     variant="outlined"
                                     hide-details
                                 />
-                                <VBtn class="mt-3" color="primary" block type="submit"> Apply </VBtn>
+                                <VBtn
+                                    :loading="isApplyingCoupon"
+                                    :disabled="isApplyingCoupon"
+                                    class="mt-3"
+                                    color="primary"
+                                    block
+                                    type="submit"
+                                >
+                                    Apply
+                                </VBtn>
                             </VForm>
+                            <div v-if="cart?.promotions?.length" class="mb-4">
+                                <h3 class="text-subtitle-1 font-weight-medium mt-4">Applied Promotions:</h3>
 
+                                <ul>
+                                    <li
+                                        v-for="promo in cart?.promotions"
+                                        :key="promo.id"
+                                        class="d-flex justify-space-between align-center border px-3"
+                                    >
+                                        <span>
+                                            <strong>{{ promo.code }}&nbsp;</strong>
+                                            <span class="text-success">
+                                                {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
+                                            </span>
+                                        </span>
+
+                                        <VBtn icon small variant="text" aria-label="Remove promotion" @click="removePromotion(promo.code)">
+                                            <VIcon>mdi-close</VIcon>
+                                        </VBtn>
+                                    </li>
+                                </ul>
+                            </div>
                             <VDivider class="my-4" />
 
                             <div class="d-flex justify-space-between mb-2">
@@ -252,7 +305,9 @@ const currencyCode = computed(() => cart.value?.currency_code ?? DEFAULT_CURENCY
                             </div>
 
                             <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/address">
-                                <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty"> Checkout </VBtn>
+                                <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0">
+                                    Checkout
+                                </VBtn>
                             </NuxtLink>
                         </VCard>
                     </VCol>

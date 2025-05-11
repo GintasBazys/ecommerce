@@ -12,7 +12,7 @@ const { data: latestPosts } = await useAsyncData("/", () => {
             </VCol>
         </VRow>
 
-        <VRow class="pb-10" align="stretch" justify="center" dense>
+        <VRow class="pb-10 ga-4 ga-md-0" align="stretch" justify="center" dense>
             <template v-if="latestPosts">
                 <VCol v-for="article in latestPosts" :key="article.path" cols="12" md="6" lg="4">
                     <NuxtLink :to="BLOG_HANDLE + article.path" style="text-decoration: none">

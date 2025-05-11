@@ -1,50 +1,43 @@
+import type { CartResponse } from "@/stores/product"
+
 export default eventHandler(async (event) => {
     const cartId = getCookie(event, "cart_id") || null
     const config = useRuntimeConfig()
     const query = getQuery(event)
 
     try {
-        const regionId = query.regionId || null
+        const regionId = query.region_id || null
 
         if (!regionId) {
-            throw new Error("Region ID is required")
+            throw createError({ statusCode: 400, statusMessage: "Region ID is required" })
         }
 
         let cart
 
         if (!cartId) {
-            const response = await fetch(`${config.public.MEDUSA_URL}/store/carts`, {
+            const { cart: newCart } = await $fetch<CartResponse>(`${config.public.MEDUSA_URL}/store/carts`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
                     "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ region_id: regionId })
+                body: { region_id: regionId }
             })
-
-            if (!response.ok) {
-                throw new Error(`Failed to create cart: ${response.statusText}`)
-            }
-
-            const data = await response.json()
-            cart = data.cart
+            cart = newCart
         } else {
-            const response = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}?fields=*items`, {
+            const { cart: existingCart } = await $fetch<CartResponse>(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
                     "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
                     "Content-Type": "application/json"
+                },
+                params: {
+                    fields: "*items"
                 }
             })
-
-            if (!response.ok) {
-                throw new Error(`Failed to retrieve cart: ${response.statusText}`)
-            }
-
-            const data = await response.json()
-            cart = data.cart
+            cart = existingCart
         }
 
         return { cart, regionId }

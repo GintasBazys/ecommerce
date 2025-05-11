@@ -10,6 +10,12 @@ useHead({
         { rel: "manifest", href: "/site.webmanifest" }
     ]
 })
+
+const nuxtApp = useNuxtApp()
+
+nuxtApp.hook("page:finish", () => {
+    window.scrollTo(0, 0)
+})
 </script>
 
 <template>

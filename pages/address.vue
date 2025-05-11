@@ -81,7 +81,7 @@ const rules = {
 </script>
 
 <template>
-    <VContainer>
+    <VContainer class="pt-12">
         <VForm ref="form" lazy-validation>
             <VRow>
                 <VCol cols="12">

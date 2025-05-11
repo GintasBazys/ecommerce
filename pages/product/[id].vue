@@ -4,6 +4,7 @@ import { formatPrice } from "@/utils/formatPrice"
 const route = useRoute()
 const { regionStoreId } = storeToRefs(useRegionStore())
 const cartStore = useCartStore()
+const { openCartDrawer } = storeToRefs(cartStore)
 
 const handle = route.fullPath.split("/").pop()
 
@@ -61,14 +62,14 @@ const addToCart = async () => {
         await cartStore.updateLineItem(selectedVariant.value, quantity.value)
     } finally {
         adding.value = false
-        window.scrollTo(0, 0)
+        openCartDrawer.value = true
     }
 }
 </script>
 
 <template>
     <VContainer v-if="product" class="py-10">
-        <VRow class="align-start" dense>
+        <VRow class="align-start mt-md-10" dense>
             <VCol cols="12" md="6">
                 <VCard class="rounded-lg" elevation="2">
                     <ClientOnly>

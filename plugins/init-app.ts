@@ -30,7 +30,7 @@ export default defineNuxtPlugin(async () => {
         return
     }
 
-    const { cart } = await $fetch<{ cart: CartDTO }>(`/api/cart/cart?regionId=${regionStore.regionStoreId}`, {
+    const { cart } = await $fetch<{ cart: CartDTO }>(`/api/cart/cart?region_id=${regionStore.regionStoreId}`, {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",

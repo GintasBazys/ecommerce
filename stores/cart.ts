@@ -7,17 +7,20 @@ interface CartResponseInterface {
 
 export const useCartStore = defineStore("cart", () => {
     const cart = ref<MedusaCart>()
+    const openCartDrawer = ref(false)
 
     const loadCart = async () => {
         try {
-            const response = await $fetch<CartResponseInterface>("/api/cart", {
+            const regionId = useRegionStore().regionStoreId
+            const res = await fetch(`/api/cart/cart?region_id=${regionId}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
 
-            if (response && response.success) {
+            const response: CartResponseInterface = await res.json()
+            if (response.cart) {
                 cart.value = response.cart
             } else {
                 throw new Error(response.error || "Failed to load cart")
@@ -83,6 +86,7 @@ export const useCartStore = defineStore("cart", () => {
 
                 if (response && response.success) {
                     cart.value = response.cart
+                    openCartDrawer.value = true
                 } else {
                     throw new Error(response.error || "Unknown error")
                 }
@@ -93,49 +97,21 @@ export const useCartStore = defineStore("cart", () => {
     }
 
     const removeLineItem = async (lineItemId: string) => {
-        if (!cart.value || !cart.value.items) {
-            console.warn("Cart or cart items are not initialized")
-            return
-        }
-
-        const previousCart = JSON.parse(JSON.stringify(cart.value))
+        if (!cart.value?.id) return
 
         try {
-            const itemIndex = cart.value.items.findIndex((item) => item.id === lineItemId)
-            if (itemIndex === -1) {
-                console.warn("Item not found in cart")
-                return
-            }
-
-            const itemToRemove = cart.value.items[itemIndex]
-
-            const unitPrice = Number(itemToRemove.unit_price ?? 0)
-            const quantity = Number(itemToRemove.quantity ?? 0)
-
-            const itemTotal = unitPrice * quantity
-
-            cart.value.total = Number(cart.value.total ?? 0) - itemTotal
-            cart.value.subtotal = Number(cart.value.subtotal ?? 0) - itemTotal
-
-            cart.value.items.splice(itemIndex, 1)
-
             const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cart.value.id}/${lineItemId}`, {
                 method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: { "Content-Type": "application/json" }
             })
 
-            if (response && response.success) {
-                cart.value.total = response.cart.total
-                cart.value.subtotal = response.cart.subtotal
-                cart.value.updated_at = response.cart.updated_at
+            if (response?.success) {
+                cart.value = response.cart.parent
             } else {
                 throw new Error(response.error || "Unknown error")
             }
-        } catch (error) {
-            console.error("Failed to remove item:", error)
-            cart.value = previousCart
+        } catch (err) {
+            console.error("Failed to remove item:", err)
         }
     }
 
@@ -151,6 +127,7 @@ export const useCartStore = defineStore("cart", () => {
         removeLineItem,
         itemCount,
         cart,
-        loadCart
+        loadCart,
+        openCartDrawer
     }
 })

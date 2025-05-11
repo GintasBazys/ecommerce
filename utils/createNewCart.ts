@@ -4,7 +4,7 @@ export const createNewCart = async (cartStore: { $patch: (arg0: { cart: CartResp
         const cartCookieToDelete = useCookie("cart_id")
         cartCookieToDelete.value = null
         cartStore.$patch({ cart: null })
-        const response = await fetch(`/api/cart/cart?regionId=${useRegionStore().regionStoreId}`, {
+        const response = await fetch(`/api/cart/cart?region_id=${useRegionStore().regionStoreId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
