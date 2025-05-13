@@ -1,32 +1,6 @@
 <script setup lang="ts">
-import debounce from "lodash/debounce"
-
 const store = useProductStore()
-const isLargeScreen = ref<boolean>(true)
-const expandedPanels = ref<number[][]>([[], [], []])
-
-const handleResize = () => {
-    isLargeScreen.value = window.innerWidth > 767.98
-}
-
-const debouncedResize = debounce(handleResize, 300)
-
-onMounted(() => {
-    window.addEventListener("resize", debouncedResize)
-    window.dispatchEvent(new Event("resize"))
-})
-
-onUnmounted(() => {
-    window.removeEventListener("resize", debouncedResize)
-})
-
-watch(
-    isLargeScreen,
-    (val) => {
-        expandedPanels.value = val ? [[0], [0], [0]] : [[], [], []]
-    },
-    { immediate: true }
-)
+const expandedPanels = ref<number[][]>([[0], [0], [0]])
 
 const helpLinks = [
     { label: "FAQ", to: "/faq" },
