@@ -15,6 +15,17 @@ const limit = 9
 const totalCount = ref(0)
 const loadingRef = ref(false)
 
+const sortOptions = [
+    { text: "From latest", value: "-created_at" },
+    { text: "From oldest", value: "created_at" },
+    //TODO enable price options when medusa js releases 2.8+ version update
+    // { text: "Price: low → high", value: "variants.prices.amount" },
+    // { text: "Price: high → low", value: "-variants.prices.amount" },
+    { text: "Title: A → Z", value: "title" },
+    { text: "Title: Z → A", value: "-title" }
+]
+const sortOption = ref<string>(sortOptions[0].value)
+
 const fetchProducts = async () => {
     if (!category.value?.handle) return
 
@@ -28,7 +39,8 @@ const fetchProducts = async () => {
             category_id: category.value.id,
             region_id: regionStoreId.value,
             limit,
-            offset: offset.value
+            offset: offset.value,
+            order: sortOption.value
         }
     })
 
@@ -60,7 +72,6 @@ useHead({
 })
 
 //TODO remove sentinel element and add last item class to product
-//TODO implement sort when store API supports sorting by price
 const infiniteSentinel = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver
 
@@ -87,6 +98,12 @@ onMounted(() => {
 onUnmounted(() => {
     observer.disconnect()
 })
+
+watch(sortOption, async () => {
+    offset.value = 0
+    await fetchProducts()
+    window?.scrollTo(0, 0)
+})
 </script>
 
 <template>
@@ -110,6 +127,19 @@ onUnmounted(() => {
             </VSheet>
         </VContainer>
         <VContainer class="my-6">
+            <VRow class="mb-4" align="center">
+                <VCol cols="12" sm="6" md="4" lg="3">
+                    <VSelect
+                        v-model="sortOption"
+                        :items="sortOptions"
+                        item-title="text"
+                        item-value="value"
+                        label="Sort by"
+                        outlined
+                        dense
+                    />
+                </VCol>
+            </VRow>
             <VRow>
                 <VCol v-for="product in products" :key="product.id" class="pa-0" cols="12" sm="6" md="4" lg="3">
                     <ProductCard :product="product" />

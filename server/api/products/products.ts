@@ -9,11 +9,12 @@ export default defineEventHandler(async (event) => {
     const categoryId = query.category_id !== undefined && query.category_id !== null ? String(query.category_id) : null
     const regionId = String(query.region_id)
     const handle = query.handle ? String(query.handle) : null
+    const order = query.order ? String(query.order) : "-created_at"
 
     const queryParams = new URLSearchParams({
         fields: `*variants.calculated_price,*variants.inventory_quantity`,
         region_id: regionId,
-        order: "-created_at"
+        order: order
     })
 
     if (handle) {

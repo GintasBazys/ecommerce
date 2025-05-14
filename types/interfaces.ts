@@ -51,3 +51,26 @@ export interface SearchResponse {
     products: ProductDTO[]
     count: number
 }
+
+export type StoreProductReview = {
+    id: string
+    title: string
+    rating: number
+    content: string
+    first_name: string
+    last_name: string
+}
+
+type Review = {
+    id: string
+    rating: number
+    title: string
+    first_name: string
+    last_name: string
+    content: string
+    created_at: string
+}
+
+export type ReviewApiResponse = {
+    reviews: Review[]
+}
