@@ -52,16 +52,7 @@ export interface SearchResponse {
     count: number
 }
 
-export type StoreProductReview = {
-    id: string
-    title: string
-    rating: number
-    content: string
-    first_name: string
-    last_name: string
-}
-
-type Review = {
+export type Review = {
     id: string
     rating: number
     title: string

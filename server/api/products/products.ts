@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const order = query.order ? String(query.order) : "-created_at"
 
     const queryParams = new URLSearchParams({
-        fields: `*variants.calculated_price,*variants.inventory_quantity`,
+        fields: `+metadata,*variants.calculated_price,*variants.inventory_quantity`,
         region_id: regionId,
         order: order
     })

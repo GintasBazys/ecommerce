@@ -16,6 +16,7 @@ interface Address {
 }
 
 const { cart } = storeToRefs(useCartStore())
+const { regionCountries } = storeToRefs(useRegionStore())
 
 const form = ref<VForm | null>(null)
 const billingAddress = reactive<Address>({
@@ -111,11 +112,16 @@ const rules = {
                 <VCol cols="6" md="3">
                     <VTextField v-model="billingAddress.city" label="City" :rules="[rules.required]" />
                 </VCol>
-
                 <VCol cols="12" md="6">
-                    <VTextField v-model="billingAddress.country_code" label="Country Code" :rules="[rules.required]" />
+                    <VSelect
+                        v-model="billingAddress.country_code"
+                        :items="regionCountries"
+                        item-title="display_name"
+                        item-value="iso_2"
+                        label="Country"
+                        :rules="[rules.required]"
+                    />
                 </VCol>
-
                 <VCol cols="12" md="6">
                     <VTextField v-model="billingAddress.province" label="Province / State" :rules="[rules.required]" />
                 </VCol>
@@ -160,8 +166,15 @@ const rules = {
                     <VTextField v-model="shippingAddress.city" label="City" :rules="[rules.required]" />
                 </VCol>
 
-                <VCol cols="12" md="6">
-                    <VTextField v-model="shippingAddress.country_code" label="Country Code" :rules="[rules.required]" />
+                <VCol v-if="useSeparateShipping" cols="12" md="6">
+                    <VSelect
+                        v-model="shippingAddress.country_code"
+                        :items="regionCountries"
+                        item-title="display_name"
+                        item-value="iso_2"
+                        label="Country"
+                        :rules="[rules.required]"
+                    />
                 </VCol>
 
                 <VCol cols="12" md="6">

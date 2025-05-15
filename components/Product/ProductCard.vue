@@ -52,6 +52,11 @@ const addToCart = async () => {
 }
 
 const debouncedAddToCart = debounce(addToCart, 300)
+
+const averageRating = computed<number | null>(() => {
+    const rating = Number(product?.metadata?.averageRating)
+    return rating > 0 ? rating : null
+})
 </script>
 
 <template>
@@ -80,6 +85,12 @@ const debouncedAddToCart = debounce(addToCart, 300)
 
                 <p class="truncate text-body-2 mb-2">{{ product.description }}</p>
 
+                <div class="d-flex align-center mt-2">
+                    <VIcon v-for="i in 5" :key="i" size="18" class="mr-1">
+                        {{ i <= Math.round(averageRating ?? 0) ? "mdi-star" : "mdi-star-outline" }}
+                    </VIcon>
+                </div>
+
                 <div class="d-flex justify-space-between align-start mt-4">
                     <div>
                         <div class="text-subtitle-1 font-weight-bold">
@@ -90,7 +101,6 @@ const debouncedAddToCart = debounce(addToCart, 300)
                         </div>
                         <div class="text-caption mt-1">Option: {{ selectedVariant?.title || "No options available" }}</div>
                     </div>
-
                     <VBtn
                         icon
                         color="black"
