@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { VForm } from "vuetify/components"
 useHead({
     title: "Signin | Ecommerce"
 })
@@ -8,34 +9,32 @@ definePageMeta({
 })
 
 const router = useRouter()
-const customerStore = useCustomerStore()
-const cartStore = useCartStore()
 const runtimeConfig = useRuntimeConfig()
 
-const showResetDialog = ref(false)
+const showResetDialog = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
-const snackbar = ref(false)
-const snackbarText = ref("")
-const snackbarColor = ref("success")
+const snackbar = ref<boolean>(false)
+const snackbarText = ref<string>("")
+const snackbarColor = ref<string>("success")
 
-const loginFormRef = ref()
-const resetFormRef = ref()
+const loginFormRef = ref<InstanceType<typeof VForm> | null>(null)
+const resetFormRef = ref<InstanceType<typeof VForm> | null>(null)
 
-const resetEmail = ref("")
-const emailRules = [
+const resetEmail = ref<string>("")
+const emailRules: ((v: string) => boolean | string)[] = [
     (v: string) => !!v || "E-mail is required",
     (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "E-mail must be valid"
 ]
 
-const handleLogin = async (e: Event) => {
+async function handleLogin(e: Event): Promise<void> {
     e.preventDefault()
 
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
+    const email = formData.get("email")
+    const password = formData.get("password")
 
     try {
         const { token } = await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass`, {
@@ -71,8 +70,8 @@ const handleLogin = async (e: Event) => {
             return
         }
 
-        customerStore.customer = customer
-        await assignCustomerToCart(cartStore)
+        useCustomerStore().customer = customer
+        await assignCustomerToCart(useCartStore())
         await router.push("/")
     } catch (error) {
         console.error("Login failed:", error)
@@ -82,7 +81,7 @@ const handleLogin = async (e: Event) => {
     }
 }
 
-const handleSocialLogin = async (provider: string) => {
+async function handleSocialLogin(provider: string): Promise<void> {
     try {
         const result = await fetch(`/api/social/${provider}`, {
             credentials: "include",
@@ -108,7 +107,7 @@ const handleSocialLogin = async (provider: string) => {
     }
 }
 
-const handleReset = async () => {
+async function handleReset(): Promise<void> {
     if (!resetEmail.value) return
 
     try {

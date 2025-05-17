@@ -16,7 +16,7 @@ export default defineNuxtConfig({
             meta: [{ name: "description", content: "..." }]
         }
     },
-    css: ["@/assets/scss/main.scss"],
+    css: ["@/assets/scss/main.scss", "swiper/swiper-bundle.css"],
     image: {
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
@@ -27,7 +27,6 @@ export default defineNuxtConfig({
         "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
         "@nuxtjs/sitemap",
-        "nuxt-swiper",
         "@unlok-co/nuxt-stripe",
         "@nuxt/content",
         "vuetify-nuxt-module"
@@ -60,6 +59,11 @@ export default defineNuxtConfig({
     vite: {
         optimizeDeps: {
             include: ["@stripe/stripe-js"]
+        }
+    },
+    vue: {
+        compilerOptions: {
+            isCustomElement: (tag) => tag.startsWith("swiper-")
         }
     }
 })

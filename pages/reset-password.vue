@@ -5,12 +5,12 @@ const runtimeConfig = useRuntimeConfig()
 
 const token = encodeURIComponent((route.query.token as string) || "")
 const email = encodeURIComponent((route.query.email as string) || "")
-const password = ref("")
-const errorMessage = ref("")
-const successMessage = ref("")
-const formRef = ref()
+const password = ref<string>("")
+const errorMessage = ref<string>("")
+const successMessage = ref<string>("")
+const formRef = ref<string>()
 
-const handleSubmit = async () => {
+async function handleSubmit(): Promise<void> {
     if (!password.value) {
         errorMessage.value = "Password is required"
         return

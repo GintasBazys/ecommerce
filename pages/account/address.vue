@@ -10,17 +10,17 @@ definePageMeta({
 useHead({ title: "Addresses | Ecommerce" })
 
 const LIMIT = 3
-const page = ref(1)
-const limit = ref(LIMIT)
-const offset = computed(() => (page.value - 1) * limit.value)
+const page = ref<number>(1)
+const limit = ref<number>(LIMIT)
+const offset = computed<number>(() => (page.value - 1) * limit.value)
 
-const loading = ref(false)
+const loading = ref<boolean>(false)
 
 const addresses = ref<CustomerAddressDTO[]>([])
-const totalCount = ref(0)
+const totalCount = ref<number>(0)
 const error = ref<string | null>(null)
 
-async function fetchPage() {
+async function fetchPage(): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -51,11 +51,11 @@ onMounted(() => {
 
 watch(page, fetchPage, { immediate: false })
 
-const showAdd = ref(false)
-const showEdit = ref(false)
+const showAdd = ref<boolean>(false)
+const showEdit = ref<boolean>(false)
 const editAddr = ref<Partial<CustomerAddressDTO>>({})
 
-async function createAddress(payload: Partial<CustomerAddressDTO>) {
+async function createAddress(payload: Partial<CustomerAddressDTO>): Promise<void> {
     try {
         const { id, customer_id, created_at, updated_at, ...body } = payload
         await $fetch("/api/account/create-address", {
@@ -69,7 +69,7 @@ async function createAddress(payload: Partial<CustomerAddressDTO>) {
     }
 }
 
-async function updateAddress(payload: CustomerAddressDTO) {
+async function updateAddress(payload: CustomerAddressDTO): Promise<void> {
     const { id, customer_id, created_at, updated_at, ...body } = payload
     try {
         await $fetch(`/api/account/update-address/${id}`, {
@@ -83,7 +83,7 @@ async function updateAddress(payload: CustomerAddressDTO) {
     }
 }
 
-async function deleteAddress(id: string) {
+async function deleteAddress(id: string): Promise<void> {
     try {
         await $fetch(`/api/account/delete-address/${id}`, {
             method: "DELETE",
@@ -95,12 +95,12 @@ async function deleteAddress(id: string) {
     }
 }
 
-function onEdit(addr: CustomerAddressDTO) {
+function onEdit(addr: CustomerAddressDTO): void {
     editAddr.value = { ...addr }
     showEdit.value = true
 }
 
-function onDelete(id: string) {
+function onDelete(id: string): void {
     deleteAddress(id)
 }
 </script>

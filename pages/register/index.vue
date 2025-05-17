@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue"
 import type { CustomerResponseInterface } from "@/types/interfaces"
 import type { VForm } from "vuetify/components"
 
@@ -12,15 +11,14 @@ definePageMeta({
 })
 
 const router = useRouter()
-const customerStore = useCustomerStore()
 const config = useRuntimeConfig()
 
 const registerFormRef = ref<VForm | null>(null)
 
-const firstName = ref("")
-const lastName = ref("")
-const email = ref("")
-const password = ref("")
+const firstName = ref<string>("")
+const lastName = ref<string>("")
+const email = ref<string>("")
+const password = ref<string>("")
 
 const requiredRule = (field: string) => (v: string) => !!v || `${field} is required`
 const nameRules = [requiredRule("First name"), requiredRule("Last name")]
@@ -30,7 +28,7 @@ const passwordRules = [
     (v: string) => (v && v.length >= 6) || "Password must be at least 6 characters"
 ]
 
-const handleRegister = async () => {
+async function handleRegister(): Promise<void> {
     const result = await registerFormRef.value?.validate()
     if (result && !result.valid) return
 
@@ -48,7 +46,7 @@ const handleRegister = async () => {
                 last_name: lastName.value
             })
         })
-        customerStore.customer = response.customer
+        useCustomerStore().customer = response.customer
         await router.push("/")
     } catch (error) {
         console.error("Register failed:", error)

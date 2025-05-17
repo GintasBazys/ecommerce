@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VForm } from "vuetify/components"
+import type { Customer, APIError } from "@/types/interfaces"
 
 definePageMeta({
     layout: "account",
@@ -7,19 +8,6 @@ definePageMeta({
 })
 
 useHead({ title: "Profile | Ecommerce" })
-
-interface Customer {
-    company_name: string
-    first_name: string
-    last_name: string
-    phone: string
-}
-
-interface APIError {
-    data?: {
-        message?: string
-    }
-}
 
 const { customer } = storeToRefs(useCustomerStore())
 
@@ -36,10 +24,10 @@ const rules = {
 
 const formRef: Ref<InstanceType<typeof VForm> | null> = ref(null)
 
-const snackbar = ref(false)
-const snackbarText = ref("")
+const snackbar = ref<boolean>(false)
+const snackbarText = ref<string>("")
 
-async function onSubmit() {
+async function onSubmit(): Promise<void> {
     if (!formRef.value?.validate()) {
         return
     }

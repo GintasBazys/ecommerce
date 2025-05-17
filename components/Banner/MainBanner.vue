@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ClientOnly } from "#components"
-
-const slides = ref(Array.from({ length: 4 }))
+const slides = ref<number[]>(Array.from({ length: 4 }))
 </script>
 
 <template>

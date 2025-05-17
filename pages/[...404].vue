@@ -7,7 +7,9 @@ definePageMeta({
     layout: "account"
 })
 
-const handleError = () => clearError({ redirect: "/" })
+function handleError(): void {
+    clearError({ redirect: "/" })
+}
 </script>
 
 <template>
@@ -15,7 +17,7 @@ const handleError = () => clearError({ redirect: "/" })
         <VRow justify="center">
             <VCol cols="12">
                 <h1 class="text-h5 mb-6">Sorry. The page you were looking for doesn't exist.</h1>
-                <VBtn color="primary" @click="handleError" class="px-6"> Go to homepage </VBtn>
+                <VBtn color="primary" class="px-6" @click="handleError"> Go to homepage </VBtn>
             </VCol>
         </VRow>
     </VContainer>

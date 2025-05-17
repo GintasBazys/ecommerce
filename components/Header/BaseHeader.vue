@@ -1,14 +1,10 @@
 <script setup lang="ts">
-const bannerHidden = ref(false)
-const drawer = ref(false)
+const bannerHidden = ref<boolean>(false)
+const drawer = ref<boolean>(false)
 
-const customerStore = useCustomerStore()
-const cartStore = useCartStore()
-const productStore = useProductStore()
-
-const { customer } = storeToRefs(customerStore)
-const { itemCount } = storeToRefs(cartStore)
-const { categories } = storeToRefs(productStore)
+const { customer } = storeToRefs(useCustomerStore())
+const { itemCount } = storeToRefs(useCartStore())
+const { categories } = storeToRefs(useProductStore())
 </script>
 
 <template>

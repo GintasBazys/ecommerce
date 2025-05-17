@@ -1,19 +1,7 @@
 <script setup lang="ts">
 import type { VForm } from "vuetify/components"
 import type { CartDTO } from "@medusajs/types"
-
-interface Address {
-    first_name: string
-    last_name: string
-    address_1: string
-    address_2?: string
-    city: string
-    province?: string
-    postal_code: string
-    country_code: string
-    phone?: string
-    company?: string
-}
+import type { Address } from "@/types/interfaces"
 
 const { cart } = storeToRefs(useCartStore())
 const { regionCountries } = storeToRefs(useRegionStore())
@@ -43,10 +31,10 @@ const shippingAddress = reactive<Address>({
     phone: "",
     company: ""
 })
-const useSeparateShipping = ref(false)
+const useSeparateShipping = ref<boolean>(false)
 const router = useRouter()
 
-const onSubmit = async () => {
+async function onSubmit(): Promise<void> {
     const isValid = await form.value?.validate()
     if (!isValid || !cart.value) {
         return

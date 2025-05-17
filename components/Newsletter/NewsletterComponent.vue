@@ -2,9 +2,9 @@
 import type { FetchError } from "ofetch"
 
 const errorMessage = ref<string | null>(null)
-const loading = ref(false)
+const loading = ref<boolean>(false)
 
-const handleSubscribe = async (e: Event) => {
+async function handleSubscribe(e: Event): Promise<void> {
     e.preventDefault()
 
     const form = e.target as HTMLFormElement

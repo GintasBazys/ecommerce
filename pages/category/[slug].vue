@@ -31,21 +31,21 @@ const fetchProducts = async () => {
 
     loadingRef.value = true
 
-    const { data: productData, error } = await useFetch<{
-        products: ProductDTO[]
-        count: number
-    }>(`/api/products/products`, {
-        query: {
-            category_id: category.value.id,
-            region_id: regionStoreId.value,
-            limit,
-            offset: offset.value,
-            order: sortOption.value
-        }
-    })
+    try {
+        const productData = await $fetch<{
+            products: ProductDTO[]
+            count: number
+        }>("/api/products/products", {
+            query: {
+                category_id: category.value.id,
+                region_id: regionStoreId.value,
+                limit,
+                offset: offset.value,
+                order: sortOption.value
+            }
+        })
 
-    if (!error.value && productData.value) {
-        const newProducts = Array.isArray(productData.value?.products) ? productData.value.products : []
+        const newProducts = Array.isArray(productData?.products) ? productData.products : []
 
         if (offset.value === 0) {
             products.value = newProducts
@@ -53,10 +53,12 @@ const fetchProducts = async () => {
             products.value = [...products.value, ...newProducts]
         }
 
-        totalCount.value = productData.value.count
+        totalCount.value = productData.count
+    } catch (e) {
+        console.error("Error fetching products", e)
+    } finally {
+        loadingRef.value = false
     }
-
-    loadingRef.value = false
 }
 
 const { data } = await useFetch<ProductCategoryDTO>(`/api/categories/${route.params.slug}`)

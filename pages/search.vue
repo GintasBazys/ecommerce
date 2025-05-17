@@ -6,23 +6,22 @@ useHead({
     title: "Search | Ecommerce"
 })
 
-const searchCounter = ref(0)
-const searchQuery = ref("")
+const searchCounter = ref<number>(0)
+const searchQuery = ref<string>("")
 const products = ref<ProductDTO[]>([])
-const isLoading = ref(false)
-const hasSearched = ref(false)
-const lastSearchQuery = ref("")
+const isLoading = ref<boolean>(false)
+const hasSearched = ref<boolean>(false)
+const lastSearchQuery = ref<string>("")
 const searchHistory = ref<string[]>([])
-const regionStore = useRegionStore()
-const { regionStoreId } = storeToRefs(regionStore)
 
-const regionId = regionStoreId.value ?? ""
+const { regionStoreId } = storeToRefs(useRegionStore())
+const regionId: string = regionStoreId.value ?? ""
 
 if (typeof window !== "undefined") {
     searchHistory.value = JSON.parse(localStorage.getItem("searchHistory") || "[]")
 }
 
-const updateSearchHistory = (query: string) => {
+function updateSearchHistory(query: string): void {
     if (!searchHistory.value.includes(query)) {
         searchHistory.value.unshift(query)
         if (searchHistory.value.length > 5) {
@@ -32,7 +31,7 @@ const updateSearchHistory = (query: string) => {
     }
 }
 
-const handleSearch = async (e: Event) => {
+async function handleSearch(e: Event): Promise<void> {
     e.preventDefault()
 
     if (searchQuery.value === lastSearchQuery.value) {
@@ -50,13 +49,12 @@ const handleSearch = async (e: Event) => {
                 Accept: "application/json",
                 "Content-Type": "application/json"
             },
-            params: {
-                ...(regionId ? { region_id: regionId } : {})
-            },
+            params: regionId ? { region_id: regionId } : {},
             body: {
                 q: searchQuery.value
             }
         })
+
         searchCounter.value = response.count
         products.value = response.products
     } catch (error) {
@@ -67,12 +65,12 @@ const handleSearch = async (e: Event) => {
     }
 }
 
-const reRunSearch = (query: string) => {
+function reRunSearch(query: string): void {
     searchQuery.value = query
     handleSearch(new Event("submit"))
 }
 
-const deleteHistoryItem = (index: number) => {
+function deleteHistoryItem(index: number): void {
     searchHistory.value.splice(index, 1)
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory.value))
 }

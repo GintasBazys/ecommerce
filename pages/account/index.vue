@@ -9,12 +9,11 @@ useHead({
 })
 
 const router = useRouter()
-const customerStore = useCustomerStore()
 
-const handleLogout = async () => {
+async function handleLogout(): Promise<void> {
     const response = await $fetch("/api/account/logout", { method: "POST" })
     if (response.success) {
-        customerStore.$patch({ customer: null })
+        useCustomerStore().$patch({ customer: null })
         await router.push("/")
     }
 }
@@ -30,7 +29,7 @@ const handleLogout = async () => {
                     <VBtn color="info" class="mb-4" variant="outlined" to="/account/profile" block> View Profile </VBtn>
                     <VBtn color="accent" class="mb-4" variant="outlined" to="/account/address" block> View Addresses </VBtn>
                     <VBtn color="secondary" class="mb-4" variant="outlined" to="/account/orders" block> View Orders </VBtn>
-                    <VBtn color="primary" @click="handleLogout" block> Log Out </VBtn>
+                    <VBtn color="primary" block @click="handleLogout"> Log Out </VBtn>
                 </VCard>
             </VCol>
         </VRow>

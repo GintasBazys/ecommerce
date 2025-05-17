@@ -2,6 +2,8 @@
 import AppFooter from "@/components/Footer/AppFooter.vue"
 import BaseHeader from "@/components/Header/BaseHeader.vue"
 
+import { register } from "swiper/element/bundle"
+
 useHead({
     link: [
         { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
@@ -16,6 +18,8 @@ const nuxtApp = useNuxtApp()
 nuxtApp.hook("page:finish", () => {
     window.scrollTo(0, 0)
 })
+
+register()
 </script>
 
 <template>

@@ -1,13 +1,11 @@
 <script setup lang="ts">
-const store = useProductStore()
-const { products } = storeToRefs(store)
+const { products } = storeToRefs(useProductStore())
 
-const regionStore = useRegionStore()
-const { regionStoreId } = storeToRefs(regionStore)
+const { regionStoreId } = storeToRefs(useRegionStore())
 
 await useAsyncData("product", async () => {
-    await store.fetchData(regionStoreId.value ?? "")
-    return store.products ?? null
+    await useProductStore().fetchData(regionStoreId.value ?? "")
+    return useProductStore().products ?? null
 })
 </script>
 

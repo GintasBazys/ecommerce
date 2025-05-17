@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
-const loading = ref(false)
+const loading = ref<boolean>(false)
 
-const handleSubmit = (e: Event): void => {
+function handleSubmit(e: Event): void {
     e.preventDefault()
     loading.value = true
     const form = e.target as HTMLFormElement
@@ -40,7 +40,7 @@ const handleSubmit = (e: Event): void => {
         })
 }
 
-const getFormatedDate = () => {
+function getFormatedDate(): string {
     return new Date().toLocaleString("lt-LT", {
         year: "numeric",
         month: "2-digit",
@@ -51,13 +51,13 @@ const getFormatedDate = () => {
     })
 }
 
-const formErrors = ref({
+const formErrors = ref<{ subject: string; email: string; message: string }>({
     subject: "",
     email: "",
     message: ""
 })
 
-const validateForm = (formData: FormData) => {
+function validateForm(formData: FormData): boolean {
     let isValid = true
     formErrors.value = { subject: "", email: "", message: "" }
 

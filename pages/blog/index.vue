@@ -5,7 +5,7 @@ useHead({
 
 const limit = 12
 const page = ref<number>(1)
-const skip = computed(() => (page.value - 1) * limit)
+const skip = computed<number>(() => (page.value - 1) * limit)
 
 const { data: articles, refresh: refreshArticles } = useAsyncData(`articles-page-${page.value}`, () =>
     queryCollection("content").order("date", "DESC").limit(limit).skip(skip.value).select("title", "path", "description", "image").all()
@@ -13,8 +13,8 @@ const { data: articles, refresh: refreshArticles } = useAsyncData(`articles-page
 
 const { data: allArticles } = useAsyncData("all-content", () => queryCollection("content").select("path").all())
 
-const total = computed(() => allArticles.value?.length ?? 0)
-const totalPages = computed(() => Math.ceil(total.value / limit))
+const total = computed<number>(() => allArticles.value?.length ?? 0)
+const totalPages = computed<number>(() => Math.ceil(total.value / limit))
 
 const route = useRoute()
 const router = useRouter()

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import type { Policies } from "@/types/interfaces"
 
-const policies = ref([
+const policies = ref<Policies[]>([
     {
         icon: "mdi-truck-fast",
         title: "Free Shipping",

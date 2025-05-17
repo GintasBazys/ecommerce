@@ -24,8 +24,8 @@
         "jwt-decode": "^4.0.0",
         "lodash": "^4.17.21",
         "nuxt": "^3.17.1",
-        "nuxt-swiper": "^2.0.0",
         "pinia-plugin-persistedstate": "^4.2.0",
+        "swiper": "^11.2.6",
         "vue": "latest",
         "vuetify-nuxt-module": "0.18.6"
     },

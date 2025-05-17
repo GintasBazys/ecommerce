@@ -17,7 +17,7 @@ const emit = defineEmits<{
     (e: "close"): void
 }>()
 
-const form = ref({
+const form = ref<Props>({
     title: props.title,
     content: props.content,
     rating: props.rating,
@@ -26,14 +26,14 @@ const form = ref({
     productId: props.productId
 })
 
-const isValid = computed(
+const isValid = computed<boolean>(
     () => form.value.title.trim().length > 0 && form.value.content.trim().length > 0 && form.value.rating >= 1 && form.value.rating <= 5
 )
 
-const snackbar = ref(false)
-const snackbarText = ref("")
+const snackbar = ref<boolean>(false)
+const snackbarText = ref<string>("")
 
-const handleSubmit = () => {
+function handleSubmit(): void {
     if (!isValid.value) {
         snackbarText.value = "Please fill in all fields and choose a rating between 1 and 5."
         snackbar.value = true
@@ -43,7 +43,7 @@ const handleSubmit = () => {
     emit("close")
 }
 
-const handleCancel = () => {
+function handleCancel(): void {
     emit("close")
 }
 </script>

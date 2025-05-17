@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PoliciesBlock from "~/components/About/PoliciesBlock.vue"
+import PoliciesBlock from "@/components/About/PoliciesBlock.vue"
 
 const { cart } = storeToRefs(useCartStore())
 </script>

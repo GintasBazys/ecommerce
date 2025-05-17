@@ -1,28 +1,22 @@
 <script setup lang="ts">
-const store = useProductStore()
-const expandedPanels = ref<number[][]>([[0], [0], [0]])
+import type { NavLink } from "@/types/interfaces"
 
-const helpLinks = [
+const expandedPanels = ref<number[][]>([[0], [0], [0]])
+const { categories } = useProductStore()
+
+const helpLinks: NavLink[] = [
     { label: "FAQ", to: "/faq" },
     { label: "Returns", to: "/returns" },
     { label: "Payment & Shipping", to: "/shipping" },
     { label: "Contact Us", to: "/contact" }
 ]
 
-const aboutLinks = [
+const aboutLinks: NavLink[] = [
     { label: "About Us", to: "/about" },
     { label: "Blog", to: BLOG_HANDLE },
     { label: "Contact Us", to: "/contact" },
-    {
-        label: "Facebook",
-        to: "https://facebook.com",
-        icon: "mdi-facebook"
-    },
-    {
-        label: "Instagram",
-        to: "https://instagram.com",
-        icon: "mdi-instagram"
-    }
+    { label: "Facebook", to: "https://facebook.com", icon: "mdi-facebook" },
+    { label: "Instagram", to: "https://instagram.com", icon: "mdi-instagram" }
 ]
 </script>
 
@@ -51,7 +45,7 @@ const aboutLinks = [
                             <VExpansionPanelTitle>Categories</VExpansionPanelTitle>
                             <VExpansionPanelText class="bg-primary text-white">
                                 <VList dense class="bg-primary">
-                                    <VListItem v-for="category in store.categories" :key="category.id" class="pa-0">
+                                    <VListItem v-for="category in categories" :key="category.id" class="pa-0">
                                         <NuxtLink :to="`${CATEGORY_HANDLE}/` + category.handle" class="text-white text-decoration-none">
                                             {{ category.name }}
                                         </NuxtLink>

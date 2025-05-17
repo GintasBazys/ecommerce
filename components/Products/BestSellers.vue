@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import type { ProductDTO } from "@medusajs/types"
-const store = useProductStore()
-const { bestSellers } = storeToRefs(store)
+const { bestSellers } = storeToRefs(useProductStore())
 
-const regionStore = useRegionStore()
-const { regionStoreId } = storeToRefs(regionStore)
+const { regionStoreId } = storeToRefs(useRegionStore())
 
 const { data: sellers } = await useAsyncData<ProductDTO[]>(
     `product-bestsellers-${regionStoreId.value}`,
     async () => {
-        await store.fetchBestSellers(regionStoreId.value ?? "")
-        return store.bestSellers ?? []
+        await useProductStore().fetchBestSellers(regionStoreId.value ?? "")
+        return useProductStore().bestSellers ?? []
     },
     {
         default: () => []

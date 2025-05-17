@@ -3,7 +3,7 @@ useHead({
     title: "Returns | Ecommerce"
 })
 
-const faqPanels = ref([])
+const faqPanels = ref<number[]>([])
 </script>
 
 <template>

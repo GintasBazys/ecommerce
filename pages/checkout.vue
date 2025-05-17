@@ -10,8 +10,8 @@ useHead({
     title: "Checkout | Ecommerce"
 })
 
-const isLoading = ref(false)
-const isShippingLoading = ref(true)
+const isLoading = ref<boolean>(false)
+const isShippingLoading = ref<boolean>(true)
 let stripe: Stripe | null = null
 let elements: StripeElements | null = null
 const clientSecretValue = ref<string | null>(null)
@@ -19,12 +19,11 @@ const clientSecretValue = ref<string | null>(null)
 const shippingOptions = ref<ShippingOption[]>([])
 const selectedShippingOptionId = ref<string | null>(null)
 
-const cartStore = useCartStore()
-const { cart } = storeToRefs(cartStore)
+const { cart } = storeToRefs(useCartStore())
 const config = useRuntimeConfig()
 const router = useRouter()
 
-async function createPaymentIntent() {
+async function createPaymentIntent(): Promise<void> {
     if (!stripe || !cart.value?.id || !selectedShippingOptionId.value) return
 
     isShippingLoading.value = true
@@ -75,7 +74,7 @@ async function createPaymentIntent() {
     isShippingLoading.value = false
 }
 
-async function loadShippingOptions() {
+async function loadShippingOptions(): Promise<void> {
     if (!cart.value?.id) {
         isShippingLoading.value = false
         return
@@ -99,7 +98,7 @@ async function loadShippingOptions() {
     }
 }
 
-async function updateShippingOption() {
+async function updateShippingOption(): Promise<void> {
     if (!cart.value?.id || !selectedShippingOptionId.value) return
 
     try {
@@ -147,7 +146,7 @@ watch(
     { immediate: true }
 )
 
-async function handleSubmit() {
+async function handleSubmit(): Promise<void> {
     if (isLoading.value || !stripe || !elements || !clientSecretValue.value) return
     isLoading.value = true
 
@@ -169,7 +168,7 @@ async function handleSubmit() {
     }
 }
 
-async function completeCart() {
+async function completeCart(): Promise<void> {
     try {
         const res = await fetch("/api/cart/complete-cart", {
             method: "POST",
@@ -186,9 +185,8 @@ async function completeCart() {
             return
         }
         if (payload.type === "order") {
-            alert("Order placed.")
             const orderId = payload.order.id
-            await createNewCart(cartStore)
+            await createNewCart(useCartStore())
             await router.push({ name: "order-completed", query: { orderId } })
         } else {
             console.error("Order completion issue:", payload.error)

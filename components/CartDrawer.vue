@@ -3,9 +3,8 @@ import { formatPrice } from "@/utils/formatPrice"
 import { DEFAULT_CURENCY } from "@/utils/consts"
 import type { CartLineItemDTO } from "@medusajs/types"
 
-const cartStore = useCartStore()
-const { cart, openCartDrawer } = storeToRefs(cartStore)
-const { removeLineItem, updateLineItem } = cartStore
+const { cart, openCartDrawer } = storeToRefs(useCartStore())
+const { removeLineItem, updateLineItem } = useCartStore()
 
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
@@ -34,7 +33,7 @@ watch(
     { immediate: true }
 )
 
-const originalQtys = computed(() => {
+const originalQtys = computed<Record<string, number>>(() => {
     const map: Record<string, number> = {}
     cart.value?.items?.forEach((item) => {
         map[item.id] = Number(item.quantity)
@@ -42,9 +41,9 @@ const originalQtys = computed(() => {
     return map
 })
 
-const isCartDirty = computed(() => Object.entries(qtyMap).some(([id, qty]) => qty !== originalQtys.value[id]))
+const isCartDirty = computed<boolean>(() => Object.entries(qtyMap).some(([id, qty]) => qty !== originalQtys.value[id]))
 
-const removeItem = async (lineItemId: string) => {
+async function removeItem(lineItemId: string): Promise<void> {
     if (!cart.value?.id) throw new Error("No active cart found")
     try {
         await removeLineItem(lineItemId)
@@ -53,16 +52,16 @@ const removeItem = async (lineItemId: string) => {
     }
 }
 
-const decrementQty = (itemId: string) => {
+function decrementQty(itemId: string): void {
     if (qtyMap[itemId] > 1) qtyMap[itemId]--
 }
-const incrementQty = (item: CartLineItemDTO) => {
+function incrementQty(item: CartLineItemDTO): void {
     if (qtyMap[item.id] < (item.stocked_quantity ?? Infinity)) {
         qtyMap[item.id]++
     }
 }
 
-const updateCount = async (item: CartLineItemDTO) => {
+async function updateCount(item: CartLineItemDTO): Promise<void> {
     const desiredQty = qtyMap[item.id]
     const currentQty = Number(item.quantity)
     if (desiredQty === currentQty || desiredQty < 1 || desiredQty > (item.stocked_quantity ?? Infinity) || !cart.value?.id) {
@@ -86,13 +85,13 @@ const updateCount = async (item: CartLineItemDTO) => {
     }
 }
 
-const updateCart = () => {
+function updateCart(): void {
     cart.value?.items?.forEach((item) => updateCount(item))
 }
 
-const isAnyUpdating = computed(() => Object.values(updating).some(Boolean))
+const isAnyUpdating = computed<boolean>(() => Object.values(updating).some(Boolean))
 
-const displayTotal = computed(() => {
+const displayTotal = computed<string>(() => {
     const sum = (cart.value?.items || []).reduce((acc, item) => {
         const qty = qtyMap[item.id] ?? Number(item.quantity)
         return acc + qty * Number(item.unit_price)

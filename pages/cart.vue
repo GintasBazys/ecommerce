@@ -8,13 +8,12 @@ definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Cart | Ecommerce" })
 
-const cartStore = useCartStore()
-const { cart } = storeToRefs(cartStore)
-const { removeLineItem, updateLineItem, loadCart } = cartStore
+const { cart } = storeToRefs(useCartStore())
+const { removeLineItem, updateLineItem, loadCart } = useCartStore()
 
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
-const isApplyingCoupon = ref(false)
+const isApplyingCoupon = ref<boolean>(false)
 
 watch(
     cart,
@@ -31,7 +30,7 @@ watch(
     { immediate: true }
 )
 
-const originalQtys = computed(() => {
+const originalQtys = computed<Record<string, number>>(() => {
     const map: Record<string, number> = {}
     cart.value?.items?.forEach((item) => {
         map[item.id] = Number(item.quantity)
@@ -39,13 +38,13 @@ const originalQtys = computed(() => {
     return map
 })
 
-const isCartDirty = computed(() => Object.entries(qtyMap).some(([id, qty]) => qty !== originalQtys.value[id]))
+const isCartDirty = computed<boolean>(() => Object.entries(qtyMap).some(([id, qty]) => qty !== originalQtys.value[id]))
 
 const debouncedQtyUpdate = debounce((id: string, value: number, max: number) => {
     qtyMap[id] = Math.max(1, Math.min(value, max))
 }, 300)
 
-const removeItem = async (lineItemId: string) => {
+async function removeItem(lineItemId: string): Promise<void> {
     if (!cart.value?.id) throw new Error("No active cart found")
     try {
         await removeLineItem(lineItemId)
@@ -54,16 +53,16 @@ const removeItem = async (lineItemId: string) => {
     }
 }
 
-const decrementQty = (itemId: string) => {
+function decrementQty(itemId: string): void {
     if (qtyMap[itemId] > 1) qtyMap[itemId]--
 }
-const incrementQty = (item: CartLineItemDTO) => {
+function incrementQty(item: CartLineItemDTO): void {
     if (qtyMap[item.id] < (item.stocked_quantity ?? Infinity)) {
         qtyMap[item.id]++
     }
 }
 
-const updateCount = async (item: CartLineItemDTO) => {
+async function updateCount(item: CartLineItemDTO): Promise<void> {
     const desiredQty = qtyMap[item.id]
     const currentQty = Number(item.quantity)
 
@@ -88,14 +87,14 @@ const updateCount = async (item: CartLineItemDTO) => {
     }
 }
 
-const isCartLoading = ref(true)
+const isCartLoading = ref<boolean>(true)
 onMounted(async () => {
     if (!cart.value) await loadCart()
     isCartLoading.value = false
 })
 
-const couponCode = ref("")
-const applyCoupon = async () => {
+const couponCode = ref<string>("")
+async function applyCoupon(): Promise<void> {
     if (!cart.value?.id) {
         console.error("Cart not found")
         return
@@ -118,9 +117,9 @@ const applyCoupon = async () => {
     }
 }
 
-const currencyCode = computed(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
+const currencyCode = computed<string>(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
 
-const removePromotion = async (promoCode: string | undefined) => {
+async function removePromotion(promoCode: string | undefined): Promise<void> {
     if (!cart.value?.id || !promoCode) return
 
     try {

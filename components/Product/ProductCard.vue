@@ -2,14 +2,13 @@
 import type { ProductDTO } from "@medusajs/types"
 import type { SimpleProductVariant } from "@/types/interfaces"
 import { formatPrice } from "@/utils/formatPrice"
-import { debounce } from "lodash"
+import debounce from "lodash/debounce"
 
 const { product } = defineProps<{
     product: ProductDTO
 }>()
 
-const cartStore = useCartStore()
-const { openCartDrawer } = storeToRefs(cartStore)
+const { openCartDrawer } = storeToRefs(useCartStore())
 const loading = ref<boolean>(false)
 
 const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
@@ -41,12 +40,12 @@ const originalPrice = computed<string | null>(() => {
     return null
 })
 
-const addToCart = async () => {
+async function addToCart(): Promise<void> {
     loading.value = true
     if (!selectedVariant.value) {
         return
     }
-    await cartStore.updateLineItem(selectedVariant.value)
+    await useCartStore().updateLineItem(selectedVariant.value)
     loading.value = false
     openCartDrawer.value = true
 }

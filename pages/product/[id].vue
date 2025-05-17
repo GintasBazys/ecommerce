@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { formatPrice } from "@/utils/formatPrice"
-import type { ReviewApiResponse } from "@/types/interfaces"
+import type { Review, ReviewApiResponse } from "@/types/interfaces"
+import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
 const route = useRoute()
 const { regionStoreId } = storeToRefs(useRegionStore())
-const cartStore = useCartStore()
-const { openCartDrawer } = storeToRefs(cartStore)
+const { openCartDrawer } = storeToRefs(useCartStore())
 
 const handle = route.fullPath.split("/").pop()
 
 const { data } = await useFetch(`/api/products/products`, {
     params: { handle, ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}) }
 })
-const product = computed(() => data.value?.products?.[0])
+const product = computed<ProductDTO>(() => data.value?.products?.[0])
 if (!product.value) {
     await navigateTo({ path: "/" })
 }
@@ -22,7 +22,9 @@ useHead({
 })
 
 const selectedVariantId = ref<string | null>(null)
-const selectedVariant = computed(() => product.value?.variants.find((v: { id: string | null }) => v.id === selectedVariantId.value) || null)
+const selectedVariant = computed<ProductVariantDTO | null>(
+    () => product.value?.variants.find((v: { id: string | null }) => v.id === selectedVariantId.value) || null
+)
 
 const isOnSale = computed<number | boolean>(() => {
     return (
@@ -30,37 +32,37 @@ const isOnSale = computed<number | boolean>(() => {
         selectedVariant.value?.calculated_price.original_amount
     )
 })
-const originalPrice = computed(() =>
+const originalPrice = computed<string | null>(() =>
     isOnSale.value
         ? formatPrice(selectedVariant.value!.calculated_price.original_amount!, selectedVariant.value!.calculated_price.currency_code)
         : null
 )
-const salePrice = computed(() =>
+const salePrice = computed<string | null>(() =>
     selectedVariant.value
         ? formatPrice(selectedVariant.value.calculated_price.calculated_amount, selectedVariant.value.calculated_price.currency_code)
         : null
 )
 
-const quantity = ref(1)
-const maxStock = computed(() => selectedVariant.value?.inventory_quantity || 0)
+const quantity = ref<number>(1)
+const maxStock = computed<number>(() => selectedVariant.value?.inventory_quantity || 0)
 
 watch(selectedVariant, () => {
     quantity.value = 1
 })
 
-const decrement = () => {
+function decrement(): void {
     if (quantity.value > 1) quantity.value--
 }
-const increment = () => {
+function increment(): void {
     if (quantity.value < maxStock.value) quantity.value++
 }
 
-const adding = ref(false)
-const addToCart = async () => {
+const adding = ref<boolean>(false)
+async function addToCart(): Promise<void> {
     if (!selectedVariant.value) return
     adding.value = true
     try {
-        await cartStore.updateLineItem(selectedVariant.value, quantity.value)
+        await useCartStore().updateLineItem(selectedVariant.value, quantity.value)
     } finally {
         adding.value = false
         openCartDrawer.value = true
@@ -68,16 +70,16 @@ const addToCart = async () => {
 }
 
 const { customer } = storeToRefs(useCustomerStore())
-const showReviewForm = ref(false)
+const showReviewForm = ref<boolean>(false)
 
-const handleReviewSubmit = async (review: {
+async function handleReviewSubmit(review: {
     title: string
     content: string
     rating: number
     firstName: string
     lastName: string
     productId: string
-}) => {
+}): Promise<void> {
     try {
         await $fetch<ReviewApiResponse>("/api/reviews/add-review", {
             method: "POST",
@@ -96,16 +98,16 @@ const handleReviewSubmit = async (review: {
 }
 
 const reviewsData = ref<ReviewApiResponse | null>(null)
-const reviews = computed(() => reviewsData.value?.reviews || [])
+const reviews = computed<Review[]>(() => reviewsData.value?.reviews || [])
 
 watch(
     () => product.value?.id,
     async (id) => {
         if (id) {
-            const res = await useFetch("/api/reviews/list-reviews", {
+            const res = await $fetch("/api/reviews/list-reviews", {
                 params: { product_id: id, limit: 10, offset: 0 }
             })
-            reviewsData.value = res.data.value
+            reviewsData.value = res
         }
     },
     { immediate: true }

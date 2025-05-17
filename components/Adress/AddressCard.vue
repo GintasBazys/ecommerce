@@ -9,10 +9,10 @@ const emit = defineEmits<{
     (e: "delete", id: string): void
 }>()
 
-function onEdit() {
+function onEdit(): void {
     emit("edit", props.address)
 }
-function onDelete() {
+function onDelete(): void {
     if (confirm("Are you sure you want to delete this address?")) {
         emit("delete", props.address.id)
     }

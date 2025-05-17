@@ -2,7 +2,6 @@
 import type { CustomJwtPayload } from "@/types/interfaces"
 import { jwtDecode } from "jwt-decode"
 import { useRouter, useRoute } from "vue-router"
-import { useCustomerStore } from "@/stores/customer"
 
 definePageMeta({
     layout: "account"
@@ -11,19 +10,17 @@ definePageMeta({
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
-const customerStore = useCustomerStore()
-const cartStore = useCartStore()
 
 const email = ref<string>("")
 const firstName = ref<string>("")
 const lastName = ref<string>("")
 
-const { customer } = storeToRefs(customerStore)
+const { customer } = storeToRefs(useCustomerStore())
 
 const isLoading = ref<boolean>(true)
 const loadingMessage = ref<string>("Initializing...")
 
-const sendCallback = async () => {
+async function sendCallback(): Promise<string | null> {
     const searchParams = new URLSearchParams(window.location.search)
     const queryParams = Object.fromEntries(searchParams.entries())
 
@@ -52,7 +49,7 @@ const sendCallback = async () => {
     }
 }
 
-const createCustomer = async (token: string, email: string, first_name: string, last_name: string) => {
+async function createCustomer(token: string, email: string, first_name: string, last_name: string): Promise<Response | null> {
     try {
         loadingMessage.value = "Creating customer account..."
         const response = await fetch(`${config.public.MEDUSA_URL}/store/customers`, {
@@ -77,7 +74,7 @@ const createCustomer = async (token: string, email: string, first_name: string, 
     }
 }
 
-const refreshToken = async (token: string) => {
+async function refreshToken(token: string): Promise<string | null> {
     try {
         loadingMessage.value = "Refreshing session token..."
         const response = await fetch(`${config.public.MEDUSA_URL}/auth/token/refresh`, {
@@ -189,9 +186,9 @@ const validateCallback = async () => {
             customer.value = customerData
 
             isLoading.value = false
-            customerStore.customer = customerData
+            useCustomerStore().customer = customerData
 
-            await assignCustomerToCart(cartStore)
+            await assignCustomerToCart(useCartStore())
             alert(`Welcome, ${customer.value?.email}!`)
             router.push("/")
         } catch (decodeError) {

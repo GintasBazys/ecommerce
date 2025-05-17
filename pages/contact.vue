@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import ContactForm from "@/components/Forms/ContactForm.vue"
-
 useHead({
     title: "Contact us | Ecommerce"
 })
@@ -49,11 +47,6 @@ useHead({
                     </VCard>
                 </VCol>
             </VRow>
-
-            <div class="mx-auto mb-10" style="max-width: 500px">
-                <p class="text-subtitle-1 font-weight-bold mb-1">Address</p>
-                <p class="text-body-2">Lorem ipsum 163, 12345 Vilnius, Lithuania</p>
-            </div>
 
             <VDivider class="my-6" />
 

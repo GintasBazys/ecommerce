@@ -54,11 +54,11 @@ watch(
     }
 )
 
-function close() {
+function close(): void {
     model.value = false
 }
 
-function save() {
+function save(): void {
     emit("save", { ...local })
     model.value = false
 }

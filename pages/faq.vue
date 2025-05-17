@@ -3,8 +3,8 @@ useHead({
     title: "FAQ | Ecommerce"
 })
 
-const panels1 = ref([0])
-const panels2 = ref([0])
+const panels1 = ref<number[]>([0])
+const panels2 = ref<number[]>([0])
 </script>
 
 <template>

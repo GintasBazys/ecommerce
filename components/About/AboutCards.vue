@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
     <VContainer class="py-12">
         <VRow justify="center">

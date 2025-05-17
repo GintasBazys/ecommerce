@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DataTableHeader, DataTableSortItem } from "vuetify"
-import type { OrderDTO } from "@medusajs/types"
 import { ORDER_STATUS } from "@/enumerators/order"
+import type { OrdersResponse } from "@/types/interfaces"
 
 definePageMeta({
     layout: "account",
@@ -12,13 +12,8 @@ useHead({ title: "Orders | Ecommerce" })
 
 const runtimeConfig = useRuntimeConfig()
 
-interface OrdersResponse {
-    orders: OrderDTO[]
-    total: number
-}
-
-const page = ref(1)
-const perPage = ref(10)
+const page = ref<number>(1)
+const perPage = ref<number>(10)
 const {
     data: ordersData,
     refresh,

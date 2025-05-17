@@ -1,4 +1,4 @@
-import type { CustomerDTO, ProductDTO } from "@medusajs/types"
+import type { AddressDTO, CustomerDTO, OrderDTO, ProductDTO } from "@medusajs/types"
 import type { JwtPayload } from "jwt-decode"
 export interface CustomerResponseInterface {
     customer: CustomerDTO
@@ -64,4 +64,39 @@ export type Review = {
 
 export type ReviewApiResponse = {
     reviews: Review[]
+}
+
+export interface Policies {
+    icon: string
+    title: string
+    description: string
+}
+
+export interface NavLink {
+    label: string
+    to: string
+    icon?: string
+}
+
+export interface OrdersResponse {
+    orders: OrderDTO[]
+    total: number
+}
+
+export interface Customer {
+    company_name: string
+    first_name: string
+    last_name: string
+    phone: string
+}
+
+export interface APIError {
+    data?: {
+        message?: string
+    }
+}
+
+export interface Address extends AddressDTO {
+    first_name: string
+    last_name: string
 }

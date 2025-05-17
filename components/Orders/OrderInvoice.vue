@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
 import { ORDER_STATUS } from "@/enumerators/order"
-import { NuxtImg } from "#components"
 
 const route = useRoute()
 const orderId = route.params.id
@@ -19,7 +18,7 @@ const {
     }
 })
 
-const order = computed(() => orderRes.value?.order)
+const order = computed<OrderDTO | undefined>(() => orderRes.value?.order)
 
 const invoiceRef = ref<HTMLElement | null>(null)
 
@@ -31,7 +30,7 @@ const pdfOptions = {
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
 }
 
-async function downloadPdf() {
+async function downloadPdf(): Promise<void> {
     if (!invoiceRef.value) return
     if (import.meta.client) {
         const html2pdf = (await import("html2pdf.js")).default
