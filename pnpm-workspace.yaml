@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+    - "@parcel/watcher"
+    - core-js
+    - esbuild
+    - sharp
+    - unrs-resolver
+onlyBuiltDependencies:
+    - better-sqlite3

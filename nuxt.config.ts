@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     },
     css: ["@/assets/scss/main.scss", "swiper/swiper-bundle.css"],
     image: {
+        inject: true,
         domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
     modules: [
@@ -60,6 +61,9 @@ export default defineNuxtConfig({
         optimizeDeps: {
             include: ["@stripe/stripe-js"]
         }
+    },
+    content: {
+        experimental: { nativeSqlite: true }
     },
     vue: {
         compilerOptions: {

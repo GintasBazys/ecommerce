@@ -129,6 +129,14 @@ watch(sortOption, async () => {
             </VSheet>
         </VContainer>
         <VContainer class="my-6">
+            <VRow>
+                <VCol lg="8">
+                    <p>{{ category?.description }}</p>
+                </VCol>
+            </VRow>
+        </VContainer>
+        <VDivider class="mt-6" />
+        <VContainer v-if="products.length > 0" class="my-6">
             <VRow class="mb-4" align="center">
                 <VCol cols="12" sm="6" md="4" lg="3">
                     <VSelect
