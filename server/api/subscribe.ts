@@ -1,5 +1,6 @@
-import type { H3Event } from "h3"
 import { sendError } from "h3"
+
+import type { H3Event } from "h3"
 
 export default defineEventHandler(async (event: H3Event) => {
     try {

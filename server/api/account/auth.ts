@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
         }
 
         const response = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
-            headers: headers,
+            headers,
             credentials: "include"
         })
 

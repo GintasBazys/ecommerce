@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
         cookie: event.node.req.headers.cookie || ""
     }
 
-    return await $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses?fields=*address_name&limit=${limit}&offset=${offset}`, {
+    return $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses?fields=*address_name&limit=${limit}&offset=${offset}`, {
         method: "GET",
         headers,
         credentials: "include"

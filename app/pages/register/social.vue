@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { CustomJwtPayload } from "@/types/interfaces"
 import { jwtDecode } from "jwt-decode"
 import { useRouter, useRoute } from "vue-router"
+
+import type { CustomJwtPayload } from "@/types/interfaces"
 
 definePageMeta({
     layout: "account"
@@ -213,16 +214,16 @@ onMounted(() => {
 </script>
 
 <template>
-    <main>
-        <div v-if="isLoading" class="loading-overlay">
-            <div class="loading-container">
-                <div class="progress-bar">
-                    <div class="progress"></div>
-                </div>
-                <p class="loading-message">{{ loadingMessage }}</p>
-            </div>
+  <main>
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-container">
+        <div class="progress-bar">
+          <div class="progress"></div>
         </div>
-    </main>
+        <p class="loading-message">{{ loadingMessage }}</p>
+      </div>
+    </div>
+  </main>
 </template>
 
 <style scoped lang="scss">

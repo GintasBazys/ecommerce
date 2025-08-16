@@ -1,5 +1,6 @@
 import type { AddressDTO, CustomerDTO, OrderDTO, ProductDTO } from "@medusajs/types"
 import type { JwtPayload } from "jwt-decode"
+
 export interface CustomerResponseInterface {
     customer: CustomerDTO
     token: string

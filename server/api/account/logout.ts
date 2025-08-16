@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
         const response = await fetch(`${config.public.MEDUSA_URL}/auth/session`, {
             method: "DELETE",
             credentials: "include",
-            headers: headers
+            headers
         })
 
         if (!response.ok) {

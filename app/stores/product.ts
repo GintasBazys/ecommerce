@@ -1,5 +1,6 @@
-import { LIMIT } from "@/utils/consts"
 import type { ProductDTO, ProductCategoryDTO, CartDTO } from "@medusajs/types"
+
+import { LIMIT } from "@/utils/consts"
 
 interface ProductResponse {
     products: ProductDTO[]

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { register } from "swiper/element/bundle"
+
 import AppFooter from "@/components/Footer/AppFooter.vue"
 import BaseHeader from "@/components/Header/BaseHeader.vue"
-
-import { register } from "swiper/element/bundle"
 
 useHead({
     link: [
@@ -23,14 +23,14 @@ register()
 </script>
 
 <template>
-    <NuxtLoadingIndicator />
-    <VApp>
-        <BaseHeader />
-        <NuxtLayout>
-            <NuxtPage />
-        </NuxtLayout>
-        <AppFooter
-    /></VApp>
+  <NuxtLoadingIndicator />
+  <VApp>
+    <BaseHeader />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <AppFooter/>
+  </VApp>
 </template>
 
 <style lang="scss">

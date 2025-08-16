@@ -10,5 +10,5 @@ useHead({ title: "Order Details | Ecommerce" })
 </script>
 
 <template>
-    <OrderInvoice />
+  <OrderInvoice />
 </template>

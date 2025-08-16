@@ -1,4 +1,5 @@
 import type { FetchError } from "ofetch"
+
 interface Address {
     first_name: string
     last_name: string

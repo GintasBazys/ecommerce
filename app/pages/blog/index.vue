@@ -38,41 +38,41 @@ watch(page, (newPage) => {
 </script>
 
 <template>
-    <main>
-        <VContainer>
-            <VRow justify="center" class="mb-6 mt-10 blog-row">
-                <VCol cols="12" md="8">
-                    <h1 class="text-center">Explore Latest Blog Posts</h1>
-                </VCol>
-            </VRow>
+  <main>
+    <VContainer>
+      <VRow justify="center" class="mb-6 mt-10 blog-row">
+        <VCol cols="12" md="8">
+          <h1 class="text-center">Explore Latest Blog Posts</h1>
+        </VCol>
+      </VRow>
 
-            <VRow>
-                <VCol v-for="article in articles" :key="article.path" cols="12" md="6" lg="4">
-                    <NuxtLink :to="route.path + article.path" style="text-decoration: none">
-                        <VImg :src="article.image" :alt="article.title" height="250" class="mb-4 rounded-lg" cover />
-                    </NuxtLink>
+      <VRow>
+        <VCol v-for="article in articles" :key="article.path" cols="12" md="6" lg="4">
+          <NuxtLink :to="route.path + article.path" style="text-decoration: none">
+            <VImg :src="article.image" :alt="article.title" height="250" class="mb-4 rounded-lg" cover />
+          </NuxtLink>
 
-                    <NuxtLink :to="route.path + article.path" class="text-decoration-none">
-                        <h2 class="text-h6 mb-2">{{ article.title }}</h2>
-                    </NuxtLink>
+          <NuxtLink :to="route.path + article.path" class="text-decoration-none">
+            <h2 class="text-h6 mb-2">{{ article.title }}</h2>
+          </NuxtLink>
 
-                    <p class="mb-4">{{ article.description }}</p>
+          <p class="mb-4">{{ article.description }}</p>
 
-                    <NuxtLink :to="route.path + article.path">
-                        <VBtn variant="outlined" color="primary">Read more</VBtn>
-                    </NuxtLink>
-                </VCol>
-            </VRow>
+          <NuxtLink :to="route.path + article.path">
+            <VBtn variant="outlined" color="primary">Read more</VBtn>
+          </NuxtLink>
+        </VCol>
+      </VRow>
 
-            <VRow v-if="totalPages > 1" justify="center" class="mt-6">
-                <VCol cols="auto">
-                    <VBtn color="primary" variant="flat" :disabled="page === 1" class="mx-2" @click="page--"> Previous </VBtn>
+      <VRow v-if="totalPages > 1" justify="center" class="mt-6">
+        <VCol cols="auto">
+          <VBtn color="primary" variant="flat" :disabled="page === 1" class="mx-2" @click="page--"> Previous </VBtn>
 
-                    <span class="mx-2">Page {{ page }} of {{ totalPages }}</span>
+          <span class="mx-2">Page {{ page }} of {{ totalPages }}</span>
 
-                    <VBtn color="primary" variant="flat" :disabled="page === totalPages" class="mx-2" @click="page++"> Next </VBtn>
-                </VCol>
-            </VRow>
-        </VContainer>
-    </main>
+          <VBtn color="primary" variant="flat" :disabled="page === totalPages" class="mx-2" @click="page++"> Next </VBtn>
+        </VCol>
+      </VRow>
+    </VContainer>
+  </main>
 </template>

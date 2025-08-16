@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { OrderDTO, OrderAddressDTO, ProductVariantDTO, CartLineItemDTO, CartDTO, type StoreCartPromotion } from "@medusajs/types"
+import type { StoreCartPromotion } from "@medusajs/types"
 
 declare module "@medusajs/types" {
     interface OrderDTO {

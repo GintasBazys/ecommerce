@@ -49,34 +49,34 @@ function handleCancel(): void {
 </script>
 
 <template>
-    <VCard>
-        <VCardTitle class="text-h6">Write a Review</VCardTitle>
+  <VCard>
+    <VCardTitle class="text-h6">Write a Review</VCardTitle>
 
-        <VCardText>
-            <VForm>
-                <VTextField v-model="form.title" label="Review Title" placeholder="Summarize your experience" required />
+    <VCardText>
+      <VForm>
+        <VTextField v-model="form.title" label="Review Title" placeholder="Summarize your experience" required />
 
-                <VTextarea v-model="form.content" label="Review Content" placeholder="Share your thoughts" rows="4" required />
+        <VTextarea v-model="form.content" label="Review Content" placeholder="Share your thoughts" rows="4" required />
 
-                <div class="my-4">
-                    <span class="font-medium">Rating</span>
-                    <VRating v-model="form.rating" background-color="grey lighten-2" hover length="5" size="lg" />
-                </div>
+        <div class="my-4">
+          <span class="font-medium">Rating</span>
+          <VRating v-model="form.rating" background-color="grey lighten-2" hover length="5" size="lg" />
+        </div>
 
-                <VTextField v-model="form.firstName" label="First Name" placeholder="Your first name" />
-                <VTextField v-model="form.lastName" label="Last Name" placeholder="Your last name" />
-            </VForm>
-        </VCardText>
+        <VTextField v-model="form.firstName" label="First Name" placeholder="Your first name" />
+        <VTextField v-model="form.lastName" label="Last Name" placeholder="Your last name" />
+      </VForm>
+    </VCardText>
 
-        <VCardActions>
-            <VSpacer />
-            <VBtn text @click="handleCancel">Cancel</VBtn>
-            <VBtn color="primary" :disabled="!isValid" @click="handleSubmit"> Submit </VBtn>
-        </VCardActions>
-        <VSnackbar v-model="snackbar" :timeout="3000" location="top" elevation="2" color="error">
-            {{ snackbarText }}
-        </VSnackbar>
-    </VCard>
+    <VCardActions>
+      <VSpacer />
+      <VBtn text @click="handleCancel">Cancel</VBtn>
+      <VBtn color="primary" :disabled="!isValid" @click="handleSubmit"> Submit </VBtn>
+    </VCardActions>
+    <VSnackbar v-model="snackbar" :timeout="3000" location="top" elevation="2" color="error">
+      {{ snackbarText }}
+    </VSnackbar>
+  </VCard>
 </template>
 
 <style scoped>

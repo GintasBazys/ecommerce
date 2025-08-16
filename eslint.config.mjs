@@ -30,7 +30,6 @@ export default withNuxt({
         "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
         "vue/no-unused-components": "warn",
         "vue/require-v-for-key": "error",
-        "vue/script-setup-uses-vars": "error",
         "vue/no-mutating-props": "error",
         "vue/require-default-prop": "warn",
         "vue/require-explicit-emits": "error",
@@ -46,8 +45,6 @@ export default withNuxt({
             }
         ],
         "import/newline-after-import": "warn",
-        "import/no-duplicates": "error",
-        "unused-imports/no-unused-imports": "warn",
-        "unused-imports/no-unused-vars": ["warn", { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" }]
+        "import/no-duplicates": "error"
     }
 })

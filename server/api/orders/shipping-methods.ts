@@ -29,5 +29,5 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: res.status, statusMessage: text })
     }
 
-    return await res.json()
+    return res.json()
 })

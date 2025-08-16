@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CustomerAddressDTO } from "@medusajs/types"
+
 import AddressCard from "@/components/Adress/AddressCard.vue"
 import AddressForm from "@/components/Adress/AddressForm.vue"
 
@@ -106,41 +107,41 @@ function onDelete(id: string): void {
 </script>
 
 <template>
-    <VContainer class="py-10">
-        <VBtn text to="/account" class="my-8">
-            <VIcon left>mdi-arrow-left</VIcon>
-            Back to Account Dashboard
-        </VBtn>
-        <VCard elevation="2" class="pa-6 mb-6">
-            <VCardTitle class="text-h5 mb-2">Your Addresses</VCardTitle>
-            <VRow v-if="loading" justify="center" class="my-6">
-                <VProgressCircular indeterminate color="primary" size="48" />
-            </VRow>
-            <VRow v-if="!loading">
-                <VCol v-for="addr in addresses" :key="addr.id" cols="12" sm="6" md="4">
-                    <AddressCard :address="addr" @edit="onEdit" @delete="onDelete" />
-                </VCol>
-            </VRow>
+  <VContainer class="py-10">
+    <VBtn text to="/account" class="my-8">
+      <VIcon left>mdi-arrow-left</VIcon>
+      Back to Account Dashboard
+    </VBtn>
+    <VCard elevation="2" class="pa-6 mb-6">
+      <VCardTitle class="text-h5 mb-2">Your Addresses</VCardTitle>
+      <VRow v-if="loading" justify="center" class="my-6">
+        <VProgressCircular indeterminate color="primary" size="48" />
+      </VRow>
+      <VRow v-if="!loading">
+        <VCol v-for="addr in addresses" :key="addr.id" cols="12" sm="6" md="4">
+          <AddressCard :address="addr" @edit="onEdit" @delete="onDelete" />
+        </VCol>
+      </VRow>
 
-            <VRow class="mt-6" justify="center">
-                <VPagination v-model="page" :length="Math.ceil(totalCount / limit)" circle rounded />
-            </VRow>
+      <VRow class="mt-6" justify="center">
+        <VPagination v-model="page" :length="Math.ceil(totalCount / limit)" circle rounded />
+      </VRow>
 
-            <VRow class="mt-4">
-                <VCol cols="12" sm="6" md="4">
-                    <VCard outlined class="d-flex align-center justify-center pa-6" style="cursor: pointer" @click="showAdd = true">
-                        <VIcon size="32">mdi-plus</VIcon>
-                        <span class="ml-2 font-weight-medium"> Add New Address </span>
-                    </VCard>
-                </VCol>
-            </VRow>
+      <VRow class="mt-4">
+        <VCol cols="12" sm="6" md="4">
+          <VCard outlined class="d-flex align-center justify-center pa-6" style="cursor: pointer" @click="showAdd = true">
+            <VIcon size="32">mdi-plus</VIcon>
+            <span class="ml-2 font-weight-medium"> Add New Address </span>
+          </VCard>
+        </VCol>
+      </VRow>
 
-            <VAlert v-if="error" type="error" class="mt-4">
-                {{ error }}
-            </VAlert>
-        </VCard>
+      <VAlert v-if="error" type="error" class="mt-4">
+        {{ error }}
+      </VAlert>
+    </VCard>
 
-        <AddressForm v-model="showAdd" title="Add Address" :address="{}" @save="createAddress" />
-        <AddressForm v-model="showEdit" title="Edit Address" :address="editAddr" @save="updateAddress" />
-    </VContainer>
+    <AddressForm v-model="showAdd" title="Add Address" :address="{}" @save="createAddress" />
+    <AddressForm v-model="showEdit" title="Edit Address" :address="editAddr" @save="updateAddress" />
+  </VContainer>
 </template>

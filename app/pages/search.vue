@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ProductDTO } from "@medusajs/types"
 import type { SearchResponse } from "@/types/interfaces"
+import type { ProductDTO } from "@medusajs/types"
 
 useHead({
     title: "Search | Ecommerce"
@@ -77,56 +77,56 @@ function deleteHistoryItem(index: number): void {
 </script>
 
 <template>
-    <VContainer class="py-10 mt-10">
-        <VRow>
-            <VCol cols="12">
-                <h1 class="text-h4 font-weight-bold mb-6">
-                    Search
-                    <span class="text-primary">({{ searchCounter }})</span>
-                </h1>
+  <VContainer class="py-10 mt-10">
+    <VRow>
+      <VCol cols="12">
+        <h1 class="text-h4 font-weight-bold mb-6">
+          Search
+          <span class="text-primary">({{ searchCounter }})</span>
+        </h1>
 
-                <VForm @submit.prevent="handleSearch">
-                    <VTextField
-                        v-model="searchQuery"
-                        label="Search..."
-                        outlined
-                        dense
-                        clearable
-                        append-inner-icon="mdi-magnify"
-                        :loading="isLoading"
-                    />
-                </VForm>
-            </VCol>
+        <VForm @submit.prevent="handleSearch">
+          <VTextField
+            v-model="searchQuery"
+            label="Search..."
+            outlined
+            dense
+            clearable
+            append-inner-icon="mdi-magnify"
+            :loading="isLoading"
+          />
+        </VForm>
+      </VCol>
 
-            <VCol v-if="searchHistory.length" cols="12" class="mt-4">
-                <h3 class="text-h6 mb-2">Recent Searches</h3>
-                <VList dense>
-                    <VListItem v-for="(query, index) in searchHistory" :key="index" class="d-flex justify-space-between align-center">
-                        <VBtn text color="primary" @click="reRunSearch(query)">
-                            {{ query }}
-                        </VBtn>
-                        <VBtn icon @click="deleteHistoryItem(index)">
-                            <VIcon color="red">mdi-delete</VIcon>
-                        </VBtn>
-                    </VListItem>
-                </VList>
-            </VCol>
+      <VCol v-if="searchHistory.length" cols="12" class="mt-4">
+        <h3 class="text-h6 mb-2">Recent Searches</h3>
+        <VList dense>
+          <VListItem v-for="(query, index) in searchHistory" :key="index" class="d-flex justify-space-between align-center">
+            <VBtn text color="primary" @click="reRunSearch(query)">
+              {{ query }}
+            </VBtn>
+            <VBtn icon @click="deleteHistoryItem(index)">
+              <VIcon color="red">mdi-delete</VIcon>
+            </VBtn>
+          </VListItem>
+        </VList>
+      </VCol>
 
-            <VCol v-if="isLoading" cols="12" class="text-center py-6">
-                <VProgressCircular indeterminate color="primary" size="40" class="mb-3" />
-                <div>Loading results...</div>
-            </VCol>
+      <VCol v-if="isLoading" cols="12" class="text-center py-6">
+        <VProgressCircular indeterminate color="primary" size="40" class="mb-3" />
+        <div>Loading results...</div>
+      </VCol>
 
-            <VCol cols="12" class="search-results">
-                <template v-if="!isLoading && products.length">
-                    <VRow>
-                        <VCol v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
-                            <ProductCard :product="product as ProductDTO" />
-                        </VCol>
-                    </VRow>
-                </template>
-                <p v-else-if="!isLoading && hasSearched">No results found.</p>
+      <VCol cols="12" class="search-results">
+        <template v-if="!isLoading && products.length">
+          <VRow>
+            <VCol v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
+              <ProductCard :product="product as ProductDTO" />
             </VCol>
-        </VRow>
-    </VContainer>
+          </VRow>
+        </template>
+        <p v-else-if="!isLoading && hasSearched">No results found.</p>
+      </VCol>
+    </VRow>
+  </VContainer>
 </template>

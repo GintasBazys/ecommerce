@@ -1,5 +1,5 @@
-import type { CustomerDTO } from "@medusajs/types"
 import type { CustomerAuthResponseInterface } from "@/types/interfaces"
+import type { CustomerDTO } from "@medusajs/types"
 
 export const useCustomerStore = defineStore(
     "customer",

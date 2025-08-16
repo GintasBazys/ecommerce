@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         cookie: event.node.req.headers.cookie || ""
     }
 
-    return await $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses`, {
+    return $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses`, {
         method: "POST",
         headers,
         body,

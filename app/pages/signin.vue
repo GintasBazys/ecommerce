@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VForm } from "vuetify/components"
+
 useHead({
     title: "Signin | Ecommerce"
 })
@@ -97,7 +98,7 @@ async function handleSocialLogin(provider: string): Promise<void> {
             snackbarText.value = "Authentication failed"
             snackbarColor.value = "error"
             snackbar.value = true
-            return
+            
         }
     } catch (error) {
         console.error("Social login failed:", error)
@@ -139,60 +140,60 @@ async function handleReset(): Promise<void> {
 </script>
 
 <template>
-    <section class="py-10">
-        <VContainer>
-            <VRow justify="center">
-                <VCol cols="12" md="6">
-                    <div class="form-wrapper mx-auto">
-                        <h4 class="mb-4">Log in</h4>
-                        <VBtn class="mb-4" color="white" block style="border: 1px solid #ccc" @click="handleSocialLogin('google')">
-                            <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
-                            Log in with Google
-                        </VBtn>
-                        <VForm ref="loginFormRef" @submit.prevent="handleLogin">
-                            <VTextField name="email" label="E-mail" type="email" class="mb-3" variant="outlined" required />
-                            <VTextField name="password" label="Password" type="password" class="mb-3" variant="outlined" required />
-                            <div class="text-end mb-3">
-                                <VBtn variant="text" class="px-0 text-caption" @click="showResetDialog = true"> Forgot password? </VBtn>
-                            </div>
-                            <VBtn type="submit" color="primary" block>Log in</VBtn>
-                        </VForm>
-                        <p class="mt-4 text-center">
-                            Don't have an account?
-                            <NuxtLink to="/register">Register here</NuxtLink>
-                        </p>
-                    </div>
-                </VCol>
-            </VRow>
-            <VDialog v-model="showResetDialog" persistent max-width="500">
-                <VCard>
-                    <VCardTitle class="d-flex align-center">
-                        Forgot password?
-                        <VSpacer />
-                        <VBtn icon @click="showResetDialog = false">
-                            <VIcon>mdi-close</VIcon>
-                        </VBtn>
-                    </VCardTitle>
-                    <VCardText>
-                        <p>If you have forgotten your password you can reset it here.</p>
-                        <VForm ref="resetFormRef" @submit.prevent="handleReset">
-                            <VTextField
-                                v-model="resetEmail"
-                                :rules="emailRules"
-                                label="E-mail Address"
-                                type="email"
-                                class="mt-3"
-                                variant="outlined"
-                                required
-                            />
-                            <VBtn type="submit" color="primary" class="mt-3" block>Send password reset link</VBtn>
-                        </VForm>
-                    </VCardText>
-                </VCard>
-            </VDialog>
-            <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4000">
-                {{ snackbarText }}
-            </VSnackbar>
-        </VContainer>
-    </section>
+  <section class="py-10">
+    <VContainer>
+      <VRow justify="center">
+        <VCol cols="12" md="6">
+          <div class="form-wrapper mx-auto">
+            <h4 class="mb-4">Log in</h4>
+            <VBtn class="mb-4" color="white" block style="border: 1px solid #ccc" @click="handleSocialLogin('google')">
+              <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
+              Log in with Google
+            </VBtn>
+            <VForm ref="loginFormRef" @submit.prevent="handleLogin">
+              <VTextField name="email" label="E-mail" type="email" class="mb-3" variant="outlined" required />
+              <VTextField name="password" label="Password" type="password" class="mb-3" variant="outlined" required />
+              <div class="text-end mb-3">
+                <VBtn variant="text" class="px-0 text-caption" @click="showResetDialog = true"> Forgot password? </VBtn>
+              </div>
+              <VBtn type="submit" color="primary" block>Log in</VBtn>
+            </VForm>
+            <p class="mt-4 text-center">
+              Don't have an account?
+              <NuxtLink to="/register">Register here</NuxtLink>
+            </p>
+          </div>
+        </VCol>
+      </VRow>
+      <VDialog v-model="showResetDialog" persistent max-width="500">
+        <VCard>
+          <VCardTitle class="d-flex align-center">
+            Forgot password?
+            <VSpacer />
+            <VBtn icon @click="showResetDialog = false">
+              <VIcon>mdi-close</VIcon>
+            </VBtn>
+          </VCardTitle>
+          <VCardText>
+            <p>If you have forgotten your password you can reset it here.</p>
+            <VForm ref="resetFormRef" @submit.prevent="handleReset">
+              <VTextField
+                v-model="resetEmail"
+                :rules="emailRules"
+                label="E-mail Address"
+                type="email"
+                class="mt-3"
+                variant="outlined"
+                required
+              />
+              <VBtn type="submit" color="primary" class="mt-3" block>Send password reset link</VBtn>
+            </VForm>
+          </VCardText>
+        </VCard>
+      </VDialog>
+      <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4000">
+        {{ snackbarText }}
+      </VSnackbar>
+    </VContainer>
+  </section>
 </template>

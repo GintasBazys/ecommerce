@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
         const queryParams = new URLSearchParams({
             fields: `*variants.calculated_price,*variants.inventory_quantity`,
             region_id: regionId,
-            q: q
+            q
         })
 
         const response = await $fetch(`${config.public.MEDUSA_URL}/store/products?${queryParams.toString()}`, {

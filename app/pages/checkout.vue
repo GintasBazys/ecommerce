@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import type { Stripe, StripeElements } from "@stripe/stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
+
 import type { ShippingOption } from "@/types/interfaces"
+import type { Stripe, StripeElements } from "@stripe/stripe-js"
+
 import { formatPrice } from "@/utils/formatPrice"
 
 definePageMeta({ layout: "checkout" })
@@ -198,61 +200,61 @@ async function completeCart(): Promise<void> {
 </script>
 
 <template>
-    <VContainer class="py-8">
-        <VRow>
-            <VCol cols="12" md="6">
-                <VCard>
-                    <VCardTitle>Shipping Method</VCardTitle>
-                    <VCardText>
-                        <template v-if="isShippingLoading">
-                            <VSkeletonLoader type="list-item" />
-                            <VSkeletonLoader type="list-item" />
-                            <VSkeletonLoader type="list-item" />
-                        </template>
-                        <template v-else>
-                            <VRadioGroup v-model="selectedShippingOptionId" row>
-                                <VRadio
-                                    v-for="option in shippingOptions"
-                                    :key="option.id"
-                                    :value="option.id"
-                                    :label="
-                                        option.name +
-                                        ' - ' +
-                                        (option.calculated_price
-                                            ? formatPrice(option.calculated_price.calculated_amount, 'EUR')
-                                            : option.prices.length
-                                              ? formatPrice(option.prices[0].amount, option.prices[0].currency_code)
-                                              : 'Free')
-                                    "
-                                />
-                            </VRadioGroup>
-                        </template>
-                    </VCardText>
-                </VCard>
-            </VCol>
-            <VCol cols="12" md="6">
-                <VCard>
-                    <VCardTitle>Payment Details</VCardTitle>
-                    <VCardText>
-                        <div id="link-authentication-element"></div>
-                        <div id="payment-element" class="my-4"></div>
-                    </VCardText>
-                    <VCardActions>
-                        <VSpacer />
-                        <VBtn
-                            variant="tonal"
-                            :loading="isLoading"
-                            :disabled="!clientSecretValue || isShippingLoading"
-                            color="primary"
-                            large
-                            class="font-weight-bold"
-                            @click="handleSubmit"
-                        >
-                            Pay Now
-                        </VBtn>
-                    </VCardActions>
-                </VCard>
-            </VCol>
-        </VRow>
-    </VContainer>
+  <VContainer class="py-8">
+    <VRow>
+      <VCol cols="12" md="6">
+        <VCard>
+          <VCardTitle>Shipping Method</VCardTitle>
+          <VCardText>
+            <template v-if="isShippingLoading">
+              <VSkeletonLoader type="list-item" />
+              <VSkeletonLoader type="list-item" />
+              <VSkeletonLoader type="list-item" />
+            </template>
+            <template v-else>
+              <VRadioGroup v-model="selectedShippingOptionId" row>
+                <VRadio
+                  v-for="option in shippingOptions"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="
+                    option.name +
+                      ' - ' +
+                      (option.calculated_price
+                        ? formatPrice(option.calculated_price.calculated_amount, 'EUR')
+                        : option.prices.length
+                          ? formatPrice(option.prices[0].amount, option.prices[0].currency_code)
+                          : 'Free')
+                  "
+                />
+              </VRadioGroup>
+            </template>
+          </VCardText>
+        </VCard>
+      </VCol>
+      <VCol cols="12" md="6">
+        <VCard>
+          <VCardTitle>Payment Details</VCardTitle>
+          <VCardText>
+            <div id="link-authentication-element"></div>
+            <div id="payment-element" class="my-4"></div>
+          </VCardText>
+          <VCardActions>
+            <VSpacer />
+            <VBtn
+              variant="tonal"
+              :loading="isLoading"
+              :disabled="!clientSecretValue || isShippingLoading"
+              color="primary"
+              large
+              class="font-weight-bold"
+              @click="handleSubmit"
+            >
+              Pay Now
+            </VBtn>
+          </VCardActions>
+        </VCard>
+      </VCol>
+    </VRow>
+  </VContainer>
 </template>

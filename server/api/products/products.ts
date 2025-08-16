@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const queryParams = new URLSearchParams({
         fields: `+metadata,*variants.calculated_price,*variants.inventory_quantity`,
         region_id: regionId,
-        order: order
+        order
     })
 
     if (handle) {

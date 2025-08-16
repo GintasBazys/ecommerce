@@ -1,4 +1,5 @@
 import type { CartDTO as MedusaCart } from "@medusajs/types"
+
 interface CartResponseInterface {
     cart: MedusaCart
     success?: boolean
@@ -115,13 +116,7 @@ export const useCartStore = defineStore("cart", () => {
         }
     }
 
-    const itemCount = computed(() => {
-        if (!cart.value?.items) {
-            return
-        }
-        console.log("sd")
-        return cart.value?.items.reduce((total, item) => total + Number(item.quantity), 0) || 0
-    })
+    const itemCount = computed<number>(() => cart.value?.items?.reduce((total, item) => total + Number(item.quantity), 0) || 0)
 
     return {
         updateLineItem,

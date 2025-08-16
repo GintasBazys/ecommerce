@@ -26,9 +26,9 @@ export default defineEventHandler(async (event) => {
                 success: true,
                 cart: result
             }
-        } else {
+        } 
             throw new Error(result.message || "Failed to delete line item")
-        }
+        
     } catch (error) {
         console.error("Error deleting line item:", error)
         throw createError({

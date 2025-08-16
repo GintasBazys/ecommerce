@@ -65,31 +65,31 @@ function save(): void {
 </script>
 
 <template>
-    <VDialog v-model="model" max-width="600">
-        <VCard>
-            <VCardTitle>{{ props.title }}</VCardTitle>
-            <VCardText>
-                <VContainer>
-                    <VRow>
-                        <VCol cols="6"><VTextField v-model="local.first_name" label="First Name" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.last_name" label="Last Name" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.phone" label="Phone" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.company" label="Company" /></VCol>
-                        <VCol cols="12"><VTextField v-model="local.address_1" label="Address Line 1" /></VCol>
-                        <VCol cols="12"><VTextField v-model="local.address_2" label="Address Line 2" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.city" label="City" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.postal_code" label="Postal Code" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.country_code" label="Country Code" /></VCol>
-                        <VCol cols="6"><VTextField v-model="local.province" label="Province" /></VCol>
-                        <VCol cols="12"><VTextField v-model="local.address_name" label="Label (Home, Work, etc.)" /></VCol>
-                    </VRow>
-                </VContainer>
-            </VCardText>
-            <VCardActions>
-                <VSpacer />
-                <VBtn text @click="close">Cancel</VBtn>
-                <VBtn color="primary" @click="save">Save</VBtn>
-            </VCardActions>
-        </VCard>
-    </VDialog>
+  <VDialog v-model="model" max-width="600">
+    <VCard>
+      <VCardTitle>{{ props.title }}</VCardTitle>
+      <VCardText>
+        <VContainer>
+          <VRow>
+            <VCol cols="6"><VTextField v-model="local.first_name" label="First Name" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.last_name" label="Last Name" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.phone" label="Phone" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.company" label="Company" /></VCol>
+            <VCol cols="12"><VTextField v-model="local.address_1" label="Address Line 1" /></VCol>
+            <VCol cols="12"><VTextField v-model="local.address_2" label="Address Line 2" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.city" label="City" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.postal_code" label="Postal Code" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.country_code" label="Country Code" /></VCol>
+            <VCol cols="6"><VTextField v-model="local.province" label="Province" /></VCol>
+            <VCol cols="12"><VTextField v-model="local.address_name" label="Label (Home, Work, etc.)" /></VCol>
+          </VRow>
+        </VContainer>
+      </VCardText>
+      <VCardActions>
+        <VSpacer />
+        <VBtn text @click="close">Cancel</VBtn>
+        <VBtn color="primary" @click="save">Save</VBtn>
+      </VCardActions>
+    </VCard>
+  </VDialog>
 </template>

@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event)
-    return await $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses/${address_id}`, {
+    return $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses/${address_id}`, {
         method: "POST",
         headers,
         body,

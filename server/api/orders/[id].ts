@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
         "Content-Type": "application/json"
     }
 
-    return await $fetch(`${config.public.MEDUSA_URL}/store/orders/${encodeURIComponent(id)}`, {
+    return $fetch(`${config.public.MEDUSA_URL}/store/orders/${encodeURIComponent(id)}`, {
         method: "GET",
         headers
     })
