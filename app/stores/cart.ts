@@ -119,6 +119,7 @@ export const useCartStore = defineStore("cart", () => {
         if (!cart.value?.items) {
             return
         }
+        console.log("sd")
         return cart.value?.items.reduce((total, item) => total + Number(item.quantity), 0) || 0
     })
 
