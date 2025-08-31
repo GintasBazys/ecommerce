@@ -88,65 +88,65 @@ function validateForm(formData: FormData): boolean {
 </script>
 
 <template>
-  <VForm @submit.prevent="handleSubmit">
-    <VRow dense>
-      <VCol cols="12">
-        <VTextField
-          label="Subject"
-          name="subject"
-          placeholder="Example: Customer service"
-          variant="outlined"
-          required
-          :error="!!formErrors.subject"
-          :error-messages="formErrors.subject"
-        />
-      </VCol>
+    <VForm @submit.prevent="handleSubmit">
+        <VRow dense>
+            <VCol cols="12">
+                <VTextField
+                    label="Subject"
+                    name="subject"
+                    placeholder="Example: Customer service"
+                    variant="outlined"
+                    required
+                    :error="!!formErrors.subject"
+                    :error-messages="formErrors.subject"
+                />
+            </VCol>
 
-      <VCol cols="12" md="6">
-        <VTextField
-          label="Email"
-          name="email"
-          type="email"
-          placeholder="name@example.com"
-          variant="outlined"
-          required
-          :error="!!formErrors.email"
-          :error-messages="formErrors.email"
-        />
-      </VCol>
+            <VCol cols="12" md="6">
+                <VTextField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    variant="outlined"
+                    required
+                    :error="!!formErrors.email"
+                    :error-messages="formErrors.email"
+                />
+            </VCol>
 
-      <VCol cols="12" md="6">
-        <VTextField label="Phone number" name="phone" type="tel" placeholder="+370" variant="outlined" />
-      </VCol>
+            <VCol cols="12" md="6">
+                <VTextField label="Phone number" name="phone" type="tel" placeholder="+370" variant="outlined" />
+            </VCol>
 
-      <VCol cols="12">
-        <VTextarea
-          label="Message"
-          name="message"
-          placeholder="How can we help? Include your order number if applicable."
-          variant="outlined"
-          rows="5"
-          auto-grow
-          required
-          :error="!!formErrors.message"
-          :error-messages="formErrors.message"
-        />
-      </VCol>
+            <VCol cols="12">
+                <VTextarea
+                    label="Message"
+                    name="message"
+                    placeholder="How can we help? Include your order number if applicable."
+                    variant="outlined"
+                    rows="5"
+                    auto-grow
+                    required
+                    :error="!!formErrors.message"
+                    :error-messages="formErrors.message"
+                />
+            </VCol>
 
-      <input type="hidden" name="_subject" :value="getFormatedDate() + ' - New submission'" />
+            <input type="hidden" name="_subject" :value="getFormatedDate() + ' - New submission'" />
 
-      <VCol cols="12" class="mt-2">
-        <VBtn :loading="loading" :disabled="loading" type="submit" color="primary" block size="large"> Send Message </VBtn>
-      </VCol>
+            <VCol cols="12" class="mt-2">
+                <VBtn :loading="loading" :disabled="loading" type="submit" color="primary" block size="large"> Send Message </VBtn>
+            </VCol>
 
-      <VCol cols="12" class="mt-2">
-        <VAlert v-if="errorMessage" type="error" border="start" variant="tonal" dense>
-          {{ errorMessage }}
-        </VAlert>
-        <VAlert v-if="successMessage" type="success" border="start" variant="tonal" dense>
-          {{ successMessage }}
-        </VAlert>
-      </VCol>
-    </VRow>
-  </VForm>
+            <VCol cols="12" class="mt-2">
+                <VAlert v-if="errorMessage" type="error" border="start" variant="tonal" dense>
+                    {{ errorMessage }}
+                </VAlert>
+                <VAlert v-if="successMessage" type="success" border="start" variant="tonal" dense>
+                    {{ successMessage }}
+                </VAlert>
+            </VCol>
+        </VRow>
+    </VForm>
 </template>

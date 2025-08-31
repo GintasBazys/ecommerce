@@ -5,12 +5,12 @@ const { cart } = storeToRefs(useCartStore())
 </script>
 
 <template>
-  <main>
-    <div>
-      <slot></slot>
-    </div>
-    <NewsletterComponent />
-    <PoliciesBlock />
-    <CartDrawer v-if="cart" />
-  </main>
+    <main>
+        <div>
+            <slot></slot>
+        </div>
+        <NewsletterComponent />
+        <PoliciesBlock />
+        <CartDrawer v-if="cart" />
+    </main>
 </template>

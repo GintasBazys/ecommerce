@@ -214,16 +214,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <main>
-    <div v-if="isLoading" class="loading-overlay">
-      <div class="loading-container">
-        <div class="progress-bar">
-          <div class="progress"></div>
+    <main>
+        <div v-if="isLoading" class="loading-overlay">
+            <div class="loading-container">
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <p class="loading-message">{{ loadingMessage }}</p>
+            </div>
         </div>
-        <p class="loading-message">{{ loadingMessage }}</p>
-      </div>
-    </div>
-  </main>
+    </main>
 </template>
 
 <style scoped lang="scss">

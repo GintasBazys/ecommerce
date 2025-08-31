@@ -70,115 +70,115 @@ const rules = {
 </script>
 
 <template>
-  <VContainer class="pt-12">
-    <VForm ref="form" lazy-validation>
-      <VRow>
-        <VCol cols="12">
-          <h2>Billing Address</h2>
-        </VCol>
+    <VContainer class="pt-12">
+        <VForm ref="form" lazy-validation>
+            <VRow>
+                <VCol cols="12">
+                    <h2>Billing Address</h2>
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="billingAddress.first_name" label="First Name" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="billingAddress.first_name" label="First Name" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="billingAddress.last_name" label="Last Name" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="billingAddress.last_name" label="Last Name" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12">
-          <VTextField v-model="billingAddress.address_1" label="Address Line 1" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12">
+                    <VTextField v-model="billingAddress.address_1" label="Address Line 1" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="billingAddress.company" label="Company" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="billingAddress.company" label="Company" />
+                </VCol>
 
-        <VCol cols="6" md="3">
-          <VTextField v-model="billingAddress.postal_code" label="Postal Code" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="6" md="3">
+                    <VTextField v-model="billingAddress.postal_code" label="Postal Code" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="6" md="3">
-          <VTextField v-model="billingAddress.city" label="City" :rules="[rules.required]" />
-        </VCol>
-        <VCol cols="12" md="6">
-          <VSelect
-            v-model="billingAddress.country_code"
-            :items="regionCountries"
-            item-title="display_name"
-            item-value="iso_2"
-            label="Country"
-            :rules="[rules.required]"
-          />
-        </VCol>
-        <VCol cols="12" md="6">
-          <VTextField v-model="billingAddress.province" label="Province / State" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="6" md="3">
+                    <VTextField v-model="billingAddress.city" label="City" :rules="[rules.required]" />
+                </VCol>
+                <VCol cols="12" md="6">
+                    <VSelect
+                        v-model="billingAddress.country_code"
+                        :items="regionCountries"
+                        item-title="display_name"
+                        item-value="iso_2"
+                        label="Country"
+                        :rules="[rules.required]"
+                    />
+                </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="billingAddress.province" label="Province / State" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="billingAddress.phone" label="Phone Number" :rules="[rules.required, rules.phone]" />
-        </VCol>
-      </VRow>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="billingAddress.phone" label="Phone Number" :rules="[rules.required, rules.phone]" />
+                </VCol>
+            </VRow>
 
-      <VRow>
-        <VCol cols="12">
-          <VCheckbox v-model="useSeparateShipping" label="Use a separate shipping address" />
-        </VCol>
-      </VRow>
+            <VRow>
+                <VCol cols="12">
+                    <VCheckbox v-model="useSeparateShipping" label="Use a separate shipping address" />
+                </VCol>
+            </VRow>
 
-      <VRow v-if="useSeparateShipping">
-        <VCol cols="12">
-          <h2>Shipping Address</h2>
-        </VCol>
+            <VRow v-if="useSeparateShipping">
+                <VCol cols="12">
+                    <h2>Shipping Address</h2>
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="shippingAddress.first_name" label="First Name" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="shippingAddress.first_name" label="First Name" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="shippingAddress.last_name" label="Last Name" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="shippingAddress.last_name" label="Last Name" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12">
-          <VTextField v-model="shippingAddress.address_1" label="Address Line 1" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12">
+                    <VTextField v-model="shippingAddress.address_1" label="Address Line 1" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="shippingAddress.company" label="Company" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="shippingAddress.company" label="Company" />
+                </VCol>
 
-        <VCol cols="6" md="3">
-          <VTextField v-model="shippingAddress.postal_code" label="Postal Code" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="6" md="3">
+                    <VTextField v-model="shippingAddress.postal_code" label="Postal Code" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="6" md="3">
-          <VTextField v-model="shippingAddress.city" label="City" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="6" md="3">
+                    <VTextField v-model="shippingAddress.city" label="City" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol v-if="useSeparateShipping" cols="12" md="6">
-          <VSelect
-            v-model="shippingAddress.country_code"
-            :items="regionCountries"
-            item-title="display_name"
-            item-value="iso_2"
-            label="Country"
-            :rules="[rules.required]"
-          />
-        </VCol>
+                <VCol v-if="useSeparateShipping" cols="12" md="6">
+                    <VSelect
+                        v-model="shippingAddress.country_code"
+                        :items="regionCountries"
+                        item-title="display_name"
+                        item-value="iso_2"
+                        label="Country"
+                        :rules="[rules.required]"
+                    />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="shippingAddress.province" label="Province / State" :rules="[rules.required]" />
-        </VCol>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="shippingAddress.province" label="Province / State" :rules="[rules.required]" />
+                </VCol>
 
-        <VCol cols="12" md="6">
-          <VTextField v-model="shippingAddress.phone" label="Phone Number" :rules="[rules.required, rules.phone]" />
-        </VCol>
-      </VRow>
+                <VCol cols="12" md="6">
+                    <VTextField v-model="shippingAddress.phone" label="Phone Number" :rules="[rules.required, rules.phone]" />
+                </VCol>
+            </VRow>
 
-      <VRow>
-        <VCol cols="12" class="text-right">
-          <VBtn color="primary" @click="onSubmit"> Continue to Payment </VBtn>
-        </VCol>
-      </VRow>
-    </VForm>
-  </VContainer>
+            <VRow>
+                <VCol cols="12" class="text-right">
+                    <VBtn color="primary" @click="onSubmit"> Continue to Payment </VBtn>
+                </VCol>
+            </VRow>
+        </VForm>
+    </VContainer>
 </template>

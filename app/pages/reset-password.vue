@@ -49,27 +49,27 @@ async function handleSubmit(): Promise<void> {
 </script>
 
 <template>
-  <section class="py-10">
-    <VContainer>
-      <VRow justify="center">
-        <VCol cols="12" sm="8" md="6" lg="4">
-          <h2 class="text-h5 mb-4 text-center">Reset Your Password</h2>
-          <VForm ref="formRef" @submit.prevent="handleSubmit">
-            <VTextField
-              v-model="password"
-              type="password"
-              label="New Password"
-              placeholder="Enter your new password"
-              required
-              variant="outlined"
-              class="mb-4"
-            />
-            <VBtn color="primary" type="submit" block>Reset Password</VBtn>
-          </VForm>
-          <div v-if="errorMessage" class="text-error mt-4">{{ errorMessage }}</div>
-          <div v-if="successMessage" class="text-success mt-4">{{ successMessage }}</div>
-        </VCol>
-      </VRow>
-    </VContainer>
-  </section>
+    <section class="py-10">
+        <VContainer>
+            <VRow justify="center">
+                <VCol cols="12" sm="8" md="6" lg="4">
+                    <h2 class="text-h5 mb-4 text-center">Reset Your Password</h2>
+                    <VForm ref="formRef" @submit.prevent="handleSubmit">
+                        <VTextField
+                            v-model="password"
+                            type="password"
+                            label="New Password"
+                            placeholder="Enter your new password"
+                            required
+                            variant="outlined"
+                            class="mb-4"
+                        />
+                        <VBtn color="primary" type="submit" block>Reset Password</VBtn>
+                    </VForm>
+                    <div v-if="errorMessage" class="text-error mt-4">{{ errorMessage }}</div>
+                    <div v-if="successMessage" class="text-success mt-4">{{ successMessage }}</div>
+                </VCol>
+            </VRow>
+        </VContainer>
+    </section>
 </template>

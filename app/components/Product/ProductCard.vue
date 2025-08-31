@@ -60,64 +60,64 @@ const averageRating = computed<number | null>(() => {
 </script>
 
 <template>
-  <div class="py-4 px-2 px-md-4">
-    <VCard class="pa-4" elevation="2" rounded>
-      <div class="d-flex justify-center align-center position-relative">
-        <NuxtLink style="width: 100%" :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
-          <VImg
-            :src="product.thumbnail || product.images[0]?.url || '/images/placeholder.png'"
-            alt="Product Image"
-            height="236"
-            cover
-            class="mb-4 w-100"
-          />
-        </NuxtLink>
+    <div class="py-4 px-2 px-md-4">
+        <VCard class="pa-4" elevation="2" rounded>
+            <div class="d-flex justify-center align-center position-relative">
+                <NuxtLink style="width: 100%" :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
+                    <VImg
+                        :src="product.thumbnail || product.images[0]?.url || '/images/placeholder.png'"
+                        alt="Product Image"
+                        height="236"
+                        cover
+                        class="mb-4 w-100"
+                    />
+                </NuxtLink>
 
-        <VChip v-if="isOnSale" color="red" text-color="white" class="position-absolute top-0 right-0 ma-2" label size="small">
-          Sale
-        </VChip>
-      </div>
-
-      <div>
-        <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
-          <div class="text-h6 font-weight-bold mb-2">{{ product.title }}</div>
-        </NuxtLink>
-
-        <p class="truncate text-body-2 mb-2">{{ product.description }}</p>
-
-        <div class="d-flex align-center mt-2">
-          <VIcon v-for="i in 5" :key="i" size="18" class="mr-1">
-            {{ i <= Math.round(averageRating ?? 0) ? "mdi-star" : "mdi-star-outline" }}
-          </VIcon>
-        </div>
-
-        <div class="d-flex justify-space-between align-start mt-4">
-          <div>
-            <div class="text-subtitle-1 font-weight-bold">
-              {{ computedPrice }}
-              <template v-if="isOnSale">
-                <del class="text-error ms-2">{{ originalPrice }}</del>
-              </template>
+                <VChip v-if="isOnSale" color="red" text-color="white" class="position-absolute top-0 right-0 ma-2" label size="small">
+                    Sale
+                </VChip>
             </div>
-            <div class="text-caption mt-1">Option: {{ selectedVariant?.title || "No options available" }}</div>
-          </div>
-          <VBtn
-            icon
-            color="black"
-            :loading="loading"
-            :disabled="!selectedVariant?.inventory_quantity"
-            class="elevation-0"
-            @click="debouncedAddToCart"
-          >
-            <template #loader>
-              <VProgressCircular indeterminate color="white" size="20" />
-            </template>
-            <VIcon>mdi-cart</VIcon>
-          </VBtn>
-        </div>
-      </div>
-    </VCard>
-  </div>
+
+            <div>
+                <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
+                    <div class="text-h6 font-weight-bold mb-2">{{ product.title }}</div>
+                </NuxtLink>
+
+                <p class="truncate text-body-2 mb-2">{{ product.description }}</p>
+
+                <div class="d-flex align-center mt-2">
+                    <VIcon v-for="i in 5" :key="i" size="18" class="mr-1">
+                        {{ i <= Math.round(averageRating ?? 0) ? "mdi-star" : "mdi-star-outline" }}
+                    </VIcon>
+                </div>
+
+                <div class="d-flex justify-space-between align-start mt-4">
+                    <div>
+                        <div class="text-subtitle-1 font-weight-bold">
+                            {{ computedPrice }}
+                            <template v-if="isOnSale">
+                                <del class="text-error ms-2">{{ originalPrice }}</del>
+                            </template>
+                        </div>
+                        <div class="text-caption mt-1">Option: {{ selectedVariant?.title || "No options available" }}</div>
+                    </div>
+                    <VBtn
+                        icon
+                        color="black"
+                        :loading="loading"
+                        :disabled="!selectedVariant?.inventory_quantity"
+                        class="elevation-0"
+                        @click="debouncedAddToCart"
+                    >
+                        <template #loader>
+                            <VProgressCircular indeterminate color="white" size="20" />
+                        </template>
+                        <VIcon>mdi-cart</VIcon>
+                    </VBtn>
+                </div>
+            </div>
+        </VCard>
+    </div>
 </template>
 
 <style lang="scss" scoped>

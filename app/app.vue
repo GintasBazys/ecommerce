@@ -23,14 +23,14 @@ register()
 </script>
 
 <template>
-  <NuxtLoadingIndicator />
-  <VApp>
-    <BaseHeader />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-    <AppFooter/>
-  </VApp>
+    <NuxtLoadingIndicator />
+    <VApp>
+        <BaseHeader />
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
+        <AppFooter/>
+    </VApp>
 </template>
 
 <style lang="scss">

@@ -52,50 +52,50 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <VContainer class="py-10">
-    <VBtn text to="/account" class="my-8">
-      <VIcon left>mdi-arrow-left</VIcon>
-      Back to Account Dashboard
-    </VBtn>
-    <VCard elevation="2" class="pa-6">
-      <VCardTitle class="text-h5 mb-2">Profile Information</VCardTitle>
-      <VCardSubtitle class="mb-6"> Update your personal and company details. Make sure everything is accurate. </VCardSubtitle>
+    <VContainer class="py-10">
+        <VBtn text to="/account" class="my-8">
+            <VIcon left>mdi-arrow-left</VIcon>
+            Back to Account Dashboard
+        </VBtn>
+        <VCard elevation="2" class="pa-6">
+            <VCardTitle class="text-h5 mb-2">Profile Information</VCardTitle>
+            <VCardSubtitle class="mb-6"> Update your personal and company details. Make sure everything is accurate. </VCardSubtitle>
 
-      <VForm ref="formRef" @submit.prevent="onSubmit">
-        <VRow dense>
-          <VCol cols="12" sm="6">
-            <VTextField
-              v-model="customerData.first_name"
-              label="First Name"
-              :rules="[rules.required]"
-              prepend-icon="mdi-account"
-            />
-          </VCol>
-          <VCol cols="12" sm="6">
-            <VTextField
-              v-model="customerData.last_name"
-              label="Last Name"
-              :rules="[rules.required]"
-              prepend-icon="mdi-account-outline"
-            />
-          </VCol>
-          <VCol cols="12" sm="6">
-            <VTextField v-model="customerData.phone" label="Phone" prepend-icon="mdi-phone" />
-          </VCol>
-          <VCol cols="12" sm="6">
-            <VTextField v-model="customerData.company_name" label="Company Name" prepend-icon="mdi-domain" />
-          </VCol>
-        </VRow>
+            <VForm ref="formRef" @submit.prevent="onSubmit">
+                <VRow dense>
+                    <VCol cols="12" sm="6">
+                        <VTextField
+                            v-model="customerData.first_name"
+                            label="First Name"
+                            :rules="[rules.required]"
+                            prepend-icon="mdi-account"
+                        />
+                    </VCol>
+                    <VCol cols="12" sm="6">
+                        <VTextField
+                            v-model="customerData.last_name"
+                            label="Last Name"
+                            :rules="[rules.required]"
+                            prepend-icon="mdi-account-outline"
+                        />
+                    </VCol>
+                    <VCol cols="12" sm="6">
+                        <VTextField v-model="customerData.phone" label="Phone" prepend-icon="mdi-phone" />
+                    </VCol>
+                    <VCol cols="12" sm="6">
+                        <VTextField v-model="customerData.company_name" label="Company Name" prepend-icon="mdi-domain" />
+                    </VCol>
+                </VRow>
 
-        <VRow class="mt-6">
-          <VCol>
-            <VBtn type="submit" color="primary" elevation="2">Save Changes</VBtn>
-          </VCol>
-        </VRow>
-      </VForm>
-    </VCard>
-    <VSnackbar v-model="snackbar" timeout="3000" color="success" top right>
-      {{ snackbarText }}
-    </VSnackbar>
-  </VContainer>
+                <VRow class="mt-6">
+                    <VCol>
+                        <VBtn type="submit" color="primary" elevation="2">Save Changes</VBtn>
+                    </VCol>
+                </VRow>
+            </VForm>
+        </VCard>
+        <VSnackbar v-model="snackbar" timeout="3000" color="success" top right>
+            {{ snackbarText }}
+        </VSnackbar>
+    </VContainer>
 </template>

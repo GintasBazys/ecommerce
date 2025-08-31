@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CATEGORY_HANDLE, BLOG_HANDLE } from "~/utils/consts"
+
 const bannerHidden = ref<boolean>(false)
 const drawer = ref<boolean>(false)
 
@@ -8,129 +10,129 @@ const { categories } = storeToRefs(useProductStore())
 </script>
 
 <template>
-  <header>
-    <VBanner
-      v-if="!bannerHidden"
-      style="position: sticky"
-      color="white"
-      class="primary-banner justify-center"
-      density="comfortable"
-      icon="mdi-truck-fast"
-    >
-      <template #actions>
-        <VBtn height="16" icon @click="bannerHidden = true">
-          <VIcon>mdi-close</VIcon>
-        </VBtn>
-      </template>
-      Free shipping on 35 €
-    </VBanner>
-    <VAppBar
-      style="position: sticky"
-      :style="{ top: bannerHidden ? '0px' : '32px' }"
-      app
-      color="white"
-      elevate-on-scroll
-      elevation="1"
-      height="64"
-    >
-      <VContainer>
-        <VRow align="center" justify="space-between" no-gutters class="w-100">
-          <VCol class="logo-container" cols="auto">
-            <NuxtLink class="flex-center logo-link" to="/">
-              <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
-            </NuxtLink>
-          </VCol>
-
-          <div class="hidden-md-and-down nav-links-container">
-            <NuxtLink class="mx-2" to="#">Special offers</NuxtLink>
-            <NuxtLink v-for="cat in categories" :key="cat.id" class="mx-2" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
-              {{ cat.name }}
-            </NuxtLink>
-            <NuxtLink class="mx-2" :to="BLOG_HANDLE">Blog</NuxtLink>
-            <NuxtLink class="mx-2" to="/about">About us</NuxtLink>
-          </div>
-
-          <VCol cols="auto" class="flex-center">
-            <VToolbarItems class="flex-center">
-              <NuxtLink to="/search">
-                <VBtn icon>
-                  <VIcon>mdi-magnify</VIcon>
+    <header>
+        <VBanner
+            v-if="!bannerHidden"
+            style="position: sticky"
+            color="white"
+            class="primary-banner justify-center"
+            density="comfortable"
+            icon="mdi-truck-fast"
+        >
+            <template #actions>
+                <VBtn height="16" icon @click="bannerHidden = true">
+                    <VIcon>mdi-close</VIcon>
                 </VBtn>
-              </NuxtLink>
+            </template>
+            Free shipping on 35 €
+        </VBanner>
+        <VAppBar
+            style="position: sticky"
+            :style="{ top: bannerHidden ? '0px' : '32px' }"
+            app
+            color="white"
+            elevate-on-scroll
+            elevation="1"
+            height="64"
+        >
+            <VContainer>
+                <VRow align="center" justify="space-between" no-gutters class="w-100">
+                    <VCol class="logo-container" cols="auto">
+                        <NuxtLink class="flex-center logo-link" to="/">
+                            <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
+                        </NuxtLink>
+                    </VCol>
 
-              <NuxtLink to="/cart" class="position-relative">
-                <VBtn icon>
-                  <VIcon>mdi-cart</VIcon>
-                  <ClientOnly>
-                    <VBadge
-                      v-if="itemCount"
-                      :content="itemCount < 99 ? itemCount : '99+'"
-                      color="error"
-                      overlap
-                      bordered
-                      class="cart-counter"
-                    />
-                  </ClientOnly>
-                </VBtn>
-              </NuxtLink>
+                    <div class="hidden-md-and-down nav-links-container">
+                        <NuxtLink class="mx-2" to="/special-offers">Special offers</NuxtLink>
+                        <NuxtLink v-for="cat in categories" :key="cat.id" class="mx-2" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
+                            {{ cat.name }}
+                        </NuxtLink>
+                        <NuxtLink class="mx-2" :to="BLOG_HANDLE">Blog</NuxtLink>
+                        <NuxtLink class="mx-2" to="/about">About us</NuxtLink>
+                    </div>
 
-              <NuxtLink v-if="customer?.id" class="hidden-md-and-down" to="/account">
-                <VBtn text>
-                  <VIcon>mdi-account</VIcon>
-                  <span class="ms-2 truncate-text">{{ customer.first_name }}</span>
-                </VBtn>
-              </NuxtLink>
-              <NuxtLink v-else class="hidden-md-and-down" to="/signin">
-                <VBtn text>
-                  <VIcon>mdi-account</VIcon>
-                  <span class="ms-2">Sign In</span>
-                </VBtn>
-              </NuxtLink>
-            </VToolbarItems>
+                    <VCol cols="auto" class="flex-center">
+                        <VToolbarItems class="flex-center">
+                            <NuxtLink to="/search">
+                                <VBtn icon>
+                                    <VIcon>mdi-magnify</VIcon>
+                                </VBtn>
+                            </NuxtLink>
 
-            <VBtn icon class="hidden-lg-and-up" @click="drawer = !drawer">
-              <VIcon>mdi-menu</VIcon>
-            </VBtn>
-          </VCol>
-        </VRow>
-      </VContainer>
-    </VAppBar>
+                            <NuxtLink to="/cart" class="position-relative">
+                                <VBtn icon>
+                                    <VIcon>mdi-cart</VIcon>
+                                    <ClientOnly>
+                                        <VBadge
+                                            v-if="itemCount"
+                                            :content="itemCount < 99 ? itemCount : '99+'"
+                                            color="error"
+                                            overlap
+                                            bordered
+                                            class="cart-counter"
+                                        />
+                                    </ClientOnly>
+                                </VBtn>
+                            </NuxtLink>
 
-    <VNavigationDrawer v-model="drawer" :style="{ paddingTop: !bannerHidden ? '32px' : '0' }" app temporary width="250">
-      <VList nav>
-        <VListItem>
-          <NuxtLink class="nav-link" to="#">Special offers</NuxtLink>
-        </VListItem>
+                            <NuxtLink v-if="customer?.id" class="hidden-md-and-down" to="/account">
+                                <VBtn text>
+                                    <VIcon>mdi-account</VIcon>
+                                    <span class="ms-2 truncate-text">{{ customer.first_name }}</span>
+                                </VBtn>
+                            </NuxtLink>
+                            <NuxtLink v-else class="hidden-md-and-down" to="/signin">
+                                <VBtn text>
+                                    <VIcon>mdi-account</VIcon>
+                                    <span class="ms-2">Sign In</span>
+                                </VBtn>
+                            </NuxtLink>
+                        </VToolbarItems>
 
-        <VListItem v-for="cat in categories" :key="cat.id">
-          <NuxtLink class="nav-link" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
-            {{ cat.name }}
-          </NuxtLink>
-        </VListItem>
+                        <VBtn icon class="hidden-lg-and-up" @click="drawer = !drawer">
+                            <VIcon>mdi-menu</VIcon>
+                        </VBtn>
+                    </VCol>
+                </VRow>
+            </VContainer>
+        </VAppBar>
 
-        <VListItem>
-          <NuxtLink class="nav-link" :to="BLOG_HANDLE">Blog</NuxtLink>
-        </VListItem>
-        <VListItem>
-          <NuxtLink class="nav-link" to="/about">About us</NuxtLink>
-        </VListItem>
-        <VListItem>
-          <NuxtLink v-if="customer?.id" to="/account">
-            <VBtn text>
-              <VIcon>mdi-account</VIcon>
-              <span class="ms-2">{{ customer.first_name }}</span>
-            </VBtn>
-          </NuxtLink>
-          <NuxtLink v-else to="/signin">
-            <VBtn text>
-              <VIcon>mdi-account</VIcon>
-              <span class="ms-2">Sign In</span>
-            </VBtn>
-          </NuxtLink>
-        </VListItem>
-      </VList>
-    </VNavigationDrawer>
-  </header>
+        <VNavigationDrawer v-model="drawer" :style="{ paddingTop: !bannerHidden ? '32px' : '0' }" app temporary width="250">
+            <VList nav>
+                <VListItem>
+                    <NuxtLink class="nav-link" to="/special-offers">Special offers</NuxtLink>
+                </VListItem>
+
+                <VListItem v-for="cat in categories" :key="cat.id">
+                    <NuxtLink class="nav-link" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
+                        {{ cat.name }}
+                    </NuxtLink>
+                </VListItem>
+
+                <VListItem>
+                    <NuxtLink class="nav-link" :to="BLOG_HANDLE">Blog</NuxtLink>
+                </VListItem>
+                <VListItem>
+                    <NuxtLink class="nav-link" to="/about">About us</NuxtLink>
+                </VListItem>
+                <VListItem>
+                    <NuxtLink v-if="customer?.id" to="/account">
+                        <VBtn text>
+                            <VIcon>mdi-account</VIcon>
+                            <span class="ms-2">{{ customer.first_name }}</span>
+                        </VBtn>
+                    </NuxtLink>
+                    <NuxtLink v-else to="/signin">
+                        <VBtn text>
+                            <VIcon>mdi-account</VIcon>
+                            <span class="ms-2">Sign In</span>
+                        </VBtn>
+                    </NuxtLink>
+                </VListItem>
+            </VList>
+        </VNavigationDrawer>
+    </header>
 </template>
 
 <style scoped lang="scss">

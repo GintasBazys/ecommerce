@@ -33,11 +33,11 @@ useHead({
 </script>
 
 <template>
-  <section>
-    <MainBanner />
-    <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
-    <LatestProducts />
-    <BestSellers />
-    <LatestPosts />
-  </section>
+    <section>
+        <MainBanner />
+        <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
+        <LatestProducts />
+        <BestSellers />
+        <LatestPosts />
+    </section>
 </template>

@@ -35,7 +35,7 @@ export default withNuxt({
         "vue/require-explicit-emits": "error",
         "vue/no-v-html": "warn",
         "vue/padding-line-between-blocks": ["warn", "always"],
-        "vue/html-indent": ["error", 2, { baseIndent: 1 }],
+        "vue/html-indent": ["error", 4, { baseIndent: 1 }],
         "import/order": [
             "warn",
             {

@@ -6,7 +6,6 @@ import type { CartLineItemDTO } from "@medusajs/types"
 import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "@/utils/consts"
 import { formatPrice } from "@/utils/formatPrice"
 
-
 definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Cart | Ecommerce" })
@@ -57,41 +56,40 @@ async function removeItem(lineItemId: string): Promise<void> {
 }
 
 function decrementQty(itemId: string): void {
-  const current = qtyMap[itemId] ?? 0
-  if (current > 1) qtyMap[itemId] = current - 1
+    const current = qtyMap[itemId] ?? 0
+    if (current > 1) qtyMap[itemId] = current - 1
 }
 
 function incrementQty(item: CartLineItemDTO): void {
-  const current = qtyMap[item.id] ?? 0
-  const max = item.stocked_quantity ?? Infinity
-  if (current < max) qtyMap[item.id] = current + 1
+    const current = qtyMap[item.id] ?? 0
+    const max = item.stocked_quantity ?? Infinity
+    if (current < max) qtyMap[item.id] = current + 1
 }
 
 async function updateCount(item: CartLineItemDTO): Promise<void> {
-  const desiredQty = qtyMap[item.id] ?? Number(item.quantity)
-  const currentQty = Number(item.quantity)
-  const max = item.stocked_quantity ?? Infinity
+    const desiredQty = qtyMap[item.id] ?? Number(item.quantity)
+    const currentQty = Number(item.quantity)
+    const max = item.stocked_quantity ?? Infinity
 
-  if (desiredQty === currentQty || desiredQty < 1 || desiredQty > max || !cart.value?.id) {
-    return
-  }
-
-  updating[item.id] = true
-  try {
-    const variant = {
-      inventory_quantity: item.stocked_quantity ?? desiredQty,
-      id: item.variant_id ?? null,
-      title: item.variant_title ?? "",
-      calculated_price: { calculated_amount: Number(item.unit_price) },
+    if (desiredQty === currentQty || desiredQty < 1 || desiredQty > max || !cart.value?.id) {
+        return
     }
-    await updateLineItem(variant, desiredQty, true)
-  } catch (err) {
-    console.error("Failed to update count:", err)
-  } finally {
-    updating[item.id] = false
-  }
-}
 
+    updating[item.id] = true
+    try {
+        const variant = {
+            inventory_quantity: item.stocked_quantity ?? desiredQty,
+            id: item.variant_id ?? null,
+            title: item.variant_title ?? "",
+            calculated_price: { calculated_amount: Number(item.unit_price) }
+        }
+        await updateLineItem(variant, desiredQty, true)
+    } catch (err) {
+        console.error("Failed to update count:", err)
+    } finally {
+        updating[item.id] = false
+    }
+}
 
 const isCartLoading = ref<boolean>(true)
 onMounted(async () => {
@@ -145,179 +143,177 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
 </script>
 
 <template>
-  <section class="py-10">
-    <VContainer>
-      <div v-if="isCartLoading" class="text-center py-10">
-        <VProgressCircular indeterminate color="primary" size="40" />
-        <p class="mt-4">Loading your cart...</p>
-      </div>
+    <section class="py-10">
+        <VContainer>
+            <div v-if="isCartLoading" class="text-center py-10">
+                <VProgressCircular indeterminate color="primary" size="40" />
+                <p class="mt-4">Loading your cart...</p>
+            </div>
+            <template v-else>
+                <VRow class="mb-6" align="center" justify="space-between">
+                    <VCol cols="12" lg="6">
+                        <h1 class="text-h5 font-weight-bold">Shopping Cart</h1>
+                    </VCol>
+                    <VCol cols="12" lg="6" class="text-lg-end text-sm-start mt-2 mt-lg-0">
+                        <p class="mb-0">
+                            <strong>Total:</strong>
+                            {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
+                        </p>
+                    </VCol>
+                </VRow>
+                <VRow>
+                    <VCol cols="12" lg="7">
+                        <VCard v-for="item in cart?.items || []" :key="item.id" class="mb-4" flat>
+                            <VCardText class="d-flex pa-4 ga-5">
+                                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="flex-shrink-0">
+                                    <VImg
+                                        :src="item.thumbnail || '/images/placeholder.png'"
+                                        :alt="item.product_title ?? ''"
+                                        width="100"
+                                        height="120"
+                                        class="rounded-lg"
+                                        cover
+                                    />
+                                </NuxtLink>
 
-      <template v-else>
-        <VRow class="mb-6" align="center" justify="space-between">
-          <VCol cols="12" lg="6">
-            <h1 class="text-h5 font-weight-bold">Shopping Cart</h1>
-          </VCol>
-          <VCol cols="12" lg="6" class="text-lg-end text-sm-start mt-2 mt-lg-0">
-            <p class="mb-0">
-              <strong>Total:</strong>
-              {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
-            </p>
-          </VCol>
-        </VRow>
+                                <div class="flex-grow-1 d-flex flex-column justify-space-between">
+                                    <div class="d-flex justify-space-between align-start mb-2">
+                                        <div class="ms-4">
+                                            <NuxtLink
+                                                :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`"
+                                                class="text-primary text-decoration-none text-subtitle-1 font-weight-medium"
+                                            >
+                                                {{ item.product_title }}
+                                            </NuxtLink>
+                                            <p class="text-body-2 text-grey-darken-2 mt-1 mb-1">
+                                                {{ item.product_description }}
+                                            </p>
+                                            <p class="text-caption text-grey-darken-1 mb-0">Option: {{ item.variant_title }}</p>
+                                            <p class="text-caption text-grey-darken-1">Code: {{ item.variant_sku ?? "N/A" }}</p>
+                                        </div>
+                                        <VBtn icon color="error" variant="text" aria-label="Remove" @click="removeItem(item.id)">
+                                            <VIcon>mdi-delete</VIcon>
+                                        </VBtn>
+                                    </div>
 
-        <VRow>
-          <VCol cols="12" lg="7">
-            <VCard v-for="item in cart?.items || []" :key="item.id" class="mb-4" flat>
-              <VCardText class="d-flex pa-4 ga-5">
-                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="flex-shrink-0">
-                  <VImg
-                    :src="item.thumbnail || '/images/placeholder.png'"
-                    :alt="item.product_title ?? ''"
-                    width="100"
-                    height="120"
-                    class="rounded-lg"
-                    cover
-                  />
-                </NuxtLink>
+                                    <div class="d-flex align-center gap-2 ms-4">
+                                        <VBtn icon :disabled="(qtyMap[item.id] ?? 0) <= 1" @click="decrementQty(item.id)">
+                                            <VIcon>mdi-minus</VIcon>
+                                        </VBtn>
 
-                <div class="flex-grow-1 d-flex flex-column justify-space-between">
-                  <div class="d-flex justify-space-between align-start mb-2">
-                    <div class="ms-4">
-                      <NuxtLink
-                        :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`"
-                        class="text-primary text-decoration-none text-subtitle-1 font-weight-medium"
-                      >
-                        {{ item.product_title }}
-                      </NuxtLink>
-                      <p class="text-body-2 text-grey-darken-2 mt-1 mb-1">
-                        {{ item.product_description }}
-                      </p>
-                      <p class="text-caption text-grey-darken-1 mb-0">Option: {{ item.variant_title }}</p>
-                      <p class="text-caption text-grey-darken-1">Code: {{ item.variant_sku ?? "N/A" }}</p>
-                    </div>
-                    <VBtn icon color="error" variant="text" aria-label="Remove" @click="removeItem(item.id)">
-                      <VIcon>mdi-delete</VIcon>
-                    </VBtn>
-                  </div>
+                                        <VTextField
+                                            v-model.number="qtyMap[item.id]"
+                                            type="number"
+                                            hide-details
+                                            variant="outlined"
+                                            class="mx-2"
+                                            density="compact"
+                                            style="max-width: 80px"
+                                            @update:model-value="
+                                                (val) => debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
+                                            "
+                                        />
 
-                  <div class="d-flex align-center gap-2 ms-4">
-                    <VBtn icon :disabled="(qtyMap[item.id] ?? 0) <= 1" @click="decrementQty(item.id)">
-                      <VIcon>mdi-minus</VIcon>
-                    </VBtn>
+                                        <VBtn
+                                            icon
+                                            :disabled="(qtyMap[item.id] ?? 0) >= (item.stocked_quantity ?? Infinity)"
+                                            @click="incrementQty(item)"
+                                        >
+                                            <VIcon>mdi-plus</VIcon>
+                                        </VBtn>
+                                    </div>
 
-                    <VTextField
-                      v-model.number="qtyMap[item.id]"
-                      type="number"
-                      hide-details
-                      variant="outlined"
-                      class="mx-2"
-                      density="compact"
-                      style="max-width: 80px"
-                      @update:model-value="
-                        (val) => debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
-                      "
-                    />
+                                    <div class="text-end mt-2 me-4">
+                                        <strong class="text-subtitle-1">
+                                            {{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1), currencyCode) }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </VCardText>
+                        </VCard>
 
-                    <VBtn
-                      icon
-                      :disabled="(qtyMap[item.id] ?? 0) >= (item.stocked_quantity ?? Infinity)"
-                      @click="incrementQty(item)"
-                    >
-                      <VIcon>mdi-plus</VIcon>
-                    </VBtn>
-                  </div>
+                        <VBtn
+                            v-if="cart?.items?.length"
+                            class="mt-4"
+                            color="primary"
+                            block
+                            :loading="Object.values(updating).some(Boolean)"
+                            :disabled="!isCartDirty || Object.values(updating).some(Boolean)"
+                            @click="cart?.items?.forEach((item) => updateCount(item))"
+                        >
+                            Update Cart
+                        </VBtn>
 
-                  <div class="text-end mt-2 me-4">
-                    <strong class="text-subtitle-1">
-                      {{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1), currencyCode) }}
-                    </strong>
-                  </div>
-                </div>
-              </VCardText>
-            </VCard>
+                        <p v-if="!cart?.items?.length" class="text-center text-grey mt-6">Your cart is empty.</p>
+                    </VCol>
 
-            <VBtn
-              v-if="cart?.items?.length"
-              class="mt-4"
-              color="primary"
-              block
-              :loading="Object.values(updating).some(Boolean)"
-              :disabled="!isCartDirty || Object.values(updating).some(Boolean)"
-              @click="cart?.items?.forEach((item) => updateCount(item))"
-            >
-              Update Cart
-            </VBtn>
+                    <VCol cols="12" lg="5">
+                        <VCard class="pa-6" elevation="2">
+                            <h2 class="text-h6 mb-4">Order Summary</h2>
+                            <VForm @submit.prevent="applyCoupon">
+                                <VTextField
+                                    v-model="couponCode"
+                                    name="couponTextInput"
+                                    placeholder="Enter coupon code"
+                                    prepend-inner-icon="mdi-ticket-percent"
+                                    variant="outlined"
+                                    hide-details
+                                />
+                                <VBtn
+                                    :loading="isApplyingCoupon"
+                                    :disabled="isApplyingCoupon"
+                                    class="mt-3"
+                                    color="primary"
+                                    block
+                                    type="submit"
+                                >
+                                    Apply
+                                </VBtn>
+                            </VForm>
+                            <div v-if="cart?.promotions?.length" class="mb-4">
+                                <h3 class="text-subtitle-1 font-weight-medium mt-4">Applied Promotions:</h3>
 
-            <p v-if="!cart?.items?.length" class="text-center text-grey mt-6">Your cart is empty.</p>
-          </VCol>
+                                <ul>
+                                    <li
+                                        v-for="promo in cart?.promotions"
+                                        :key="promo.id"
+                                        class="d-flex justify-space-between align-center border px-3 mb-3"
+                                    >
+                                        <span>
+                                            <strong>{{ promo.code }}&nbsp;</strong>
+                                            <span class="text-success">
+                                                {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
+                                            </span>
+                                        </span>
 
-          <VCol cols="12" lg="5">
-            <VCard class="pa-6" elevation="2">
-              <h2 class="text-h6 mb-4">Order Summary</h2>
-              <VForm @submit.prevent="applyCoupon">
-                <VTextField
-                  v-model="couponCode"
-                  name="couponTextInput"
-                  placeholder="Enter coupon code"
-                  prepend-inner-icon="mdi-ticket-percent"
-                  variant="outlined"
-                  hide-details
-                />
-                <VBtn
-                  :loading="isApplyingCoupon"
-                  :disabled="isApplyingCoupon"
-                  class="mt-3"
-                  color="primary"
-                  block
-                  type="submit"
-                >
-                  Apply
-                </VBtn>
-              </VForm>
-              <div v-if="cart?.promotions?.length" class="mb-4">
-                <h3 class="text-subtitle-1 font-weight-medium mt-4">Applied Promotions:</h3>
+                                        <VBtn icon small variant="text" aria-label="Remove promotion" @click="removePromotion(promo.code)">
+                                            <VIcon>mdi-close</VIcon>
+                                        </VBtn>
+                                    </li>
+                                </ul>
+                            </div>
+                            <VDivider class="my-4" />
 
-                <ul>
-                  <li
-                    v-for="promo in cart?.promotions"
-                    :key="promo.id"
-                    class="d-flex justify-space-between align-center border px-3 mb-3"
-                  >
-                    <span>
-                      <strong>{{ promo.code }}&nbsp;</strong>
-                      <span class="text-success">
-                        {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
-                      </span>
-                    </span>
+                            <div class="d-flex justify-space-between mb-2">
+                                <span><strong>Subtotal:</strong></span>
+                                <span>{{ formatPrice(Number(cart?.subtotal || 0), currencyCode) }}</span>
+                            </div>
+                            <div class="d-flex justify-space-between mb-6">
+                                <span class="text-lg font-weight-bold">Total:</span>
+                                <span class="text-lg font-weight-bold">
+                                    {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
+                                </span>
+                            </div>
 
-                    <VBtn icon small variant="text" aria-label="Remove promotion" @click="removePromotion(promo.code)">
-                      <VIcon>mdi-close</VIcon>
-                    </VBtn>
-                  </li>
-                </ul>
-              </div>
-              <VDivider class="my-4" />
-
-              <div class="d-flex justify-space-between mb-2">
-                <span><strong>Subtotal:</strong></span>
-                <span>{{ formatPrice(Number(cart?.subtotal || 0), currencyCode) }}</span>
-              </div>
-              <div class="d-flex justify-space-between mb-6">
-                <span class="text-lg font-weight-bold">Total:</span>
-                <span class="text-lg font-weight-bold">
-                  {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
-                </span>
-              </div>
-
-              <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/address">
-                <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0">
-                  Checkout
-                </VBtn>
-              </NuxtLink>
-            </VCard>
-          </VCol>
-        </VRow>
-      </template>
-    </VContainer>
-  </section>
+                            <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/address">
+                                <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0">
+                                    Checkout
+                                </VBtn>
+                            </NuxtLink>
+                        </VCard>
+                    </VCol>
+                </VRow>
+            </template>
+        </VContainer>
+    </section>
 </template>

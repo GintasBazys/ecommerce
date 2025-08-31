@@ -13,6 +13,7 @@ const isLoading = ref<boolean>(false)
 const hasSearched = ref<boolean>(false)
 const lastSearchQuery = ref<string>("")
 const searchHistory = ref<string[]>([])
+const formInput = ref<HTMLElement | null>(null)
 
 const { regionStoreId } = storeToRefs(useRegionStore())
 const regionId: string = regionStoreId.value ?? ""
@@ -42,6 +43,8 @@ async function handleSearch(e: Event): Promise<void> {
     updateSearchHistory(searchQuery.value)
 
     isLoading.value = true
+
+    formInput.value?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
     try {
         const response = await $fetch<SearchResponse>("/api/search", {
             method: "POST",
@@ -77,56 +80,54 @@ function deleteHistoryItem(index: number): void {
 </script>
 
 <template>
-  <VContainer class="py-10 mt-10">
-    <VRow>
-      <VCol cols="12">
-        <h1 class="text-h4 font-weight-bold mb-6">
-          Search
-          <span class="text-primary">({{ searchCounter }})</span>
-        </h1>
-
-        <VForm @submit.prevent="handleSearch">
-          <VTextField
-            v-model="searchQuery"
-            label="Search..."
-            outlined
-            dense
-            clearable
-            append-inner-icon="mdi-magnify"
-            :loading="isLoading"
-          />
-        </VForm>
-      </VCol>
-
-      <VCol v-if="searchHistory.length" cols="12" class="mt-4">
-        <h3 class="text-h6 mb-2">Recent Searches</h3>
-        <VList dense>
-          <VListItem v-for="(query, index) in searchHistory" :key="index" class="d-flex justify-space-between align-center">
-            <VBtn text color="primary" @click="reRunSearch(query)">
-              {{ query }}
-            </VBtn>
-            <VBtn icon @click="deleteHistoryItem(index)">
-              <VIcon color="red">mdi-delete</VIcon>
-            </VBtn>
-          </VListItem>
-        </VList>
-      </VCol>
-
-      <VCol v-if="isLoading" cols="12" class="text-center py-6">
-        <VProgressCircular indeterminate color="primary" size="40" class="mb-3" />
-        <div>Loading results...</div>
-      </VCol>
-
-      <VCol cols="12" class="search-results">
-        <template v-if="!isLoading && products.length">
-          <VRow>
-            <VCol v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
-              <ProductCard :product="product as ProductDTO" />
+    <VContainer class="py-10 mt-10">
+        <VRow>
+            <VCol cols="12">
+                <h1 class="text-h4 font-weight-bold mb-6">
+                    Search
+                    <span class="text-primary">({{ searchCounter }})</span>
+                </h1>
+                <VForm @submit.prevent="handleSearch">
+                    <VTextField
+                        ref="formInput"
+                        v-model="searchQuery"
+                        label="Search..."
+                        outlined
+                        dense
+                        clearable
+                        append-inner-icon="mdi-magnify"
+                        :loading="isLoading"
+                    />
+                </VForm>
             </VCol>
-          </VRow>
-        </template>
-        <p v-else-if="!isLoading && hasSearched">No results found.</p>
-      </VCol>
-    </VRow>
-  </VContainer>
+            <VCol v-if="isLoading" cols="12" class="text-center py-6">
+                <VProgressCircular indeterminate color="primary" size="40" class="mb-3" />
+                <div>Loading results...</div>
+            </VCol>
+            <VCol cols="12" class="search-results">
+                <template v-if="!isLoading && products.length">
+                    <VRow>
+                        <VCol v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
+                            <ProductCard :product="product as ProductDTO" />
+                        </VCol>
+                    </VRow>
+                </template>
+                <p v-else-if="!isLoading && hasSearched">No results found.</p>
+            </VCol>
+
+            <VCol v-if="searchHistory.length" cols="12" class="mt-4">
+                <h3 class="text-h6 mb-2">Recent Searches</h3>
+                <VList dense>
+                    <VListItem v-for="(query, index) in searchHistory" :key="index" class="d-flex justify-space-between align-center">
+                        <VBtn text color="primary" @click="reRunSearch(query)">
+                            {{ query }}
+                        </VBtn>
+                        <VBtn icon @click="deleteHistoryItem(index)">
+                            <VIcon color="red">mdi-delete</VIcon>
+                        </VBtn>
+                    </VListItem>
+                </VList>
+            </VCol>
+        </VRow>
+    </VContainer>
 </template>

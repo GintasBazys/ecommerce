@@ -56,60 +56,60 @@ async function handleRegister(): Promise<void> {
 </script>
 
 <template>
-  <section class="py-10">
-    <VContainer>
-      <VRow justify="center">
-        <VCol cols="12" md="6">
-          <div class="form-wrapper mx-auto">
-            <h4 class="mb-4">Register</h4>
-            <VForm ref="registerFormRef" @submit.prevent="handleRegister">
-              <VTextField
-                v-model="firstName"
-                name="firstName"
-                label="First name"
-                :rules="nameRules[0] ? [nameRules[0]] : []"
-                required
-                class="mb-3"
-                variant="outlined"
-              />
-              <VTextField
-                v-model="lastName"
-                name="lastName"
-                label="Last name"
-                :rules="nameRules[1] ? [nameRules[1]] : []"
-                required
-                class="mb-3"
-                variant="outlined"
-              />
-              <VTextField
-                v-model="email"
-                name="email"
-                label="E-mail"
-                type="email"
-                :rules="emailRules"
-                required
-                class="mb-3"
-                variant="outlined"
-              />
-              <VTextField
-                v-model="password"
-                name="password"
-                label="Password"
-                type="password"
-                :rules="passwordRules"
-                required
-                class="mb-3"
-                variant="outlined"
-              />
-              <VBtn type="submit" color="primary" block>Register</VBtn>
-            </VForm>
-            <p class="mt-4 text-center">
-              Already have an account?
-              <NuxtLink to="/signin">Login here</NuxtLink>
-            </p>
-          </div>
-        </VCol>
-      </VRow>
-    </VContainer>
-  </section>
+    <section class="py-10">
+        <VContainer>
+            <VRow justify="center">
+                <VCol cols="12" md="6">
+                    <div class="form-wrapper mx-auto">
+                        <h4 class="mb-4">Register</h4>
+                        <VForm ref="registerFormRef" @submit.prevent="handleRegister">
+                            <VTextField
+                                v-model="firstName"
+                                name="firstName"
+                                label="First name"
+                                :rules="nameRules[0] ? [nameRules[0]] : []"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VTextField
+                                v-model="lastName"
+                                name="lastName"
+                                label="Last name"
+                                :rules="nameRules[1] ? [nameRules[1]] : []"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VTextField
+                                v-model="email"
+                                name="email"
+                                label="E-mail"
+                                type="email"
+                                :rules="emailRules"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VTextField
+                                v-model="password"
+                                name="password"
+                                label="Password"
+                                type="password"
+                                :rules="passwordRules"
+                                required
+                                class="mb-3"
+                                variant="outlined"
+                            />
+                            <VBtn type="submit" color="primary" block>Register</VBtn>
+                        </VForm>
+                        <p class="mt-4 text-center">
+                            Already have an account?
+                            <NuxtLink to="/signin">Login here</NuxtLink>
+                        </p>
+                    </div>
+                </VCol>
+            </VRow>
+        </VContainer>
+    </section>
 </template>
