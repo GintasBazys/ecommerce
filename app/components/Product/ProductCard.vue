@@ -6,7 +6,6 @@ import type { ProductDTO } from "@medusajs/types"
 
 import { formatPrice } from "@/utils/formatPrice"
 
-
 const { product } = defineProps<{
     product: ProductDTO
 }>()
@@ -28,10 +27,11 @@ const computedPrice = computed<number | string>(() => {
     return "N/A"
 })
 
-const isOnSale = computed<number | boolean>(() => (
+const isOnSale = computed<number | boolean>(
+    () =>
         selectedVariant.value?.calculated_price.calculated_price.price_list_type === "sale" &&
         selectedVariant.value?.calculated_price.original_amount
-    ))
+)
 
 const originalPrice = computed<string | null>(() => {
     if (selectedVariant.value?.calculated_price.original_amount) {
@@ -85,7 +85,7 @@ const averageRating = computed<number | null>(() => {
 
                 <p class="truncate text-body-2 mb-2">{{ product.description }}</p>
 
-                <div class="d-flex align-center mt-2">
+                <div v-if="averageRating" class="d-flex align-center mt-2">
                     <VIcon v-for="i in 5" :key="i" size="18" class="mr-1">
                         {{ i <= Math.round(averageRating ?? 0) ? "mdi-star" : "mdi-star-outline" }}
                     </VIcon>

@@ -20,6 +20,7 @@ const { customer } = storeToRefs(useCustomerStore())
 
 const isLoading = ref<boolean>(true)
 const loadingMessage = ref<string>("Initializing...")
+const provider = computed(() => (route.query.provider as string) || "google")
 
 async function sendCallback(): Promise<string | null> {
     const searchParams = new URLSearchParams(window.location.search)
@@ -27,22 +28,13 @@ async function sendCallback(): Promise<string | null> {
 
     try {
         loadingMessage.value = "Contacting authentication server..."
-        const response = await fetch(
-            `${config.public.MEDUSA_URL}/auth/customer/google/callback?${new URLSearchParams(queryParams).toString()}`,
-            {
-                credentials: "include",
-                method: "POST"
-            }
-        )
+        const url = `${config.public.MEDUSA_URL}/auth/customer/${provider.value}/callback?${new URLSearchParams(queryParams).toString()}`
+        const response = await fetch(url, { credentials: "include", method: "POST" })
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
+        if (!response.ok) console.error(`HTTP error! status: ${response.status}`)
 
         const data = await response.json()
-        if (!data.token) {
-            throw new Error("No token received from server")
-        }
+        if (!data.token) console.error("No token received from server")
         return data.token
     } catch (error) {
         console.error("Error during callback:", error)
@@ -65,7 +57,7 @@ async function createCustomer(token: string, email: string, first_name: string, 
         })
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            console.error(`HTTP error! status: ${response.status}`)
         }
 
         return await response.json()
@@ -89,12 +81,12 @@ async function refreshToken(token: string): Promise<string | null> {
         if (!response.ok) {
             console.error(`HTTP error! status: ${response.status}`)
             alert("Authentication failed: An unknown error occurred.")
-            router.push("/signin")
+            await router.push("/signin")
         }
 
         const data = await response.json()
         if (!data.token) {
-            throw new Error("No refresh token received")
+            console.error("No refresh token received")
         }
         return data.token
     } catch (error) {
@@ -109,23 +101,27 @@ const validateCallback = async () => {
         const state = route.query.state as string
 
         if (!state) {
-            throw new Error("No state found in query parameters.")
+            console.error("No state found in query parameters.")
         }
 
         const token = await sendCallback()
 
         if (!token) {
-            throw new Error("Failed to obtain token")
+            console.error("Failed to obtain token")
         }
         let currentToken = token
 
         try {
-            const decodedToken = jwtDecode<CustomJwtPayload>(currentToken) // Replace 'any' with your CustomJwtPayload interface if available
+            if (!currentToken) {
+                return
+            }
+
+            const decodedToken = jwtDecode<CustomJwtPayload>(currentToken)
             const shouldCreateCustomer = !decodedToken.actor_id
             const authIdentityId = decodedToken.auth_identity_id
 
             if (!authIdentityId) {
-                throw new Error("No auth_identity_id found in token")
+                console.error("No auth_identity_id found in token")
             }
 
             loadingMessage.value = "Retrieving identity information..."
@@ -142,15 +138,27 @@ const validateCallback = async () => {
             const { authIdentity } = await identityResponse.json()
 
             if (shouldCreateCustomer) {
-                email.value = authIdentity.user_metadata?.email
-                firstName.value = authIdentity.user_metadata?.given_name || ""
-                lastName.value = authIdentity.user_metadata?.family_name || ""
+                const meta = authIdentity.user_metadata || {}
+
+                email.value = meta.email || ""
+
+                const given = meta.given_name || meta.first_name
+                const family = meta.family_name || meta.last_name
+                if (given || family) {
+                    firstName.value = given || ""
+                    lastName.value = family || ""
+                } else if (meta.name) {
+                    const parts = String(meta.name).trim().split(/\s+/)
+                    firstName.value = parts.shift() || ""
+                    lastName.value = parts.join(" ")
+                } else {
+                    firstName.value = ""
+                    lastName.value = ""
+                }
 
                 await createCustomer(currentToken, email.value, firstName.value, lastName.value)
                 const newToken = await refreshToken(currentToken)
-                if (!newToken) {
-                    throw new Error("Failed to refresh token")
-                }
+                if (!newToken) console.error("Failed to refresh token")
                 currentToken = newToken
             }
 
@@ -165,7 +173,7 @@ const validateCallback = async () => {
             })
 
             if (!sessionResponse.ok) {
-                throw new Error(`Failed to set session: ${sessionResponse.status}`)
+                console.error(`Failed to set session: ${sessionResponse.status}`)
             }
 
             loadingMessage.value = "Fetching customer details..."
@@ -180,7 +188,7 @@ const validateCallback = async () => {
             })
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
+                console.error(`HTTP error! status: ${response.status}`)
             }
 
             const { customer: customerData } = await response.json()
@@ -191,10 +199,9 @@ const validateCallback = async () => {
 
             await assignCustomerToCart(useCartStore())
             alert(`Welcome, ${customer.value?.email}!`)
-            router.push("/")
+            await router.push("/")
         } catch (decodeError) {
             console.error("Error decoding token:", decodeError)
-            throw new Error("Invalid token format received from server")
         }
     } catch (error) {
         console.error("Authentication error:", error)
@@ -204,7 +211,7 @@ const validateCallback = async () => {
         } else {
             alert("Authentication failed: An unknown error occurred.")
         }
-        router.push("/signin")
+        await router.push("/signin")
     }
 }
 
@@ -263,13 +270,13 @@ onMounted(() => {
 
 @keyframes progressAnimation {
     0% {
-        width: 0%;
+        width: 0;
     }
     50% {
         width: 100%;
     }
     100% {
-        width: 0%;
+        width: 0;
     }
 }
 

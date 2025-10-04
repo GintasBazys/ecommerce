@@ -1,41 +1,40 @@
 <script setup lang="ts">
+import { nextTick } from "vue"
+
 import type { ProductCategoryDTO, ProductDTO } from "@medusajs/types"
 
-definePageMeta({
-    layout: "default"
-})
+definePageMeta({ layout: "default" })
 
 const { regionStoreId } = storeToRefs(useRegionStore())
 
 const route = useRoute()
 const category = ref<ProductCategoryDTO | null>(null)
 const products = ref<ProductDTO[]>([])
-const offset = ref(0)
+const offset = ref<number>(0)
 const limit = 9
-const totalCount = ref(0)
-const loadingRef = ref(false)
+const totalCount = ref<number>(0)
+const loadingRef = ref<boolean>(false)
 
 const sortOptions = [
     { text: "From latest", value: "-created_at" },
     { text: "From oldest", value: "created_at" },
-    //https://github.com/medusajs/medusa/issues/12900
-    // { text: "Price: low → high", value: "variants.prices.amount" },
-    // { text: "Price: high → low", value: "-variants.prices.amount" },
+    { text: "Price: low → high", value: "variants.calculated_price.calculated_amount" },
+    { text: "Price: high → low", value: "-variants.calculated_price.calculated_amount" },
     { text: "Title: A → Z", value: "title" },
     { text: "Title: Z → A", value: "-title" }
 ]
 const sortOption = ref<string>(sortOptions[0]!.value)
 
+const hasMore = computed(() => offset.value + limit < totalCount.value)
+
 const fetchProducts = async () => {
     if (!category.value?.handle) return
-
     loadingRef.value = true
-
     try {
-        const productData = await $fetch<{
-            products: ProductDTO[]
-            count: number
-        }>("/api/products/products", {
+        const isPriceSort = sortOption.value.includes("variants.calculated_price")
+        const endpoint = isPriceSort ? "/api/products/products-price" : "/api/products/products"
+
+        const productData = await $fetch<{ products: ProductDTO[]; count: number }>(endpoint, {
             query: {
                 category_id: category.value.id,
                 region_id: regionStoreId.value,
@@ -54,6 +53,7 @@ const fetchProducts = async () => {
         }
 
         totalCount.value = productData.count
+        await nextTick()
     } catch (e) {
         console.error("Error fetching products", e)
     } finally {
@@ -69,42 +69,23 @@ if (data.value && "error" in data.value) {
     await fetchProducts()
 }
 
-useHead({
-    title: `${category.value?.name} | Ecommerce`
-})
+useHead({ title: `${category.value?.name} | Ecommerce` })
 
-//TODO remove sentinel element and add last item class to product
-const infiniteSentinel = ref<HTMLElement | null>(null)
-let observer: IntersectionObserver
+const onIntersectLast = async (isIntersecting: boolean, entries: IntersectionObserverEntry[]) => {
+    if (!isIntersecting || loadingRef.value || !hasMore.value) return
 
-onMounted(() => {
-    observer = new IntersectionObserver(
-        async ([entry]) => {
-            if (entry?.isIntersecting && !loadingRef.value && offset.value + limit < totalCount.value) {
-                offset.value += limit
-                await fetchProducts()
-            }
-        },
-        {
-            root: null,
-            rootMargin: "200px",
-            threshold: 0
-        }
-    )
+    const entry = entries?.[0]
+    const target = entry?.target as HTMLElement | undefined
+    if (!target || !target.classList.contains("js-last-item")) return
 
-    if (infiniteSentinel.value) {
-        observer.observe(infiniteSentinel.value)
-    }
-})
-
-onUnmounted(() => {
-    observer.disconnect()
-})
+    offset.value += limit
+    await fetchProducts()
+}
 
 watch(sortOption, async () => {
     offset.value = 0
     await fetchProducts()
-    window?.scrollTo(0, 0)
+    window?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior })
 })
 </script>
 
@@ -129,9 +110,9 @@ watch(sortOption, async () => {
             </VSheet>
         </VContainer>
         <VContainer class="my-6">
-            <VRow>
+            <VRow justify="center">
                 <VCol lg="8">
-                    <p>{{ category?.description }}</p>
+                    <p style="text-align: center">{{ category?.description }}</p>
                 </VCol>
             </VRow>
         </VContainer>
@@ -151,11 +132,23 @@ watch(sortOption, async () => {
                 </VCol>
             </VRow>
             <VRow>
-                <VCol v-for="product in products" :key="product.id" class="pa-0" cols="12" sm="6" md="4" lg="3">
+                <VCol
+                    v-for="(product, index) in products"
+                    :key="product.id"
+                    v-intersect="{
+                        handler: onIntersectLast,
+                        options: { root: null, rootMargin: '300px', threshold: 0 }
+                    }"
+                    cols="12"
+                    sm="6"
+                    md="4"
+                    lg="3"
+                    class="pa-0"
+                    :class="{ 'js-last-item': index === products.length - 1 }"
+                >
                     <ProductCard :product="product" />
                 </VCol>
             </VRow>
-            <div ref="infiniteSentinel" style="height: 1px"></div>
             <VRow justify="center" class="mt-4">
                 <VProgressCircular v-if="loadingRef" indeterminate color="primary" />
             </VRow>

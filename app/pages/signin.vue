@@ -1,27 +1,25 @@
 <script setup lang="ts">
 import type { VForm } from "vuetify/components"
 
-useHead({
-    title: "Signin | Ecommerce"
-})
-
-definePageMeta({
-    layout: "account"
-})
+useHead({ title: "Signin | Ecommerce" })
+definePageMeta({ layout: "account" })
 
 const router = useRouter()
 const runtimeConfig = useRuntimeConfig()
 
-const showResetDialog = ref<boolean>(false)
+const showResetDialog = ref(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
-const snackbar = ref<boolean>(false)
-const snackbarText = ref<string>("")
-const snackbarColor = ref<string>("success")
+const snackbar = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
 const loginFormRef = ref<InstanceType<typeof VForm> | null>(null)
 const resetFormRef = ref<InstanceType<typeof VForm> | null>(null)
+
+const loginEmail = ref<string>("")
+const loginPassword = ref<string>("")
 
 const resetEmail = ref<string>("")
 const emailRules: ((v: string) => boolean | string)[] = [
@@ -29,21 +27,23 @@ const emailRules: ((v: string) => boolean | string)[] = [
     (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "E-mail must be valid"
 ]
 
+const passwordRules: ((v: string) => boolean | string)[] = [(v: string) => !!v || "Password is required"]
+
 async function handleLogin(e: Event): Promise<void> {
     e.preventDefault()
 
-    const form = e.target as HTMLFormElement
-    const formData = new FormData(form)
-    const email = formData.get("email")
-    const password = formData.get("password")
+    // Ask Vuetify to validate inputs. This will show inline errors on the fields.
+    const { valid } = (await loginFormRef.value?.validate()) ?? { valid: false }
+    if (!valid) return // stop here — do not hit your endpoints
+
+    const email = loginEmail.value
+    const password = loginPassword.value
 
     try {
         const { token } = await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass`, {
             credentials: "include",
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
         }).then((res) => res.json())
 
@@ -145,13 +145,38 @@ async function handleReset(): Promise<void> {
                 <VCol cols="12" md="6">
                     <div class="form-wrapper mx-auto">
                         <h4 class="mb-4">Log in</h4>
-                        <VBtn class="mb-4" color="white" block style="border: 1px solid #ccc" @click="handleSocialLogin('google')">
+                        <VBtn class="mb-4" color="white" block @click="handleSocialLogin('google')">
                             <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
                             Log in with Google
                         </VBtn>
+                        <VBtn class="mb-4" block color="white" @click="handleSocialLogin('facebook')">
+                            <VImg src="/images/facebook_login_icon.svg" width="24" height="24" class="me-3" />
+                            Log in with Facebook
+                        </VBtn>
+                        <hr class="mb-4" />
                         <VForm ref="loginFormRef" @submit.prevent="handleLogin">
-                            <VTextField name="email" label="E-mail" type="email" class="mb-3" variant="outlined" required />
-                            <VTextField name="password" label="Password" type="password" class="mb-3" variant="outlined" required />
+                            <VTextField
+                                v-model.trim="loginEmail"
+                                :rules="emailRules"
+                                name="email"
+                                label="E-mail"
+                                type="email"
+                                class="mb-3"
+                                variant="outlined"
+                                autocomplete="email"
+                                required
+                            />
+                            <VTextField
+                                v-model="loginPassword"
+                                :rules="passwordRules"
+                                name="password"
+                                label="Password"
+                                type="password"
+                                class="mb-3"
+                                variant="outlined"
+                                autocomplete="current-password"
+                                required
+                            />
                             <div class="text-end mb-3">
                                 <VBtn variant="text" class="px-0 text-caption" @click="showResetDialog = true"> Forgot password? </VBtn>
                             </div>

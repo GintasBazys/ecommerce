@@ -79,7 +79,7 @@ const { categories } = storeToRefs(useProductStore())
                             <NuxtLink v-if="customer?.id" class="hidden-md-and-down" to="/account">
                                 <VBtn text>
                                     <VIcon>mdi-account</VIcon>
-                                    <span class="ms-2 truncate-text">{{ customer.first_name }}</span>
+                                    <span class="ms-2 truncate-text">{{ customer.first_name ?? "Profile" }}</span>
                                 </VBtn>
                             </NuxtLink>
                             <NuxtLink v-else class="hidden-md-and-down" to="/signin">

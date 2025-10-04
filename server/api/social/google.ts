@@ -22,9 +22,7 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-        const result = await backendResponse.json()
-
-        return result
+        return await backendResponse.json()
     } catch (error) {
         console.error("Error in API proxy:", error)
         return {
