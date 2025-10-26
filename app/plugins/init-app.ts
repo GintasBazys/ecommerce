@@ -45,15 +45,21 @@ export default defineNuxtPlugin(async () => {
     customerStore.customer = customerState.value
 
     if (regionStore.regionStoreId) {
-        const cartIdCookie = useCookie<string | null>("cart_id")
+        const cartIdCookie = useCookie<string | null>("cart_id", {
+            sameSite: "lax",
+            path: "/",
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24 * 30
+        })
+
         const cartKey = `cart:${regionStore.regionStoreId}:${cartIdCookie.value ?? ""}`
 
         const cartState = useState<CartDTO | null>(cartKey, () => null)
         if (cartState.value === null) {
             try {
                 const { cart } = await $fetch<{ cart: CartDTO | null }>(`/api/cart/cart?region_id=${regionStore.regionStoreId}`, {
-                    credentials: "include",
                     headers: {
+                        ...useRequestHeaders(["cookie"]),
                         "Content-Type": "application/json",
                         "x-publishable-api-key": config.public.PUBLISHABLE_KEY
                     }

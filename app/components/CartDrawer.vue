@@ -7,7 +7,7 @@ import { formatPrice } from "@/utils/formatPrice"
 const { cart, openCartDrawer } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem } = useCartStore()
 
-const qtyMap = reactive<Record<string, number>>({})
+const qtyMap = reactive<Record<string, number | undefined>>({})
 const updating = reactive<Record<string, boolean>>({})
 
 watch(
@@ -42,7 +42,9 @@ const originalQtys = computed<Record<string, number>>(() => {
     return map
 })
 
-const isCartDirty = computed<boolean>(() => Object.entries(qtyMap).some(([id, qty]) => qty !== originalQtys.value[id]))
+const isCartDirty = computed<boolean>(() =>
+    Object.entries(qtyMap).some(([id, qty]) => (qty ?? originalQtys.value[id]) !== originalQtys.value[id])
+)
 
 async function removeItem(lineItemId: string): Promise<void> {
     if (!cart.value?.id) throw new Error("No active cart found")
@@ -54,16 +56,18 @@ async function removeItem(lineItemId: string): Promise<void> {
 }
 
 function decrementQty(itemId: string): void {
-    if (qtyMap[itemId] > 1) qtyMap[itemId]--
+    const q = qtyMap[itemId] ?? 1
+    if (q > 1) qtyMap[itemId] = q - 1
 }
+
 function incrementQty(item: CartLineItemDTO): void {
-    if (qtyMap[item.id] < (item.stocked_quantity ?? Infinity)) {
-        qtyMap[item.id]++
-    }
+    const q = qtyMap[item.id] ?? Number(item.quantity)
+    const max = item.stocked_quantity ?? Infinity
+    if (q < max) qtyMap[item.id] = q + 1
 }
 
 async function updateCount(item: CartLineItemDTO): Promise<void> {
-    const desiredQty = qtyMap[item.id]
+    const desiredQty = qtyMap[item.id] ?? Number(item.quantity)
     const currentQty = Number(item.quantity)
     if (desiredQty === currentQty || desiredQty < 1 || desiredQty > (item.stocked_quantity ?? Infinity) || !cart.value?.id) {
         return
@@ -127,13 +131,13 @@ const displayTotal = computed<string>(() => {
 
                                 <div class="d-flex justify-space-between align-center">
                                     <div class="d-flex align-center">
-                                        <VBtn icon size="small" :disabled="qtyMap[item.id] <= 1" @click="decrementQty(item.id)">
+                                        <VBtn icon size="small" :disabled="(qtyMap[item.id] ?? 1) <= 1" @click="decrementQty(item.id)">
                                             <VIcon>mdi-minus</VIcon>
                                         </VBtn>
                                         <VBtn
                                             icon
                                             size="small"
-                                            :disabled="qtyMap[item.id] >= (item.stocked_quantity ?? Infinity)"
+                                            :disabled="(qtyMap[item.id] ?? Number(item.quantity)) >= (item.stocked_quantity ?? Infinity)"
                                             @click="incrementQty(item)"
                                         >
                                             <VIcon>mdi-plus</VIcon>
@@ -144,7 +148,7 @@ const displayTotal = computed<string>(() => {
                                         <span class="font-weight-medium">
                                             {{
                                                 formatPrice(
-                                                    qtyMap[item.id] * Number(item.unit_price),
+                                                    (qtyMap[item.id] ?? Number(item.quantity)) * Number(item.unit_price),
                                                     cart?.currency_code ?? DEFAULT_CURENCY
                                                 )
                                             }}
@@ -174,8 +178,8 @@ const displayTotal = computed<string>(() => {
                     >
                         Update Cart
                     </VBtn>
-                    <NuxtLink :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }" to="/address">
-                        <VBtn color="primary" class="mt-4" block> Go to Checkout </VBtn>
+                    <NuxtLink :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }" to="/cart">
+                        <VBtn color="primary" class="mt-4" block> Go to Cart </VBtn>
                     </NuxtLink>
                 </div>
             </VContainer>
