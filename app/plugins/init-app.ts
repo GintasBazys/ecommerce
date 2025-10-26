@@ -1,4 +1,3 @@
-// plugins/bootstrap.server.ts
 import type { CartDTO, CustomerDTO } from "@medusajs/types"
 
 export default defineNuxtPlugin(async () => {
@@ -12,7 +11,7 @@ export default defineNuxtPlugin(async () => {
         await regionStore.fetchRegion()
     }
 
-    const categoriesState = useState("categories", () => []) // set your real type if you have it
+    const categoriesState = useState("categories", () => [])
     if (!categoriesState.value.length) {
         try {
             categoriesState.value = await $fetch("/api/categories/categories", {

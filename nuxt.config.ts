@@ -23,7 +23,6 @@ export default defineNuxtConfig({
     },
     modules: [
         "@nuxt/eslint",
-        "nuxt-medusa",
         "@pinia/nuxt",
         "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
@@ -41,9 +40,6 @@ export default defineNuxtConfig({
             key: process.env.STRIPE_PUBLIC_KEY,
             options: {}
         }
-    },
-    medusa: {
-        server: true
     },
     runtimeConfig: {
         public: {
