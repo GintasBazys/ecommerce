@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { CartLineItemDTO } from "@medusajs/types"
 
-import { DEFAULT_CURENCY } from "@/utils/consts"
-import { formatPrice } from "@/utils/formatPrice"
+import { DEFAULT_CURENCY } from "~/utils/consts"
+import { formatPrice } from "~/utils/formatPrice"
 
 const { cart, openCartDrawer } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem } = useCartStore()
