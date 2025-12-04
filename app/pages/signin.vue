@@ -32,9 +32,8 @@ const passwordRules: ((v: string) => boolean | string)[] = [(v: string) => !!v |
 async function handleLogin(e: Event): Promise<void> {
     e.preventDefault()
 
-    // Ask Vuetify to validate inputs. This will show inline errors on the fields.
     const { valid } = (await loginFormRef.value?.validate()) ?? { valid: false }
-    if (!valid) return // stop here — do not hit your endpoints
+    if (!valid) return
 
     const email = loginEmail.value
     const password = loginPassword.value

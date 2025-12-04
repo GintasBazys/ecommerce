@@ -1,7 +1,19 @@
 // @ts-check
+import tsParser from "@typescript-eslint/parser"
+import vueParser from "vue-eslint-parser"
+
 import withNuxt from "./.nuxt/eslint.config.mjs"
 
 export default withNuxt({
+    languageOptions: {
+        parser: vueParser,
+        parserOptions: {
+            parser: tsParser,
+            ecmaVersion: 2022,
+            sourceType: "module",
+            extraFileExtensions: [".vue"],
+        },
+    },
     rules: {
         "vue/html-self-closing": [
             "error",
@@ -9,11 +21,11 @@ export default withNuxt({
                 html: {
                     void: "always",
                     normal: "never",
-                    component: "always"
+                    component: "always",
                 },
                 svg: "always",
-                math: "always"
-            }
+                math: "always",
+            },
         ],
         "no-console": ["warn", { allow: ["warn", "error"] }],
         "no-debugger": "warn",
@@ -41,10 +53,10 @@ export default withNuxt({
             {
                 groups: ["builtin", "external", "internal", ["parent", "sibling", "index"], "object", "type"],
                 "newlines-between": "always",
-                alphabetize: { order: "asc", caseInsensitive: true }
-            }
+                alphabetize: { order: "asc", caseInsensitive: true },
+            },
         ],
         "import/newline-after-import": "warn",
-        "import/no-duplicates": "error"
-    }
+        "import/no-duplicates": "error",
+    },
 })

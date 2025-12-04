@@ -36,7 +36,7 @@ const { categories } = storeToRefs(useProductStore())
             height="64"
         >
             <VContainer>
-                <VRow align="center" justify="space-between" no-gutters class="w-100">
+                <VRow align="center" justify="space-between" no-gutters class="w-100 no-wrap">
                     <VCol class="logo-container" cols="auto">
                         <NuxtLink class="flex-center logo-link" to="/">
                             <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
@@ -138,7 +138,7 @@ const { categories } = storeToRefs(useProductStore())
 <style scoped lang="scss">
 .cart-counter {
     position: absolute;
-    top: 0px;
+    top: 0;
     right: 10px;
 }
 

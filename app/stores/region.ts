@@ -1,4 +1,3 @@
-import { defineStore } from "pinia"
 import { ref } from "vue"
 
 import type { RegionCountryDTO, RegionDTO } from "@medusajs/types"
@@ -21,7 +20,9 @@ export const useRegionStore = defineStore("regionStore", () => {
             const firstRegionId = data.regions?.[0]?.id
             regionCountries.value = data.regions?.[0]?.countries ?? []
             if (!firstRegionId) {
-                throw new Error("No valid region ID found")
+                console.error("No valid region ID found")
+
+                return;
             }
 
             regionStoreId.value = firstRegionId

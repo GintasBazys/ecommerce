@@ -23,8 +23,6 @@ export const useCartStore = defineStore("cart", () => {
             const response: CartResponseInterface = await res.json()
             if (response.cart) {
                 cart.value = response.cart
-            } else {
-                throw new Error(response.error || "Failed to load cart")
             }
         } catch (error) {
             console.error("Error loading cart:", error)
@@ -69,8 +67,6 @@ export const useCartStore = defineStore("cart", () => {
 
                 if (response && response.success) {
                     cart.value = response.cart
-                } else {
-                    throw new Error(response.error || "Unknown error")
                 }
             } else {
                 const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
@@ -88,8 +84,6 @@ export const useCartStore = defineStore("cart", () => {
                 if (response && response.success) {
                     cart.value = response.cart
                     openCartDrawer.value = true
-                } else {
-                    throw new Error(response.error || "Unknown error")
                 }
             }
         } catch (error) {
@@ -108,8 +102,6 @@ export const useCartStore = defineStore("cart", () => {
 
             if (response?.success) {
                 cart.value = response.cart.parent
-            } else {
-                throw new Error(response.error || "Unknown error")
             }
         } catch (err) {
             console.error("Failed to remove item:", err)

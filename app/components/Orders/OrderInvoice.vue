@@ -35,7 +35,7 @@ async function downloadPdf(): Promise<void> {
     if (!invoiceRef.value) return
     if (import.meta.client) {
         const html2pdf = (await import("html2pdf.js")).default
-        html2pdf().set(pdfOptions).from(invoiceRef.value).save()
+        await html2pdf().set(pdfOptions as any).from(invoiceRef.value).save()
     }
 }
 </script>

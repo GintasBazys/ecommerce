@@ -52,13 +52,13 @@ async function handleSearch(e: Event): Promise<void> {
                 Accept: "application/json",
                 "Content-Type": "application/json"
             },
-            params: regionId ? { region_id: regionId } : {},
+            query: regionId ? { region_id: regionId } : {},
             body: {
                 q: searchQuery.value
             }
         })
 
-        searchCounter.value = response.count
+        searchCounter.value = response.products.length
         products.value = response.products
     } catch (error) {
         console.error("Error during search:", error)

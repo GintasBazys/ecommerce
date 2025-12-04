@@ -49,7 +49,7 @@ export const useProductStore = defineStore("product", () => {
     const fetchData = async (regionId?: string) => {
         try {
             const response = await $fetch<ProductResponse>("/api/products/products", {
-                params: {
+                query: {
                     limit: limit.value,
                     offset: offset.value,
                     ...(regionId ? { region_id: regionId } : {})
@@ -80,7 +80,7 @@ export const useProductStore = defineStore("product", () => {
     const fetchBestSellers = async (regionId?: string) => {
         try {
             const { products } = await $fetch<{ products: ProductDTO[] }>(`/api/categories/best-selling`, {
-                params: {
+                query: {
                     limit: limit.value,
                     offset: offset.value,
                     ...(regionId ? { region_id: regionId } : {})
