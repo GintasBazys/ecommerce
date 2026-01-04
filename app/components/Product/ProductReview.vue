@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from "vue"
-import { VSnackbar } from "vuetify/components"
 
 type Props = {
     title: string
@@ -51,23 +50,18 @@ function handleCancel(): void {
 <template>
     <VCard>
         <VCardTitle class="text-h6">Write a Review</VCardTitle>
-
         <VCardText>
             <VForm>
                 <VTextField v-model="form.title" label="Review Title" placeholder="Summarize your experience" required />
-
                 <VTextarea v-model="form.content" label="Review Content" placeholder="Share your thoughts" rows="4" required />
-
                 <div class="my-4">
                     <span class="font-medium">Rating</span>
                     <VRating v-model="form.rating" background-color="grey lighten-2" hover length="5" size="lg" />
                 </div>
-
                 <VTextField v-model="form.firstName" label="First Name" placeholder="Your first name" />
                 <VTextField v-model="form.lastName" label="Last Name" placeholder="Your last name" />
             </VForm>
         </VCardText>
-
         <VCardActions>
             <VSpacer />
             <VBtn text @click="handleCancel">Cancel</VBtn>

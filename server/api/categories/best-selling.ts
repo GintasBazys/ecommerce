@@ -17,15 +17,13 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        const data = await $fetch(`${config.public.MEDUSA_URL}/store/products`, {
+        return await $fetch(`${config.public.MEDUSA_URL}/store/products`, {
             method: "GET",
             headers: {
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY
             },
-            params
+            query: params
         })
-
-        return data
     } catch (error) {
         console.error("Error fetching products:", error)
         return { error: "Failed to fetch products" }

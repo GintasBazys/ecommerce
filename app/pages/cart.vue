@@ -47,7 +47,7 @@ const debouncedQtyUpdate = debounce((id: string, value: number, max: number) => 
 }, 300)
 
 async function removeItem(lineItemId: string): Promise<void> {
-    if (!cart.value?.id) throw new Error("No active cart found")
+    if (!cart.value?.id) {throw new Error("No active cart found")}
     try {
         await removeLineItem(lineItemId)
     } catch (err) {
@@ -57,13 +57,13 @@ async function removeItem(lineItemId: string): Promise<void> {
 
 function decrementQty(itemId: string): void {
     const current = qtyMap[itemId] ?? 0
-    if (current > 1) qtyMap[itemId] = current - 1
+    if (current > 1) {qtyMap[itemId] = current - 1}
 }
 
 function incrementQty(item: CartLineItemDTO): void {
     const current = qtyMap[item.id] ?? 0
     const max = item.stocked_quantity ?? Infinity
-    if (current < max) qtyMap[item.id] = current + 1
+    if (current < max) {qtyMap[item.id] = current + 1}
 }
 
 async function updateCount(item: CartLineItemDTO): Promise<void> {
@@ -93,7 +93,7 @@ async function updateCount(item: CartLineItemDTO): Promise<void> {
 
 const isCartLoading = ref<boolean>(true)
 onMounted(async () => {
-    if (!cart.value) await loadCart()
+    if (!cart.value) {await loadCart()}
     isCartLoading.value = false
 })
 
@@ -124,7 +124,7 @@ async function applyCoupon(): Promise<void> {
 const currencyCode = computed<string>(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
 
 async function removePromotion(promoCode: string | undefined): Promise<void> {
-    if (!cart.value?.id || !promoCode) return
+    if (!cart.value?.id || !promoCode) {return}
 
     try {
         await $fetch("/api/cart/remove-promotion", {
@@ -175,7 +175,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                         cover
                                     />
                                 </NuxtLink>
-
                                 <div class="flex-grow-1 d-flex flex-column justify-space-between">
                                     <div class="d-flex justify-space-between align-start mb-2">
                                         <div class="ms-4">
@@ -195,12 +194,10 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                             <VIcon>mdi-delete</VIcon>
                                         </VBtn>
                                     </div>
-
                                     <div class="d-flex align-center gap-2 ms-4">
                                         <VBtn icon :disabled="(qtyMap[item.id] ?? 0) <= 1" @click="decrementQty(item.id)">
                                             <VIcon>mdi-minus</VIcon>
                                         </VBtn>
-
                                         <VTextField
                                             v-model.number="qtyMap[item.id]"
                                             type="number"
@@ -213,7 +210,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                                 (val) => debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
                                             "
                                         />
-
                                         <VBtn
                                             icon
                                             :disabled="(qtyMap[item.id] ?? 0) >= (item.stocked_quantity ?? Infinity)"
@@ -222,7 +218,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                             <VIcon>mdi-plus</VIcon>
                                         </VBtn>
                                     </div>
-
                                     <div class="text-end mt-2 me-4">
                                         <strong class="text-subtitle-1">
                                             {{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1), currencyCode) }}
@@ -231,7 +226,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                 </div>
                             </VCardText>
                         </VCard>
-
                         <VBtn
                             v-if="cart?.items?.length"
                             class="mt-4"
@@ -243,10 +237,8 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                         >
                             Update Cart
                         </VBtn>
-
                         <p v-if="!cart?.items?.length" class="text-center text-grey mt-6">Your cart is empty.</p>
                     </VCol>
-
                     <VCol cols="12" lg="5">
                         <VCard class="pa-6" elevation="2">
                             <h2 class="text-h6 mb-4">Order Summary</h2>
@@ -272,7 +264,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                             </VForm>
                             <div v-if="cart?.promotions?.length" class="mb-4">
                                 <h3 class="text-subtitle-1 font-weight-medium mt-4">Applied Promotions:</h3>
-
                                 <ul>
                                     <li
                                         v-for="promo in cart?.promotions"
@@ -285,7 +276,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                                 {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
                                             </span>
                                         </span>
-
                                         <VBtn icon small variant="text" aria-label="Remove promotion" @click="removePromotion(promo.code)">
                                             <VIcon>mdi-close</VIcon>
                                         </VBtn>
@@ -293,7 +283,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                 </ul>
                             </div>
                             <VDivider class="my-4" />
-
                             <div class="d-flex justify-space-between mb-2">
                                 <span><strong>Subtotal:</strong></span>
                                 <span>{{ formatPrice(Number(cart?.subtotal || 0), currencyCode) }}</span>
@@ -304,7 +293,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                     {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
                                 </span>
                             </div>
-
                             <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/address">
                                 <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0">
                                     Checkout

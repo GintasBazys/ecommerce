@@ -11,13 +11,11 @@ export default defineEventHandler(async (event) => {
         "Content-Type": "application/json"
     }
 
-    const response = await $fetch(`${config.public.MEDUSA_URL}/store/carts/${body.cartId}/promotions`, {
+    return await $fetch(`${config.public.MEDUSA_URL}/store/carts/${body.cartId}/promotions`, {
         method: "POST",
         headers,
         body: {
             promo_codes: [body.promoCode]
         }
     })
-
-    return response
 })

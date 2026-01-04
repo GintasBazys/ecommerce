@@ -114,7 +114,6 @@ function deleteHistoryItem(index: number): void {
                 </template>
                 <p v-else-if="!isLoading && hasSearched">No results found.</p>
             </VCol>
-
             <VCol v-if="searchHistory.length" cols="12" class="mt-4">
                 <h3 class="text-h6 mb-2">Recent Searches</h3>
                 <VList dense>

@@ -26,7 +26,7 @@ const config = useRuntimeConfig()
 const router = useRouter()
 
 async function createPaymentIntent(): Promise<void> {
-    if (!stripe || !cart.value?.id || !selectedShippingOptionId.value) return
+    if (!stripe || !cart.value?.id || !selectedShippingOptionId.value) {return}
 
     isShippingLoading.value = true
 
@@ -101,7 +101,7 @@ async function loadShippingOptions(): Promise<void> {
 }
 
 async function updateShippingOption(): Promise<void> {
-    if (!cart.value?.id || !selectedShippingOptionId.value) return
+    if (!cart.value?.id || !selectedShippingOptionId.value) {return}
 
     try {
         const res = await fetch("/api/orders/shipping-methods", {
@@ -135,7 +135,7 @@ onMounted(async () => {
 watch(
     () => cart.value?.id,
     (id) => {
-        if (id) loadShippingOptions()
+        if (id) {loadShippingOptions()}
     },
     { immediate: true }
 )
@@ -143,13 +143,13 @@ watch(
 watch(
     selectedShippingOptionId,
     async (newId) => {
-        if (newId) await createPaymentIntent()
+        if (newId) {await createPaymentIntent()}
     },
     { immediate: true }
 )
 
 async function handleSubmit(): Promise<void> {
-    if (isLoading.value || !stripe || !elements || !clientSecretValue.value) return
+    if (isLoading.value || !stripe || !elements || !clientSecretValue.value) {return}
     isLoading.value = true
 
     try {

@@ -33,7 +33,7 @@ async function handleLogin(e: Event): Promise<void> {
     e.preventDefault()
 
     const { valid } = (await loginFormRef.value?.validate()) ?? { valid: false }
-    if (!valid) return
+    if (!valid) {return}
 
     const email = loginEmail.value
     const password = loginPassword.value
@@ -107,7 +107,7 @@ async function handleSocialLogin(provider: string): Promise<void> {
 }
 
 async function handleReset(): Promise<void> {
-    if (!resetEmail.value) return
+    if (!resetEmail.value) {return}
 
     try {
         errorMessage.value = null

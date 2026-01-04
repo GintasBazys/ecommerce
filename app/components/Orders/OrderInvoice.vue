@@ -32,7 +32,7 @@ const pdfOptions = {
 }
 
 async function downloadPdf(): Promise<void> {
-    if (!invoiceRef.value) return
+    if (!invoiceRef.value) {return}
     if (import.meta.client) {
         const html2pdf = (await import("html2pdf.js")).default
         await html2pdf().set(pdfOptions as any).from(invoiceRef.value).save()
@@ -46,7 +46,6 @@ async function downloadPdf(): Promise<void> {
             <VIcon left>mdi-arrow-left</VIcon>
             Back to Orders
         </VBtn>
-
         <VSkeletonLoader v-if="pending" type="card" />
         <VAlert v-else-if="error" type="error">Failed to load order.</VAlert>
         <div v-else ref="invoiceRef">
@@ -54,7 +53,6 @@ async function downloadPdf(): Promise<void> {
                 <VToolbar flat class="justify-center py-4 px-4">
                     <img src="/images/logo.svg" alt="Your Logo" style="max-height: 60px" />
                 </VToolbar>
-
                 <VCardTitle class="text-h5"> Invoice #{{ order?.display_id || order?.id }} </VCardTitle>
                 <VCardSubtitle class="mb-4">
                     {{

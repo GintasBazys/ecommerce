@@ -22,14 +22,12 @@ const panels2 = ref<number[]>([0])
                                     <strong>This is the first item's accordion body.</strong> It is shown by default...
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Accordion Item #2</VExpansionPanelTitle>
                                 <VExpansionPanelText>
                                     <strong>This is the second item's accordion body.</strong> It is hidden by default...
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Accordion Item #3</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -52,7 +50,6 @@ const panels2 = ref<number[]>([0])
                                     <strong>This is the second item's accordion body.</strong> It is hidden by default...
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Accordion Item #3</VExpansionPanelTitle>
                                 <VExpansionPanelText>

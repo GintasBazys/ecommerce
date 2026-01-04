@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce"
 
-import type { SimpleProductVariant } from "@/types/interfaces"
-import type { ProductDTO } from "@medusajs/types"
+
+import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
 import { formatPrice } from "@/utils/formatPrice"
+import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const { product } = defineProps<{
     product: ProductDTO
 }>()
 
-const { openCartDrawer } = storeToRefs(useCartStore())
+const cartStore = useCartStore()
+const { openCartDrawer, } = storeToRefs(cartStore)
+
 const loading = ref<boolean>(false)
 
-const selectedVariant = ref<SimpleProductVariant | null>(product.variants ? product.variants[0] : null)
+const selectedVariant = ref<ProductVariantDTO | null>(product.variants?.[0] ?? null)
 
 const computedPrice = computed<number | string>(() => {
     if (
@@ -42,13 +45,16 @@ const originalPrice = computed<string | null>(() => {
 })
 
 async function addToCart(): Promise<void> {
-    loading.value = true
     if (!selectedVariant.value) {
         return
     }
-    await useCartStore().updateLineItem(selectedVariant.value)
-    loading.value = false
+
+    loading.value = true
+
+    await cartStore.updateLineItem(selectedVariant.value)
+
     openCartDrawer.value = true
+    loading.value = false
 }
 
 const debouncedAddToCart = debounce(addToCart, 300)
@@ -72,25 +78,20 @@ const averageRating = computed<number | null>(() => {
                         class="mb-4 w-100"
                     />
                 </NuxtLink>
-
                 <VChip v-if="isOnSale" color="red" text-color="white" class="position-absolute top-0 right-0 ma-2" label size="small">
                     Sale
                 </VChip>
             </div>
-
             <div>
                 <NuxtLink :to="product.handle ? `${PRODUCT_URL_HANDLE}/` + product.handle : '#'">
                     <div class="text-h6 font-weight-bold mb-2">{{ product.title }}</div>
                 </NuxtLink>
-
                 <p class="truncate text-body-2 mb-2">{{ product.description }}</p>
-
                 <div v-if="averageRating" class="d-flex align-center mt-2">
                     <VIcon v-for="i in 5" :key="i" size="18" class="mr-1">
                         {{ i <= Math.round(averageRating ?? 0) ? "mdi-star" : "mdi-star-outline" }}
                     </VIcon>
                 </div>
-
                 <div class="d-flex justify-space-between align-start mt-4">
                     <div>
                         <div class="text-subtitle-1 font-weight-bold">
@@ -128,7 +129,6 @@ const averageRating = computed<number | null>(() => {
     display: block;
     display: -webkit-box;
     overflow: hidden;
-    text-overflow: -o-ellipsis-lastline;
     text-overflow: ellipsis;
     min-height: 2.5rem;
 }

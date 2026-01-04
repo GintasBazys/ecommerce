@@ -103,13 +103,11 @@ const { categories } = storeToRefs(useProductStore())
                 <VListItem>
                     <NuxtLink class="nav-link" to="/special-offers">Special offers</NuxtLink>
                 </VListItem>
-
                 <VListItem v-for="cat in categories" :key="cat.id">
                     <NuxtLink class="nav-link" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
                         {{ cat.name }}
                     </NuxtLink>
                 </VListItem>
-
                 <VListItem>
                     <NuxtLink class="nav-link" :to="BLOG_HANDLE">Blog</NuxtLink>
                 </VListItem>

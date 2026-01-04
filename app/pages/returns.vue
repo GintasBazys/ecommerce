@@ -11,7 +11,6 @@ const faqPanels = ref<number[]>([])
         <VContainer>
             <h1 class="text-h4 text-center mb-2">RETURNS</h1>
             <div class="text-center mb-8">Follow these easy steps to return your unwanted product hassle-free.</div>
-
             <VRow justify="center" class="mb-10" dense>
                 <VCol cols="12" md="8" lg="4" class="mb-4">
                     <VCard class="pa-4">
@@ -59,7 +58,6 @@ const faqPanels = ref<number[]>([])
                     arrange a replacement or full refund.
                 </p>
             </div>
-
             <h2 class="text-h6 text-center mb-4">Return policy FAQ's</h2>
             <VExpansionPanels v-model="faqPanels" multiple>
                 <VExpansionPanel>

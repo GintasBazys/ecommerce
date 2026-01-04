@@ -25,7 +25,6 @@ async function handleLogout(): Promise<void> {
             <VCol cols="12" md="6">
                 <VCard class="pa-6" elevation="2" rounded="2xl">
                     <h2 class="text-h5 font-weight-bold mb-4">Account Dashboard</h2>
-
                     <VBtn color="info" class="mb-4" variant="outlined" to="/account/profile" block> View Profile </VBtn>
                     <VBtn color="accent" class="mb-4" variant="outlined" to="/account/address" block> View Addresses </VBtn>
                     <VBtn color="secondary" class="mb-4" variant="outlined" to="/account/orders" block> View Orders </VBtn>

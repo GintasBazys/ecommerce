@@ -7,7 +7,6 @@
                     Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris
                     vel sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
                 </p>
-
                 <VRow dense class="mt-6">
                     <VCol cols="12" md="4">
                         <VCard class="d-flex flex-column align-center pa-6 h-100" flat>

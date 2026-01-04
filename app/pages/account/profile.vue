@@ -60,7 +60,6 @@ async function onSubmit(): Promise<void> {
         <VCard elevation="2" class="pa-6">
             <VCardTitle class="text-h5 mb-2">Profile Information</VCardTitle>
             <VCardSubtitle class="mb-6"> Update your personal and company details. Make sure everything is accurate. </VCardSubtitle>
-
             <VForm ref="formRef" @submit.prevent="onSubmit">
                 <VRow dense>
                     <VCol cols="12" sm="6">
@@ -86,7 +85,6 @@ async function onSubmit(): Promise<void> {
                         <VTextField v-model="customerData.company_name" label="Company Name" prepend-icon="mdi-domain" />
                     </VCol>
                 </VRow>
-
                 <VRow class="mt-6">
                     <VCol>
                         <VBtn type="submit" color="primary" elevation="2">Save Changes</VBtn>

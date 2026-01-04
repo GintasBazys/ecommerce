@@ -65,7 +65,6 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                     <VToolbar flat>
                         <VToolbarTitle>Orders</VToolbarTitle>
                     </VToolbar>
-
                     <VDataTable
                         v-model:page="page"
                         v-model:items-per-page="perPage"
@@ -83,7 +82,6 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                         <template #loading>
                             <VSkeletonLoader type="table" :loading="pending" />
                         </template>
-
                         <template #[`item.created_at`]="{ item }">
                             {{
                                 new Date(item.created_at).toLocaleDateString("en-US", {
@@ -93,11 +91,9 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                                 })
                             }}
                         </template>
-
                         <template #[`item.currency_code`]="{ item }">
                             {{ item.currency_code.toUpperCase() }}
                         </template>
-
                         <template #[`item.total`]="{ item }">
                             {{
                                 Number(item.total).toLocaleString(undefined, {
@@ -106,7 +102,6 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                                 })
                             }}
                         </template>
-
                         <template #[`item.fulfillment_status`]="{ item }">
                             <VChip small text-color="white">
                                 {{ ORDER_STATUS[item.fulfillment_status as keyof typeof ORDER_STATUS] || item.fulfillment_status }}

@@ -43,7 +43,6 @@ async function handleSubscribe(e: Event): Promise<void> {
                     Get the latest updates, articles, and exclusive content straight to your inbox.
                 </p>
             </div>
-
             <VForm @submit="handleSubscribe">
                 <VRow class="d-flex align-center" no-gutters>
                     <VCol cols="12" sm="8">
@@ -60,7 +59,6 @@ async function handleSubscribe(e: Event): Promise<void> {
                             @input="errorMessage = null"
                         />
                     </VCol>
-
                     <VCol cols="12" sm="4" class="mt-2 mt-sm-0">
                         <VBtn type="submit" color="primary" :loading="loading" size="large" class="rounded-r" block> Subscribe </VBtn>
                     </VCol>

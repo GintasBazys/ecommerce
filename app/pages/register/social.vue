@@ -31,10 +31,10 @@ async function sendCallback(): Promise<string | null> {
         const url = `${config.public.MEDUSA_URL}/auth/customer/${provider.value}/callback?${new URLSearchParams(queryParams).toString()}`
         const response = await fetch(url, { credentials: "include", method: "POST" })
 
-        if (!response.ok) console.error(`HTTP error! status: ${response.status}`)
+        if (!response.ok) {console.error(`HTTP error! status: ${response.status}`)}
 
         const data = await response.json()
-        if (!data.token) console.error("No token received from server")
+        if (!data.token) {console.error("No token received from server")}
         return data.token
     } catch (error) {
         console.error("Error during callback:", error)
@@ -158,7 +158,7 @@ const validateCallback = async () => {
 
                 await createCustomer(currentToken, email.value, firstName.value, lastName.value)
                 const newToken = await refreshToken(currentToken)
-                if (!newToken) console.error("Failed to refresh token")
+                if (!newToken) {console.error("Failed to refresh token")}
                 currentToken = newToken
             }
 

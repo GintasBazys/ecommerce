@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
                     "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
                     "Content-Type": "application/json"
                 },
-                params: {
+                query: {
                     fields: "*items"
                 }
             })

@@ -10,6 +10,29 @@ export const useCartStore = defineStore("cart", () => {
     const cart = ref<MedusaCart>()
     const openCartDrawer = ref(false)
 
+    const isUpdatingCart = ref(false)
+
+    let mutationChain: Promise<void> = Promise.resolve()
+    let activeMutations = 0
+
+    const queueCartMutation = (fn: () => Promise<void>): Promise<void> => {
+        const run = async () => {
+            activeMutations++
+            isUpdatingCart.value = true
+            try {
+                await fn()
+            } finally {
+                activeMutations--
+                if (activeMutations === 0) {
+                    isUpdatingCart.value = false
+                }
+            }
+        }
+
+        mutationChain = mutationChain.then(run, run)
+        return mutationChain
+    }
+
     const loadCart = async () => {
         try {
             const regionId = useRegionStore().regionStoreId
@@ -29,7 +52,7 @@ export const useCartStore = defineStore("cart", () => {
         }
     }
 
-    const updateLineItem = async (
+    const updateLineItem = (
         selectedVariant: {
             inventory_quantity: number
             id: string | null
@@ -38,77 +61,108 @@ export const useCartStore = defineStore("cart", () => {
         },
         quantityToAdd = 1,
         updateItem = false
-    ) => {
-        if (!cart.value || !cart.value.items) {
-            console.warn("Cart or cart items are not initialized")
-            return
-        }
-
-        if (selectedVariant.inventory_quantity <= 0) {
-            console.warn("Selected variant is out of stock")
-            return
-        }
-
-        try {
-            const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id && !item.id.startsWith("temp-"))
-
-            if (existingItem) {
-                const newQuantity = Number(!updateItem ? existingItem.quantity : 0) + quantityToAdd
-
-                const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: {
-                        quantity: newQuantity
-                    }
-                })
-
-                if (response && response.success) {
-                    cart.value = response.cart
-                }
-            } else {
-                const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: {
-                        cartId: cart.value.id,
-                        variant_id: selectedVariant.id,
-                        quantity: quantityToAdd
-                    }
-                })
-
-                if (response && response.success) {
-                    cart.value = response.cart
-                    openCartDrawer.value = true
-                }
+    ): Promise<void> => {
+        return queueCartMutation(async () => {
+            if (!cart.value || !cart.value.items) {
+                console.warn("Cart or cart items are not initialized")
+                return
             }
-        } catch (error) {
-            console.error("Failed to update line item:", error)
-        }
+
+            if (!selectedVariant.id) {
+                console.warn("Variant id is missing")
+                return
+            }
+
+            if (selectedVariant.inventory_quantity <= 0) {
+                console.warn("Selected variant is out of stock")
+                return
+            }
+
+            try {
+                const existingItem = cart.value.items.find(
+                    (item) =>
+                        item.variant_id === selectedVariant.id &&
+                        !item.id.startsWith("temp-")
+                )
+
+                if (existingItem) {
+                    const newQuantity =
+                        Number(!updateItem ? existingItem.quantity : 0) + quantityToAdd
+
+                    const response = await $fetch<CartResponseInterface>(
+                        `/api/cart/line-items/${cart.value.id}/${existingItem.id}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: {
+                                variant_id: selectedVariant.id,
+                                quantity: newQuantity,
+                            },
+                        }
+                    )
+
+                    if (response && response.success) {
+                        cart.value = response.cart
+                        openCartDrawer.value = true
+                    }
+                } else {
+                    const response = await $fetch<CartResponseInterface>(
+                        "/api/cart/line-items",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: {
+                                cartId: cart.value.id,
+                                variant_id: selectedVariant.id,
+                                quantity: quantityToAdd
+                            }
+                        }
+                    )
+
+                    if (response && response.success) {
+                        cart.value = response.cart
+                        openCartDrawer.value = true
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to update line item:", error)
+            }
+        })
     }
 
-    const removeLineItem = async (lineItemId: string) => {
-        if (!cart.value?.id) return
+    const removeLineItem = (lineItemId: string): Promise<void> => {
+        if (!cart.value?.id) return Promise.resolve()
 
-        try {
-            const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cart.value.id}/${lineItemId}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" }
-            })
+        return queueCartMutation(async () => {
+            try {
+                const response = await $fetch<CartResponseInterface>(
+                    `/api/cart/line-items/delete/${cart.value!.id}/${lineItemId}`,
+                    {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" }
+                    }
+                )
 
-            if (response?.success) {
-                cart.value = response.cart.parent
+                if (response?.success) {
+                    cart.value = response.cart.parent ?? response.cart
+                }
+            } catch (err) {
+                console.error("Failed to remove item:", err)
             }
-        } catch (err) {
-            console.error("Failed to remove item:", err)
-        }
+        })
     }
 
-    const itemCount = computed<number>(() => cart.value?.items?.reduce((total, item) => total + Number(item.quantity), 0) || 0)
+    const itemCount = computed<number>(
+        () =>
+            cart.value?.items?.reduce(
+                (total, item) => total + Number(item.quantity),
+                0
+            ) || 0
+    )
 
     return {
         updateLineItem,
@@ -116,6 +170,7 @@ export const useCartStore = defineStore("cart", () => {
         itemCount,
         cart,
         loadCart,
-        openCartDrawer
+        openCartDrawer,
+        isUpdatingCart
     }
 })

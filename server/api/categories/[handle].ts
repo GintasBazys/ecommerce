@@ -16,7 +16,7 @@ export default defineCachedEventHandler(
                 headers: {
                     "x-publishable-api-key": config.public.PUBLISHABLE_KEY
                 },
-                params: { handle }
+                query: { handle, fields: "*category_children, *products, *product_category_image" }
             }
         )
 

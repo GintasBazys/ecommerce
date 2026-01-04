@@ -2,6 +2,8 @@
 import type { OrderDTO } from "@medusajs/types"
 
 import { formatPrice } from "@/utils/formatPrice"
+import { DEFAULT_CURENCY } from "~/utils/consts"
+
 
 definePageMeta({ layout: "checkout" })
 
@@ -12,7 +14,7 @@ const orderId = route.query.orderId
 
 const { customer } = storeToRefs(useCustomerStore())
 
-if (!orderId) throw new Error("Missing orderId")
+if (!orderId) {throw new Error("Missing orderId")}
 
 const {
     data: orderRes,
@@ -43,7 +45,6 @@ const {
                             </p>
                         </VCardText>
                     </VCard>
-
                     <VCard class="mb-6">
                         <VCardTitle>Shipping Address</VCardTitle>
                         <VCardText>
@@ -55,9 +56,7 @@ const {
                                 {{ orderRes?.order?.shipping_address?.country?.display_name }}
                             </p>
                         </VCardText>
-
                         <VDivider />
-
                         <VCardTitle>Billing Address</VCardTitle>
                         <VCardText>
                             <p>
@@ -69,7 +68,6 @@ const {
                             </p>
                         </VCardText>
                     </VCard>
-
                     <VCard class="mb-6">
                         <VCardTitle>Shipping Method</VCardTitle>
                         <VCardText>
@@ -110,7 +108,6 @@ const {
                         </VCardText>
                     </VCard>
                 </VCol>
-
                 <VCol cols="12" md="4">
                     <VCard>
                         <VCardTitle>Order Summary</VCardTitle>

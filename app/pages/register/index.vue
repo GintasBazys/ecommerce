@@ -30,7 +30,7 @@ const passwordRules = [
 
 async function handleRegister(): Promise<void> {
     const result = await registerFormRef.value?.validate()
-    if (result && !result.valid) return
+    if (result && !result.valid) {return}
 
     try {
         const response = await $fetch<CustomerResponseInterface>("/api/account/register", {

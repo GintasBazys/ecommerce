@@ -122,11 +122,9 @@ function onDelete(id: string): void {
                     <AddressCard :address="addr" @edit="onEdit" @delete="onDelete" />
                 </VCol>
             </VRow>
-
             <VRow class="mt-6" justify="center">
                 <VPagination v-model="page" :length="Math.ceil(totalCount / limit)" circle rounded />
             </VRow>
-
             <VRow class="mt-4">
                 <VCol cols="12" sm="6" md="4">
                     <VCard outlined class="d-flex align-center justify-center pa-6" style="cursor: pointer" @click="showAdd = true">
@@ -135,12 +133,10 @@ function onDelete(id: string): void {
                     </VCard>
                 </VCol>
             </VRow>
-
             <VAlert v-if="error" type="error" class="mt-4">
                 {{ error }}
             </VAlert>
         </VCard>
-
         <AddressForm v-model="showAdd" title="Add Address" :address="{}" @save="createAddress" />
         <AddressForm v-model="showEdit" title="Edit Address" :address="editAddr" @save="updateAddress" />
     </VContainer>

@@ -10,15 +10,12 @@ useHead({
             <VCol cols="12" md="9">
                 <VCard flat class="pa-4">
                     <VCardTitle class="text-h4 mb-6">Privacy Policy</VCardTitle>
-
                     <VCardText>
                         <p class="mb-4">Effective date: [Date]</p>
-
                         <p>
                             This Privacy Policy describes how [Your Company Name] ("we," "our," or "us") collects, uses, and shares
                             information when you visit or make a purchase from [Website URL] (the "Site").
                         </p>
-
                         <h2 class="text-h5 mt-8 mb-2">1. Information We Collect</h2>
                         <p>We collect several types of information from and about users of our Site, including:</p>
                         <VList density="compact" class="mb-4">
@@ -33,7 +30,6 @@ useHead({
                                 <strong>Device Information:</strong> This includes browser, IP address, time zone, and cookies.
                             </VListItem>
                         </VList>
-
                         <h2 class="text-h5 mt-8 mb-2">2. How We Use Your Information</h2>
                         <p>We use the information we collect for the following purposes:</p>
                         <VList density="compact" class="mb-4">
@@ -46,7 +42,6 @@ useHead({
                             <VListItem> <strong>Marketing:</strong> With consent, we may send promotional emails and updates. </VListItem>
                             <VListItem> <strong>Legal Compliance:</strong> To fulfill legal and regulatory obligations. </VListItem>
                         </VList>
-
                         <h2 class="text-h5 mt-8 mb-2">3. Sharing Your Information</h2>
                         <p>We may share your information with third parties such as:</p>
                         <VList density="compact" class="mb-4">
@@ -56,28 +51,22 @@ useHead({
                             <VListItem> <strong>Compliance with Laws:</strong> When legally required to do so. </VListItem>
                             <VListItem> <strong>Business Transfers:</strong> In the event of mergers or acquisitions. </VListItem>
                         </VList>
-
                         <h2 class="text-h5 mt-8 mb-2">4. Data Security</h2>
                         <p>We implement reasonable safeguards, but no internet method is 100% secure. Use at your own risk.</p>
-
                         <h2 class="text-h5 mt-8 mb-2">5. Cookies</h2>
                         <p>
                             We use cookies to enhance your experience. You can disable cookies in your browser, but it may affect
                             functionality.
                         </p>
-
                         <h2 class="text-h5 mt-8 mb-2">6. Your Rights</h2>
                         <p>
                             You can access, update, or delete your data and opt out of marketing by contacting us or using unsubscribe
                             links.
                         </p>
-
                         <h2 class="text-h5 mt-8 mb-2">7. Third-Party Links</h2>
                         <p>Our Site may link to third-party sites. We are not responsible for their privacy practices.</p>
-
                         <h2 class="text-h5 mt-8 mb-2">8. Changes to This Privacy Policy</h2>
                         <p>We may revise this policy from time to time. Updates will appear here with an effective date.</p>
-
                         <h2 class="text-h5 mt-8 mb-2">9. Contact Us</h2>
                         <p>If you have questions, contact us at:</p>
                         <p><strong>Email:</strong> support@[yourcompany].com</p>

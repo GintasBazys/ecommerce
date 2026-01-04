@@ -21,8 +21,7 @@ export default eventHandler(async (event) => {
             throw new Error(`Cart completion failed: ${errorData.message}`)
         }
 
-        const result = await completeResponse.json()
-        return result
+        return await completeResponse.json()
     } catch (error) {
         console.error("Error completing cart:", error)
         throw new Error("Cart completion error.")

@@ -20,7 +20,6 @@ defineProps<{
                     cover
                 />
             </VCol>
-
             <VCol cols="12" md="9" xl="6">
                 <div>
                     <div class="text-subtitle-2 mb-2">WHO WE ARE</div>
@@ -40,7 +39,6 @@ defineProps<{
                         questions or need assistance, our friendly customer support team is here to help.
                     </p>
                     <p class="mb-0">Speak to us today to find out more.</p>
-
                     <VBtn v-if="linkShown" to="/about" variant="outlined" class="mt-4" tag="NuxtLink"> Read more </VBtn>
                 </div>
             </VCol>

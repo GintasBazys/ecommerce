@@ -7,9 +7,7 @@
                     Cosmo lacus meleifend menean diverra loremous. Nullam sit amet orci rutrum risus laoreet semper vel non magna. Mauris
                     vel sem a lectus vehicula ultricies. Etiam semper sollicitudin lectus indous scelerisque.
                 </p>
-
                 <VDivider class="my-8" />
-
                 <VRow align="center" class="flex-column-reverse flex-lg-row">
                     <VCol cols="12" lg="6" md="8">
                         <VImg
@@ -21,7 +19,6 @@
                             style="object-fit: cover"
                         />
                     </VCol>
-
                     <VCol cols="12" lg="6" class="d-flex flex-column align-center justify-center">
                         <h3 class="text-h5 mb-4">Our mission</h3>
                         <p class="text-center mb-3">

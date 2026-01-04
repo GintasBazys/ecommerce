@@ -51,15 +51,15 @@ watch(selectedVariant, () => {
 })
 
 function decrement(): void {
-    if (quantity.value > 1) quantity.value--
+    if (quantity.value > 1) {quantity.value--}
 }
 function increment(): void {
-    if (quantity.value < maxStock.value) quantity.value++
+    if (quantity.value < maxStock.value) {quantity.value++}
 }
 
 const adding = ref<boolean>(false)
 async function addToCart(): Promise<void> {
-    if (!selectedVariant.value) return
+    if (!selectedVariant.value) {return}
     adding.value = true
     try {
         await useCartStore().updateLineItem(selectedVariant.value, quantity.value)
@@ -104,10 +104,9 @@ watch(
     () => product.value?.id,
     async (id) => {
         if (id) {
-            const res = await $fetch("/api/reviews/list-reviews", {
+            reviewsData.value = await $fetch("/api/reviews/list-reviews", {
                 params: { product_id: id, limit: 10, offset: 0 }
             })
-            reviewsData.value = res
         }
     },
     { immediate: true }
@@ -127,7 +126,6 @@ watch(
                         ></ClientOnly>
                 </VCard>
             </VCol>
-
             <VCol cols="12" md="6">
                 <div class="d-flex flex-column ga-4 ml-0 ml-md-4 mt-4 mt-md-0">
                     <div>
@@ -135,7 +133,6 @@ watch(
                         <div v-if="product.subtitle" class="text-subtitle-1 text-grey mb-3">
                             {{ product.subtitle }}
                         </div>
-
                         <div v-if="product.tags.length" class="mb-4">
                             <VChip v-for="tag in product.tags" :key="tag.id" class="ma-1" color="primary" variant="tonal" size="small">{{
                                 tag.value
@@ -143,7 +140,6 @@ watch(
                         </div>
                         <p class="text-body-1">{{ product.description }}</p>
                     </div>
-
                     <div v-if="product.variants.length">
                         <h4 class="text-subtitle-2 font-weight-medium mb-2">Select Variant</h4>
                         <VBtnToggle v-model="selectedVariantId" mandatory divided>
@@ -152,7 +148,6 @@ watch(
                             }}</VBtn>
                         </VBtnToggle>
                     </div>
-
                     <div v-if="selectedVariant">
                         <p class="text-body-1">
                             <strong>Price:&nbsp;</strong>
@@ -169,7 +164,6 @@ watch(
                             </span>
                         </p>
                     </div>
-
                     <div v-if="selectedVariant && selectedVariant.inventory_quantity > 0" class="d-flex align-center ga-2">
                         <VBtn icon :disabled="quantity <= 1" @click="decrement">
                             <VIcon>mdi-minus</VIcon>
@@ -179,7 +173,6 @@ watch(
                             <VIcon>mdi-plus</VIcon>
                         </VBtn>
                     </div>
-
                     <VBtn
                         class="mt-4"
                         color="primary"

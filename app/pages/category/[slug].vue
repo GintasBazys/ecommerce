@@ -28,7 +28,7 @@ const sortOption = ref<string>(sortOptions[0]!.value)
 const hasMore = computed(() => offset.value + limit < totalCount.value)
 
 const fetchProducts = async () => {
-    if (!category.value?.handle) return
+    if (!category.value?.handle) {return}
     loadingRef.value = true
     try {
         const isPriceSort = sortOption.value.includes("variants.calculated_price")
@@ -72,11 +72,11 @@ if (data.value && "error" in data.value) {
 useHead({ title: `${category.value?.name} | Ecommerce` })
 
 const onIntersectLast = async (isIntersecting: boolean, entries: IntersectionObserverEntry[]) => {
-    if (!isIntersecting || loadingRef.value || !hasMore.value) return
+    if (!isIntersecting || loadingRef.value || !hasMore.value) {return}
 
     const entry = entries?.[0]
     const target = entry?.target as HTMLElement | undefined
-    if (!target || !target.classList.contains("js-last-item")) return
+    if (!target || !target.classList.contains("js-last-item")) {return}
 
     offset.value += limit
     await fetchProducts()
@@ -85,8 +85,15 @@ const onIntersectLast = async (isIntersecting: boolean, entries: IntersectionObs
 watch(sortOption, async () => {
     offset.value = 0
     await fetchProducts()
-    window?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior })
+    window?.scrollTo({ top: 0, behavior: "instant" })
 })
+
+//@ts-ignore
+const thumbnail = category.value?.product_category_image?.find(
+    //@ts-ignore
+    (img) => img.type === "thumbnail"
+)
+
 </script>
 
 <template>
@@ -96,8 +103,8 @@ watch(sortOption, async () => {
                 height="300"
                 class="d-flex position-relative align-center justify-center text-white py-6"
                 :style="
-                    category?.metadata?.collectionImage
-                        ? `background: url(${category.metadata.collectionImage}) center/cover no-repeat;`
+                    thumbnail
+                        ? `background: url(${thumbnail?.url}) center/cover no-repeat;`
                         : 'background-color: #4A90E2;'
                 "
             >
