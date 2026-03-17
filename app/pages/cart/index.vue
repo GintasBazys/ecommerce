@@ -3,8 +3,8 @@ import debounce from "lodash/debounce"
 
 import type { CartLineItemDTO } from "@medusajs/types"
 
-import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "@/utils/consts"
-import { formatPrice } from "@/utils/formatPrice"
+import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { formatPrice } from "~/utils/formatPrice"
 
 definePageMeta({ layout: "checkout" })
 
@@ -12,6 +12,7 @@ useHead({ title: "Cart | Ecommerce" })
 
 const { cart } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem, loadCart } = useCartStore()
+const { customer } = storeToRefs(useCustomerStore())
 
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
@@ -47,7 +48,9 @@ const debouncedQtyUpdate = debounce((id: string, value: number, max: number) => 
 }, 300)
 
 async function removeItem(lineItemId: string): Promise<void> {
-    if (!cart.value?.id) {throw new Error("No active cart found")}
+    if (!cart.value?.id) {
+        throw new Error("No active cart found")
+    }
     try {
         await removeLineItem(lineItemId)
     } catch (err) {
@@ -57,13 +60,17 @@ async function removeItem(lineItemId: string): Promise<void> {
 
 function decrementQty(itemId: string): void {
     const current = qtyMap[itemId] ?? 0
-    if (current > 1) {qtyMap[itemId] = current - 1}
+    if (current > 1) {
+        qtyMap[itemId] = current - 1
+    }
 }
 
 function incrementQty(item: CartLineItemDTO): void {
     const current = qtyMap[item.id] ?? 0
     const max = item.stocked_quantity ?? Infinity
-    if (current < max) {qtyMap[item.id] = current + 1}
+    if (current < max) {
+        qtyMap[item.id] = current + 1
+    }
 }
 
 async function updateCount(item: CartLineItemDTO): Promise<void> {
@@ -93,7 +100,9 @@ async function updateCount(item: CartLineItemDTO): Promise<void> {
 
 const isCartLoading = ref<boolean>(true)
 onMounted(async () => {
-    if (!cart.value) {await loadCart()}
+    if (!cart.value) {
+        await loadCart()
+    }
     isCartLoading.value = false
 })
 
@@ -124,7 +133,9 @@ async function applyCoupon(): Promise<void> {
 const currencyCode = computed<string>(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
 
 async function removePromotion(promoCode: string | undefined): Promise<void> {
-    if (!cart.value?.id || !promoCode) {return}
+    if (!cart.value?.id || !promoCode) {
+        return
+    }
 
     try {
         await $fetch("/api/cart/remove-promotion", {
@@ -293,7 +304,10 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                     {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
                                 </span>
                             </div>
-                            <NuxtLink :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }" to="/address">
+                            <NuxtLink
+                                :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }"
+                                :to="customer?.id ? '/address' : '/cart/customer'"
+                            >
                                 <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0">
                                     Checkout
                                 </VBtn>

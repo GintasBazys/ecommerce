@@ -4,7 +4,6 @@ import type { OrderDTO } from "@medusajs/types"
 import { formatPrice } from "@/utils/formatPrice"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
-
 definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Order Completed | Ecommerce" })
@@ -14,14 +13,17 @@ const orderId = route.query.orderId
 
 const { customer } = storeToRefs(useCustomerStore())
 
-if (!orderId) {throw new Error("Missing orderId")}
+if (!orderId) {
+    throw new Error("Missing orderId")
+}
 
 const {
     data: orderRes,
     pending,
     error
 } = await useFetch<{ order: OrderDTO }>(`/api/orders/${orderId}`, {
-    method: "GET"
+    method: "GET",
+    credentials: "include",
 })
 </script>
 

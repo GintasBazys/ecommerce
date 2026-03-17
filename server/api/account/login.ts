@@ -1,39 +1,9 @@
-type RegisterBody = {
-    email?: string
-    password?: string
-    first_name?: string
-    last_name?: string
-}
-
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
-    const body = await readBody<RegisterBody>(event)
+    const body = await readBody<{ email?: string; password?: string }>(event)
 
-    if (!body?.email || !body?.password || !body?.first_name || !body?.last_name) {
-        throw createError({ statusCode: 400, statusMessage: "Missing registration fields" })
-    }
-
-    const createRes = await fetch(`${config.public.MEDUSA_URL}/store/customers`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            cookie: getIncomingCookie(event)
-        },
-        body: JSON.stringify({
-            email: body.email,
-            password: body.password,
-            first_name: body.first_name,
-            last_name: body.last_name
-        })
-    })
-
-    if (!createRes.ok) {
-        const err = await safeJson(createRes)
-        throw createError({
-            statusCode: createRes.status,
-            statusMessage: err?.message || "Registration failed"
-        })
+    if (!body?.email || !body?.password) {
+        throw createError({ statusCode: 400, statusMessage: "Email and password are required" })
     }
 
     const tokenRes = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass`, {
@@ -46,13 +16,13 @@ export default defineEventHandler(async (event) => {
         const err = await safeJson(tokenRes)
         throw createError({
             statusCode: tokenRes.status,
-            statusMessage: err?.message || "Could not login after registration"
+            statusMessage: err?.message || "Invalid credentials"
         })
     }
 
     const tokenData = (await tokenRes.json()) as { token?: string }
     if (!tokenData.token) {
-        throw createError({ statusCode: 401, statusMessage: "Could not login after registration" })
+        throw createError({ statusCode: 401, statusMessage: "Invalid credentials" })
     }
 
     const incomingCookie = getIncomingCookie(event)

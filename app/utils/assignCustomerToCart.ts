@@ -1,22 +1,16 @@
 import type { CartDTO } from "@medusajs/types"
 
-export const assignCustomerToCart = async (cartStore: { cart: CartDTO | undefined }) => {
-    if (!cartStore.cart) {
-        console.warn("Cart is null, cannot assign customer.")
-        return
-    }
+export const assignCustomerToCart = async (cartStore: { cart: CartDTO | null }) => {
+    const cartId = cartStore.cart?.id
+    if (!cartId) return
 
-    const runtimeConfig = useRuntimeConfig()
-    fetch(`${runtimeConfig.public.MEDUSA_URL}/store/carts/${cartStore.cart.id}/customer`, {
-        credentials: "include",
+    const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {}
+
+    const { cart } = await $fetch<{ cart: CartDTO }>("/api/account/assign-customer", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
-        }
+        headers,
+        body: { cartId }
     })
-        .then((res) => res.json())
-        .then(({ cart }) => {
-            cartStore.cart = cart ?? null
-        })
+
+    cartStore.cart = cart
 }

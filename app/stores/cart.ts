@@ -79,49 +79,38 @@ export const useCartStore = defineStore("cart", () => {
             }
 
             try {
-                const existingItem = cart.value.items.find(
-                    (item) =>
-                        item.variant_id === selectedVariant.id &&
-                        !item.id.startsWith("temp-")
-                )
+                const existingItem = cart.value.items.find((item) => item.variant_id === selectedVariant.id && !item.id.startsWith("temp-"))
 
                 if (existingItem) {
-                    const newQuantity =
-                        Number(!updateItem ? existingItem.quantity : 0) + quantityToAdd
+                    const newQuantity = Number(!updateItem ? existingItem.quantity : 0) + quantityToAdd
 
-                    const response = await $fetch<CartResponseInterface>(
-                        `/api/cart/line-items/${cart.value.id}/${existingItem.id}`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: {
-                                variant_id: selectedVariant.id,
-                                quantity: newQuantity,
-                            },
+                    const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/${cart.value.id}/${existingItem.id}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: {
+                            variant_id: selectedVariant.id,
+                            quantity: newQuantity
                         }
-                    )
+                    })
 
                     if (response && response.success) {
                         cart.value = response.cart
                         openCartDrawer.value = true
                     }
                 } else {
-                    const response = await $fetch<CartResponseInterface>(
-                        "/api/cart/line-items",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: {
-                                cartId: cart.value.id,
-                                variant_id: selectedVariant.id,
-                                quantity: quantityToAdd
-                            }
+                    const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: {
+                            cartId: cart.value.id,
+                            variant_id: selectedVariant.id,
+                            quantity: quantityToAdd
                         }
-                    )
+                    })
 
                     if (response && response.success) {
                         cart.value = response.cart
@@ -139,13 +128,10 @@ export const useCartStore = defineStore("cart", () => {
 
         return queueCartMutation(async () => {
             try {
-                const response = await $fetch<CartResponseInterface>(
-                    `/api/cart/line-items/delete/${cart.value!.id}/${lineItemId}`,
-                    {
-                        method: "DELETE",
-                        headers: { "Content-Type": "application/json" }
-                    }
-                )
+                const response = await $fetch<CartResponseInterface>(`/api/cart/line-items/delete/${cart.value!.id}/${lineItemId}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" }
+                })
 
                 if (response?.success) {
                     cart.value = response.cart.parent ?? response.cart
@@ -156,13 +142,7 @@ export const useCartStore = defineStore("cart", () => {
         })
     }
 
-    const itemCount = computed<number>(
-        () =>
-            cart.value?.items?.reduce(
-                (total, item) => total + Number(item.quantity),
-                0
-            ) || 0
-    )
+    const itemCount = computed<number>(() => cart.value?.items?.reduce((total, item) => total + Number(item.quantity), 0) || 0)
 
     return {
         updateLineItem,

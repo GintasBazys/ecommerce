@@ -12,8 +12,8 @@ type Props = {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-    (e: "submit", payload: Props): void
-    (e: "close"): void
+    (_: "submit", __: Props): void
+    (___: "close"): void
 }>()
 
 const form = ref<Props>({
@@ -72,9 +72,3 @@ function handleCancel(): void {
         </VSnackbar>
     </VCard>
 </template>
-
-<style scoped>
-.v-card {
-    width: 100%;
-}
-</style>

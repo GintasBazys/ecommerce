@@ -1,11 +1,13 @@
-import { getQuery, setHeader, createError } from "h3"
-
 import type { ProductDTO } from "@medusajs/types"
 
 import { LIMIT } from "@/utils/consts"
 
 const PAGE_SIZE = 200
 const MAX_FETCH = 3000
+
+type VariantWithPrice = ProductDTO["variants"][number] & {
+    calculated_price?: Record<string, number>
+}
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
@@ -82,7 +84,9 @@ export default defineEventHandler(async (event) => {
         const missingSentinel = isDesc ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
 
         const perProductValue = (p: ProductDTO) => {
-            const nums = (p.variants ?? []).map((v) => v?.calculated_price?.[priceField]).filter((n) => typeof n === "number") as number[]
+            const nums = ((p.variants as VariantWithPrice[]) ?? [])
+                .map((v) => v?.calculated_price?.[priceField])
+                .filter((n) => typeof n === "number")
             if (!nums.length) return missingSentinel
             return agg === "max" ? Math.max(...nums) : Math.min(...nums)
         }

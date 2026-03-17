@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Address } from "@/types/interfaces"
 import type { CartDTO } from "@medusajs/types"
-import type { VForm } from "vuetify/components"
+import type { VForm } from "~/types/interfaces"
+
+useHead({ title: "Address | Ecommerce" })
 
 const { cart } = storeToRefs(useCartStore())
 const { regionCountries } = storeToRefs(useRegionStore())

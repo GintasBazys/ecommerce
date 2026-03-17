@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { OrdersResponse } from "@/types/interfaces"
-import type { DataTableHeader, DataTableSortItem } from "vuetify"
+import type { OrdersResponse, DataTableHeader, DataTableSortItem } from "@/types/interfaces"
 
 import { ORDER_STATUS } from "@/enumerators/order"
 
@@ -15,19 +14,21 @@ const runtimeConfig = useRuntimeConfig()
 
 const page = ref<number>(1)
 const perPage = ref<number>(10)
+
 const {
     data: ordersData,
-    refresh,
+    refresh: _,
     pending
 } = await useFetch<OrdersResponse>(
     () => {
         const params = new URLSearchParams({
-            page: page.value.toString(),
-            limit: perPage.value.toString()
+            page: String(page.value),
+            limit: String(perPage.value)
         })
         return `/api/orders/orders?${params.toString()}`
     },
     {
+        watch: [page, perPage],
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
@@ -36,9 +37,8 @@ const {
     }
 )
 
-watch([page, perPage], () => {
+watch(perPage, () => {
     page.value = 1
-    refresh()
 })
 
 const headers: DataTableHeader[] = [
@@ -65,19 +65,17 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                     <VToolbar flat>
                         <VToolbarTitle>Orders</VToolbarTitle>
                     </VToolbar>
-                    <VDataTable
+                    <VDataTableServer
                         v-model:page="page"
                         v-model:items-per-page="perPage"
                         v-model:sort-by="sortBy"
                         :headers="headers"
                         :items="ordersData?.orders || []"
-                        :server-items-length="ordersData?.total || 0"
+                        :items-length="ordersData?.total || 0"
                         :loading="pending"
                         item-key="id"
                         class="elevation-1"
-                        :footer-props="{
-                            'items-per-page-options': [5, 10, 20, 50]
-                        }"
+                        :items-per-page-options="[5, 10, 20, 50]"
                     >
                         <template #loading>
                             <VSkeletonLoader type="table" :loading="pending" />
@@ -112,7 +110,7 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                                 <VIcon>mdi-eye</VIcon>
                             </VBtn>
                         </template>
-                    </VDataTable>
+                    </VDataTableServer>
                 </VCard>
             </VCol>
         </VRow>

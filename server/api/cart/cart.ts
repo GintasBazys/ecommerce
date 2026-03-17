@@ -1,48 +1,62 @@
-import type { CartResponse } from "@/stores/product"
-
-export default eventHandler(async (event) => {
-    const cartId = getCookie(event, "cart_id") || null
+export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const query = getQuery(event)
 
-    try {
-        const regionId = query.region_id || null
+    const regionId = String(query.region_id || "")
+    if (!regionId) {
+        throw createError({ statusCode: 400, statusMessage: "Region ID is required" })
+    }
 
-        if (!regionId) {
-            throw createError({ statusCode: 400, statusMessage: "Region ID is required" })
-        }
+    const forceNew = query.force_new === "1"
+    const cartId = forceNew ? null : getCookie(event, "cart_id") || null
 
-        let cart
+    const cookieOptions = { path: "/", sameSite: "lax" as const, secure: process.env.NODE_ENV === "production" }
 
-        if (!cartId) {
-            const { cart: newCart } = await $fetch<CartResponse>(`${config.public.MEDUSA_URL}/store/carts`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                    "Content-Type": "application/json"
-                },
-                body: { region_id: regionId }
-            })
-            cart = newCart
-        } else {
-            const { cart: existingCart } = await $fetch<CartResponse>(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                    "Content-Type": "application/json"
-                },
-                query: {
-                    fields: "*items"
-                }
-            })
-            cart = existingCart
-        }
+    if (!cartId) {
+        const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts`, {
+            method: "POST",
+            headers: {
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+                "Content-Type": "application/json",
+                cookie: getHeader(event, "cookie") ?? ""
+            },
+            body: JSON.stringify({ region_id: regionId })
+        })
+
+        const data = await medusaRes.json()
+        const cart = data.cart ?? data
+
+        setCookie(event, "cart_id", cart.id, cookieOptions)
 
         return { cart, regionId }
-    } catch (error) {
-        console.error("Error in cart operation:", error)
-        throw error
     }
+
+    const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}?fields=*items`, {
+        method: "GET",
+        headers: {
+            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+            "Content-Type": "application/json",
+            cookie: getHeader(event, "cookie") ?? ""
+        }
+    })
+
+    if (!medusaRes.ok) {
+        setCookie(event, "cart_id", "", { ...cookieOptions, maxAge: 0 })
+        const createRes = await fetch(`${config.public.MEDUSA_URL}/store/carts`, {
+            method: "POST",
+            headers: {
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+                "Content-Type": "application/json",
+                cookie: getHeader(event, "cookie") ?? ""
+            },
+            body: JSON.stringify({ region_id: regionId })
+        })
+        const data = await createRes.json()
+        const cart = data.cart ?? data
+        setCookie(event, "cart_id", cart.id, cookieOptions)
+        return { cart, regionId }
+    }
+
+    const data = await medusaRes.json()
+    return { cart: data.cart ?? data, regionId }
 })

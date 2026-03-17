@@ -1,16 +1,10 @@
 export const createNewCart = async (cartStore: { $patch: (arg0: { cart: CartResponse | null }) => void }) => {
-    const runtimeConfig = useRuntimeConfig()
     try {
-        const cartCookieToDelete = useCookie("cart_id")
-        cartCookieToDelete.value = null
         cartStore.$patch({ cart: null })
-        const response = await fetch(`/api/cart/cart?region_id=${useRegionStore().regionStoreId}`, {
+        const response = await fetch(`/api/cart/cart?region_id=${useRegionStore().regionStoreId}&force_new=1`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
-            },
-            credentials: "omit"
+            headers: { "Content-Type": "application/json" },
+            credentials: "include"
         })
 
         if (!response.ok) {
@@ -19,9 +13,10 @@ export const createNewCart = async (cartStore: { $patch: (arg0: { cart: CartResp
         }
 
         const newCart = await response.json()
-        cartStore.$patch({ cart: newCart.cart })
-        const cartCookie = useCookie("cart_id")
-        cartCookie.value = newCart.id
+        const nextCart = newCart.cart ?? newCart
+        cartStore.$patch({ cart: nextCart })
+
+        return nextCart
     } catch (error) {
         console.error("Error initializing new cart:", error)
         return null

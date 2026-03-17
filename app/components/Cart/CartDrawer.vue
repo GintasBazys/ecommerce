@@ -47,7 +47,9 @@ const isCartDirty = computed<boolean>(() =>
 )
 
 async function removeItem(lineItemId: string): Promise<void> {
-    if (!cart.value?.id) {throw new Error("No active cart found")}
+    if (!cart.value?.id) {
+        throw new Error("No active cart found")
+    }
     try {
         await removeLineItem(lineItemId)
     } catch (err) {
@@ -57,13 +59,17 @@ async function removeItem(lineItemId: string): Promise<void> {
 
 function decrementQty(itemId: string): void {
     const q = qtyMap[itemId] ?? 1
-    if (q > 1) {qtyMap[itemId] = q - 1}
+    if (q > 1) {
+        qtyMap[itemId] = q - 1
+    }
 }
 
 function incrementQty(item: CartLineItemDTO): void {
     const q = qtyMap[item.id] ?? Number(item.quantity)
     const max = item.stocked_quantity ?? Infinity
-    if (q < max) {qtyMap[item.id] = q + 1}
+    if (q < max) {
+        qtyMap[item.id] = q + 1
+    }
 }
 
 async function updateCount(item: CartLineItemDTO): Promise<void> {
@@ -112,7 +118,7 @@ router.afterEach(() => {
 </script>
 
 <template>
-    <VNavigationDrawer v-model="openCartDrawer" location="right" temporary width="400">
+    <VNavigationDrawer v-model="openCartDrawer" location="right" touchless temporary width="400">
         <VContainer class="pa-4 d-flex flex-column fill-height flex-nowrap">
             <div class="d-flex w-100 justify-space-between align-center mb-4">
                 <div class="text-h6">My Cart</div>

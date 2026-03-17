@@ -19,9 +19,8 @@ await callOnce(async () => {
             </div>
             <ClientOnly>
                 <swiper-container
-                    class="px-2"
                     :breakpoints="{
-                        280: { slidesPerView: 1.5 },
+                        280: { slidesPerView: 1 },
                         768: { slidesPerView: 3 },
                         1024: { slidesPerView: 4 }
                     }"

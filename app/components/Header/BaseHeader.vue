@@ -97,8 +97,14 @@ const { categories } = storeToRefs(useProductStore())
                 </VRow>
             </VContainer>
         </VAppBar>
-
-        <VNavigationDrawer v-model="drawer" :style="{ paddingTop: !bannerHidden ? '32px' : '0' }" app temporary width="250">
+        <VNavigationDrawer
+            v-model="drawer"
+            :style="{ paddingTop: !bannerHidden ? '32px' : '0' }"
+            temporary
+            touchless
+            location="right"
+            width="250"
+        >
             <VList nav>
                 <VListItem>
                     <NuxtLink class="nav-link" to="/special-offers">Special offers</NuxtLink>
@@ -115,18 +121,20 @@ const { categories } = storeToRefs(useProductStore())
                     <NuxtLink class="nav-link" to="/about">About us</NuxtLink>
                 </VListItem>
                 <VListItem>
-                    <NuxtLink v-if="customer?.id" to="/account">
-                        <VBtn text>
-                            <VIcon>mdi-account</VIcon>
-                            <span class="ms-2">{{ customer.first_name }}</span>
-                        </VBtn>
-                    </NuxtLink>
-                    <NuxtLink v-else to="/signin">
-                        <VBtn text>
-                            <VIcon>mdi-account</VIcon>
-                            <span class="ms-2">Sign In</span>
-                        </VBtn>
-                    </NuxtLink>
+                    <div class="my-2">
+                        <NuxtLink v-if="customer?.id" to="/account">
+                            <VBtn text>
+                                <VIcon>mdi-account</VIcon>
+                                <span class="ms-2">{{ customer.first_name }}</span>
+                            </VBtn>
+                        </NuxtLink>
+                        <NuxtLink v-else to="/signin">
+                            <VBtn text>
+                                <VIcon>mdi-account</VIcon>
+                                <span class="ms-2">Sign In</span>
+                            </VBtn>
+                        </NuxtLink>
+                    </div>
                 </VListItem>
             </VList>
         </VNavigationDrawer>

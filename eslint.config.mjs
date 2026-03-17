@@ -58,6 +58,6 @@ export default withNuxt({
         ],
         "import/newline-after-import": "warn",
         "import/no-duplicates": "error",
-        curly: [2, "all"]
+        curly: [1, "all"]
     },
 })

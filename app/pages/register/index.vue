@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CustomerResponseInterface } from "@/types/interfaces"
-import type { VForm } from "vuetify/components"
+import type { VForm } from "~/types/interfaces"
 
 useHead({
     title: "Register | Ecommerce"
@@ -30,7 +30,9 @@ const passwordRules = [
 
 async function handleRegister(): Promise<void> {
     const result = await registerFormRef.value?.validate()
-    if (result && !result.valid) {return}
+    if (result && !result.valid) {
+        return
+    }
 
     try {
         const response = await $fetch<CustomerResponseInterface>("/api/account/register", {

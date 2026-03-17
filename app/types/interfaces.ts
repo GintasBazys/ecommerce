@@ -101,3 +101,19 @@ export interface Address extends AddressDTO {
     first_name: string
     last_name: string
 }
+
+export interface VForm {
+    validate: () => Promise<{ valid: boolean }>
+}
+
+export interface DataTableHeader {
+    title: string
+    align?: "start" | "center" | "end"
+    sortable?: boolean
+    value?: string
+}
+
+export interface DataTableSortItem {
+    key: string
+    order?: "asc" | "desc"
+}

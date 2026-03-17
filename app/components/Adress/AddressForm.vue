@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    (e: "save", payload: CustomerAddressDTO): void
+    (_: "save", __: CustomerAddressDTO): void
 }>()
 
 const local = reactive<CustomerAddressDTO>({

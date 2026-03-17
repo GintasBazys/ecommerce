@@ -4,4 +4,6 @@ useHead({
 })
 </script>
 
-<template></template>
+<template>
+    <div><h1>Special offers</h1></div>
+</template>

@@ -31,7 +31,7 @@ async function fetchPage(): Promise<void> {
             count: number
         }>("/api/account/get-addresses", {
             credentials: "include",
-            params: {
+            query: {
                 limit: limit.value,
                 offset: offset.value
             }
@@ -58,7 +58,7 @@ const editAddr = ref<Partial<CustomerAddressDTO>>({})
 
 async function createAddress(payload: Partial<CustomerAddressDTO>): Promise<void> {
     try {
-        const { id, customer_id, created_at, updated_at, ...body } = payload
+        const { id: _id, customer_id: _customer_id, created_at: _created_at, updated_at: _updated_at, ...body } = payload
         await $fetch("/api/account/create-address", {
             method: "POST",
             credentials: "include",
@@ -71,9 +71,9 @@ async function createAddress(payload: Partial<CustomerAddressDTO>): Promise<void
 }
 
 async function updateAddress(payload: CustomerAddressDTO): Promise<void> {
-    const { id, customer_id, created_at, updated_at, ...body } = payload
+    const { id: _id, customer_id: _customer_id, created_at: _created_at, updated_at: _updated_at, ...body } = payload
     try {
-        await $fetch(`/api/account/update-address/${id}`, {
+        await $fetch(`/api/account/update-address/${_id}`, {
             method: "POST",
             credentials: "include",
             body

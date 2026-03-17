@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Customer, APIError } from "@/types/interfaces"
-import type { VForm } from "vuetify/components"
+import type { VForm } from "~/types/interfaces"
 
 definePageMeta({
     layout: "account",
@@ -22,7 +22,7 @@ const rules = {
     required: (v: unknown) => !!v || "This field is required"
 }
 
-const formRef: Ref<InstanceType<typeof VForm> | null> = ref(null)
+const formRef = ref<VForm | null>(null)
 
 const snackbar = ref<boolean>(false)
 const snackbarText = ref<string>("")

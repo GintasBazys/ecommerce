@@ -16,9 +16,9 @@ export interface CartResponse {
 
 export const useProductStore = defineStore("product", () => {
     const products = ref<ProductDTO[]>([])
-    const limit = ref(LIMIT)
-    const offset = ref(0)
-    const totalCount = ref(0)
+    const limit = ref<number>(LIMIT)
+    const offset = ref<number>(0)
+    const totalCount = ref<number>(0)
     const bestSellers = ref<ProductDTO[]>([])
 
     const setProducts = (newProducts: ProductDTO[]) => {

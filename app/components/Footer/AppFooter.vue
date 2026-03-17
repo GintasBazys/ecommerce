@@ -22,7 +22,7 @@ const aboutLinks: NavLink[] = [
 
 <template>
     <VFooter class="bg-primary text-white pa-6" padless>
-        <VContainer>
+        <VContainer style="padding: 0">
             <VRow class="footer-main" dense>
                 <VCol cols="12" md="6" lg="3">
                     <VExpansionPanels v-model="expandedPanels[0]" multiple flat tile class="bg-primary text-white">

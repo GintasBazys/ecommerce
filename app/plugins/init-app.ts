@@ -1,11 +1,17 @@
 import type { CartDTO, CustomerDTO } from "@medusajs/types"
 
 export default defineNuxtPlugin(async () => {
+    if (!import.meta.server) {
+        return
+    }
+
     const config = useRuntimeConfig()
     const regionStore = useRegionStore()
     const productStore = useProductStore()
     const customerStore = useCustomerStore()
     const cartStore = useCartStore()
+
+    const requestFetch = useRequestFetch()
 
     if (!regionStore.regionStoreId) {
         await regionStore.fetchRegion()
@@ -14,7 +20,7 @@ export default defineNuxtPlugin(async () => {
     const categoriesState = useState("categories", () => [])
     if (!categoriesState.value.length) {
         try {
-            categoriesState.value = await $fetch("/api/categories/categories", {
+            categoriesState.value = await requestFetch("/api/categories/categories", {
                 credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
@@ -32,16 +38,15 @@ export default defineNuxtPlugin(async () => {
     const customerState = useState<CustomerDTO | null>("customer", () => null)
     if (customerState.value === null) {
         try {
-            const { customer } = await $fetch<{ customer: CustomerDTO | null }>("/api/account/auth", {
-                credentials: "include",
-                headers: useRequestHeaders(["cookie"])
+            const { customer } = await requestFetch<{ customer: CustomerDTO | null }>("/api/account/me", {
+                credentials: "include"
             })
             customerState.value = customer ?? null
         } catch {
             customerState.value = null
         }
     }
-    customerStore.customer = customerState.value
+    customerStore.customer = customerState.value ?? null
 
     if (regionStore.regionStoreId) {
         const cartIdCookie = useCookie<string | null>("cart_id", {
@@ -53,10 +58,10 @@ export default defineNuxtPlugin(async () => {
 
         const cartKey = `cart:${regionStore.regionStoreId}:${cartIdCookie.value ?? ""}`
 
-        const cartState = useState<CartDTO | null>(cartKey, () => null)
+        const cartState = useState<CartDTO | null | undefined>(cartKey, () => null)
         if (cartState.value === null) {
             try {
-                const { cart } = await $fetch<{ cart: CartDTO | null }>(`/api/cart/cart?region_id=${regionStore.regionStoreId}`, {
+                const { cart } = await $fetch<{ cart: CartDTO | null| undefined }>(`/api/cart/cart?region_id=${regionStore.regionStoreId}`, {
                     headers: {
                         ...useRequestHeaders(["cookie"]),
                         "Content-Type": "application/json",

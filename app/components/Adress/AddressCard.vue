@@ -5,8 +5,8 @@ type CustomerAddress = CustomerDTO["addresses"][number]
 
 const props = defineProps<{ address: CustomerAddress }>()
 const emit = defineEmits<{
-    (e: "edit", addr: CustomerAddress): void
-    (e: "delete", id: string): void
+    (_: "edit", __: CustomerAddress): void
+    (___: "delete", ____: string): void
 }>()
 
 function onEdit(): void {

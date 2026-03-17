@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-    compatibilityDate: "2025-05-04",
+    compatibilityDate: "2026-01-26",
     app: {
         layoutTransition: {
             name: "page",
@@ -29,7 +29,8 @@ export default defineNuxtConfig({
         "@nuxtjs/sitemap",
         "@unlok-co/nuxt-stripe",
         "@nuxt/content",
-        "vuetify-nuxt-module"
+        "vuetify-nuxt-module",
+        "@nuxt/test-utils/module"
     ],
     stripe: {
         server: {
@@ -42,6 +43,7 @@ export default defineNuxtConfig({
         }
     },
     runtimeConfig: {
+        medusaUrl: process.env.MEDUSA_URL,
         public: {
             MEDUSA_URL: process.env.MEDUSA_URL,
             PUBLISHABLE_KEY: process.env.PUBLISHABLE_KEY,
@@ -52,7 +54,7 @@ export default defineNuxtConfig({
             mailchimpAudienceId: process.env.MAILCHIMP_AUDIENCE_ID
         }
     },
-    plugins: ["~/plugins/init-app"],
+    plugins: ["~/plugins/init-app", "~/plugins/silktide.client.js"],
     vite: {
         optimizeDeps: {
             include: ["@stripe/stripe-js"]

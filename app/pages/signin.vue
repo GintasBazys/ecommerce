@@ -1,113 +1,62 @@
 <script setup lang="ts">
-import type { VForm } from "vuetify/components"
+import type { VForm } from "~/types/interfaces"
 
 useHead({ title: "Signin | Ecommerce" })
 definePageMeta({ layout: "account" })
 
 const router = useRouter()
-const runtimeConfig = useRuntimeConfig()
 
-const showResetDialog = ref(false)
+const showResetDialog = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
-const snackbar = ref(false)
-const snackbarText = ref("")
-const snackbarColor = ref("success")
+const snackbar = ref<boolean>(false)
+const snackbarText = ref<string>("")
+const snackbarColor = ref<string>("success")
 
-const loginFormRef = ref<InstanceType<typeof VForm> | null>(null)
-const resetFormRef = ref<InstanceType<typeof VForm> | null>(null)
+const loginFormRef = ref<VForm | null>(null)
+const resetFormRef = ref<VForm | null>(null)
 
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
 
 const resetEmail = ref<string>("")
-const emailRules: ((v: string) => boolean | string)[] = [
+const emailRules: ((_: string) => boolean | string)[] = [
     (v: string) => !!v || "E-mail is required",
     (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "E-mail must be valid"
 ]
 
-const passwordRules: ((v: string) => boolean | string)[] = [(v: string) => !!v || "Password is required"]
+const passwordRules: ((__: string) => boolean | string)[] = [(v: string) => !!v || "Password is required"]
 
-async function handleLogin(e: Event): Promise<void> {
+const auth = useCustomerAuth()
+
+async function handleLogin(e: Event) {
     e.preventDefault()
 
     const { valid } = (await loginFormRef.value?.validate()) ?? { valid: false }
-    if (!valid) {return}
+    if (!valid) {
+        return
+    }
 
-    const email = loginEmail.value
-    const password = loginPassword.value
-
-    try {
-        const { token } = await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass`, {
-            credentials: "include",
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        }).then((res) => res.json())
-
-        await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/session`, {
-            credentials: "include",
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            }
-        })
-
-        const { customer } = await fetch(`${runtimeConfig.public.MEDUSA_URL}/store/customers/me`, {
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
-            }
-        }).then((res) => res.json())
-
-        if (!customer) {
-            snackbarText.value = "Authentication failed"
-            snackbarColor.value = "error"
-            snackbar.value = true
-            return
-        }
-
-        useCustomerStore().customer = customer
-        await assignCustomerToCart(useCartStore())
-        await router.push("/")
-    } catch (error) {
-        console.error("Login failed:", error)
-        snackbarText.value = "Login failed. Please try again."
+    const customer = await auth.login(loginEmail.value, loginPassword.value, { loadCart: true })
+    if (!customer) {
+        snackbarText.value = "Login failed"
         snackbarColor.value = "error"
         snackbar.value = true
+        return
     }
+    
+    await router.push("/")
 }
 
-async function handleSocialLogin(provider: string): Promise<void> {
-    try {
-        const result = await fetch(`/api/social/${provider}`, {
-            credentials: "include",
-            method: "POST"
-        }).then((res) => res.json())
-
-        if (result.location) {
-            window.location.href = result.location
-            return
-        }
-
-        if (!result.token) {
-            snackbarText.value = "Authentication failed"
-            snackbarColor.value = "error"
-            snackbar.value = true
-        }
-    } catch (error) {
-        console.error("Social login failed:", error)
-        snackbarText.value = "An error occurred during social login"
-        snackbarColor.value = "error"
-        snackbar.value = true
-    }
+async function handleSocialLogin(provider: "google" | "facebook") {
+    await auth.startSocialLogin(provider, "/")
 }
 
 async function handleReset(): Promise<void> {
-    if (!resetEmail.value) {return}
+    if (!resetEmail.value) {
+        return
+    }
 
     try {
         errorMessage.value = null

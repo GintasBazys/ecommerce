@@ -29,7 +29,7 @@ register()
         <NuxtLayout>
             <NuxtPage />
         </NuxtLayout>
-        <AppFooter/>
+        <AppFooter />
     </VApp>
 </template>
 
@@ -46,5 +46,10 @@ register()
 html {
     font-family: "Archivo", sans-serif;
     scroll-behavior: smooth;
+}
+
+html,
+body {
+    overflow-x: hidden;
 }
 </style>
