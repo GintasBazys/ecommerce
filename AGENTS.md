@@ -1,0 +1,26 @@
+These instructions apply to the entire repository unless a deeper `AGENTS.md` overrides them.
+- App type: Nuxt application using Vue, Pinia, Vuetify, and server routes under `server/`.
+- Package manager: Prefer `pnpm` because the repo includes `pnpm-workspace.yaml`.
+- Default dev server: `pnpm run dev` on `http://localhost:3000`.
+- Keep changes focused and minimal; do not refactor unrelated code.
+- Match the existing code style and naming in the surrounding files.
+- Prefer fixing root causes over adding one-off workarounds.
+- Do not edit generated outputs such as `.nuxt/`, `.output/`, `dist/`, or `node_modules/`.
+- Treat `content/`, `public/`, `app/`, and `server/` as source directories.
+- Install dependencies: `pnpm install`
+- Start development server: `pnpm run dev`
+- Build production output: `pnpm run build`
+- Preview production build: `pnpm run preview`
+- Lint: `pnpm run lint`
+- Auto-fix lint issues: `pnpm run lint:fix`
+- Type-check: `pnpm run type-check`
+- After code changes, run the narrowest relevant validation first.
+- For frontend and shared app changes, prefer `pnpm run lint` and `pnpm run type-check`.
+- For server-side changes, run the smallest relevant validation available before broader checks.
+- If a command fails because of an existing unrelated issue, note it instead of changing unrelated code.
+- Keep `.gitignore` aligned with generated outputs and local-only artifacts.
+- Do not commit secrets or local environment files.
+- Avoid adding new dependencies unless they are necessary for the requested task.
+- Search with `rg` or `rg --files` when possible.
+- Read large files in chunks.
+- If you touch a directory with a more specific `AGENTS.md`, follow the deeper file.

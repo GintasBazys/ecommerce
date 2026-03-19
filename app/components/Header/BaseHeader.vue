@@ -1,67 +1,132 @@
 <script setup lang="ts">
-import { CATEGORY_HANDLE, BLOG_HANDLE } from "~/utils/consts"
+import debounce from "lodash/debounce"
+
+import type { SearchResponse } from "@/types/interfaces"
+import type { ProductDTO } from "@medusajs/types"
+
+import { CATEGORY_HANDLE, BLOG_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const bannerHidden = ref<boolean>(false)
 const drawer = ref<boolean>(false)
+const searchDialog = ref<boolean>(false)
+const searchQuery = ref<string>("")
+const searchLoading = ref<boolean>(false)
+const searchResults = ref<ProductDTO[]>([])
+const searchHasSearched = ref<boolean>(false)
+const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
 
 const { customer } = storeToRefs(useCustomerStore())
 const { itemCount } = storeToRefs(useCartStore())
 const { categories } = storeToRefs(useProductStore())
+const { regionStoreId } = storeToRefs(useRegionStore())
+
+const topOffset = computed<number>(() => (bannerHidden.value ? 0 : 32))
+const regionId = computed<string>(() => regionStoreId.value ?? "")
+
+const runSearch = debounce(async (value: string) => {
+    if (value.length < 2) {
+        searchResults.value = []
+        searchHasSearched.value = false
+        searchLoading.value = false
+        return
+    }
+
+    searchLoading.value = true
+    try {
+        const response = await $fetch<SearchResponse>("/api/search", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            query: regionId.value ? { region_id: regionId.value } : {},
+            body: {
+                q: value
+            }
+        })
+        searchResults.value = response.products.slice(0, 8)
+    } catch {
+        searchResults.value = []
+    } finally {
+        searchHasSearched.value = true
+        searchLoading.value = false
+    }
+}, 260)
+
+watch(searchDialog, (opened) => {
+    if (!opened) {
+        searchQuery.value = ""
+        searchLoading.value = false
+        searchHasSearched.value = false
+        searchResults.value = []
+        runSearch.cancel()
+    }
+})
+
+watch(searchQuery, (value) => {
+    const query = value.trim()
+    if (!searchDialog.value) {
+        return
+    }
+    runSearch(query)
+})
+
+function openSearchDialog(): void {
+    searchDialog.value = true
+}
+
+function closeSearchDialog(): void {
+    searchDialog.value = false
+}
 </script>
 
 <template>
-    <header>
-        <VBanner
-            v-if="!bannerHidden"
-            style="position: sticky"
-            color="white"
-            class="primary-banner justify-center"
-            density="comfortable"
-            icon="mdi-truck-fast"
-        >
-            <template #actions>
-                <VBtn height="16" icon @click="bannerHidden = true">
-                    <VIcon>mdi-close</VIcon>
+    <header class="siteHeader">
+        <div v-if="!bannerHidden" class="siteHeader__notice">
+            <div class="siteHeader__noticeInner">
+                <div class="siteHeader__noticeContent">
+                    <VIcon size="18" class="siteHeader__noticeIcon">mdi-truck-fast</VIcon>
+                    <span>Free shipping on 35 €</span>
+                </div>
+                <VBtn icon size="x-small" variant="text" class="siteHeader__noticeClose" @click="bannerHidden = true">
+                    <VIcon size="18">mdi-close</VIcon>
                 </VBtn>
-            </template>
-            Free shipping on 35 €
-        </VBanner>
+            </div>
+        </div>
+
         <VAppBar
-            style="position: sticky"
-            :style="{ top: bannerHidden ? '0px' : '32px' }"
             app
             color="white"
-            elevate-on-scroll
-            elevation="1"
+            elevation="0"
             height="64"
+            class="siteHeader__appBar"
+            :style="{ top: `${topOffset}px` }"
         >
             <VContainer>
                 <VRow align="center" justify="space-between" no-gutters class="w-100 no-wrap">
-                    <VCol class="logo-container" cols="auto">
-                        <NuxtLink class="flex-center logo-link" to="/">
+                    <VCol class="siteHeader__logoCol" cols="auto">
+                        <NuxtLink class="siteHeader__logoLink" to="/">
                             <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
                         </NuxtLink>
                     </VCol>
 
-                    <div class="hidden-md-and-down nav-links-container">
-                        <NuxtLink class="mx-2" to="/special-offers">Special offers</NuxtLink>
-                        <NuxtLink v-for="cat in categories" :key="cat.id" class="mx-2" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
+                    <nav class="hidden-md-and-down siteHeader__nav">
+                        <NuxtLink class="siteHeader__navLink" to="/special-offers">Special offers</NuxtLink>
+                        <NuxtLink v-for="cat in categories" :key="cat.id" class="siteHeader__navLink" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
                             {{ cat.name }}
                         </NuxtLink>
-                        <NuxtLink class="mx-2" :to="BLOG_HANDLE">Blog</NuxtLink>
-                        <NuxtLink class="mx-2" to="/about">About us</NuxtLink>
-                    </div>
+                        <NuxtLink class="siteHeader__navLink" :to="BLOG_HANDLE">Blog</NuxtLink>
+                        <NuxtLink class="siteHeader__navLink" to="/about">About us</NuxtLink>
+                    </nav>
 
-                    <VCol cols="auto" class="flex-center">
-                        <VToolbarItems class="flex-center">
-                            <NuxtLink to="/search">
-                                <VBtn icon>
-                                    <VIcon>mdi-magnify</VIcon>
-                                </VBtn>
-                            </NuxtLink>
+                    <VCol cols="auto" class="d-flex align-center">
+                        <VToolbarItems class="d-flex align-center">
+                            <VBtn icon class="siteHeader__iconBtn" @click="openSearchDialog">
+                                <VIcon>mdi-magnify</VIcon>
+                            </VBtn>
 
                             <NuxtLink to="/cart" class="position-relative">
-                                <VBtn icon>
+                                <VBtn icon class="siteHeader__iconBtn">
                                     <VIcon>mdi-cart</VIcon>
                                     <ClientOnly>
                                         <VBadge
@@ -70,143 +135,371 @@ const { categories } = storeToRefs(useProductStore())
                                             color="error"
                                             overlap
                                             bordered
-                                            class="cart-counter"
+                                            class="siteHeader__cartCounter"
                                         />
                                     </ClientOnly>
                                 </VBtn>
                             </NuxtLink>
 
                             <NuxtLink v-if="customer?.id" class="hidden-md-and-down" to="/account">
-                                <VBtn text>
+                                <VBtn variant="text" class="siteHeader__accountBtn">
                                     <VIcon>mdi-account</VIcon>
-                                    <span class="ms-2 truncate-text">{{ customer.first_name ?? "Profile" }}</span>
+                                    <span class="ms-2 siteHeader__truncate">{{ customer.first_name ?? "Profile" }}</span>
                                 </VBtn>
                             </NuxtLink>
                             <NuxtLink v-else class="hidden-md-and-down" to="/signin">
-                                <VBtn text>
+                                <VBtn variant="text" class="siteHeader__accountBtn">
                                     <VIcon>mdi-account</VIcon>
                                     <span class="ms-2">Sign In</span>
                                 </VBtn>
                             </NuxtLink>
                         </VToolbarItems>
 
-                        <VBtn icon class="hidden-lg-and-up" @click="drawer = !drawer">
+                        <VBtn icon class="hidden-lg-and-up siteHeader__iconBtn" @click="drawer = !drawer">
                             <VIcon>mdi-menu</VIcon>
                         </VBtn>
                     </VCol>
                 </VRow>
             </VContainer>
         </VAppBar>
+
         <VNavigationDrawer
             v-model="drawer"
-            :style="{ paddingTop: !bannerHidden ? '32px' : '0' }"
             temporary
             touchless
             location="right"
-            width="250"
+            width="260"
+            :style="{ paddingTop: `${topOffset}px` }"
         >
             <VList nav>
                 <VListItem>
-                    <NuxtLink class="nav-link" to="/special-offers">Special offers</NuxtLink>
+                    <NuxtLink class="siteHeader__drawerLink" to="/special-offers">Special offers</NuxtLink>
                 </VListItem>
                 <VListItem v-for="cat in categories" :key="cat.id">
-                    <NuxtLink class="nav-link" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
+                    <NuxtLink class="siteHeader__drawerLink" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
                         {{ cat.name }}
                     </NuxtLink>
                 </VListItem>
                 <VListItem>
-                    <NuxtLink class="nav-link" :to="BLOG_HANDLE">Blog</NuxtLink>
+                    <NuxtLink class="siteHeader__drawerLink" :to="BLOG_HANDLE">Blog</NuxtLink>
                 </VListItem>
                 <VListItem>
-                    <NuxtLink class="nav-link" to="/about">About us</NuxtLink>
+                    <NuxtLink class="siteHeader__drawerLink" to="/about">About us</NuxtLink>
                 </VListItem>
                 <VListItem>
-                    <div class="my-2">
-                        <NuxtLink v-if="customer?.id" to="/account">
-                            <VBtn text>
-                                <VIcon>mdi-account</VIcon>
-                                <span class="ms-2">{{ customer.first_name }}</span>
-                            </VBtn>
-                        </NuxtLink>
-                        <NuxtLink v-else to="/signin">
-                            <VBtn text>
-                                <VIcon>mdi-account</VIcon>
-                                <span class="ms-2">Sign In</span>
-                            </VBtn>
-                        </NuxtLink>
-                    </div>
+                    <NuxtLink v-if="customer?.id" class="siteHeader__drawerLink" to="/account">Profile</NuxtLink>
+                    <NuxtLink v-else class="siteHeader__drawerLink" to="/signin">Sign In</NuxtLink>
                 </VListItem>
             </VList>
         </VNavigationDrawer>
+
+        <VDialog v-model="searchDialog" max-width="760" scrollable>
+            <VCard class="searchWindow">
+                <div class="searchWindow__top">
+                    <h2 class="searchWindow__title">Search products</h2>
+                    <VBtn icon variant="text" @click="closeSearchDialog">
+                        <VIcon>mdi-close</VIcon>
+                    </VBtn>
+                </div>
+
+                <VTextField
+                    v-model="searchQuery"
+                    placeholder="Search by product name..."
+                    density="comfortable"
+                    variant="solo-filled"
+                    hide-details
+                    clearable
+                    prepend-inner-icon="mdi-magnify"
+                    class="searchWindow__input"
+                />
+
+                <div class="searchWindow__summary">
+                    <span v-if="normalizedSearchQuery.length < 2">Type at least 2 characters</span>
+                    <span v-else-if="searchLoading">Searching...</span>
+                    <span v-else-if="searchHasSearched">{{ searchResults.length }} result{{ searchResults.length === 1 ? "" : "s" }}</span>
+                </div>
+
+                <div class="searchWindow__results">
+                    <div v-if="searchLoading" class="searchWindow__state">
+                        <VProgressCircular indeterminate size="28" color="primary" />
+                    </div>
+
+                    <div v-else-if="searchHasSearched && !searchResults.length" class="searchWindow__state">
+                        No products found.
+                    </div>
+
+                    <NuxtLink
+                        v-for="product in searchResults"
+                        :key="product.id"
+                        :to="product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : '#'"
+                        class="searchWindow__item"
+                        @click="closeSearchDialog"
+                    >
+                        <NuxtImg
+                            :src="product.thumbnail || product.images?.[0]?.url || '/images/about_banner.webp'"
+                            :alt="product.title || 'Product image'"
+                            width="80"
+                            height="80"
+                            format="webp"
+                            class="searchWindow__thumb"
+                        />
+                        <div class="searchWindow__itemContent">
+                            <p class="searchWindow__itemTitle">{{ product.title }}</p>
+                            <p class="searchWindow__itemMeta">{{ product.subtitle || product.handle }}</p>
+                        </div>
+                        <VIcon size="18" class="searchWindow__itemArrow">mdi-chevron-right</VIcon>
+                    </NuxtLink>
+                </div>
+            </VCard>
+        </VDialog>
     </header>
 </template>
 
 <style scoped lang="scss">
-.cart-counter {
-    position: absolute;
+.siteHeader {
+    position: sticky;
     top: 0;
-    right: 10px;
-}
+    z-index: 1100;
 
-.primary-banner {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 32px;
-    background-color: #1976d2;
-    color: white;
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    padding-left: 16px;
-}
+    &__notice {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 32px;
+        background: linear-gradient(90deg, #010c80 0%, #0043c8 100%);
+        color: #ffffff;
+        z-index: 1102;
+    }
 
-:deep(.v-banner__prepend) {
-    align-self: auto;
-    width: 20px;
-    .v-avatar {
-        height: 24px;
-        width: 24px;
+    &__noticeInner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 0.75rem;
+    }
+
+    &__noticeContent {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.83rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    &__noticeClose {
+        color: #ffffff;
+    }
+
+    &__appBar {
+        border-bottom: 1px solid rgba(1, 12, 128, 0.08);
+        background: rgba(255, 255, 255, 0.92) !important;
+        backdrop-filter: blur(10px);
+    }
+
+    &__logoCol {
+        max-width: 200px;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+    &__logoLink {
+        display: flex;
+        align-items: center;
+
+        img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+    }
+
+    &__nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        gap: 0.35rem;
+    }
+
+    &__navLink {
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        color: #203255;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+            color 0.22s ease,
+            background-color 0.22s ease;
+
+        &:hover {
+            background: rgba(1, 12, 128, 0.08);
+            color: #010c80;
+        }
+    }
+
+    &__iconBtn {
+        color: #1d2f53;
+    }
+
+    &__accountBtn {
+        color: #1d2f53;
+        font-weight: 600;
+        text-transform: none;
+    }
+
+    &__cartCounter {
+        position: absolute;
+        top: 0;
+        right: 10px;
+    }
+
+    &__truncate {
+        display: inline-block;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+    }
+
+    &__drawerLink {
+        color: #23365b;
+        font-weight: 600;
+        text-decoration: none;
     }
 }
 
-.flex-center {
-    display: flex;
-    align-items: center;
+.searchWindow {
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 1.2rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    box-shadow: 0 18px 50px rgba(9, 29, 88, 0.12);
+
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.95rem 1rem 0.7rem;
+        border-bottom: 1px solid rgba(8, 23, 63, 0.06);
+    }
+
+    &__title {
+        margin: 0;
+        color: #08173f;
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    &__input {
+        padding: 0.75rem 1rem 0.35rem;
+    }
+
+    &__summary {
+        padding: 0 1rem 0.7rem;
+        color: #667694;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    &__results {
+        max-height: 420px;
+        overflow-y: auto;
+        padding: 0 1rem 1rem;
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    &__state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 120px;
+        color: #53607b;
+        font-size: 0.95rem;
+        text-align: center;
+    }
+
+    &__item {
+        display: grid;
+        grid-template-columns: 72px 1fr auto;
+        gap: 0.8rem;
+        align-items: center;
+        padding: 0.55rem 0.65rem;
+        border: 1px solid rgba(8, 23, 63, 0.08);
+        border-radius: 0.8rem;
+        background: rgba(255, 255, 255, 0.82);
+        text-decoration: none;
+        transition:
+            background-color 0.22s ease,
+            border-color 0.22s ease,
+            transform 0.22s ease;
+
+        &:hover {
+            background: rgba(1, 12, 128, 0.04);
+            border-color: rgba(1, 12, 128, 0.18);
+            transform: translateY(-1px);
+        }
+    }
+
+    &__thumb {
+        width: 72px;
+        height: 72px;
+        border-radius: 0.65rem;
+        object-fit: cover;
+    }
+
+    &__itemContent {
+        min-width: 0;
+    }
+
+    &__itemTitle {
+        margin: 0 0 0.2rem;
+        color: #08173f;
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    &__itemMeta {
+        margin: 0;
+        color: #607090;
+        font-size: 0.82rem;
+        line-height: 1.45;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    &__itemArrow {
+        color: #6c7d9d;
+    }
 }
 
-.nav-links-container {
-    text-align: center;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+@media screen and (max-width: 1024px) {
+    .siteHeader {
+        &__noticeInner {
+            padding: 0 0.55rem;
+        }
+    }
 
-.logo-container {
-    max-width: 200px;
-    flex-shrink: 1;
-    flex-grow: 1;
-}
+    .searchWindow {
+        &__item {
+            grid-template-columns: 64px 1fr auto;
+            gap: 0.65rem;
+        }
 
-.logo-link img {
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-.truncate-text {
-    display: inline-block;
-    max-width: 100px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: bottom;
-}
-
-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+        &__thumb {
+            width: 64px;
+            height: 64px;
+        }
+    }
 }
 </style>

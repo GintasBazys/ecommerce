@@ -52,4 +52,8 @@ html,
 body {
     overflow-x: hidden;
 }
+
+main {
+    padding-top: 98px;
+}
 </style>

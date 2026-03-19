@@ -87,7 +87,7 @@ async function handleReset(): Promise<void> {
 </script>
 
 <template>
-    <section class="py-10">
+    <main class="pb-10">
         <VContainer>
             <VRow justify="center">
                 <VCol cols="12" md="6">
@@ -167,5 +167,5 @@ async function handleReset(): Promise<void> {
                 {{ snackbarText }}
             </VSnackbar>
         </VContainer>
-    </section>
+    </main>
 </template>

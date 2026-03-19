@@ -58,7 +58,7 @@ async function handleRegister(): Promise<void> {
 </script>
 
 <template>
-    <section class="py-10">
+    <main class="pb-10">
         <VContainer>
             <VRow justify="center">
                 <VCol cols="12" md="6">
@@ -113,5 +113,5 @@ async function handleRegister(): Promise<void> {
                 </VCol>
             </VRow>
         </VContainer>
-    </section>
+    </main>
 </template>
