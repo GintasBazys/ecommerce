@@ -1,16 +1,18 @@
-import type { CartDTO } from "@medusajs/types"
+type CartStore = ReturnType<typeof useCartStore>
 
-export const assignCustomerToCart = async (cartStore: { cart: CartDTO | null }) => {
-    const cartId = cartStore.cart?.id
-    if (!cartId) return
+export async function assignCustomerToCart(cartStore: CartStore): Promise<void> {
+    if (!cartStore.cart?.id) {
+        return
+    }
 
-    const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {}
-
-    const { cart } = await $fetch<{ cart: CartDTO }>("/api/account/assign-customer", {
+    const response = await $fetch<{ cart: CartStore["cart"] }>("/api/cart/assign-customer", {
         method: "POST",
-        headers,
-        body: { cartId }
+        body: {
+            cart_id: cartStore.cart.id
+        }
     })
 
-    cartStore.cart = cart
+    if (response.cart) {
+        cartStore.cart = response.cart
+    }
 }

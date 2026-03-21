@@ -54,65 +54,67 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
 </script>
 
 <template>
-    <VContainer class="py-6">
-        <VBtn text to="/account" class="my-8">
-            <VIcon left>mdi-arrow-left</VIcon>
-            Back to Account Dashboard
-        </VBtn>
-        <VRow justify="center">
-            <VCol cols="12" md="10" lg="8">
-                <VCard elevation="2">
-                    <VToolbar flat>
-                        <VToolbarTitle>Orders</VToolbarTitle>
-                    </VToolbar>
-                    <VDataTableServer
-                        v-model:page="page"
-                        v-model:items-per-page="perPage"
-                        v-model:sort-by="sortBy"
-                        :headers="headers"
-                        :items="ordersData?.orders || []"
-                        :items-length="ordersData?.total || 0"
-                        :loading="pending"
-                        item-key="id"
-                        class="elevation-1"
-                        :items-per-page-options="[5, 10, 20, 50]"
-                    >
-                        <template #loading>
-                            <VSkeletonLoader type="table" :loading="pending" />
-                        </template>
-                        <template #[`item.created_at`]="{ item }">
-                            {{
-                                new Date(item.created_at).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric"
-                                })
-                            }}
-                        </template>
-                        <template #[`item.currency_code`]="{ item }">
-                            {{ item.currency_code.toUpperCase() }}
-                        </template>
-                        <template #[`item.total`]="{ item }">
-                            {{
-                                Number(item.total).toLocaleString(undefined, {
-                                    style: "currency",
-                                    currency: item.currency_code
-                                })
-                            }}
-                        </template>
-                        <template #[`item.fulfillment_status`]="{ item }">
-                            <VChip small text-color="white">
-                                {{ ORDER_STATUS[item.fulfillment_status as keyof typeof ORDER_STATUS] || item.fulfillment_status }}
-                            </VChip>
-                        </template>
-                        <template #[`item.actions`]="{ item }">
-                            <VBtn icon :to="`/account/orders/${item.id}`" aria-label="View order">
-                                <VIcon>mdi-eye</VIcon>
-                            </VBtn>
-                        </template>
-                    </VDataTableServer>
-                </VCard>
-            </VCol>
-        </VRow>
-    </VContainer>
+    <main>
+        <VContainer class="pb-6">
+            <VBtn text to="/account" class="my-8">
+                <VIcon left>mdi-arrow-left</VIcon>
+                Back to Account Dashboard
+            </VBtn>
+            <VRow justify="center">
+                <VCol cols="12" md="10" lg="8">
+                    <VCard elevation="2">
+                        <VToolbar flat>
+                            <VToolbarTitle>Orders</VToolbarTitle>
+                        </VToolbar>
+                        <VDataTableServer
+                            v-model:page="page"
+                            v-model:items-per-page="perPage"
+                            v-model:sort-by="sortBy"
+                            :headers="headers"
+                            :items="ordersData?.orders || []"
+                            :items-length="ordersData?.total || 0"
+                            :loading="pending"
+                            item-key="id"
+                            class="elevation-1"
+                            :items-per-page-options="[5, 10, 20, 50]"
+                        >
+                            <template #loading>
+                                <VSkeletonLoader type="table" :loading="pending" />
+                            </template>
+                            <template #[`item.created_at`]="{ item }">
+                                {{
+                                    new Date(item.created_at).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric"
+                                    })
+                                }}
+                            </template>
+                            <template #[`item.currency_code`]="{ item }">
+                                {{ item.currency_code.toUpperCase() }}
+                            </template>
+                            <template #[`item.total`]="{ item }">
+                                {{
+                                    Number(item.total).toLocaleString(undefined, {
+                                        style: "currency",
+                                        currency: item.currency_code
+                                    })
+                                }}
+                            </template>
+                            <template #[`item.fulfillment_status`]="{ item }">
+                                <VChip small text-color="white">
+                                    {{ ORDER_STATUS[item.fulfillment_status as keyof typeof ORDER_STATUS] || item.fulfillment_status }}
+                                </VChip>
+                            </template>
+                            <template #[`item.actions`]="{ item }">
+                                <VBtn icon :to="`/account/orders/${item.id}`" aria-label="View order">
+                                    <VIcon>mdi-eye</VIcon>
+                                </VBtn>
+                            </template>
+                        </VDataTableServer>
+                    </VCard>
+                </VCol>
+            </VRow>
+        </VContainer>
+    </main>
 </template>

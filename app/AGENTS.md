@@ -1,0 +1,16 @@
+These instructions apply within `app/` and override the repository root `AGENTS.md` when they are more specific.
+- Scope: Frontend Nuxt app code under `app/` including pages, components, composables, stores, layouts, plugins, and utilities used by the app layer.
+- Keep the frontend structure aligned with the existing codebase; extend the current patterns instead of introducing a new architectural style.
+- Prefer Nuxt and Vue conventions over custom abstractions.
+- Use TypeScript intentionally and keep types explicit where they improve safety and readability.
+- Do not use `any`. If a type is unclear, narrow it with interfaces, type aliases, generics, `unknown`, or framework-provided types.
+- Prefer lean, human-readable code over clever abstractions.
+- Keep components and composables focused; extract helpers only when they remove real duplication or complexity.
+- Prefer typed `computed`, `ref`, props, emits, and store contracts when inference is not clear.
+- In Vue files, keep script logic simple and colocated unless reuse is clear.
+- Prefer `useFetch`, `useAsyncData`, runtime config, and Nuxt utilities when they fit the existing code.
+- Avoid direct workarounds for TypeScript issues; fix the underlying types instead.
+- Reuse existing shared types and helpers before creating new ones.
+- Follow existing naming and file placement conventions in nearby frontend files.
+- For UI work, prefer minimal changes that preserve current behavior and visual consistency.
+- Validation after frontend changes: start with the narrowest relevant check, then prefer `pnpm run lint` and `pnpm run type-check` if the change touches shared or cross-cutting app code.

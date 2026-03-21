@@ -217,6 +217,11 @@ useHead({
     margin-bottom: 0.8rem;
 }
 
+:deep(.blogPost__content a) {
+    color: #010c80;
+    text-decoration: none;
+}
+
 :deep(.blogPost__content p),
 :deep(.blogPost__content li) {
     color: #42506b;

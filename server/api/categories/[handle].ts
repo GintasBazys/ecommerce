@@ -40,7 +40,7 @@ export default defineCachedEventHandler(
 
             return category
         } catch (err: any) {
-            console.error("Category fetch failed:", err?.cause?.code || err)
+            console.error("Category fetch failed:", err?.code || err)
 
             setHeader(event, "Cache-Control", "no-store")
 

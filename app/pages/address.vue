@@ -3,6 +3,9 @@ import type { Address } from "@/types/interfaces"
 import type { CartDTO } from "@medusajs/types"
 import type { VForm } from "~/types/interfaces"
 
+definePageMeta({
+    layout: "address"
+})
 useHead({ title: "Address | Ecommerce" })
 
 const { cart } = storeToRefs(useCartStore())

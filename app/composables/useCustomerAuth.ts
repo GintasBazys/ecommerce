@@ -1,3 +1,5 @@
+import type { CustomerDTO } from "@medusajs/types"
+
 type SocialProvider = "google" | "facebook"
 
 function normalizeError(e: any): string {
@@ -19,7 +21,7 @@ export function useCustomerAuth() {
         loading.value = true
         error.value = null
         try {
-            const res = await $fetch<{ success: boolean; customer: any | null }>("/api/account/me", {
+            const res = await $fetch<{ success: boolean; customer: CustomerDTO | null }>("/api/account/me", {
                 credentials: "include"
             })
             customerStore.customer = res.customer
@@ -36,7 +38,7 @@ export function useCustomerAuth() {
         loading.value = true
         error.value = null
         try {
-            const res = await $fetch<{ success: boolean; customer: any | null }>("/api/account/login", {
+            const res = await $fetch<{ success: boolean; customer: CustomerDTO | null }>("/api/account/login", {
                 method: "POST",
                 credentials: "include",
                 body: { email, password }
@@ -74,7 +76,7 @@ export function useCustomerAuth() {
         loading.value = true
         error.value = null
         try {
-            const res = await $fetch<{ success: boolean; customer: any | null }>("/api/account/register", {
+            const res = await $fetch<{ success: boolean; customer: CustomerDTO | null }>("/api/account/register", {
                 method: "POST",
                 credentials: "include",
                 body: payload

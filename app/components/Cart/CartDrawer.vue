@@ -119,7 +119,7 @@ router.afterEach(() => {
 
 <template>
     <VNavigationDrawer v-model="openCartDrawer" location="right" touchless temporary width="400">
-        <VContainer class="pa-4 d-flex flex-column fill-height flex-nowrap">
+        <VContainer class="pa-4 pt-12 d-flex flex-column fill-height flex-nowrap">
             <div class="d-flex w-100 justify-space-between align-center mb-4">
                 <div class="text-h6">My Cart</div>
                 <VBtn icon @click="openCartDrawer = false">
