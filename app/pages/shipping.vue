@@ -62,17 +62,14 @@ const faqPanels = ref<number[]>([0])
                         <p class="shippingPage__description">
                             This page covers how orders move, which payment methods we support, and what to expect from confirmation through delivery.
                         </p>
-
                         <div class="shippingPage__heroActions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/contact">Ask a question</VBtn>
-
                             <div class="shippingPage__responseCard">
                                 <span class="shippingPage__responseLabel">Order processing</span>
                                 <strong class="shippingPage__responseValue">Usually within 1-2 business days</strong>
                             </div>
                         </div>
                     </div>
-
                     <div class="shippingPage__heroCard">
                         <span class="shippingPage__heroLabel">Quick overview</span>
                         <h2 class="shippingPage__heroTitle">Trusted payment methods, clear rates, and delivery updates once an order ships.</h2>
@@ -86,7 +83,6 @@ const faqPanels = ref<number[]>([0])
                 </div>
             </VContainer>
         </div>
-
         <VContainer class="shippingPage__container">
             <div class="shippingPage__optionGrid">
                 <article v-for="option in shippingOptions" :key="option.title" class="shippingPage__optionCard">
@@ -94,7 +90,6 @@ const faqPanels = ref<number[]>([0])
                     <p class="shippingPage__optionDetail">{{ option.detail }}</p>
                 </article>
             </div>
-
             <div class="shippingPage__contentGrid">
                 <div class="shippingPage__main">
                     <section v-for="block in policyBlocks" :key="block.title" class="shippingPage__sectionCard">
@@ -102,11 +97,9 @@ const faqPanels = ref<number[]>([0])
                         <h2 class="shippingPage__sectionTitle">{{ block.title }}</h2>
                         <p class="shippingPage__sectionText">{{ block.text }}</p>
                     </section>
-
                     <section class="shippingPage__sectionCard">
                         <span class="shippingPage__sectionEyebrow">Frequently Asked</span>
                         <h2 class="shippingPage__sectionTitle">Common delivery and payment questions</h2>
-
                         <VExpansionPanels v-model="faqPanels" multiple class="shippingPage__panels">
                             <VExpansionPanel
                                 v-for="item in shippingFaq"
@@ -125,7 +118,6 @@ const faqPanels = ref<number[]>([0])
                         </VExpansionPanels>
                     </section>
                 </div>
-
                 <aside class="shippingPage__sidebar">
                     <div class="shippingPage__sidebarCard">
                         <span class="shippingPage__sidebarLabel">Need order help?</span>

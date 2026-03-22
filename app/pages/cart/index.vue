@@ -12,19 +12,30 @@ useHead({ title: "Cart | Ecommerce" })
 
 const { cart } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem, loadCart } = useCartStore()
-const { customer } = storeToRefs(useCustomerStore())
-
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
 const isApplyingCoupon = ref<boolean>(false)
+const isCartLoading = ref<boolean>(true)
 
 watch(
     cart,
     (newCart) => {
-        newCart?.items?.forEach((item: CartLineItemDTO) => {
-            if (qtyMap[item.id] === undefined) {
-                qtyMap[item.id] = Number(item.quantity)
+        const nextItemIds = new Set((newCart?.items ?? []).map((item) => item.id))
+
+        Object.keys(qtyMap).forEach((itemId) => {
+            if (!nextItemIds.has(itemId)) {
+                delete qtyMap[itemId]
             }
+        })
+
+        Object.keys(updating).forEach((itemId) => {
+            if (!nextItemIds.has(itemId)) {
+                delete updating[itemId]
+            }
+        })
+
+        newCart?.items?.forEach((item: CartLineItemDTO) => {
+            qtyMap[item.id] = Number(item.quantity)
             if (updating[item.id] === undefined) {
                 updating[item.id] = false
             }
@@ -42,6 +53,28 @@ const originalQtys = computed<Record<string, number>>(() => {
 })
 
 const isCartDirty = computed<boolean>(() => Object.entries(qtyMap).some(([id, qty]) => qty !== originalQtys.value[id]))
+const hasCartItems = computed<boolean>(() => Boolean(cart.value?.items?.length))
+const isUpdatingCart = computed<boolean>(() => Object.values(updating).some(Boolean))
+const trimmedCouponCode = computed<string>(() => couponCode.value.trim())
+const isCheckoutDisabled = computed<boolean>(() => !hasCartItems.value || isCartDirty.value || Number(cart.value?.total) <= 0)
+const isCouponDisabled = computed<boolean>(
+    () => !hasCartItems.value || isCartDirty.value || isApplyingCoupon.value || !trimmedCouponCode.value
+)
+const couponHint = computed<string>(() => {
+    if (!hasCartItems.value) {
+        return "Add an item to your cart to unlock promo codes."
+    }
+
+    if (isCartDirty.value) {
+        return "Save your cart updates before applying a code."
+    }
+
+    if (!trimmedCouponCode.value) {
+        return "Enter a promo code to apply it."
+    }
+
+    return "Promo codes apply to your current saved cart."
+})
 
 const debouncedQtyUpdate = debounce((id: string, value: number, max: number) => {
     qtyMap[id] = Math.max(1, Math.min(value, max))
@@ -98,7 +131,6 @@ async function updateCount(item: CartLineItemDTO): Promise<void> {
     }
 }
 
-const isCartLoading = ref<boolean>(true)
 onMounted(async () => {
     if (!cart.value) {
         await loadCart()
@@ -108,8 +140,7 @@ onMounted(async () => {
 
 const couponCode = ref<string>("")
 async function applyCoupon(): Promise<void> {
-    if (!cart.value?.id) {
-        console.error("Cart not found")
+    if (!cart.value?.id || isCouponDisabled.value) {
         return
     }
     isApplyingCoupon.value = true
@@ -118,7 +149,7 @@ async function applyCoupon(): Promise<void> {
             method: "POST",
             body: {
                 cartId: cart.value.id,
-                promoCode: couponCode.value
+                promoCode: trimmedCouponCode.value
             }
         })
         await loadCart()
@@ -151,6 +182,14 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
         console.error("Failed to remove promotion:", err)
     }
 }
+
+async function updateCart(): Promise<void> {
+    if (!cart.value?.items?.length || !isCartDirty.value) {
+        return
+    }
+
+    await Promise.all(cart.value.items.map((item) => updateCount(item)))
+}
 </script>
 
 <template>
@@ -161,7 +200,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                     <VProgressCircular indeterminate color="primary" size="40" />
                     <p class="cartPage__loadingText">Loading your cart...</p>
                 </div>
-
                 <template v-else>
                     <div class="cartPage__heroGrid">
                         <div class="cartPage__heroCopy">
@@ -171,24 +209,20 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                 Fine-tune quantities, remove anything that no longer fits, and keep your order feeling as considered as the
                                 rest of the shop.
                             </p>
-
                             <div class="cartPage__heroActions">
                                 <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/"> Continue shopping </VBtn>
-
                                 <div class="cartPage__statCard">
                                     <span class="cartPage__statLabel">Current total</span>
                                     <strong class="cartPage__statValue">{{ formatPrice(Number(cart?.total || 0), currencyCode) }}</strong>
                                 </div>
                             </div>
                         </div>
-
                         <div class="cartPage__heroPanel">
                             <span class="cartPage__panelLabel">Checkout notes</span>
                             <h2 class="cartPage__panelTitle">Everything stays editable until the final step.</h2>
                             <p class="cartPage__panelText">
                                 Confirm quantities here, apply a promotion if you have one, and continue when your basket looks right.
                             </p>
-
                             <ul class="cartPage__promiseList">
                                 <li class="cartPage__promiseItem">
                                     <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
@@ -205,7 +239,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                             </ul>
                         </div>
                     </div>
-
                     <div class="cartPage__contentGrid">
                         <div class="cartPage__itemsPanel">
                             <div v-if="cart?.items?.length" class="cartPage__itemList">
@@ -220,7 +253,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                             cover
                                         />
                                     </NuxtLink>
-
                                     <div class="cartPage__itemBody">
                                         <div class="cartPage__itemTop">
                                             <div>
@@ -231,7 +263,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                                 <p class="cartPage__itemMeta">Option: {{ item.variant_title || "Standard option" }}</p>
                                                 <p class="cartPage__itemMeta">Code: {{ item.variant_sku ?? "N/A" }}</p>
                                             </div>
-
                                             <VBtn
                                                 icon
                                                 variant="text"
@@ -242,7 +273,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                                 <VIcon>mdi-delete-outline</VIcon>
                                             </VBtn>
                                         </div>
-
                                         <div class="cartPage__itemFooter">
                                             <div class="cartPage__qtySection">
                                                 <span class="cartPage__qtyLabel">Quantity</span>
@@ -279,7 +309,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                                     </VBtn>
                                                 </div>
                                             </div>
-
                                             <div class="cartPage__priceBlock">
                                                 <span class="cartPage__priceLabel">Line total</span>
                                                 <strong class="cartPage__priceValue">
@@ -294,20 +323,18 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                         </div>
                                     </div>
                                 </article>
-
                                 <VBtn
                                     color="primary"
                                     rounded="pill"
                                     class="cartPage__updateBtn text-none"
                                     block
-                                    :loading="Object.values(updating).some(Boolean)"
-                                    :disabled="!isCartDirty || Object.values(updating).some(Boolean)"
-                                    @click="cart?.items?.forEach((item) => updateCount(item))"
+                                    :loading="isUpdatingCart"
+                                    :disabled="!isCartDirty || isUpdatingCart"
+                                    @click="updateCart"
                                 >
                                     Update cart
                                 </VBtn>
                             </div>
-
                             <div v-else class="cartPage__emptyState">
                                 <div class="cartPage__emptyIcon">
                                     <VIcon size="26">mdi-cart-outline</VIcon>
@@ -319,7 +346,6 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                 <VBtn color="primary" rounded="pill" class="text-none px-6" to="/">Browse products</VBtn>
                             </div>
                         </div>
-
                         <aside class="cartPage__summaryColumn">
                             <div class="cartPage__summaryCard">
                                 <span class="cartPage__sectionEyebrow">Order summary</span>
@@ -336,10 +362,11 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                         prepend-inner-icon="mdi-ticket-percent"
                                         variant="outlined"
                                         hide-details
+                                        :disabled="!hasCartItems || isCartDirty"
                                     />
                                     <VBtn
                                         :loading="isApplyingCoupon"
-                                        :disabled="isApplyingCoupon"
+                                        :disabled="isCouponDisabled"
                                         color="primary"
                                         rounded="pill"
                                         class="text-none"
@@ -349,7 +376,7 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                         Apply code
                                     </VBtn>
                                 </VForm>
-
+                                <p class="cartPage__couponHint">{{ couponHint }}</p>
                                 <div v-if="cart?.promotions?.length" class="cartPage__promoList">
                                     <h3 class="cartPage__promoHeading">Applied promotions</h3>
                                     <div v-for="promo in cart?.promotions" :key="promo.id" class="cartPage__promoItem">
@@ -370,9 +397,7 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                         </VBtn>
                                     </div>
                                 </div>
-
                                 <VDivider class="my-5" />
-
                                 <div class="cartPage__totals">
                                     <div class="cartPage__totalRow">
                                         <span class="cartPage__totalLabel">Subtotal</span>
@@ -387,23 +412,17 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
                                         }}</strong>
                                     </div>
                                 </div>
-
                                 <p class="cartPage__summaryNote">Shipping and taxes are calculated during the next step.</p>
-
-                                <NuxtLink
-                                    :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }"
-                                    :to="customer?.id ? '/address' : '/cart/customer'"
+                                <VBtn
+                                    color="primary"
+                                    rounded="pill"
+                                    class="text-none"
+                                    block
+                                    :disabled="isCheckoutDisabled"
+                                    :to="isCheckoutDisabled ? undefined : '/checkout'"
                                 >
-                                    <VBtn
-                                        color="primary"
-                                        rounded="pill"
-                                        class="text-none"
-                                        block
-                                        :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0"
-                                    >
-                                        Checkout
-                                    </VBtn>
-                                </NuxtLink>
+                                    Checkout
+                                </VBtn>
                             </div>
                         </aside>
                     </div>
@@ -696,6 +715,13 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
     display: grid;
     gap: 0.9rem;
     margin-top: 1.25rem;
+}
+
+.cartPage__couponHint {
+    margin: 0.75rem 0 0;
+    color: rgba(8, 23, 63, 0.72);
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .cartPage__promoHeading {

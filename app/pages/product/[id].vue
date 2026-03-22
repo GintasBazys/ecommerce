@@ -234,7 +234,6 @@ watch(
                     <div class="productPage__galleryShell">
                         <div class="productPage__galleryCard">
                             <div v-if="isOnSale" class="productPage__saleBadge">Sale</div>
-
                             <div class="productPage__mainImageWrap">
                                 <VImg
                                     :src="activeImage?.url || product.thumbnail || '/images/placeholder.png'"
@@ -243,7 +242,6 @@ watch(
                                     cover
                                 />
                             </div>
-
                             <div v-if="productImages.length > 1" class="productPage__thumbGrid">
                                 <button
                                     v-for="(image, index) in productImages"
@@ -263,7 +261,6 @@ watch(
                             </div>
                         </div>
                     </div>
-
                     <div class="productPage__content">
                         <div class="productPage__introCard">
                             <div class="productPage__introTop">
@@ -275,17 +272,14 @@ watch(
                                     <span>{{ reviewAverage }} / 5</span>
                                 </div>
                             </div>
-
                             <h1 class="productPage__title">{{ product.title }}</h1>
                             <p v-if="product.subtitle" class="productPage__subtitle">{{ product.subtitle }}</p>
                             <p class="productPage__description">{{ product.description || "A refined product pick designed to feel premium, practical, and easy to wear every day." }}</p>
-
                             <div v-if="product.tags.length" class="productPage__tagRow">
                                 <VChip v-for="tag in product.tags" :key="tag.id" class="productPage__tag" size="small" label>
                                     {{ tag.value }}
                                 </VChip>
                             </div>
-
                             <div v-if="selectedVariant" class="productPage__priceBlock">
                                 <div class="productPage__priceRow">
                                     <span class="productPage__price">{{ salePrice }}</span>
@@ -299,14 +293,12 @@ watch(
                                 </p>
                             </div>
                         </div>
-
                         <div class="productPage__purchaseCard">
                             <div v-if="product.variants.length" class="productPage__variantBlock">
                                 <div class="productPage__labelRow">
                                     <span class="productPage__label">Select option</span>
                                     <span class="productPage__labelValue">{{ selectedVariant?.title || "Choose a variant" }}</span>
                                 </div>
-
                                 <VBtnToggle v-model="selectedVariantId" mandatory divided class="productPage__variantToggle">
                                     <VBtn
                                         v-for="variant in product.variants"
@@ -320,14 +312,12 @@ watch(
                                     </VBtn>
                                 </VBtnToggle>
                             </div>
-
                             <div class="productPage__factsGrid">
                                 <div v-for="fact in productFacts" :key="fact.label" class="productPage__factCard">
                                     <span class="productPage__factLabel">{{ fact.label }}</span>
                                     <strong class="productPage__factValue">{{ fact.value }}</strong>
                                 </div>
                             </div>
-
                             <div v-if="selectedVariant && inStock" class="productPage__ctaRow">
                                 <div class="productPage__qtyBlock">
                                     <span class="productPage__label">Quantity</span>
@@ -341,7 +331,6 @@ watch(
                                         </VBtn>
                                     </div>
                                 </div>
-
                                 <VBtn
                                     color="primary"
                                     rounded="pill"
@@ -353,11 +342,9 @@ watch(
                                     Add to cart
                                 </VBtn>
                             </div>
-
                             <div v-else class="productPage__outOfStockCard">
                                 This variant is currently unavailable. Try another option or browse related products below.
                             </div>
-
                             <div class="productPage__serviceGrid">
                                 <div class="productPage__serviceItem">
                                     <VIcon size="18" color="primary">mdi-truck-fast-outline</VIcon>
@@ -375,12 +362,10 @@ watch(
                         </div>
                     </div>
                 </div>
-
                 <div class="productPage__detailsGrid">
                     <div class="productPage__detailsCard">
                         <span class="productPage__sectionEyebrow">Product details</span>
                         <h2 class="productPage__sectionTitle">More context before you commit.</h2>
-
                         <VExpansionPanels v-model="panel" multiple variant="accordion" class="productPage__accordion">
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Description</VExpansionPanelTitle>
@@ -409,14 +394,12 @@ watch(
                             </VExpansionPanel>
                         </VExpansionPanels>
                     </div>
-
                     <div class="productPage__reviewsCard">
                         <div class="productPage__reviewsHeader">
                             <div>
                                 <span class="productPage__sectionEyebrow">Customer feedback</span>
                                 <h2 class="productPage__sectionTitle">What shoppers are saying.</h2>
                             </div>
-
                             <VBtn
                                 v-if="customer"
                                 color="primary"
@@ -428,11 +411,9 @@ watch(
                                 Write a review
                             </VBtn>
                         </div>
-
                         <ProductReviews :reviews="reviews" />
                     </div>
                 </div>
-
                 <section v-if="relatedProducts.length" class="productPage__related">
                     <div class="productPage__relatedIntro">
                         <span class="productPage__sectionEyebrow">Related products</span>
@@ -441,14 +422,12 @@ watch(
                             Picked from the same category so the next suggestion still feels aligned with what you are viewing now.
                         </p>
                     </div>
-
                     <VRow class="productPage__relatedGrid" align="stretch">
                         <VCol v-for="relatedProduct in relatedProducts" :key="relatedProduct.id" cols="12" sm="6" lg="3">
                             <ProductCard :product="relatedProduct" />
                         </VCol>
                     </VRow>
                 </section>
-
                 <VDialog v-if="customer" v-model="showReviewForm" max-width="600">
                     <ProductReview
                         :title="''"

@@ -8,28 +8,28 @@ definePageMeta({
     layout: "account",
     middleware: ["auth"]
 })
+
 useHead({ title: "Addresses | Ecommerce" })
 
 const LIMIT = 3
-const page = ref<number>(1)
-const limit = ref<number>(LIMIT)
-const offset = computed<number>(() => (page.value - 1) * limit.value)
+const page = ref(1)
+const limit = ref(LIMIT)
+const offset = computed(() => (page.value - 1) * limit.value)
 
-const loading = ref<boolean>(false)
-
+const loading = ref(false)
 const addresses = ref<CustomerAddressDTO[]>([])
-const totalCount = ref<number>(0)
+const totalCount = ref(0)
 const error = ref<string | null>(null)
+const showAdd = ref(false)
+const showEdit = ref(false)
+const editAddr = ref<Partial<CustomerAddressDTO>>({})
 
 async function fetchPage(): Promise<void> {
     loading.value = true
     error.value = null
+
     try {
-        await nextTick()
-        const res = await $fetch<{
-            addresses: CustomerAddressDTO[]
-            count: number
-        }>("/api/account/get-addresses", {
+        const response = await $fetch<{ addresses: CustomerAddressDTO[]; count: number }>("/api/account/get-addresses", {
             credentials: "include",
             query: {
                 limit: limit.value,
@@ -37,33 +37,23 @@ async function fetchPage(): Promise<void> {
             }
         })
 
-        addresses.value = res.addresses
-        totalCount.value = res.count
-    } catch (e) {
-        console.error(e)
+        addresses.value = response.addresses
+        totalCount.value = response.count
+    } catch (fetchError) {
+        console.error(fetchError)
         error.value = "Could not load addresses."
     } finally {
         loading.value = false
     }
 }
-onMounted(() => {
-    fetchPage()
-})
 
-watch(page, fetchPage, { immediate: false })
-
-const showAdd = ref<boolean>(false)
-const showEdit = ref<boolean>(false)
-const editAddr = ref<Partial<CustomerAddressDTO>>({})
+onMounted(fetchPage)
+watch(page, fetchPage)
 
 async function createAddress(payload: Partial<CustomerAddressDTO>): Promise<void> {
     try {
-        const { id: _id, customer_id: _customer_id, created_at: _created_at, updated_at: _updated_at, ...body } = payload
-        await $fetch("/api/account/create-address", {
-            method: "POST",
-            credentials: "include",
-            body
-        })
+        const { id: _id, customer_id: _customerId, created_at: _createdAt, updated_at: _updatedAt, ...body } = payload
+        await $fetch("/api/account/create-address", { method: "POST", credentials: "include", body })
         await fetchPage()
     } catch {
         error.value = "Could not create address."
@@ -71,13 +61,10 @@ async function createAddress(payload: Partial<CustomerAddressDTO>): Promise<void
 }
 
 async function updateAddress(payload: CustomerAddressDTO): Promise<void> {
-    const { id: _id, customer_id: _customer_id, created_at: _created_at, updated_at: _updated_at, ...body } = payload
+    const { id, customer_id: _customerId, created_at: _createdAt, updated_at: _updatedAt, ...body } = payload
+
     try {
-        await $fetch(`/api/account/update-address/${_id}`, {
-            method: "POST",
-            credentials: "include",
-            body
-        })
+        await $fetch(`/api/account/update-address/${id}`, { method: "POST", credentials: "include", body })
         await fetchPage()
     } catch {
         error.value = "Could not update address."
@@ -86,60 +73,135 @@ async function updateAddress(payload: CustomerAddressDTO): Promise<void> {
 
 async function deleteAddress(id: string): Promise<void> {
     try {
-        await $fetch(`/api/account/delete-address/${id}`, {
-            method: "DELETE",
-            credentials: "include"
-        })
+        await $fetch(`/api/account/delete-address/${id}`, { method: "DELETE", credentials: "include" })
         await fetchPage()
     } catch {
         error.value = "Could not delete address."
     }
 }
 
-function onEdit(addr: CustomerAddressDTO): void {
-    editAddr.value = { ...addr }
+function onEdit(address: CustomerAddressDTO): void {
+    editAddr.value = { ...address }
     showEdit.value = true
-}
-
-function onDelete(id: string): void {
-    deleteAddress(id)
 }
 </script>
 
 <template>
-    <main>
-        <VContainer class="pb-10">
-            <VBtn text to="/account" class="my-8">
-                <VIcon left>mdi-arrow-left</VIcon>
-                Back to Account Dashboard
-            </VBtn>
-            <VCard elevation="2" class="pa-6 mb-6">
-                <VCardTitle class="text-h5 mb-2">Your Addresses</VCardTitle>
-                <VRow v-if="loading" justify="center" class="my-6">
-                    <VProgressCircular indeterminate color="primary" size="48" />
-                </VRow>
-                <VRow v-if="!loading">
-                    <VCol v-for="addr in addresses" :key="addr.id" cols="12" sm="6" md="4">
-                        <AddressCard :address="addr" @edit="onEdit" @delete="onDelete" />
+    <div class="accountAddressesContent">
+        <div class="accountAddressesContent__toolbar">
+            <div class="accountAddressesContent__statCard">
+                <span class="accountAddressesContent__statLabel">Saved entries</span>
+                <strong class="accountAddressesContent__statValue">{{ totalCount }}</strong>
+            </div>
+
+            <VBtn color="primary" rounded="pill" class="text-none px-7" @click="showAdd = true">Add new address</VBtn>
+        </div>
+        <section class="accountAddressesContent__panel">
+            <VRow v-if="loading" justify="center" class="my-6">
+                <VProgressCircular indeterminate color="primary" size="48" />
+            </VRow>
+            <template v-else>
+                <VRow v-if="addresses.length" align="stretch">
+                    <VCol v-for="address in addresses" :key="address.id" cols="12" sm="6" xl="4">
+                        <AddressCard :address="address" @edit="onEdit" @delete="deleteAddress" />
                     </VCol>
                 </VRow>
-                <VRow class="mt-6" justify="center">
-                    <VPagination v-model="page" :length="Math.ceil(totalCount / limit)" circle rounded />
-                </VRow>
-                <VRow class="mt-4">
-                    <VCol cols="12" sm="6" md="4">
-                        <VCard outlined class="d-flex align-center justify-center pa-6" style="cursor: pointer" @click="showAdd = true">
-                            <VIcon size="32">mdi-plus</VIcon>
-                            <span class="ml-2 font-weight-medium"> Add New Address </span>
-                        </VCard>
-                    </VCol>
-                </VRow>
-                <VAlert v-if="error" type="error" class="mt-4">
-                    {{ error }}
-                </VAlert>
-            </VCard>
-            <AddressForm v-model="showAdd" title="Add Address" :address="{}" @save="createAddress" />
-            <AddressForm v-model="showEdit" title="Edit Address" :address="editAddr" @save="updateAddress" />
-        </VContainer>
-    </main>
+                <div v-else class="accountAddressesContent__emptyState">
+                    <div class="accountAddressesContent__emptyIcon">
+                        <VIcon size="26">mdi-map-marker-outline</VIcon>
+                    </div>
+                    <h2 class="accountAddressesContent__emptyTitle">No addresses saved yet</h2>
+                    <p class="accountAddressesContent__emptyText">Add your first address to make future checkout steps faster.</p>
+                </div>
+            </template>
+            <VRow v-if="totalCount > limit" class="mt-6" justify="center">
+                <VPagination v-model="page" :length="Math.ceil(totalCount / limit)" circle rounded />
+            </VRow>
+            <VAlert v-if="error" type="error" variant="tonal" class="mt-4">
+                {{ error }}
+            </VAlert>
+        </section>
+        <AddressForm v-model="showAdd" title="Add address" :address="{}" @save="createAddress" />
+        <AddressForm v-model="showEdit" title="Edit address" :address="editAddr" @save="updateAddress" />
+    </div>
 </template>
+
+<style scoped lang="scss">
+.accountAddressesContent {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.accountAddressesContent__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.accountAddressesContent__statCard,
+.accountAddressesContent__panel,
+.accountAddressesContent__emptyState {
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 1.4rem;
+    background: rgba(247, 250, 255, 0.92);
+}
+
+.accountAddressesContent__statCard {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem 1.1rem;
+}
+
+.accountAddressesContent__statLabel,
+.accountAddressesContent__emptyText {
+    color: #4b5874;
+}
+
+.accountAddressesContent__statLabel {
+    font-size: 0.88rem;
+}
+
+.accountAddressesContent__statValue,
+.accountAddressesContent__emptyTitle {
+    color: #08173f;
+}
+
+.accountAddressesContent__panel,
+.accountAddressesContent__emptyState {
+    padding: 1.35rem;
+}
+
+.accountAddressesContent__emptyState {
+    display: grid;
+    justify-items: start;
+    gap: 0.85rem;
+}
+
+.accountAddressesContent__emptyIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.15rem;
+    height: 3.15rem;
+    border-radius: 1rem;
+    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
+    color: #010c80;
+}
+
+.accountAddressesContent__emptyTitle {
+    margin: 0;
+}
+
+.accountAddressesContent__emptyText {
+    margin: 0;
+    line-height: 1.7;
+}
+
+@media screen and (max-width: 700px) {
+    .accountAddressesContent__toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>

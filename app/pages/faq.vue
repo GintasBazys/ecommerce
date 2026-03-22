@@ -82,7 +82,6 @@ useHead({
                             is ready for follow-up.
                         </p>
                     </div>
-
                     <div class="faqPage__heroCard">
                         <span class="faqPage__heroLabel">Fast paths</span>
                         <h2 class="faqPage__heroTitle">Most requests fit into three quick support tracks.</h2>
@@ -96,7 +95,6 @@ useHead({
                 </div>
             </VContainer>
         </div>
-
         <VContainer class="faqPage__container">
             <div class="faqPage__contentGrid">
                 <div class="faqPage__sections">
@@ -125,7 +123,6 @@ useHead({
                         </VExpansionPanels>
                     </article>
                 </div>
-
                 <aside class="faqPage__sidebar">
                     <div class="faqPage__contactCard">
                         <span class="faqPage__sidebarLabel">Still need help?</span>

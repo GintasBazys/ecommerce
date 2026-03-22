@@ -16,6 +16,8 @@ type FacetItem = {
     count: number
 }
 
+type PriceRange = [number, number]
+
 type CategoryProduct = ProductDTO & {
     collection?: { id: string; title?: string } | null
     type?: { id: string; value?: string } | null
@@ -42,6 +44,7 @@ type CategoryProductsResponse = {
 const { regionStoreId } = storeToRefs(useRegionStore())
 
 const route = useRoute()
+const disablePanelTransitions = ref(false)
 const category = ref<ProductCategoryDTO | null>(null)
 const products = ref<CategoryProduct[]>([])
 const offset = ref(0)
@@ -77,8 +80,8 @@ const selectedCollectionIds = ref<string[]>([])
 const selectedTypeIds = ref<string[]>([])
 const selectedTagIds = ref<string[]>([])
 const inStockOnly = ref(false)
-const priceRange = ref<number[]>([0, 0])
-const appliedPriceRange = ref<number[]>([0, 0])
+const priceRange = ref<PriceRange>([0, 0])
+const appliedPriceRange = ref<PriceRange>([0, 0])
 const initialPriceRangeApplied = ref(false)
 
 const hasMore = computed(() => offset.value + limit < totalCount.value)
@@ -139,13 +142,17 @@ const priceStep = computed(() => {
 
 const gridIsInitialLoading = computed(() => loadingRef.value && products.value.length === 0)
 
+function createPriceRange(min: number, max: number): PriceRange {
+    return [min, max]
+}
+
 function syncPriceRange(force = false) {
     const nextMin = facets.value.price.min
     const nextMax = facets.value.price.max
 
     if (!initialPriceRangeApplied.value || force) {
-        priceRange.value = [nextMin, nextMax]
-        appliedPriceRange.value = [nextMin, nextMax]
+        priceRange.value = createPriceRange(nextMin, nextMax)
+        appliedPriceRange.value = createPriceRange(nextMin, nextMax)
         initialPriceRangeApplied.value = true
     }
 }
@@ -213,17 +220,17 @@ function clearAllFilters() {
     selectedTypeIds.value = []
     selectedTagIds.value = []
     inStockOnly.value = false
-    priceRange.value = [facets.value.price.min, facets.value.price.max]
-    appliedPriceRange.value = [facets.value.price.min, facets.value.price.max]
+    priceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
+    appliedPriceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
 }
 
 function resetPriceRange() {
-    priceRange.value = [facets.value.price.min, facets.value.price.max]
-    appliedPriceRange.value = [facets.value.price.min, facets.value.price.max]
+    priceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
+    appliedPriceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
 }
 
 async function applyPriceRange() {
-    appliedPriceRange.value = [...priceRange.value]
+    appliedPriceRange.value = createPriceRange(priceRange.value[0], priceRange.value[1])
 }
 
 const { data } = await useFetch<ProductCategoryDTO>(`/api/categories/${route.params.slug}`)
@@ -282,6 +289,15 @@ watch(
         scrollToResults()
     }
 )
+
+onMounted(() => {
+    if (!import.meta.client) {
+        return
+    }
+
+    const userAgent = window.navigator.userAgent || ""
+    disablePanelTransitions.value = /Android/i.test(userAgent)
+})
 </script>
 
 <template>
@@ -300,7 +316,6 @@ watch(
                 <p class="categoryPage__description">{{ category?.description }}</p>
             </VContainer>
         </div>
-
         <VContainer class="categoryPage__container">
             <div class="categoryPage__layout">
                 <aside class="categoryPage__sidebar">
@@ -315,7 +330,11 @@ watch(
                             </VBtn>
                         </div>
 
-                        <VExpansionPanels multiple class="categoryPage__filterPanels">
+                        <VExpansionPanels
+                            multiple
+                            class="categoryPage__filterPanels"
+                            :class="{ 'categoryPage__filterPanels--reducedMotion': disablePanelTransitions }"
+                        >
                             <VExpansionPanel v-if="childCategoryFacets.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Subcategories</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -333,7 +352,6 @@ watch(
                                     </div>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel v-if="facets.types.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Product types</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -351,7 +369,6 @@ watch(
                                     </div>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel v-if="facets.collections.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Collections</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -369,7 +386,6 @@ watch(
                                     </div>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel v-if="facets.tags.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Tags</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -387,7 +403,6 @@ watch(
                                     </div>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Availability</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -400,7 +415,6 @@ watch(
                                     />
                                 </VExpansionPanelText>
                             </VExpansionPanel>
-
                             <VExpansionPanel v-if="facets.price.max > facets.price.min" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Price</VExpansionPanelTitle>
                                 <VExpansionPanelText>
@@ -425,7 +439,6 @@ watch(
                         </VExpansionPanels>
                     </div>
                 </aside>
-
                 <div class="categoryPage__content">
                     <div class="categoryPage__toolbar">
                         <div class="categoryPage__toolbarCopy">
@@ -434,10 +447,11 @@ watch(
                                 <template v-if="sortLoading">Updating sort order...</template>
                                 <template v-else-if="filterLoading">Refreshing filtered results...</template>
                                 <template v-else-if="activeFilterCount">{{ activeFilterCount }} active filters</template>
-                                <template v-else>Medusa-backed filters for categories, collections, types, tags, stock, and price.</template>
+                                <template v-else>
+                                    Medusa-backed filters for categories, collections, types, tags, stock, and price.
+                                </template>
                             </p>
                         </div>
-
                         <VSelect
                             v-model="sortOption"
                             :items="sortOptions"
@@ -451,13 +465,10 @@ watch(
                             :disabled="loadingRef"
                         />
                     </div>
-
                     <VProgressLinear v-if="loadingRef" indeterminate color="primary" class="categoryPage__progress" />
-
                     <div v-if="gridIsInitialLoading" class="categoryPage__grid categoryPage__grid--skeleton">
                         <VSkeletonLoader v-for="n in 6" :key="n" type="image, article, actions" class="categoryPage__skeleton" />
                     </div>
-
                     <div v-else-if="products.length" class="categoryPage__grid">
                         <div
                             v-for="(product, index) in products"
@@ -472,13 +483,11 @@ watch(
                             <ProductCard :product="product" />
                         </div>
                     </div>
-
                     <div v-else class="categoryPage__emptyState">
                         <h2 class="categoryPage__emptyTitle">No products match these filters.</h2>
                         <p class="categoryPage__emptyText">Try clearing some filters or adjusting the selected price range.</p>
                         <VBtn color="primary" rounded="pill" class="text-none" @click="clearAllFilters">Reset filters</VBtn>
                     </div>
-
                     <div v-if="products.length" class="categoryPage__footer">
                         <VProgressCircular v-if="loadingRef && hasMore" indeterminate color="primary" />
                         <span v-else-if="!hasMore">You have reached the end of this category.</span>
@@ -601,6 +610,16 @@ watch(
     border: 1px solid rgba(8, 23, 63, 0.08);
     background: #ffffff;
     box-shadow: none;
+}
+
+.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-text__wrapper),
+.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-title),
+.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-title__icon) {
+    transition: none !important;
+}
+
+.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-text__wrapper) {
+    will-change: auto;
 }
 
 .categoryPage__filterList {
@@ -726,6 +745,12 @@ watch(
 
     .categoryPage__sidebar {
         position: static;
+    }
+
+    .categoryPage__sidebarCard,
+    .categoryPage__toolbar,
+    .categoryPage__emptyState {
+        backdrop-filter: none;
     }
 }
 

@@ -46,24 +46,20 @@ useHead({
                             <NuxtLink to="/faq" class="contactPage__inlineLink">FAQ</NuxtLink>.
                             If you still need us, send a message and we will help with products, delivery, returns, or order updates.
                         </p>
-
                         <div class="contactPage__heroActions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/faq">Browse FAQ</VBtn>
-
                             <div class="contactPage__responseCard">
                                 <span class="contactPage__responseLabel">Average response</span>
                                 <strong class="contactPage__responseValue">Within one business day</strong>
                             </div>
                         </div>
                     </div>
-
                     <div class="contactPage__heroPanel">
                         <span class="contactPage__panelLabel">Support desk</span>
                         <h2 class="contactPage__panelTitle">Built to feel as considered as the new homepage.</h2>
                         <p class="contactPage__panelText">
                             Reach out for delivery updates, product advice, or help with a recent order. We keep replies direct and practical.
                         </p>
-
                         <ul class="contactPage__promiseList">
                             <li v-for="promise in supportPromises" :key="promise" class="contactPage__promiseItem">
                                 <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
@@ -74,7 +70,6 @@ useHead({
                 </div>
             </VContainer>
         </div>
-
         <VContainer class="contactPage__container">
             <div class="contactPage__channelGrid">
                 <article v-for="channel in contactChannels" :key="channel.title" class="contactPage__channelCard">
@@ -88,7 +83,6 @@ useHead({
                     </div>
                 </article>
             </div>
-
             <div class="contactPage__contentGrid">
                 <div class="contactPage__formPanel">
                     <div class="contactPage__sectionIntro">
@@ -98,12 +92,10 @@ useHead({
                             Add your order number if you have one. That helps us respond faster and keeps follow-up straightforward.
                         </p>
                     </div>
-
                     <div class="contactPage__formCard">
                         <ContactForm />
                     </div>
                 </div>
-
                 <aside class="contactPage__sidebar">
                     <div class="contactPage__sidebarCard">
                         <span class="contactPage__sidebarLabel">Visit us</span>
@@ -113,7 +105,6 @@ useHead({
                         </p>
                         <div class="contactPage__sidebarMeta">Open on weekdays | Closed on public holidays</div>
                     </div>
-
                     <div class="contactPage__mapCard">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d203269.51871892938!2d25.088231590205528!3d54.700572672503455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46dd93fb5c6408f5%3A0x400d18c70e9dc40!2sVilnius%2C%20Vilniaus%20m.%20sav.!5e1!3m2!1slt!2slt!4v1727009719782!5m2!1slt!2slt"

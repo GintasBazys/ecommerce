@@ -41,7 +41,6 @@ useHead({
                     </div>
                 </div>
             </section>
-
             <section class="blogPost__article">
                 <NuxtImg
                     v-if="currentPost?.image"
@@ -58,18 +57,15 @@ useHead({
                     <ContentRenderer v-if="currentPost" :value="currentPost" />
                 </div>
             </section>
-
             <section class="blogPost__related">
                 <div class="blogPost__relatedIntro">
                     <h2 class="blogPost__relatedTitle">Related posts</h2>
                 </div>
-
                 <VRow v-if="relatedPosts && relatedPosts.length > 0" class="blogPost__relatedGrid" align="stretch">
                     <VCol v-for="article in relatedPosts" :key="article.path" cols="12" md="6" lg="4" class="blogPost__relatedCol">
                         <BlogCard :article="article" compact />
                     </VCol>
                 </VRow>
-
                 <div v-else class="blogPost__empty">No related posts found.</div>
             </section>
         </VContainer>

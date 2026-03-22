@@ -66,10 +66,8 @@ const faqPanels = ref<number[]>([0])
                             If something is not quite right, we keep the process simple: request the return, send the item back, and we will handle the
                             refund or exchange with a straightforward follow-up.
                         </p>
-
                         <div class="returnsPage__heroActions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/contact">Contact support</VBtn>
-
                             <div class="returnsPage__responseCard">
                                 <span class="returnsPage__responseLabel">Return window</span>
                                 <strong class="returnsPage__responseValue">30 days from delivery</strong>
@@ -87,7 +85,6 @@ const faqPanels = ref<number[]>([0])
                 </div>
             </VContainer>
         </div>
-
         <VContainer class="returnsPage__container">
             <div class="returnsPage__stepsGrid">
                 <article v-for="step in returnSteps" :key="step.number" class="returnsPage__stepCard">
@@ -96,7 +93,6 @@ const faqPanels = ref<number[]>([0])
                     <p class="returnsPage__stepDetail">{{ step.detail }}</p>
                 </article>
             </div>
-
             <div class="returnsPage__contentGrid">
                 <div class="returnsPage__main">
                     <section class="returnsPage__sectionCard">
@@ -106,14 +102,12 @@ const faqPanels = ref<number[]>([0])
                             We want you to feel confident ordering from us. If a product does not work out, the return process should stay predictable and
                             easy to understand.
                         </p>
-
                         <div class="returnsPage__highlightGrid">
                             <article v-for="item in policyHighlights" :key="item.title" class="returnsPage__highlightCard">
                                 <h3 class="returnsPage__highlightTitle">{{ item.title }}</h3>
                                 <p class="returnsPage__highlightText">{{ item.text }}</p>
                             </article>
                         </div>
-
                         <div class="returnsPage__policyText">
                             <p>
                                 To initiate a return, use your account order history and follow the return instructions for the relevant item. If the return
@@ -125,11 +119,9 @@ const faqPanels = ref<number[]>([0])
                             </p>
                         </div>
                     </section>
-
                     <section class="returnsPage__sectionCard">
                         <span class="returnsPage__sectionEyebrow">Questions</span>
                         <h2 class="returnsPage__sectionTitle">Return policy FAQ</h2>
-
                         <VExpansionPanels v-model="faqPanels" multiple class="returnsPage__panels">
                             <VExpansionPanel
                                 v-for="item in returnFaq"
@@ -148,7 +140,6 @@ const faqPanels = ref<number[]>([0])
                         </VExpansionPanels>
                     </section>
                 </div>
-
                 <aside class="returnsPage__sidebar">
                     <div class="returnsPage__sidebarCard">
                         <span class="returnsPage__sidebarLabel">Need help first?</span>

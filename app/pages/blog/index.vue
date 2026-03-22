@@ -50,13 +50,11 @@ watch(page, (newPage) => {
                     </p>
                 </div>
             </section>
-
             <VRow class="blogIndex__grid" align="stretch">
                 <VCol v-for="article in articles" :key="article.path" cols="12" md="6" lg="4" class="blogIndex__col">
                     <BlogCard :article="article" />
                 </VCol>
             </VRow>
-
             <div v-if="totalPages > 1" class="blogIndex__pagination">
                 <VBtn color="primary" variant="flat" rounded="pill" :disabled="page === 1" @click="page--">Previous</VBtn>
                 <span class="blogIndex__paginationLabel">Page {{ page }} of {{ totalPages }}</span>

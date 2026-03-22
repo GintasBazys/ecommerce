@@ -97,13 +97,11 @@ async function handleReset(): Promise<void> {
                         <p class="authPage__description">
                             Access your saved details, revisit recent orders, and move from cart to checkout with less friction.
                         </p>
-
                         <div class="authPage__statCard">
                             <span class="authPage__statLabel">Member access</span>
                             <strong class="authPage__statValue">Faster checkout, order history, and saved profile details</strong>
                         </div>
                     </div>
-
                     <div class="authPage__panel authPage__panel--form">
                         <div class="authPage__panelIntro">
                             <span class="authPage__sectionEyebrow">Account login</span>
@@ -112,7 +110,6 @@ async function handleReset(): Promise<void> {
                                 Use social sign-in or your email and password. You can reset access anytime.
                             </p>
                         </div>
-
                         <div class="authPage__socialButtons">
                             <VBtn class="authPage__socialBtn text-none" color="white" block @click="handleSocialLogin('google')">
                                 <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
@@ -123,9 +120,7 @@ async function handleReset(): Promise<void> {
                                 Log in with Facebook
                             </VBtn>
                         </div>
-
                         <div class="authPage__divider"><span>Or continue with email</span></div>
-
                         <VForm ref="loginFormRef" class="authPage__form" @submit.prevent="handleLogin">
                             <VTextField
                                 v-model.trim="loginEmail"
@@ -154,7 +149,6 @@ async function handleReset(): Promise<void> {
                             </div>
                             <VBtn type="submit" color="primary" rounded="pill" class="text-none" block>Log in</VBtn>
                         </VForm>
-
                         <p class="authPage__footerText">
                             Don't have an account?
                             <NuxtLink to="/register" class="authPage__link">Register here</NuxtLink>
@@ -163,7 +157,6 @@ async function handleReset(): Promise<void> {
                 </div>
             </VContainer>
         </div>
-
         <VDialog v-model="showResetDialog" persistent max-width="560">
             <VCard class="authModal">
                 <VCardTitle class="authModal__header">
@@ -191,7 +184,6 @@ async function handleReset(): Promise<void> {
                 </VCardText>
             </VCard>
         </VDialog>
-
         <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4000">
             {{ snackbarText }}
         </VSnackbar>

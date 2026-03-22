@@ -2,6 +2,7 @@
 import type { OrderDTO } from "@medusajs/types"
 
 import { ORDER_STATUS } from "@/enumerators/order"
+import { formatPrice } from "@/utils/formatPrice"
 
 const route = useRoute()
 const orderId = route.params.id
@@ -20,176 +21,249 @@ const {
 })
 
 const order = computed<OrderDTO | undefined>(() => orderRes.value?.order)
-
-const invoiceRef = ref<HTMLElement | null>(null)
-
-const pdfOptions = {
-    margin: [10, 10],
-    filename: `Invoice-${order.value?.display_id}-${new Date(order.value?.created_at ?? Date.now()).toLocaleDateString()}.pdf`,
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-}
-
-async function downloadPdf(): Promise<void> {
-    if (!invoiceRef.value) {
-        return
-    }
-    if (import.meta.client) {
-        const html2pdf = (await import("html2pdf.js")).default
-        await html2pdf()
-            .set(pdfOptions as any)
-            .from(invoiceRef.value)
-            .save()
-    }
-}
+const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoice`)
 </script>
 
 <template>
-    <main>
-        <VContainer class="pb-6">
-            <VBtn text to="/account/orders">
-                <VIcon left>mdi-arrow-left</VIcon>
-                Back to Orders
-            </VBtn>
-            <VSkeletonLoader v-if="pending" type="card" />
-            <VAlert v-else-if="error" type="error">Failed to load order.</VAlert>
-            <div v-else ref="invoiceRef">
-                <VCard class="mt-4 px-6 print:shadow-none" elevation="2" style="background: white">
-                    <VToolbar flat class="justify-center py-4 px-4">
-                        <img src="/images/logo.svg" alt="Your Logo" style="max-height: 60px" />
-                    </VToolbar>
-                    <VCardTitle class="text-h5"> Invoice #{{ order?.display_id || order?.id }} </VCardTitle>
-                    <VCardSubtitle class="mb-4">
-                        {{
-                            new Date(order?.created_at ?? new Date()).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric"
-                            })
-                        }}
-                    </VCardSubtitle>
-                    <VRow class="mb-6">
-                        <VCol cols="12" md="6">
-                            <div><strong>Email:</strong> {{ order?.email }}</div>
-                        </VCol>
-                        <VCol cols="12" md="6">
-                            <div><strong>Payment:</strong> {{ order?.payment_status }}</div>
-                            <div>
-                                <strong>Fulfillment:</strong>
-                                {{ ORDER_STATUS[order?.fulfillment_status as keyof typeof ORDER_STATUS] || order?.fulfillment_status }}
+    <div class="orderInvoiceContent">
+        <VSkeletonLoader v-if="pending" type="card" />
+        <VAlert v-else-if="error" type="error" variant="tonal">Failed to load order.</VAlert>
+        <template v-else-if="order">
+            <div class="orderInvoiceContent__grid">
+                <div class="orderInvoiceContent__main">
+                    <section class="orderInvoiceContent__panel orderInvoiceContent__panel--muted">
+                        <div class="orderInvoiceContent__detailsGrid">
+                            <div class="orderInvoiceContent__detailCard">
+                                <span class="orderInvoiceContent__label">Order</span>
+                                <strong class="orderInvoiceContent__value">#{{ order.display_id || order.id }}</strong>
                             </div>
-                        </VCol>
-                    </VRow>
-                    <VDataTable
-                        :headers="[
-                            { title: 'Product', value: 'product', align: 'start' },
-                            { title: 'Variant', value: 'variant' },
-                            { title: 'Qty', value: 'quantity', align: 'center' },
-                            { title: 'Unit Price', value: 'unit_price', align: 'end' },
-                            { title: 'Line Total', value: 'total', align: 'end' }
-                        ]"
-                        :items="
-                            order?.items?.map((item) => ({
-                                product: item.product_title,
-                                variant: item.variant_title,
-                                quantity: item.quantity,
-                                unit_price: Number(item.unit_price),
-                                total: Number(item.total),
-                                thumbnail: item.thumbnail
-                            }))
-                        "
-                        class="mb-6"
-                    >
-                        <template #[`item.product`]="{ item }">
-                            <NuxtImg :src="item.thumbnail ?? ''" width="40" class="mr-2" />
-                            {{ item.product }}
-                        </template>
-                        <template #[`item.unit_price`]="{ item }">
-                            {{
-                                item.unit_price.toLocaleString(undefined, {
-                                    style: "currency",
-                                    currency: order?.currency_code
-                                })
-                            }}
-                        </template>
-                        <template #[`item.total`]="{ item }">
-                            {{
-                                item.total.toLocaleString(undefined, {
-                                    style: "currency",
-                                    currency: order?.currency_code
-                                })
-                            }}
-                        </template>
-                    </VDataTable>
-                    <VRow class="mb-6">
-                        <VCol cols="12" md="6">
-                            <strong>Shipping Method</strong>
-                            <div v-for="m in order?.shipping_methods" :key="m.id">
-                                {{ m.name }} —
-                                {{
-                                    m.total.toLocaleString(undefined, {
-                                        style: "currency",
-                                        currency: order?.currency_code
-                                    })
-                                }}
+                            <div class="orderInvoiceContent__detailCard">
+                                <span class="orderInvoiceContent__label">Placed on</span>
+                                <strong class="orderInvoiceContent__value">
+                                    {{
+                                        new Date(order.created_at ?? new Date()).toLocaleDateString("en-US", {
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric"
+                                        })
+                                    }}
+                                </strong>
                             </div>
-                        </VCol>
-                        <VCol cols="12" md="6">
-                            <strong>Summary</strong>
-                            <div>
-                                Subtotal:
-                                {{
-                                    order?.subtotal.toLocaleString(undefined, {
-                                        style: "currency",
-                                        currency: order.currency_code
-                                    })
-                                }}
+                            <div class="orderInvoiceContent__detailCard">
+                                <span class="orderInvoiceContent__label">Status</span>
+                                <strong class="orderInvoiceContent__value">
+                                    {{ ORDER_STATUS[order.fulfillment_status as keyof typeof ORDER_STATUS] || order.fulfillment_status }}
+                                </strong>
                             </div>
-                            <div>
-                                Shipping:
-                                {{
-                                    order?.shipping_total.toLocaleString(undefined, {
-                                        style: "currency",
-                                        currency: order.currency_code
-                                    })
-                                }}
+                        </div>
+                    </section>
+                    <section class="orderInvoiceContent__panel">
+                        <h2 class="orderInvoiceContent__title">Items in this order</h2>
+                        <div class="orderInvoiceContent__itemsList">
+                            <article v-for="item in order.items" :key="item.id" class="orderInvoiceContent__itemCard">
+                                <NuxtImg
+                                    :src="item.thumbnail || '/images/placeholder.png'"
+                                    width="72"
+                                    class="orderInvoiceContent__itemImage"
+                                />
+                                <div class="orderInvoiceContent__itemBody">
+                                    <strong class="orderInvoiceContent__itemTitle">{{ item.product_title }}</strong>
+                                    <p class="orderInvoiceContent__itemMeta">{{ item.variant_title }}</p>
+                                    <p class="orderInvoiceContent__itemMeta">Qty {{ item.quantity }}</p>
+                                </div>
+                                <div class="orderInvoiceContent__itemPricing">
+                                    <span>{{ formatPrice(Number(item.unit_price || 0), order.currency_code) }}</span>
+                                    <strong>{{ formatPrice(Number(item.total || 0), order.currency_code) }}</strong>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+                    <section class="orderInvoiceContent__panel">
+                        <h2 class="orderInvoiceContent__title">Shipping and payment</h2>
+                        <div class="orderInvoiceContent__detailsGrid">
+                            <div class="orderInvoiceContent__detailCard">
+                                <span class="orderInvoiceContent__label">Email</span>
+                                <strong class="orderInvoiceContent__value">{{ order.email }}</strong>
                             </div>
-                            <div>
-                                Tax:
-                                {{
-                                    order?.tax_total.toLocaleString(undefined, {
-                                        style: "currency",
-                                        currency: order.currency_code
-                                    })
-                                }}
+                            <div class="orderInvoiceContent__detailCard">
+                                <span class="orderInvoiceContent__label">Payment status</span>
+                                <strong class="orderInvoiceContent__value">{{ order.payment_status }}</strong>
                             </div>
-                            <div class="mt-2 text-h6">
-                                Total:
-                                {{
-                                    order?.total.toLocaleString(undefined, {
-                                        style: "currency",
-                                        currency: order.currency_code
-                                    })
-                                }}
+                            <div class="orderInvoiceContent__detailCard">
+                                <span class="orderInvoiceContent__label">Shipping method</span>
+                                <strong class="orderInvoiceContent__value">{{ order.shipping_methods?.[0]?.name || "Unavailable" }}</strong>
                             </div>
-                        </VCol>
-                    </VRow>
-                </VCard>
+                        </div>
+                    </section>
+                </div>
+                <aside class="orderInvoiceContent__summary">
+                    <section class="orderInvoiceContent__panel orderInvoiceContent__panel--sticky">
+                        <h2 class="orderInvoiceContent__title">Totals</h2>
+                        <div class="orderInvoiceContent__totals">
+                            <div class="orderInvoiceContent__totalRow">
+                                <span>Subtotal</span>
+                                <span>{{ formatPrice(Number(order.subtotal || 0), order.currency_code) }}</span>
+                            </div>
+                            <div class="orderInvoiceContent__totalRow">
+                                <span>Shipping</span>
+                                <span>{{ formatPrice(Number(order.shipping_total || 0), order.currency_code) }}</span>
+                            </div>
+                            <div class="orderInvoiceContent__totalRow">
+                                <span>Tax</span>
+                                <span>{{ formatPrice(Number(order.tax_total || 0), order.currency_code) }}</span>
+                            </div>
+                            <div class="orderInvoiceContent__totalRow orderInvoiceContent__totalRow--grand">
+                                <span>Total</span>
+                                <strong>{{ formatPrice(Number(order.total || 0), order.currency_code) }}</strong>
+                            </div>
+                        </div>
+                        <VBtn color="primary" rounded="pill" class="text-none" block :href="invoiceDownloadUrl">Download invoice PDF</VBtn>
+                    </section>
+                </aside>
             </div>
-            <VCardActions class="justify-end">
-                <VBtn outlined to="/account/orders">Back</VBtn>
-                <VBtn color="primary" @click="downloadPdf"> Download Invoice </VBtn>
-            </VCardActions>
-        </VContainer>
-    </main>
+        </template>
+    </div>
 </template>
 
 <style scoped lang="scss">
+.orderInvoiceContent__grid,
+.orderInvoiceContent__detailsGrid {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.orderInvoiceContent__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+}
+
+.orderInvoiceContent__main,
+.orderInvoiceContent__itemsList,
+.orderInvoiceContent__totals {
+    display: grid;
+    gap: 1rem;
+}
+
+.orderInvoiceContent__panel,
+.orderInvoiceContent__detailCard,
+.orderInvoiceContent__itemCard {
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 1.4rem;
+    background: rgba(255, 255, 255, 0.88);
+}
+
+.orderInvoiceContent__panel {
+    padding: 1.35rem;
+}
+
+.orderInvoiceContent__panel--muted,
+.orderInvoiceContent__itemCard {
+    background: rgba(247, 250, 255, 0.92);
+}
+
+.orderInvoiceContent__panel--sticky {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.orderInvoiceContent__detailsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.orderInvoiceContent__detailCard {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem;
+}
+
+.orderInvoiceContent__label,
+.orderInvoiceContent__itemMeta {
+    color: #4b5874;
+}
+
+.orderInvoiceContent__value,
+.orderInvoiceContent__title,
+.orderInvoiceContent__itemTitle {
+    color: #08173f;
+}
+
+.orderInvoiceContent__title {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.orderInvoiceContent__itemCard {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.orderInvoiceContent__itemImage {
+    border-radius: 1rem;
+}
+
+.orderInvoiceContent__itemBody {
+    display: grid;
+    flex: 1;
+    gap: 0.2rem;
+}
+
+.orderInvoiceContent__itemMeta {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.orderInvoiceContent__itemPricing {
+    display: grid;
+    gap: 0.2rem;
+    justify-items: end;
+    color: #08173f;
+}
+
+.orderInvoiceContent__totalRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: #4b5874;
+}
+
+.orderInvoiceContent__totalRow--grand {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(8, 23, 63, 0.08);
+}
+
+.orderInvoiceContent__totalRow strong {
+    color: #08173f;
+}
+
+@media screen and (max-width: 1100px) {
+    .orderInvoiceContent__grid,
+    .orderInvoiceContent__detailsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .orderInvoiceContent__panel--sticky {
+        position: static;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .orderInvoiceContent__itemCard,
+    .orderInvoiceContent__totalRow {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .orderInvoiceContent__itemPricing {
+        justify-items: start;
+    }
+}
+
 @media print {
     body {
         margin: 0;
     }
+
     .v-application--wrap {
         box-shadow: none !important;
     }

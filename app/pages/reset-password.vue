@@ -58,7 +58,6 @@ async function handleSubmit(): Promise<void> {
                         <p class="resetPage__description">
                             Create fresh account access here, then head back into your profile, saved details, and upcoming checkout.
                         </p>
-
                         <div class="resetPage__statCard">
                             <span class="resetPage__statLabel">Next step</span>
                             <strong class="resetPage__statValue"
@@ -66,14 +65,12 @@ async function handleSubmit(): Promise<void> {
                             >
                         </div>
                     </div>
-
                     <div class="resetPage__panel">
                         <span class="resetPage__sectionEyebrow">Reset password</span>
                         <h2 class="resetPage__sectionTitle">Set a new password.</h2>
                         <p class="resetPage__sectionText">
                             Use a password you have not used before so the account feels secure from the next sign-in onward.
                         </p>
-
                         <VForm class="resetPage__form" @submit.prevent="handleSubmit">
                             <VTextField
                                 v-model="password"
@@ -85,7 +82,6 @@ async function handleSubmit(): Promise<void> {
                             />
                             <VBtn color="primary" rounded="pill" class="text-none" type="submit" block>Reset password</VBtn>
                         </VForm>
-
                         <VAlert v-if="errorMessage" type="error" variant="tonal" class="mt-4">
                             {{ errorMessage }}
                         </VAlert>
