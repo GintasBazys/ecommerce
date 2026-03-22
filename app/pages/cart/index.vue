@@ -154,168 +154,677 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
 </script>
 
 <template>
-    <section class="py-10">
-        <VContainer>
-            <div v-if="isCartLoading" class="text-center py-10">
-                <VProgressCircular indeterminate color="primary" size="40" />
-                <p class="mt-4">Loading your cart...</p>
-            </div>
-            <template v-else>
-                <VRow class="mb-6" align="center" justify="space-between">
-                    <VCol cols="12" lg="6">
-                        <h1 class="text-h5 font-weight-bold">Shopping Cart</h1>
-                    </VCol>
-                    <VCol cols="12" lg="6" class="text-lg-end text-sm-start mt-2 mt-lg-0">
-                        <p class="mb-0">
-                            <strong>Total:</strong>
-                            {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
-                        </p>
-                    </VCol>
-                </VRow>
-                <VRow>
-                    <VCol cols="12" lg="7">
-                        <VCard v-for="item in cart?.items || []" :key="item.id" class="mb-4" flat>
-                            <VCardText class="d-flex pa-4 ga-5">
-                                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="flex-shrink-0">
-                                    <VImg
-                                        :src="item.thumbnail || '/images/placeholder.png'"
-                                        :alt="item.product_title ?? ''"
-                                        width="100"
-                                        height="120"
-                                        class="rounded-lg"
-                                        cover
-                                    />
-                                </NuxtLink>
-                                <div class="flex-grow-1 d-flex flex-column justify-space-between">
-                                    <div class="d-flex justify-space-between align-start mb-2">
-                                        <div class="ms-4">
-                                            <NuxtLink
-                                                :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`"
-                                                class="text-primary text-decoration-none text-subtitle-1 font-weight-medium"
-                                            >
-                                                {{ item.product_title }}
-                                            </NuxtLink>
-                                            <p class="text-body-2 text-grey-darken-2 mt-1 mb-1">
-                                                {{ item.product_description }}
-                                            </p>
-                                            <p class="text-caption text-grey-darken-1 mb-0">Option: {{ item.variant_title }}</p>
-                                            <p class="text-caption text-grey-darken-1">Code: {{ item.variant_sku ?? "N/A" }}</p>
-                                        </div>
-                                        <VBtn icon color="error" variant="text" aria-label="Remove" @click="removeItem(item.id)">
-                                            <VIcon>mdi-delete</VIcon>
-                                        </VBtn>
-                                    </div>
-                                    <div class="d-flex align-center gap-2 ms-4">
-                                        <VBtn icon :disabled="(qtyMap[item.id] ?? 0) <= 1" @click="decrementQty(item.id)">
-                                            <VIcon>mdi-minus</VIcon>
-                                        </VBtn>
-                                        <VTextField
-                                            v-model.number="qtyMap[item.id]"
-                                            type="number"
-                                            hide-details
-                                            variant="outlined"
-                                            class="mx-2"
-                                            density="compact"
-                                            style="max-width: 80px"
-                                            @update:model-value="
-                                                (val) => debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
-                                            "
+    <section class="cartPage">
+        <div class="cartPage__hero">
+            <VContainer class="cartPage__container">
+                <div v-if="isCartLoading" class="cartPage__loadingState">
+                    <VProgressCircular indeterminate color="primary" size="40" />
+                    <p class="cartPage__loadingText">Loading your cart...</p>
+                </div>
+
+                <template v-else>
+                    <div class="cartPage__heroGrid">
+                        <div class="cartPage__heroCopy">
+                            <span class="cartPage__eyebrow">Shopping cart</span>
+                            <h1 class="cartPage__title">Review your picks before you head to checkout.</h1>
+                            <p class="cartPage__description">
+                                Fine-tune quantities, remove anything that no longer fits, and keep your order feeling as considered as the
+                                rest of the shop.
+                            </p>
+
+                            <div class="cartPage__heroActions">
+                                <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/"> Continue shopping </VBtn>
+
+                                <div class="cartPage__statCard">
+                                    <span class="cartPage__statLabel">Current total</span>
+                                    <strong class="cartPage__statValue">{{ formatPrice(Number(cart?.total || 0), currencyCode) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cartPage__heroPanel">
+                            <span class="cartPage__panelLabel">Checkout notes</span>
+                            <h2 class="cartPage__panelTitle">Everything stays editable until the final step.</h2>
+                            <p class="cartPage__panelText">
+                                Confirm quantities here, apply a promotion if you have one, and continue when your basket looks right.
+                            </p>
+
+                            <ul class="cartPage__promiseList">
+                                <li class="cartPage__promiseItem">
+                                    <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
+                                    <span>Live totals update after cart changes are applied</span>
+                                </li>
+                                <li class="cartPage__promiseItem">
+                                    <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
+                                    <span>Promo codes can be added before checkout</span>
+                                </li>
+                                <li class="cartPage__promiseItem">
+                                    <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
+                                    <span>Shipping and taxes are confirmed in the next step</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="cartPage__contentGrid">
+                        <div class="cartPage__itemsPanel">
+                            <div v-if="cart?.items?.length" class="cartPage__itemList">
+                                <article v-for="item in cart?.items || []" :key="item.id" class="cartPage__itemCard">
+                                    <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="cartPage__imageLink">
+                                        <VImg
+                                            :src="item.thumbnail || '/images/placeholder.png'"
+                                            :alt="item.product_title ?? ''"
+                                            width="116"
+                                            height="136"
+                                            class="cartPage__itemImage"
+                                            cover
                                         />
+                                    </NuxtLink>
+
+                                    <div class="cartPage__itemBody">
+                                        <div class="cartPage__itemTop">
+                                            <div>
+                                                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="cartPage__itemTitle">
+                                                    {{ item.product_title }}
+                                                </NuxtLink>
+                                                <p class="cartPage__itemDescription">{{ item.product_description }}</p>
+                                                <p class="cartPage__itemMeta">Option: {{ item.variant_title || "Standard option" }}</p>
+                                                <p class="cartPage__itemMeta">Code: {{ item.variant_sku ?? "N/A" }}</p>
+                                            </div>
+
+                                            <VBtn
+                                                icon
+                                                variant="text"
+                                                class="cartPage__removeBtn"
+                                                aria-label="Remove"
+                                                @click="removeItem(item.id)"
+                                            >
+                                                <VIcon>mdi-delete-outline</VIcon>
+                                            </VBtn>
+                                        </div>
+
+                                        <div class="cartPage__itemFooter">
+                                            <div class="cartPage__qtySection">
+                                                <span class="cartPage__qtyLabel">Quantity</span>
+                                                <div class="cartPage__qtyControl">
+                                                    <VBtn
+                                                        icon
+                                                        size="x-small"
+                                                        variant="text"
+                                                        :disabled="(qtyMap[item.id] ?? 0) <= 1"
+                                                        @click="decrementQty(item.id)"
+                                                    >
+                                                        <VIcon size="18">mdi-minus</VIcon>
+                                                    </VBtn>
+                                                    <VTextField
+                                                        v-model.number="qtyMap[item.id]"
+                                                        type="number"
+                                                        hide-details
+                                                        variant="plain"
+                                                        density="compact"
+                                                        class="cartPage__qtyInput"
+                                                        @update:model-value="
+                                                            (val) =>
+                                                                debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
+                                                        "
+                                                    />
+                                                    <VBtn
+                                                        icon
+                                                        size="x-small"
+                                                        variant="text"
+                                                        :disabled="(qtyMap[item.id] ?? 0) >= (item.stocked_quantity ?? Infinity)"
+                                                        @click="incrementQty(item)"
+                                                    >
+                                                        <VIcon size="18">mdi-plus</VIcon>
+                                                    </VBtn>
+                                                </div>
+                                            </div>
+
+                                            <div class="cartPage__priceBlock">
+                                                <span class="cartPage__priceLabel">Line total</span>
+                                                <strong class="cartPage__priceValue">
+                                                    {{
+                                                        formatPrice(
+                                                            Number(item.unit_price || 0) * Number(qtyMap[item.id] || 1),
+                                                            currencyCode
+                                                        )
+                                                    }}
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <VBtn
+                                    color="primary"
+                                    rounded="pill"
+                                    class="cartPage__updateBtn text-none"
+                                    block
+                                    :loading="Object.values(updating).some(Boolean)"
+                                    :disabled="!isCartDirty || Object.values(updating).some(Boolean)"
+                                    @click="cart?.items?.forEach((item) => updateCount(item))"
+                                >
+                                    Update cart
+                                </VBtn>
+                            </div>
+
+                            <div v-else class="cartPage__emptyState">
+                                <div class="cartPage__emptyIcon">
+                                    <VIcon size="26">mdi-cart-outline</VIcon>
+                                </div>
+                                <h2 class="cartPage__emptyTitle">Your cart is empty</h2>
+                                <p class="cartPage__emptyText">
+                                    Add a few products you love and come back here to review everything before checkout.
+                                </p>
+                                <VBtn color="primary" rounded="pill" class="text-none px-6" to="/">Browse products</VBtn>
+                            </div>
+                        </div>
+
+                        <aside class="cartPage__summaryColumn">
+                            <div class="cartPage__summaryCard">
+                                <span class="cartPage__sectionEyebrow">Order summary</span>
+                                <h2 class="cartPage__sectionTitle">A clean view of what you are about to order.</h2>
+                                <p class="cartPage__sectionText">
+                                    Apply a promotion, review the totals, and continue once cart updates are saved.
+                                </p>
+
+                                <VForm class="cartPage__couponForm" @submit.prevent="applyCoupon">
+                                    <VTextField
+                                        v-model="couponCode"
+                                        name="couponTextInput"
+                                        placeholder="Enter coupon code"
+                                        prepend-inner-icon="mdi-ticket-percent"
+                                        variant="outlined"
+                                        hide-details
+                                    />
+                                    <VBtn
+                                        :loading="isApplyingCoupon"
+                                        :disabled="isApplyingCoupon"
+                                        color="primary"
+                                        rounded="pill"
+                                        class="text-none"
+                                        block
+                                        type="submit"
+                                    >
+                                        Apply code
+                                    </VBtn>
+                                </VForm>
+
+                                <div v-if="cart?.promotions?.length" class="cartPage__promoList">
+                                    <h3 class="cartPage__promoHeading">Applied promotions</h3>
+                                    <div v-for="promo in cart?.promotions" :key="promo.id" class="cartPage__promoItem">
+                                        <div>
+                                            <strong class="cartPage__promoCode">{{ promo.code }}</strong>
+                                            <p class="cartPage__promoValue">
+                                                {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
+                                            </p>
+                                        </div>
                                         <VBtn
                                             icon
-                                            :disabled="(qtyMap[item.id] ?? 0) >= (item.stocked_quantity ?? Infinity)"
-                                            @click="incrementQty(item)"
+                                            size="small"
+                                            variant="text"
+                                            aria-label="Remove promotion"
+                                            @click="removePromotion(promo.code)"
                                         >
-                                            <VIcon>mdi-plus</VIcon>
+                                            <VIcon size="18">mdi-close</VIcon>
                                         </VBtn>
-                                    </div>
-                                    <div class="text-end mt-2 me-4">
-                                        <strong class="text-subtitle-1">
-                                            {{ formatPrice(Number(item.unit_price || 0) * Number(item.quantity || 1), currencyCode) }}
-                                        </strong>
                                     </div>
                                 </div>
-                            </VCardText>
-                        </VCard>
-                        <VBtn
-                            v-if="cart?.items?.length"
-                            class="mt-4"
-                            color="primary"
-                            block
-                            :loading="Object.values(updating).some(Boolean)"
-                            :disabled="!isCartDirty || Object.values(updating).some(Boolean)"
-                            @click="cart?.items?.forEach((item) => updateCount(item))"
-                        >
-                            Update Cart
-                        </VBtn>
-                        <p v-if="!cart?.items?.length" class="text-center text-grey mt-6">Your cart is empty.</p>
-                    </VCol>
-                    <VCol cols="12" lg="5">
-                        <VCard class="pa-6" elevation="2">
-                            <h2 class="text-h6 mb-4">Order Summary</h2>
-                            <VForm @submit.prevent="applyCoupon">
-                                <VTextField
-                                    v-model="couponCode"
-                                    name="couponTextInput"
-                                    placeholder="Enter coupon code"
-                                    prepend-inner-icon="mdi-ticket-percent"
-                                    variant="outlined"
-                                    hide-details
-                                />
-                                <VBtn
-                                    :loading="isApplyingCoupon"
-                                    :disabled="isApplyingCoupon"
-                                    class="mt-3"
-                                    color="primary"
-                                    block
-                                    type="submit"
+
+                                <VDivider class="my-5" />
+
+                                <div class="cartPage__totals">
+                                    <div class="cartPage__totalRow">
+                                        <span class="cartPage__totalLabel">Subtotal</span>
+                                        <span class="cartPage__totalValue">{{
+                                            formatPrice(Number(cart?.subtotal || 0), currencyCode)
+                                        }}</span>
+                                    </div>
+                                    <div class="cartPage__totalRow">
+                                        <span class="cartPage__totalLabel">Total</span>
+                                        <strong class="cartPage__grandTotal">{{
+                                            formatPrice(Number(cart?.total || 0), currencyCode)
+                                        }}</strong>
+                                    </div>
+                                </div>
+
+                                <p class="cartPage__summaryNote">Shipping and taxes are calculated during the next step.</p>
+
+                                <NuxtLink
+                                    :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }"
+                                    :to="customer?.id ? '/address' : '/cart/customer'"
                                 >
-                                    Apply
-                                </VBtn>
-                            </VForm>
-                            <div v-if="cart?.promotions?.length" class="mb-4">
-                                <h3 class="text-subtitle-1 font-weight-medium mt-4">Applied Promotions:</h3>
-                                <ul>
-                                    <li
-                                        v-for="promo in cart?.promotions"
-                                        :key="promo.id"
-                                        class="d-flex justify-space-between align-center border px-3 mb-3"
+                                    <VBtn
+                                        color="primary"
+                                        rounded="pill"
+                                        class="text-none"
+                                        block
+                                        :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0"
                                     >
-                                        <span>
-                                            <strong>{{ promo.code }}&nbsp;</strong>
-                                            <span class="text-success">
-                                                {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
-                                            </span>
-                                        </span>
-                                        <VBtn icon small variant="text" aria-label="Remove promotion" @click="removePromotion(promo.code)">
-                                            <VIcon>mdi-close</VIcon>
-                                        </VBtn>
-                                    </li>
-                                </ul>
+                                        Checkout
+                                    </VBtn>
+                                </NuxtLink>
                             </div>
-                            <VDivider class="my-4" />
-                            <div class="d-flex justify-space-between mb-2">
-                                <span><strong>Subtotal:</strong></span>
-                                <span>{{ formatPrice(Number(cart?.subtotal || 0), currencyCode) }}</span>
-                            </div>
-                            <div class="d-flex justify-space-between mb-6">
-                                <span class="text-lg font-weight-bold">Total:</span>
-                                <span class="text-lg font-weight-bold">
-                                    {{ formatPrice(Number(cart?.total || 0), currencyCode) }}
-                                </span>
-                            </div>
-                            <NuxtLink
-                                :class="{ 'pointer-events-none opacity-50': !cart?.items?.length }"
-                                :to="customer?.id ? '/address' : '/cart/customer'"
-                            >
-                                <VBtn color="primary" block :disabled="!cart?.items?.length || isCartDirty || Number(cart?.total) <= 0">
-                                    Checkout
-                                </VBtn>
-                            </NuxtLink>
-                        </VCard>
-                    </VCol>
-                </VRow>
-            </template>
-        </VContainer>
+                        </aside>
+                    </div>
+                </template>
+            </VContainer>
+        </div>
     </section>
 </template>
+
+<style scoped lang="scss">
+.cartPage {
+    background:
+        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
+        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
+}
+
+.cartPage__hero {
+    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+}
+
+.cartPage__container {
+    position: relative;
+    z-index: 1;
+}
+
+.cartPage__heroGrid,
+.cartPage__contentGrid {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2rem);
+}
+
+.cartPage__heroGrid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+    align-items: end;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.cartPage__heroCopy,
+.cartPage__heroPanel,
+.cartPage__itemsPanel,
+.cartPage__summaryColumn {
+    animation: cart-rise 0.8s ease both;
+}
+
+.cartPage__heroPanel,
+.cartPage__summaryColumn {
+    animation-delay: 0.12s;
+}
+
+.cartPage__eyebrow,
+.cartPage__panelLabel,
+.cartPage__sectionEyebrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(1, 12, 128, 0.07);
+    color: #010c80;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.cartPage__title,
+.cartPage__panelTitle,
+.cartPage__sectionTitle,
+.cartPage__emptyTitle {
+    color: #08173f;
+    letter-spacing: -0.06rem;
+    text-wrap: balance;
+}
+
+.cartPage__title {
+    max-width: 11ch;
+    margin: 1rem 0;
+    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    line-height: 0.95;
+}
+
+.cartPage__description,
+.cartPage__panelText,
+.cartPage__sectionText,
+.cartPage__itemDescription,
+.cartPage__itemMeta,
+.cartPage__summaryNote,
+.cartPage__emptyText,
+.cartPage__loadingText {
+    margin: 0;
+    color: #4b5874;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.cartPage__heroActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.25rem;
+    margin-top: 1.75rem;
+}
+
+.cartPage__statCard,
+.cartPage__heroPanel,
+.cartPage__itemCard,
+.cartPage__summaryCard,
+.cartPage__emptyState {
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 1.6rem;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
+    backdrop-filter: blur(14px);
+}
+
+.cartPage__statCard {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.9rem 1.05rem;
+}
+
+.cartPage__statLabel,
+.cartPage__priceLabel,
+.cartPage__qtyLabel,
+.cartPage__totalLabel,
+.cartPage__promoValue {
+    color: #6a7590;
+    font-size: 0.88rem;
+}
+
+.cartPage__statValue,
+.cartPage__itemTitle,
+.cartPage__priceValue,
+.cartPage__grandTotal,
+.cartPage__promoCode {
+    color: #08173f;
+}
+
+.cartPage__heroPanel,
+.cartPage__summaryCard,
+.cartPage__emptyState {
+    padding: clamp(1.4rem, 2vw, 1.9rem);
+}
+
+.cartPage__panelLabel,
+.cartPage__sectionEyebrow {
+    margin-bottom: 1rem;
+}
+
+.cartPage__panelTitle,
+.cartPage__sectionTitle,
+.cartPage__emptyTitle {
+    margin-bottom: 0.85rem;
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    line-height: 1.08;
+}
+
+.cartPage__promiseList,
+.cartPage__itemList,
+.cartPage__promoList,
+.cartPage__totals {
+    display: grid;
+    gap: 1rem;
+}
+
+.cartPage__promiseList {
+    margin: 1.4rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cartPage__promiseItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    color: #33415f;
+    line-height: 1.6;
+}
+
+.cartPage__contentGrid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
+    align-items: start;
+}
+
+.cartPage__itemCard {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1.15rem;
+    padding: 1.2rem;
+}
+
+.cartPage__imageLink {
+    display: block;
+}
+
+.cartPage__itemImage {
+    border-radius: 1.1rem;
+    background: #edf2ff;
+}
+
+.cartPage__itemBody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.cartPage__itemTop,
+.cartPage__itemFooter,
+.cartPage__promoItem,
+.cartPage__totalRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.cartPage__itemTop,
+.cartPage__itemFooter,
+.cartPage__promoItem,
+.cartPage__totalRow {
+    align-items: flex-start;
+}
+
+.cartPage__itemTitle {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-decoration: none;
+}
+
+.cartPage__itemTitle:hover {
+    text-decoration: underline;
+}
+
+.cartPage__itemDescription {
+    margin-bottom: 0.45rem;
+}
+
+.cartPage__itemMeta {
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+.cartPage__removeBtn {
+    color: #08173f;
+}
+
+.cartPage__qtySection,
+.cartPage__priceBlock {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.cartPage__priceBlock {
+    justify-items: end;
+}
+
+.cartPage__qtyControl {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem;
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 999px;
+    background: rgba(247, 250, 255, 0.95);
+}
+
+.cartPage__qtyInput {
+    max-width: 3.2rem;
+}
+
+.cartPage__qtyInput :deep(input) {
+    text-align: center;
+    color: #08173f;
+    font-weight: 700;
+    padding: 0;
+}
+
+.cartPage__updateBtn {
+    margin-top: 0.25rem;
+}
+
+.cartPage__summaryColumn {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.cartPage__couponForm {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.25rem;
+}
+
+.cartPage__promoHeading {
+    margin: 0;
+    color: #08173f;
+    font-size: 1rem;
+}
+
+.cartPage__promoItem {
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 1rem;
+    background: rgba(247, 250, 255, 0.9);
+    align-items: center;
+}
+
+.cartPage__promoValue {
+    margin-top: 0.2rem;
+}
+
+.cartPage__totalValue,
+.cartPage__priceValue,
+.cartPage__grandTotal {
+    font-weight: 700;
+}
+
+.cartPage__grandTotal {
+    font-size: 1.1rem;
+}
+
+.cartPage__summaryNote {
+    margin: 0.25rem 0 0;
+}
+
+.cartPage__emptyState {
+    display: grid;
+    justify-items: start;
+    gap: 0.85rem;
+}
+
+.cartPage__emptyIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.15rem;
+    height: 3.15rem;
+    border-radius: 1rem;
+    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
+    color: #010c80;
+}
+
+.cartPage__loadingState {
+    display: grid;
+    justify-items: center;
+    gap: 0.9rem;
+    padding: 4rem 0;
+}
+
+@keyframes cart-rise {
+    from {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .cartPage__heroGrid,
+    .cartPage__contentGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .cartPage__title {
+        max-width: 100%;
+    }
+
+    .cartPage__summaryColumn {
+        position: static;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .cartPage__hero {
+        padding: 3.75rem 0 3.5rem;
+    }
+
+    .cartPage__title {
+        font-size: clamp(2rem, 9vw, 2.8rem);
+        line-height: 1;
+    }
+
+    .cartPage__heroPanel,
+    .cartPage__summaryCard,
+    .cartPage__itemCard,
+    .cartPage__emptyState {
+        border-radius: 1.2rem;
+    }
+
+    .cartPage__itemCard {
+        grid-template-columns: 1fr;
+    }
+
+    .cartPage__itemImage {
+        width: 100% !important;
+        height: 14rem !important;
+    }
+
+    .cartPage__itemTop,
+    .cartPage__itemFooter,
+    .cartPage__promoItem,
+    .cartPage__totalRow {
+        flex-direction: column;
+    }
+
+    .cartPage__priceBlock {
+        justify-items: start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cartPage__heroCopy,
+    .cartPage__heroPanel,
+    .cartPage__itemsPanel,
+    .cartPage__summaryColumn {
+        animation: none;
+    }
+}
+</style>
