@@ -110,6 +110,10 @@ const displayTotal = computed<string>(() => {
     return formatPrice(sum, cart.value?.currency_code ?? DEFAULT_CURENCY)
 })
 
+const displayTaxTotal = computed<string>(() =>
+    formatPrice(Number(cart.value?.tax_total || 0), cart.value?.currency_code ?? DEFAULT_CURENCY)
+)
+
 const router = useRouter()
 
 router.afterEach(() => {
@@ -208,7 +212,12 @@ router.afterEach(() => {
                         <strong class="cartDrawer__summaryValue">{{ displayTotal }}</strong>
                     </div>
 
-                    <p class="cartDrawer__summaryNote">Taxes and shipping are calculated during checkout.</p>
+                    <div class="cartDrawer__summaryRow">
+                        <span class="cartDrawer__summaryLabel">Tax</span>
+                        <strong class="cartDrawer__summaryValue">{{ displayTaxTotal }}</strong>
+                    </div>
+
+                    <p class="cartDrawer__summaryNote">Shipping is calculated during checkout.</p>
 
                     <VBtn
                         v-if="isCartDirty"

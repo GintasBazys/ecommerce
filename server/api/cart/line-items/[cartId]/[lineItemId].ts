@@ -1,3 +1,5 @@
+import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+
 export default defineEventHandler(async (event) => {
     const params = event.context.params as Record<string, string> | undefined
     const { cartId, lineItemId } = params ?? {}
@@ -10,14 +12,15 @@ export default defineEventHandler(async (event) => {
     }
 
     const config = useRuntimeConfig()
+    const countryCode = getCookie(event, "country_code") || null
 
     try {
         const deleteRes = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/line-items/${lineItemId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            },
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+            }
         })
 
         if (!deleteRes.ok) {
@@ -29,12 +32,12 @@ export default defineEventHandler(async (event) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
             },
             body: JSON.stringify({
                 variant_id,
-                quantity,
-            }),
+                quantity
+            })
         })
 
         if (!addRes.ok) {
@@ -42,8 +45,13 @@ export default defineEventHandler(async (event) => {
             throw new Error(`Failed to re-add line item: ${errText}`)
         }
 
-        const updatedCart = await addRes.json()
-        return { success: true, cart: updatedCart.cart }
+        await addRes.json()
+        const updatedCart = await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
+
+        return {
+            success: true,
+            cart: await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, updatedCart, countryCode)
+        }
     } catch (err) {
         console.error("Error updating cart:", err)
         event.node.res.statusCode = 500

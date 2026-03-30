@@ -7,10 +7,12 @@ export default defineEventHandler(async (event) => {
     const limit = query.limit != null ? String(query.limit) : LIMIT
     const offset = query.offset != null ? String(query.offset) : "0"
     const regionId = String(query.region_id)
+    const countryCode = query.country_code ? String(query.country_code) : null
 
     const params = {
         fields: `*variants.calculated_price,*variants.inventory_quantity`,
         region_id: regionId,
+        ...(countryCode ? { country_code: countryCode } : {}),
         tag_id: process.env.MEDUSA_API_TAG || "",
         limit,
         offset

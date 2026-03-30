@@ -5,7 +5,7 @@ interface ProductListResponse {
     products?: ProductDTO[]
 }
 
-const { regionStoreId } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 
 const saleHighlights = [
     "Curated discounts across the current catalog",
@@ -16,15 +16,20 @@ const saleHighlights = [
 const { data, pending, error } = await useFetch<ProductListResponse>("/api/products/products", {
     params: {
         ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
+        ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {}),
         limit: 100,
         order: "-created_at"
     }
 })
 
-const saleProducts = computed<ProductDTO[]>(() => (data.value?.products ?? []).filter((product) => product.variants?.some(
+const saleProducts = computed<ProductDTO[]>(() =>
+    (data.value?.products ?? []).filter((product) =>
+        product.variants?.some(
             (variant) =>
                 variant.calculated_price?.calculated_price?.price_list_type === "sale" && Boolean(variant.calculated_price?.original_amount)
-        )))
+        )
+    )
+)
 
 useHead({
     title: "Special Offers | Ecommerce"

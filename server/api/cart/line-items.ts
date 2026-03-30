@@ -1,3 +1,5 @@
+import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { cartId, variant_id, quantity } = body
@@ -11,6 +13,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const config = useRuntimeConfig()
+    const countryCode = getCookie(event, "country_code") || null
     try {
         const cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/line-items`, {
             method: "POST",
@@ -26,8 +29,13 @@ export default defineEventHandler(async (event) => {
             throw new Error(`Failed to update cart: ${cartResponse.status} ${errorText}`)
         }
 
-        const updatedCart = await cartResponse.json()
-        return { success: true, cart: updatedCart.cart }
+        await cartResponse.json()
+        const updatedCart = await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
+
+        return {
+            success: true,
+            cart: await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, updatedCart, countryCode)
+        }
     } catch (error) {
         console.error("Error updating cart:", error)
         event.node.res.statusCode = 500

@@ -41,7 +41,7 @@ type CategoryProductsResponse = {
     }
 }
 
-const { regionStoreId } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 
 const route = useRoute()
 const disablePanelTransitions = ref(false)
@@ -161,6 +161,7 @@ function buildProductQuery() {
     return {
         category_id: category.value?.id,
         region_id: regionStoreId.value,
+        country_code: selectedCountryCode.value,
         limit,
         offset: offset.value,
         order: sortOption.value,

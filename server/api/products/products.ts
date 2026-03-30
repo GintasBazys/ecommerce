@@ -22,18 +22,27 @@ export default defineEventHandler(async (event) => {
     const order = query.order ? String(query.order) : "-created_at"
 
     const regionId = query.region_id ? String(query.region_id) : null
+    const countryCode = query.country_code ? String(query.country_code) : ''
     if (!regionId) {
         throw createError({ statusCode: 400, statusMessage: "region_id is required" })
     }
 
     const queryParams = new URLSearchParams({
-        fields: `+metadata,*categories,*variants.calculated_price,*variants.inventory_quantity`,
+        fields: `*variants.calculated_price,+variants.inventory_quantity,*categories,+metadata`,
         region_id: regionId,
+        country_code: countryCode,
         order
     })
 
+    console.log("queryParams", queryParams.toString())
+
     if (handle) queryParams.set("handle", handle)
     if (categoryId) queryParams.set("category_id", categoryId)
+    if (countryCode) queryParams.set("country_code", countryCode)
+
+    if (!countryCode) {
+        throw createError({ statusCode: 400, statusMessage: "country_code is required for tax pricing" })
+    }
 
     const url = `${config.public.MEDUSA_URL}/store/products?${queryParams.toString()}&limit=${limit}&offset=${offset}`
 
@@ -59,13 +68,14 @@ export default defineEventHandler(async (event) => {
 
         setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
         return await response.json()
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("Error fetching products:", err)
 
         setHeader(event, "Cache-Control", "no-store")
 
-        const code = err?.cause?.code || err?.code
-        if (code === "ECONNREFUSED" || code === "ENOTFOUND" || err?.name === "AbortError") {
+        const typedError = err as { cause?: { code?: string }; code?: string; name?: string }
+        const code = typedError.cause?.code || typedError.code
+        if (code === "ECONNREFUSED" || code === "ENOTFOUND" || typedError.name === "AbortError") {
             throw createError({ statusCode: 503, statusMessage: "Medusa is unavailable" })
         }
 

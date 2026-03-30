@@ -7,7 +7,7 @@ useHead({
 })
 
 definePageMeta({
-    layout: "account"
+    layout: "default"
 })
 
 const router = useRouter()

@@ -13,15 +13,31 @@ const searchQuery = ref<string>("")
 const searchLoading = ref<boolean>(false)
 const searchResults = ref<ProductDTO[]>([])
 const searchHasSearched = ref<boolean>(false)
+const selectionLoading = ref<boolean>(false)
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
+const route = useRoute()
 
+const regionStore = useRegionStore()
 const { customer } = storeToRefs(useCustomerStore())
 const { itemCount } = storeToRefs(useCartStore())
 const { categories } = storeToRefs(useProductStore())
-const { regionStoreId } = storeToRefs(useRegionStore())
+const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
 
 const topOffset = computed<number>(() => (bannerHidden.value ? 0 : 32))
 const regionId = computed<string>(() => regionStoreId.value ?? "")
+const locationItems = computed(() =>
+    availableCountries.value.map((country) => ({
+        title: country.display_name || country.iso_2.toUpperCase(),
+        value: country.iso_2
+    }))
+)
+const locationLabel = computed<string>(() => "Country")
+const locationValue = computed<string>({
+    get: () => selectedCountryCode.value ?? "",
+    set: (value) => {
+        void updateLocation(value)
+    }
+})
 
 const runSearch = debounce(async (value: string) => {
     if (value.length < 2) {
@@ -39,7 +55,10 @@ const runSearch = debounce(async (value: string) => {
                 Accept: "application/json",
                 "Content-Type": "application/json"
             },
-            query: regionId.value ? { region_id: regionId.value } : {},
+            query: {
+                ...(regionId.value ? { region_id: regionId.value } : {}),
+                ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {})
+            },
             body: {
                 q: value
             }
@@ -78,6 +97,35 @@ function openSearchDialog(): void {
 function closeSearchDialog(): void {
     searchDialog.value = false
 }
+
+async function updateLocation(value: string): Promise<void> {
+    if (!value) {
+        return
+    }
+
+    const isSameSelection = value === selectedCountryCode.value
+    if (isSameSelection) {
+        return
+    }
+
+    selectionLoading.value = true
+
+    try {
+        regionStore.setCountry(value)
+
+        drawer.value = false
+        searchDialog.value = false
+
+        if (import.meta.client) {
+            window.location.assign(route.fullPath)
+            return
+        }
+
+        await reloadNuxtApp({ path: route.fullPath })
+    } finally {
+        selectionLoading.value = false
+    }
+}
 </script>
 
 <template>
@@ -94,14 +142,7 @@ function closeSearchDialog(): void {
             </div>
         </div>
 
-        <VAppBar
-            app
-            color="white"
-            elevation="0"
-            height="64"
-            class="siteHeader__appBar"
-            :style="{ top: `${topOffset}px` }"
-        >
+        <VAppBar app color="white" elevation="0" height="64" class="siteHeader__appBar" :style="{ top: `${topOffset}px` }">
             <VContainer>
                 <VRow align="center" justify="space-between" no-gutters class="w-100 no-wrap">
                     <VCol class="siteHeader__logoCol" cols="auto">
@@ -112,7 +153,12 @@ function closeSearchDialog(): void {
 
                     <nav class="hidden-md-and-down siteHeader__nav">
                         <NuxtLink class="siteHeader__navLink" to="/special-offers">Special offers</NuxtLink>
-                        <NuxtLink v-for="cat in categories" :key="cat.id" class="siteHeader__navLink" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
+                        <NuxtLink
+                            v-for="cat in categories"
+                            :key="cat.id"
+                            class="siteHeader__navLink"
+                            :to="`${CATEGORY_HANDLE}/${cat.handle}`"
+                        >
                             {{ cat.name }}
                         </NuxtLink>
                         <NuxtLink class="siteHeader__navLink" :to="BLOG_HANDLE">Blog</NuxtLink>
@@ -121,6 +167,20 @@ function closeSearchDialog(): void {
 
                     <VCol cols="auto" class="d-flex align-center">
                         <VToolbarItems class="d-flex align-center">
+                            <VSelect
+                                v-model="locationValue"
+                                :items="locationItems"
+                                :label="locationLabel"
+                                item-title="title"
+                                item-value="value"
+                                density="compact"
+                                variant="outlined"
+                                hide-details
+                                rounded="pill"
+                                class="hidden-sm-and-down siteHeader__locationSelect"
+                                :loading="selectionLoading"
+                            />
+
                             <VBtn icon class="siteHeader__iconBtn" @click="openSearchDialog">
                                 <VIcon>mdi-magnify</VIcon>
                             </VBtn>
@@ -163,15 +223,23 @@ function closeSearchDialog(): void {
             </VContainer>
         </VAppBar>
 
-        <VNavigationDrawer
-            v-model="drawer"
-            temporary
-            touchless
-            location="right"
-            width="260"
-            :style="{ paddingTop: `${topOffset}px` }"
-        >
+        <VNavigationDrawer v-model="drawer" temporary touchless location="right" width="260" :style="{ paddingTop: `${topOffset}px` }">
             <VList nav>
+                <VListItem>
+                    <VSelect
+                        v-model="locationValue"
+                        :items="locationItems"
+                        :label="locationLabel"
+                        item-title="title"
+                        item-value="value"
+                        density="comfortable"
+                        variant="outlined"
+                        hide-details
+                        rounded="pill"
+                        class="siteHeader__drawerSelect"
+                        :loading="selectionLoading"
+                    />
+                </VListItem>
                 <VListItem>
                     <NuxtLink class="siteHeader__drawerLink" to="/special-offers">Special offers</NuxtLink>
                 </VListItem>
@@ -224,9 +292,7 @@ function closeSearchDialog(): void {
                         <VProgressCircular indeterminate size="28" color="primary" />
                     </div>
 
-                    <div v-else-if="searchHasSearched && !searchResults.length" class="searchWindow__state">
-                        No products found.
-                    </div>
+                    <div v-else-if="searchHasSearched && !searchResults.length" class="searchWindow__state">No products found.</div>
 
                     <NuxtLink
                         v-for="product in searchResults"
@@ -347,6 +413,11 @@ function closeSearchDialog(): void {
         color: #1d2f53;
     }
 
+    &__locationSelect {
+        width: 180px;
+        margin-right: 0.25rem;
+    }
+
     &__accountBtn {
         color: #1d2f53;
         font-weight: 600;
@@ -372,6 +443,10 @@ function closeSearchDialog(): void {
         color: #23365b;
         font-weight: 600;
         text-decoration: none;
+    }
+
+    &__drawerSelect {
+        margin-bottom: 0.35rem;
     }
 }
 

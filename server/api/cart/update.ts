@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
 
     try {
-        return await $fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
+        await $fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
             method: "POST",
             headers: {
                 "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
@@ -41,6 +41,10 @@ export default defineEventHandler(async (event) => {
                 ...(shipping_address ? { shipping_address } : {})
             }
         })
+
+        return {
+            cart: await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
+        }
     } catch (error: unknown) {
         const err = error as FetchError
         console.error("Medusa cart update failed:", error)

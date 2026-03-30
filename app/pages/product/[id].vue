@@ -2,7 +2,7 @@
 import type { Review, ReviewApiResponse } from "@/types/interfaces"
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
-import { formatPrice } from "@/utils/formatPrice"
+import { useProductPrice } from "~/composables/useProductPrice"
 
 interface ProductListResponse {
     products?: ProductDTO[]
@@ -14,14 +14,18 @@ interface ProductCategory {
 }
 
 const route = useRoute()
-const { regionStoreId } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { openCartDrawer } = storeToRefs(useCartStore())
 const { customer } = storeToRefs(useCustomerStore())
 
 const handle = computed<string>(() => String(route.params.id || ""))
 
 const { data } = await useFetch<ProductListResponse>("/api/products/products", {
-    params: { handle: handle.value, ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}) }
+    params: {
+        handle: handle.value,
+        ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
+        ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {})
+    }
 })
 
 const product = computed<ProductDTO | null>(() => data.value?.products?.[0] ?? null)
@@ -52,6 +56,7 @@ const { data: relatedData } = await useAsyncData<ProductListResponse>(`related-p
         params: {
             category_id: primaryCategory.value.id,
             ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
+            ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {}),
             limit: 8
         }
     })
@@ -103,21 +108,7 @@ const isOnSale = computed<boolean>(
         Boolean(selectedVariant.value?.calculated_price?.original_amount)
 )
 
-const originalPrice = computed<string | null>(() => {
-    if (!selectedVariant.value?.calculated_price?.original_amount) {
-        return null
-    }
-
-    return formatPrice(selectedVariant.value.calculated_price.original_amount, selectedVariant.value.calculated_price.currency_code)
-})
-
-const salePrice = computed<string | null>(() => {
-    if (!selectedVariant.value?.calculated_price) {
-        return null
-    }
-
-    return formatPrice(selectedVariant.value.calculated_price.calculated_amount, selectedVariant.value.calculated_price.currency_code)
-})
+const { displayPrice, originalPrice, taxLabel } = useProductPrice(selectedVariant)
 
 const maxStock = computed<number>(() => selectedVariant.value?.inventory_quantity || 0)
 const inStock = computed<boolean>(() => maxStock.value > 0)
@@ -274,7 +265,12 @@ watch(
                             </div>
                             <h1 class="productPage__title">{{ product.title }}</h1>
                             <p v-if="product.subtitle" class="productPage__subtitle">{{ product.subtitle }}</p>
-                            <p class="productPage__description">{{ product.description || "A refined product pick designed to feel premium, practical, and easy to wear every day." }}</p>
+                            <p class="productPage__description">
+                                {{
+                                    product.description ||
+                                        "A refined product pick designed to feel premium, practical, and easy to wear every day."
+                                }}
+                            </p>
                             <div v-if="product.tags.length" class="productPage__tagRow">
                                 <VChip v-for="tag in product.tags" :key="tag.id" class="productPage__tag" size="small" label>
                                     {{ tag.value }}
@@ -282,9 +278,10 @@ watch(
                             </div>
                             <div v-if="selectedVariant" class="productPage__priceBlock">
                                 <div class="productPage__priceRow">
-                                    <span class="productPage__price">{{ salePrice }}</span>
+                                    <span class="productPage__price">{{ displayPrice }}</span>
                                     <del v-if="isOnSale && originalPrice" class="productPage__originalPrice">{{ originalPrice }}</del>
                                 </div>
+                                <p class="productPage__taxMeta">{{ taxLabel }}</p>
                                 <p
                                     class="productPage__inventory"
                                     :class="inStock ? 'productPage__inventory--in' : 'productPage__inventory--out'"
@@ -370,7 +367,12 @@ watch(
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Description</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <p class="productPage__detailText">{{ product.description || "A carefully selected product with balanced styling, everyday function, and a polished finish." }}</p>
+                                    <p class="productPage__detailText">
+                                        {{
+                                            product.description ||
+                                                "A carefully selected product with balanced styling, everyday function, and a polished finish."
+                                        }}
+                                    </p>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                             <VExpansionPanel>
@@ -379,7 +381,7 @@ watch(
                                     <ul class="productPage__detailList">
                                         <li>Choose your preferred option before adjusting quantity.</li>
                                         <li>Pricing updates instantly based on the selected variant.</li>
-                                        <li>Shipping and taxes are finalized during checkout.</li>
+                                        <li>Shipping updates at checkout, and tax display follows the selected region.</li>
                                     </ul>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
@@ -669,6 +671,13 @@ watch(
     margin-top: 0.55rem;
     font-size: 0.92rem;
     font-weight: 700;
+}
+
+.productPage__taxMeta {
+    margin-top: 0.6rem;
+    color: #5a6480;
+    font-size: 0.92rem;
+    line-height: 1.5;
 }
 
 .productPage__inventory--in {

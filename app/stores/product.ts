@@ -46,13 +46,14 @@ export const useProductStore = defineStore("product", () => {
     const pageNumber = parseInt(route.query.page as string, 10) || 1
     offset.value = (pageNumber - 1) * limit.value
 
-    const fetchData = async (regionId?: string) => {
+    const fetchData = async (regionId?: string, countryCode?: string) => {
         try {
             const response = await $fetch<ProductResponse>("/api/products/products", {
                 query: {
                     limit: limit.value,
                     offset: offset.value,
-                    ...(regionId ? { region_id: regionId } : {})
+                    ...(regionId ? { region_id: regionId } : {}),
+                    ...(countryCode ? { country_code: countryCode } : {})
                 }
             })
             if (response) {
@@ -77,13 +78,14 @@ export const useProductStore = defineStore("product", () => {
             console.error("Failed to fetch categories:", error)
         }
     }
-    const fetchBestSellers = async (regionId?: string) => {
+    const fetchBestSellers = async (regionId?: string, countryCode?: string) => {
         try {
             const { products } = await $fetch<{ products: ProductDTO[] }>(`/api/categories/best-selling`, {
                 query: {
                     limit: limit.value,
                     offset: offset.value,
-                    ...(regionId ? { region_id: regionId } : {})
+                    ...(regionId ? { region_id: regionId } : {}),
+                    ...(countryCode ? { country_code: countryCode } : {})
                 }
             })
             setBestSellers(products)

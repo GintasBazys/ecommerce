@@ -3,7 +3,6 @@ import debounce from "lodash/debounce"
 
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
-import { formatPrice } from "@/utils/formatPrice"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const FALLBACK_IMAGE = "/images/about_banner.webp"
@@ -17,7 +16,7 @@ const { openCartDrawer } = storeToRefs(cartStore)
 
 const loading = ref<boolean>(false)
 
-const selectedVariant = ref<ProductVariantDTO | null>(product.variants?.[0] ?? null)
+const selectedVariant = computed<ProductVariantDTO | null>(() => product.variants?.[0] ?? null)
 
 const productHref = computed<string>(() => (product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : "#"))
 
@@ -31,33 +30,13 @@ const productDescription = computed<string>(() => {
     return "A polished ecommerce pick selected for quality, everyday utility, and easy styling."
 })
 
-const computedPrice = computed<number | string>(() => {
-    if (
-        selectedVariant.value &&
-        selectedVariant.value.calculated_price &&
-        selectedVariant.value.calculated_price.calculated_amount !== undefined
-    ) {
-        const { calculated_amount, currency_code } = selectedVariant.value.calculated_price
-        return formatPrice(calculated_amount, currency_code)
-    }
-
-    return "N/A"
-})
+const { displayPrice, originalPrice, taxLabel } = useProductPrice(selectedVariant)
 
 const isOnSale = computed<boolean>(
     () =>
         selectedVariant.value?.calculated_price?.calculated_price?.price_list_type === "sale" &&
         Boolean(selectedVariant.value?.calculated_price?.original_amount)
 )
-
-const originalPrice = computed<string | null>(() => {
-    if (selectedVariant.value?.calculated_price?.original_amount) {
-        const { original_amount, currency_code } = selectedVariant.value.calculated_price
-        return formatPrice(original_amount, currency_code)
-    }
-
-    return null
-})
 
 const averageRating = computed<number | null>(() => {
     const rating = Number(product?.metadata?.averageRating)
@@ -66,9 +45,7 @@ const averageRating = computed<number | null>(() => {
 
 const variantLabel = computed<string>(() => selectedVariant.value?.title || "Selected option")
 
-const stockLabel = computed<string>(() =>
-    selectedVariant.value?.inventory_quantity ? "Ready to ship" : "Currently unavailable"
-)
+const stockLabel = computed<string>(() => (selectedVariant.value?.inventory_quantity ? "Ready to ship" : "Currently unavailable"))
 
 async function addToCart(): Promise<void> {
     if (!selectedVariant.value) {
@@ -101,15 +78,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     class="productCard__image"
                 />
                 <div class="productCard__glow"></div>
-                <VChip
-                    v-if="isOnSale"
-                    class="productCard__badge"
-                    color="error"
-                    size="small"
-                    label
-                >
-                    Sale
-                </VChip>
+                <VChip v-if="isOnSale" class="productCard__badge" color="error" size="small" label> Sale </VChip>
             </div>
         </NuxtLink>
 
@@ -136,9 +105,10 @@ const debouncedAddToCart = debounce(addToCart, 300)
             <div class="productCard__bottom">
                 <div class="productCard__priceBlock">
                     <div class="productCard__priceRow">
-                        <span class="productCard__price">{{ computedPrice }}</span>
+                        <span class="productCard__price">{{ displayPrice }}</span>
                         <del v-if="isOnSale && originalPrice" class="productCard__originalPrice">{{ originalPrice }}</del>
                     </div>
+                    <span class="productCard__taxMeta">{{ taxLabel }}</span>
                     <span class="productCard__variant">{{ variantLabel }}</span>
                 </div>
 
@@ -189,8 +159,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
         overflow: hidden;
         aspect-ratio: 1;
         background:
-            radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 36%),
-            linear-gradient(180deg, #eef5ff 0%, #dfeafc 100%);
+            radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 36%), linear-gradient(180deg, #eef5ff 0%, #dfeafc 100%);
     }
 
     &__image {
@@ -327,6 +296,12 @@ const debouncedAddToCart = debounce(addToCart, 300)
         line-height: 1.4;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    &__taxMeta {
+        color: #5f6d8a;
+        font-size: 0.8rem;
+        line-height: 1.4;
     }
 
     &__button {

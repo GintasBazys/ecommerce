@@ -2,7 +2,7 @@
 import type { VForm } from "~/types/interfaces"
 
 useHead({ title: "Signin | Ecommerce" })
-definePageMeta({ layout: "account" })
+definePageMeta({ layout: "default" })
 
 const router = useRouter()
 

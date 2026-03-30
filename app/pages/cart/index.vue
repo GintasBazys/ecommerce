@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce"
 
+import TaxedLinePrice from "../../components/Cart/TaxedLinePrice.vue"
+
 import type { CartLineItemDTO } from "@medusajs/types"
 
 import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
@@ -9,6 +11,13 @@ import { formatPrice } from "~/utils/formatPrice"
 definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Cart | Ecommerce" })
+
+type PricedCartLineItem = CartLineItemDTO & {
+    subtotal?: number | null
+    total?: number | null
+    tax_total?: number | null
+    unit_price?: number | null
+}
 
 const { cart } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem, loadCart } = useCartStore()
@@ -163,6 +172,27 @@ async function applyCoupon(): Promise<void> {
 
 const currencyCode = computed<string>(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
 
+function getAmountWithTax(item: CartLineItemDTO): number {
+    const pricedItem = item as PricedCartLineItem
+    const savedQuantity = Math.max(Number(item.quantity) || 1, 1)
+    const desiredQuantity = Math.max(Number(qtyMap[item.id] ?? item.quantity) || 1, 1)
+    const unitAmountWithTax = pricedItem.total != null ? Number(pricedItem.total) / savedQuantity : Number(pricedItem.unit_price ?? 0)
+
+    return unitAmountWithTax * desiredQuantity
+}
+
+function getAmountWithoutTax(item: CartLineItemDTO): number {
+    const pricedItem = item as PricedCartLineItem
+    const savedQuantity = Math.max(Number(item.quantity) || 1, 1)
+    const desiredQuantity = Math.max(Number(qtyMap[item.id] ?? item.quantity) || 1, 1)
+
+    if (pricedItem.subtotal != null) {
+        return (Number(pricedItem.subtotal) / savedQuantity) * desiredQuantity
+    }
+
+    return getAmountWithTax(item) - (Number(pricedItem.tax_total ?? 0) / savedQuantity) * desiredQuantity
+}
+
 async function removePromotion(promoCode: string | undefined): Promise<void> {
     if (!cart.value?.id || !promoCode) {
         return
@@ -234,7 +264,7 @@ async function updateCart(): Promise<void> {
                                 </li>
                                 <li class="cartPage__promiseItem">
                                     <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
-                                    <span>Shipping and taxes are confirmed in the next step</span>
+                                    <span>Shipping is confirmed in the next step</span>
                                 </li>
                             </ul>
                         </div>
@@ -311,14 +341,10 @@ async function updateCart(): Promise<void> {
                                             </div>
                                             <div class="cartPage__priceBlock">
                                                 <span class="cartPage__priceLabel">Line total</span>
-                                                <strong class="cartPage__priceValue">
-                                                    {{
-                                                        formatPrice(
-                                                            Number(item.unit_price || 0) * Number(qtyMap[item.id] || 1),
-                                                            currencyCode
-                                                        )
-                                                    }}
-                                                </strong>
+                                                <TaxedLinePrice
+                                                    :amount-with-tax="getAmountWithTax(item)"
+                                                    :amount-without-tax="getAmountWithoutTax(item)"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -406,13 +432,19 @@ async function updateCart(): Promise<void> {
                                         }}</span>
                                     </div>
                                     <div class="cartPage__totalRow">
+                                        <span class="cartPage__totalLabel">Tax</span>
+                                        <span class="cartPage__totalValue">{{
+                                            formatPrice(Number(cart?.tax_total || 0), currencyCode)
+                                        }}</span>
+                                    </div>
+                                    <div class="cartPage__totalRow">
                                         <span class="cartPage__totalLabel">Total</span>
                                         <strong class="cartPage__grandTotal">{{
                                             formatPrice(Number(cart?.total || 0), currencyCode)
                                         }}</strong>
                                     </div>
                                 </div>
-                                <p class="cartPage__summaryNote">Shipping and taxes are calculated during the next step.</p>
+                                <p class="cartPage__summaryNote">Shipping is calculated during the next step.</p>
                                 <VBtn
                                     color="primary"
                                     rounded="pill"

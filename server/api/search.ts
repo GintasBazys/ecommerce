@@ -12,9 +12,7 @@ function normalizeSearchValue(value: string): string {
 }
 
 function buildProductSearchText(product: ProductDTO): string {
-    const variantTexts = (product.variants || [])
-        .map((variant) => [variant.title, variant.sku].filter(Boolean).join(" "))
-        .join(" ")
+    const variantTexts = (product.variants || []).map((variant) => [variant.title, variant.sku].filter(Boolean).join(" ")).join(" ")
 
     return normalizeSearchValue(
         [product.title, product.subtitle, product.description, product.handle, variantTexts].filter(Boolean).join(" ")
@@ -70,6 +68,7 @@ export default eventHandler(async (event) => {
     }
 
     const regionId = query.region_id ? String(query.region_id) : null
+    const countryCode = query.country_code ? String(query.country_code) : null
 
     const baseParams = new URLSearchParams({
         fields: "*variants.calculated_price,*variants.inventory_quantity",
@@ -78,6 +77,9 @@ export default eventHandler(async (event) => {
     })
     if (regionId) {
         baseParams.set("region_id", regionId)
+    }
+    if (countryCode) {
+        baseParams.set("country_code", countryCode)
     }
 
     const fetchProducts = async (searchTerm: string): Promise<StoreProductsResponse> => {

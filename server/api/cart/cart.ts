@@ -1,3 +1,5 @@
+import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const query = getQuery(event)
@@ -9,6 +11,7 @@ export default defineEventHandler(async (event) => {
 
     const forceNew = query.force_new === "1"
     const cartId = forceNew ? null : getCookie(event, "cart_id") || null
+    const countryCode = getCookie(event, "country_code") || null
 
     const cookieOptions = { path: "/", sameSite: "lax" as const, secure: process.env.NODE_ENV === "production" }
 
@@ -24,14 +27,14 @@ export default defineEventHandler(async (event) => {
         })
 
         const data = await medusaRes.json()
-        const cart = data.cart ?? data
+        const cart = await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, data.cart ?? data, countryCode)
 
         setCookie(event, "cart_id", cart.id, cookieOptions)
 
         return { cart, regionId }
     }
 
-    const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}?fields=*items`, {
+    const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}?fields=%2Bitems.*,%2Bshipping_methods.*`, {
         method: "GET",
         headers: {
             "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
@@ -52,11 +55,11 @@ export default defineEventHandler(async (event) => {
             body: JSON.stringify({ region_id: regionId })
         })
         const data = await createRes.json()
-        const cart = data.cart ?? data
+        const cart = await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, data.cart ?? data, countryCode)
         setCookie(event, "cart_id", cart.id, cookieOptions)
         return { cart, regionId }
     }
 
-    const data = await medusaRes.json()
-    return { cart: data.cart ?? data, regionId }
+    const cart = await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
+    return { cart: await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cart, countryCode), regionId }
 })

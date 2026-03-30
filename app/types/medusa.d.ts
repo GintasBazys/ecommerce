@@ -13,8 +13,12 @@ declare module "@medusajs/types" {
     interface ProductVariantDTO {
         calculated_price: {
             calculated_amount: number
+            calculated_amount_with_tax?: number
+            calculated_amount_without_tax?: number
             original_amount: number
+            original_amount_with_tax?: number
             currency_code: string
+            is_calculated_price_tax_inclusive?: boolean
             calculated_price: {
                 price_list_type: string
             }

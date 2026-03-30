@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const { regionStoreId } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const productStore = useProductStore()
 const { bestSellers } = storeToRefs(useProductStore())
 
 await callOnce(async () => {
-    await productStore.fetchBestSellers(regionStoreId.value ?? "")
+    await productStore.fetchBestSellers(regionStoreId.value ?? "", selectedCountryCode.value ?? "")
 })
 </script>
 
@@ -51,8 +51,7 @@ await callOnce(async () => {
 
     &--bestsellers {
         background:
-            radial-gradient(circle at top right, rgba(0, 128, 255, 0.1), transparent 24%),
-            linear-gradient(180deg, #f7faff 0%, #ffffff 100%);
+            radial-gradient(circle at top right, rgba(0, 128, 255, 0.1), transparent 24%), linear-gradient(180deg, #f7faff 0%, #ffffff 100%);
     }
 
     &__container {

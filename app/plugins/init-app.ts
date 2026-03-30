@@ -13,7 +13,7 @@ export default defineNuxtPlugin(async () => {
 
     const requestFetch = useRequestFetch()
 
-    if (!regionStore.regionStoreId) {
+    if (!regionStore.regions?.length) {
         await regionStore.fetchRegion()
     }
 
@@ -61,13 +61,16 @@ export default defineNuxtPlugin(async () => {
         const cartState = useState<CartDTO | null | undefined>(cartKey, () => null)
         if (cartState.value === null) {
             try {
-                const { cart } = await $fetch<{ cart: CartDTO | null| undefined }>(`/api/cart/cart?region_id=${regionStore.regionStoreId}`, {
-                    headers: {
-                        ...useRequestHeaders(["cookie"]),
-                        "Content-Type": "application/json",
-                        "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+                const { cart } = await $fetch<{ cart: CartDTO | null | undefined }>(
+                    `/api/cart/cart?region_id=${regionStore.regionStoreId}`,
+                    {
+                        headers: {
+                            ...useRequestHeaders(["cookie"]),
+                            "Content-Type": "application/json",
+                            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+                        }
                     }
-                })
+                )
                 cartState.value = cart ?? null
             } catch {
                 cartState.value = null

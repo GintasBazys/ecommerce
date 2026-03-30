@@ -1,4 +1,4 @@
-import { fetchStoreOrder } from "../../utils/orders"
+import { fetchStoreOrder } from "#server/utils/orders"
 
 export default defineEventHandler(async (event) => {
     const { id } = event.context.params!

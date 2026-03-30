@@ -1,7 +1,10 @@
+import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+
 export default defineEventHandler(async (event) => {
     const cartId = getRouterParam(event, "cartId")
     const lineItemId = getRouterParam(event, "lineItemId")
     const config = useRuntimeConfig()
+    const countryCode = getCookie(event, "country_code") || null
 
     if (!cartId || !lineItemId) {
         throw createError({
@@ -22,13 +25,14 @@ export default defineEventHandler(async (event) => {
         const result = await response.json()
 
         if (response.ok) {
+            const updatedCart = await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
+
             return {
                 success: true,
-                cart: result
+                cart: await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, updatedCart, countryCode)
             }
-        } 
-            throw new Error(result.message || "Failed to delete line item")
-        
+        }
+        throw new Error(result.message || "Failed to delete line item")
     } catch (error) {
         console.error("Error deleting line item:", error)
         throw createError({

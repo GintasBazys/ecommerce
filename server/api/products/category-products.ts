@@ -146,6 +146,7 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event)
 
     const regionId = query.region_id ? String(query.region_id) : null
+    const countryCode = query.country_code ? String(query.country_code) : null
     const categoryId = query.category_id ? String(query.category_id) : null
 
     if (!regionId || !categoryId) {
@@ -168,6 +169,10 @@ export default defineEventHandler(async (event) => {
         region_id: regionId,
         category_id: categoryId
     })
+
+    if (countryCode) {
+        params.set("country_code", countryCode)
+    }
 
     const baseUrl = `${config.public.MEDUSA_URL}/store/products?${params.toString()}`
 
@@ -306,9 +311,7 @@ export default defineEventHandler(async (event) => {
                 return false
             }
 
-            return !((minPrice || maxPrice) && price === null);
-
-
+            return !((minPrice || maxPrice) && price === null)
         })
 
         const sorted = [...filtered].sort((a, b) => compareProducts(a, b, order))

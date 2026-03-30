@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { loadStripe } from "@stripe/stripe-js/pure"
 
+import TaxedLinePrice from "../components/Cart/TaxedLinePrice.vue"
+
 import type { Address, ShippingOption, VForm } from "@/types/interfaces"
-import type { CartDTO } from "@medusajs/types"
+import type { CartDTO, CartLineItemDTO } from "@medusajs/types"
 import type { Stripe, StripeElements, StripeLinkAuthenticationElement, StripePaymentElement } from "@stripe/stripe-js"
 
 import { formatPrice } from "@/utils/formatPrice"
@@ -14,6 +16,12 @@ useHead({ title: "Checkout | Ecommerce" })
 type CheckoutStep = "account" | "address" | "payment"
 type AuthTab = "login" | "register" | "guest"
 type CheckoutCart = CartDTO & { email?: string | null }
+type PricedCartLineItem = CartLineItemDTO & {
+    subtotal?: number | null
+    total?: number | null
+    tax_total?: number | null
+    unit_price?: number | null
+}
 type CreatePaymentIntentPayload = {
     clientSecret?: string
     client_secret?: string
@@ -159,6 +167,31 @@ const cartFingerprint = computed<string>(() => {
     const items = Array.isArray(currentCart.items) ? currentCart.items.map((item) => `${item.id}:${item.quantity}`).join("|") : ""
     return `${currentCart.id}|${items}|${currentCart.total ?? ""}|${currentCart.updated_at ?? ""}`
 })
+
+function getAmountWithTax(item: CartLineItemDTO): number {
+    const pricedItem = item as PricedCartLineItem
+    return Number(pricedItem.total ?? pricedItem.unit_price ?? 0)
+}
+
+function getAmountWithoutTax(item: CartLineItemDTO): number {
+    const pricedItem = item as PricedCartLineItem
+
+    if (pricedItem.subtotal != null) {
+        return Number(pricedItem.subtotal)
+    }
+
+    return getAmountWithTax(item) - Number(pricedItem.tax_total ?? 0)
+}
+
+function getShippingOptionLabel(option: ShippingOption): string {
+    const amount = option.calculated_price
+        ? option.calculated_price.calculated_amount
+        : option.prices.length
+          ? option.prices[0]!.amount
+          : null
+
+    return `${option.name} - ${amount != null ? formatPrice(amount, currencyCode.value) : "Free"}`
+}
 
 function resetAddress(address: Address): void {
     address.first_name = ""
@@ -655,9 +688,9 @@ watch(cartFingerprint, scheduleRefresh)
                                             {{ customer?.email || checkoutEmail }}
                                         </p>
                                     </div>
-                                    <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'"
-                                    >Continue</VBtn
-                                    >
+                                    <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'">
+                                        Continue
+                                    </VBtn>
                                 </div>
                                 <div v-else class="checkoutPage__sectionCard">
                                     <VTabs v-model="authTab" grow class="checkoutPage__tabs">
@@ -905,12 +938,12 @@ watch(cartFingerprint, scheduleRefresh)
                                             </div>
                                         </div>
                                         <div class="checkoutPage__buttonRow">
-                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'account'"
-                                            >Back</VBtn
-                                            >
-                                            <VBtn color="primary" rounded="pill" class="text-none" :loading="isSubmitting" type="submit"
-                                            >Save and continue</VBtn
-                                            >
+                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'account'">
+                                                Back
+                                            </VBtn>
+                                            <VBtn color="primary" rounded="pill" class="text-none" :loading="isSubmitting" type="submit">
+                                                Save and continue
+                                            </VBtn>
                                         </div>
                                     </VForm>
                                 </div>
@@ -937,15 +970,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                 v-for="option in shippingOptions"
                                                 :key="option.id"
                                                 :value="option.id"
-                                                :label="
-                                                    option.name +
-                                                        ' - ' +
-                                                        (option.calculated_price
-                                                            ? formatPrice(option.calculated_price.calculated_amount, currencyCode)
-                                                            : option.prices.length
-                                                                ? formatPrice(option.prices[0]!.amount, option.prices[0]!.currency_code)
-                                                                : 'Free')
-                                                "
+                                                :label="getShippingOptionLabel(option)"
                                             />
                                         </VRadioGroup>
                                     </div>
@@ -954,9 +979,9 @@ watch(cartFingerprint, scheduleRefresh)
                                         <div id="link-authentication-element"></div>
                                         <div id="payment-element" class="checkoutPage__paymentElement"></div>
                                         <div class="checkoutPage__buttonRow checkoutPage__buttonRow--payment">
-                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'"
-                                            >Back</VBtn
-                                            >
+                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'">
+                                                Back
+                                            </VBtn>
                                             <VBtn
                                                 color="primary"
                                                 rounded="pill"
@@ -992,9 +1017,12 @@ watch(cartFingerprint, scheduleRefresh)
                                             <span class="checkoutPage__summaryItemMeta">{{ item.variant_title || "Standard option" }}</span>
                                             <span class="checkoutPage__summaryItemMeta">Qty {{ item.quantity }}</span>
                                         </div>
-                                        <strong class="checkoutPage__summaryItemPrice">
-                                            {{ formatPrice(Number(item.total ?? item.unit_price) || 0, currencyCode) }}
-                                        </strong>
+                                        <div class="checkoutPage__summaryItemPrice">
+                                            <TaxedLinePrice
+                                                :amount-with-tax="getAmountWithTax(item)"
+                                                :amount-without-tax="getAmountWithoutTax(item)"
+                                            />
+                                        </div>
                                     </article>
                                 </div>
                                 <div class="checkoutPage__totals">
@@ -1005,6 +1033,14 @@ watch(cartFingerprint, scheduleRefresh)
                                     <div class="checkoutPage__totalRow">
                                         <span>Subtotal</span>
                                         <span>{{ formatPrice(Number(checkoutCart?.subtotal || 0), currencyCode) }}</span>
+                                    </div>
+                                    <div class="checkoutPage__totalRow">
+                                        <span>Shipping</span>
+                                        <span>{{ formatPrice(Number(checkoutCart?.shipping_total || 0), currencyCode) }}</span>
+                                    </div>
+                                    <div class="checkoutPage__totalRow">
+                                        <span>Tax</span>
+                                        <span>{{ formatPrice(Number(checkoutCart?.tax_total || 0), currencyCode) }}</span>
                                     </div>
                                     <div class="checkoutPage__totalRow">
                                         <span>Total</span>
