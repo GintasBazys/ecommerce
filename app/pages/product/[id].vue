@@ -310,9 +310,14 @@ watch(
     () => product.value?.id,
     async (id) => {
         if (id) {
-            reviewsData.value = await $fetch("/api/reviews/list-reviews", {
-                params: { product_id: id, limit: 10, offset: 0 }
-            })
+            try {
+                reviewsData.value = await $fetch("/api/reviews/list-reviews", {
+                    params: { product_id: id, limit: 10, offset: 0 }
+                })
+            } catch (error) {
+                console.error("Review fetch error", error)
+                reviewsData.value = { reviews: [] }
+            }
         }
     },
     { immediate: true }
@@ -372,7 +377,12 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             </div>
                             <h1 class="productPage__title">{{ product.title }}</h1>
                             <p v-if="product.subtitle" class="productPage__subtitle">{{ product.subtitle }}</p>
-                            <p class="productPage__description">{{ product.description || "A refined product pick designed to feel premium, practical, and easy to wear every day." }}</p>
+                            <p class="productPage__description">
+                                {{
+                                    product.description ||
+                                        "A refined product pick designed to feel premium, practical, and easy to wear every day."
+                                }}
+                            </p>
                             <div v-if="product.tags.length" class="productPage__tagRow">
                                 <VChip v-for="tag in product.tags" :key="tag.id" class="productPage__tag" size="small" label>
                                     {{ tag.value }}
@@ -469,7 +479,12 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Description</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <p class="productPage__detailText">{{ product.description || "A carefully selected product with balanced styling, everyday function, and a polished finish." }}</p>
+                                    <p class="productPage__detailText">
+                                        {{
+                                            product.description ||
+                                                "A carefully selected product with balanced styling, everyday function, and a polished finish."
+                                        }}
+                                    </p>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                             <VExpansionPanel>

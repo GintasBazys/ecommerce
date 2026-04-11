@@ -1,33 +1,21 @@
-import { defineEventHandler, readBody } from "h3"
-
-import { useRuntimeConfig } from "#imports"
+import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     try {
-        const backendResponse = await fetch(`${config.public.MEDUSA_URL}/auth/customer/google`, {
-            credentials: "include",
+        const backendResponse = await fetchMedusaResponse(event, "/auth/customer/google", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                cookie: event.node.req.headers.cookie || ""
-            },
             body: JSON.stringify(await readBody(event))
         })
 
-        if (!backendResponse.ok) {
-            return {
-                success: false,
-                message: "Authentication failed"
-            }
+        await assertMedusaResponse(backendResponse, "Authentication failed")
+        const payload = await safeJson<{ success?: boolean; location?: string | null }>(backendResponse)
+
+        if (payload === null) {
+            throw createError({ statusCode: 502, statusMessage: "Invalid Medusa response" })
         }
 
-        return await backendResponse.json()
-    } catch (error) {
-        console.error("Error in API proxy:", error)
-        return {
-            success: false,
-            message: "Server error occurred"
-        }
+        return payload
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Social login failed")
     }
 })

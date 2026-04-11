@@ -1,7 +1,7 @@
 import { LIMIT } from "@/utils/consts"
+import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const query = getQuery(event)
 
     const productId = query.product_id
@@ -9,10 +9,7 @@ export default defineEventHandler(async (event) => {
     const offset = query.offset !== undefined && query.offset !== null ? String(query.offset) : "0"
 
     if (!productId) {
-        return {
-            error: true,
-            message: "Missing required query parameter: product_id"
-        }
+        throw createError({ statusCode: 400, statusMessage: "Missing required query parameter: product_id" })
     }
 
     const queryParams = new URLSearchParams({
@@ -21,22 +18,10 @@ export default defineEventHandler(async (event) => {
     })
 
     try {
-        const response = await fetch(`${config.public.MEDUSA_URL}/store/products/${productId}/reviews?${queryParams.toString()}`, {
-            method: "GET",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
-            }
+        return await fetchMedusaJson(event, `/store/products/${productId}/reviews?${queryParams.toString()}`, {
+            method: "GET"
         })
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch product reviews: ${response.statusText}`)
-        }
-
-        const data = await response.json()
-        return data
-    } catch (error) {
-        console.error("Error fetching product reviews:", error)
-        return { error: true, message: "Failed to fetch product reviews" }
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Failed to fetch product reviews")
     }
 })

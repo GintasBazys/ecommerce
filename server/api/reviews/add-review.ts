@@ -1,3 +1,5 @@
+import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
+
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
@@ -6,18 +8,15 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: "Not authenticated" })
     }
 
-    const config = useRuntimeConfig()
-    const headers = {
-        "Content-Type": "application/json",
-        "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-        Authorization: `Bearer ${accessToken}`,
-        cookie: event.node.req.headers.cookie || ""
+    try {
+        return await fetchMedusaJson(event, "/store/reviews", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(body)
+        })
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Failed to add review")
     }
-
-    return $fetch(`${config.public.MEDUSA_URL}/store/reviews`, {
-        method: "POST",
-        headers,
-        credentials: "include",
-        body
-    })
 })

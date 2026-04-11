@@ -91,11 +91,15 @@ const accountStatus = computed(() => [
 ])
 
 async function handleLogout(): Promise<void> {
-    const response = await $fetch<{ success: boolean }>("/api/account/logout", { method: "POST" })
+    try {
+        const response = await $fetch<{ success: boolean }>("/api/account/logout", { method: "POST" })
 
-    if (response.success) {
-        customerStore.$patch({ customer: null })
-        await router.push("/")
+        if (response.success) {
+            customerStore.$patch({ customer: null })
+            await router.push("/")
+        }
+    } catch (error) {
+        console.error("Logout failed", error)
     }
 }
 </script>

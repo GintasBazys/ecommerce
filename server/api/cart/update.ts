@@ -1,4 +1,5 @@
-import type { FetchError } from "ofetch"
+import { retrieveExpandedCart } from "#server/utils/cart"
+import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 interface Address {
     first_name: string
@@ -27,27 +28,19 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "Cart ID not found in cookies or request" })
     }
 
-    const config = useRuntimeConfig()
-
     try {
-        await $fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
+        await fetchMedusaJson(event, `/store/carts/${cartId}`, {
             method: "POST",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
-            },
-            body: {
+            body: JSON.stringify({
                 billing_address,
                 ...(shipping_address ? { shipping_address } : {})
-            }
+            })
         })
 
         return {
-            cart: await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
+            cart: await retrieveExpandedCart(event, cartId)
         }
     } catch (error: unknown) {
-        const err = error as FetchError
-        console.error("Medusa cart update failed:", error)
-        throw createError({ statusCode: err.statusCode || 500, statusMessage: err.message })
+        throw toUpstreamError(error, "Failed to update cart")
     }
 })

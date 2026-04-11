@@ -1,7 +1,39 @@
+import type { H3Event } from "h3"
+
 import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
+
+type CartResponse = {
+    cart?: {
+        id: string
+        shipping_address?: {
+            country_code?: string | null
+        } | null
+        billing_address?: {
+            country_code?: string | null
+        } | null
+    }
+}
+
+async function createCart(event: H3Event, regionId: string, countryCode: string | null) {
+    const response = await fetchMedusaResponse(event, "/store/carts", {
+        method: "POST",
+        body: JSON.stringify({ region_id: regionId })
+    })
+
+    await assertMedusaResponse(response, "Failed to create cart")
+
+    const payload = await safeJson<CartResponse>(response)
+    const cart = payload?.cart
+
+    if (!cart?.id) {
+        throw createError({ statusCode: 502, statusMessage: "Invalid Medusa cart response" })
+    }
+
+    return await syncCartCountry(event, cart, countryCode)
+}
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const query = getQuery(event)
 
     const regionId = String(query.region_id || "")
@@ -15,51 +47,28 @@ export default defineEventHandler(async (event) => {
 
     const cookieOptions = { path: "/", sameSite: "lax" as const, secure: process.env.NODE_ENV === "production" }
 
-    if (!cartId) {
-        const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts`, {
-            method: "POST",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json",
-                cookie: getHeader(event, "cookie") ?? ""
-            },
-            body: JSON.stringify({ region_id: regionId })
-        })
+    try {
+        if (!cartId) {
+            const cart = await createCart(event, regionId, countryCode)
+            setCookie(event, "cart_id", cart.id, cookieOptions)
 
-        const data = await medusaRes.json()
-        const cart = await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, data.cart ?? data, countryCode)
-
-        setCookie(event, "cart_id", cart.id, cookieOptions)
-
-        return { cart, regionId }
-    }
-
-    const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}?fields=%2Bitems.*,%2Bshipping_methods.*`, {
-        method: "GET",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json",
-            cookie: getHeader(event, "cookie") ?? ""
+            return { cart, regionId }
         }
-    })
 
-    if (!medusaRes.ok) {
-        setCookie(event, "cart_id", "", { ...cookieOptions, maxAge: 0 })
-        const createRes = await fetch(`${config.public.MEDUSA_URL}/store/carts`, {
-            method: "POST",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json",
-                cookie: getHeader(event, "cookie") ?? ""
-            },
-            body: JSON.stringify({ region_id: regionId })
+        const existingCartResponse = await fetchMedusaResponse(event, `/store/carts/${cartId}?fields=%2Bitems.*,%2Bshipping_methods.*`, {
+            method: "GET"
         })
-        const data = await createRes.json()
-        const cart = await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, data.cart ?? data, countryCode)
-        setCookie(event, "cart_id", cart.id, cookieOptions)
-        return { cart, regionId }
-    }
 
-    const cart = await retrieveExpandedCart(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cartId)
-    return { cart: await syncCartCountry(event, config.public.MEDUSA_URL, config.public.PUBLISHABLE_KEY, cart, countryCode), regionId }
+        if (!existingCartResponse.ok) {
+            setCookie(event, "cart_id", "", { ...cookieOptions, maxAge: 0 })
+            const cart = await createCart(event, regionId, countryCode)
+            setCookie(event, "cart_id", cart.id, cookieOptions)
+            return { cart, regionId }
+        }
+
+        const cart = await retrieveExpandedCart(event, cartId)
+        return { cart: await syncCartCountry(event, cart, countryCode), regionId }
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Failed to load cart")
+    }
 })

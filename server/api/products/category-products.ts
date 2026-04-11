@@ -1,14 +1,14 @@
 import type { HttpTypes } from "@medusajs/types"
 
-const PAGE_SIZE = 200
-const MAX_FETCH = 3000
+import { getQueryCacheKey } from "#server/utils/cache"
+import { fetchAllStoreProducts, getAggregatedProductPrice, getProductCurrencyCode, isProductInStock } from "#server/utils/products"
+import { toUpstreamError } from "#server/utils/medusa-proxy"
 
 type ProductRelation = {
     id: string
     name?: string
     title?: string
     value?: string
-    parent_category_id?: string | null
 }
 
 type ProductWithRelations = Omit<HttpTypes.StoreProduct, "collection" | "type" | "tags" | "categories" | "variants"> & {
@@ -19,40 +19,13 @@ type ProductWithRelations = Omit<HttpTypes.StoreProduct, "collection" | "type" |
     variants?: HttpTypes.StoreProductVariant[]
 }
 
-type StoreProductsResponse = {
-    products?: ProductWithRelations[]
-    count?: number
-}
-
 type FacetItem = {
     id: string
     label: string
     count: number
 }
 
-type ErrorShape = {
-    statusCode?: number
-    statusMessage?: string
-    code?: string
-    name?: string
-    cause?: {
-        code?: string
-    }
-}
-
-async function fetchWithTimeout(input: Parameters<typeof fetch>[0], init: Parameters<typeof fetch>[1] & { timeoutMs?: number } = {}) {
-    const { timeoutMs = 8000, ...rest } = init
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), timeoutMs)
-
-    try {
-        return await fetch(input, { ...rest, signal: controller.signal })
-    } finally {
-        clearTimeout(timeout)
-    }
-}
-
-function parseIds(value: unknown): string[] {
+function parseIds(value: unknown) {
     if (Array.isArray(value)) {
         return value
             .flatMap((item) => String(item).split(","))
@@ -70,55 +43,26 @@ function parseIds(value: unknown): string[] {
     return []
 }
 
-function getProductPrices(product: ProductWithRelations): number[] {
-    return (product.variants ?? [])
-        .map((variant) => variant.calculated_price?.calculated_amount)
-        .filter((value): value is number => typeof value === "number")
-}
-
-function getProductPrice(product: ProductWithRelations, mode: "min" | "max" = "min"): number | null {
-    const prices = getProductPrices(product)
-
-    if (!prices.length) {
+function parseNumber(value: unknown) {
+    if (value == null || value === "") {
         return null
     }
 
-    return mode === "max" ? Math.max(...prices) : Math.min(...prices)
+    const parsedValue = Number(value)
+    return Number.isFinite(parsedValue) ? parsedValue : null
 }
 
-function isInStock(product: ProductWithRelations): boolean {
-    return (product.variants ?? []).some((variant) => Number(variant.inventory_quantity ?? 0) > 0)
+function parsePositiveInteger(value: unknown, fallbackValue: number) {
+    const parsedValue = parseNumber(value)
+
+    if (parsedValue === null || parsedValue < 0) {
+        return fallbackValue
+    }
+
+    return Math.floor(parsedValue)
 }
 
-function compareProducts(a: ProductWithRelations, b: ProductWithRelations, order: string): number {
-    const isDesc = order.startsWith("-")
-    const normalizedOrder = order.replace(/^-/, "")
-
-    if (normalizedOrder.includes("variants.calculated_price")) {
-        const aPrice = getProductPrice(a, isDesc ? "max" : "min")
-        const bPrice = getProductPrice(b, isDesc ? "max" : "min")
-        const safeA = aPrice ?? (isDesc ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
-        const safeB = bPrice ?? (isDesc ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
-
-        return isDesc ? safeB - safeA : safeA - safeB
-    }
-
-    if (normalizedOrder === "title") {
-        const aTitle = String(a.title ?? "")
-        const bTitle = String(b.title ?? "")
-        return isDesc ? bTitle.localeCompare(aTitle) : aTitle.localeCompare(bTitle)
-    }
-
-    if (normalizedOrder === "created_at") {
-        const aTime = new Date(String(a.created_at ?? 0)).getTime()
-        const bTime = new Date(String(b.created_at ?? 0)).getTime()
-        return isDesc ? bTime - aTime : aTime - bTime
-    }
-
-    return 0
-}
-
-function addFacetCount(map: Map<string, FacetItem>, relation: ProductRelation | null | undefined) {
+function addFacetCount(facetMap: Map<string, FacetItem>, relation: ProductRelation | null | undefined) {
     if (!relation?.id) {
         return
     }
@@ -128,231 +72,227 @@ function addFacetCount(map: Map<string, FacetItem>, relation: ProductRelation | 
         return
     }
 
-    const existing = map.get(relation.id)
-    if (existing) {
-        existing.count += 1
+    const existingFacet = facetMap.get(relation.id)
+    if (existingFacet) {
+        existingFacet.count += 1
         return
     }
 
-    map.set(relation.id, {
+    facetMap.set(relation.id, {
         id: relation.id,
         label,
         count: 1
     })
 }
 
-export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
-    const query = getQuery(event)
+function compareProducts(leftProduct: ProductWithRelations, rightProduct: ProductWithRelations, order: string) {
+    const isDescending = order.startsWith("-")
+    const normalizedOrder = order.replace(/^-/, "")
 
-    const regionId = query.region_id ? String(query.region_id) : null
-    const countryCode = query.country_code ? String(query.country_code) : null
-    const categoryId = query.category_id ? String(query.category_id) : null
+    if (normalizedOrder.includes("variants.calculated_price")) {
+        const leftPrice = getAggregatedProductPrice(leftProduct, isDescending ? "max" : "min")
+        const rightPrice = getAggregatedProductPrice(rightProduct, isDescending ? "max" : "min")
+        const leftValue = leftPrice ?? (isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
+        const rightValue = rightPrice ?? (isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
 
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
+        return isDescending ? rightValue - leftValue : leftValue - rightValue
     }
 
-    const limit = query.limit ? Number(query.limit) : 9
-    const offset = query.offset ? Number(query.offset) : 0
-    const order = query.order ? String(query.order) : "-created_at"
-    const selectedChildCategoryIds = parseIds(query.child_category_ids)
-    const selectedCollectionIds = parseIds(query.collection_ids)
-    const selectedTypeIds = parseIds(query.type_ids)
-    const selectedTagIds = parseIds(query.tag_ids)
-    const inStockOnly = String(query.in_stock_only ?? "false") === "true"
-    const minPrice = query.min_price ? Number(query.min_price) : null
-    const maxPrice = query.max_price ? Number(query.max_price) : null
+    if (normalizedOrder === "title") {
+        const leftTitle = String(leftProduct.title ?? "")
+        const rightTitle = String(rightProduct.title ?? "")
+        return isDescending ? rightTitle.localeCompare(leftTitle) : leftTitle.localeCompare(rightTitle)
+    }
 
-    const params = new URLSearchParams({
-        fields: "+metadata,*collection,*type,*tags,*categories,*variants.calculated_price,+variants.inventory_quantity",
-        region_id: regionId
+    if (normalizedOrder === "created_at") {
+        const leftTime = new Date(String(leftProduct.created_at ?? 0)).getTime()
+        const rightTime = new Date(String(rightProduct.created_at ?? 0)).getTime()
+        return isDescending ? rightTime - leftTime : leftTime - rightTime
+    }
+
+    return 0
+}
+
+function buildFacets(products: ProductWithRelations[]) {
+    const categoryFacetMap = new Map<string, FacetItem>()
+    const collectionFacetMap = new Map<string, FacetItem>()
+    const typeFacetMap = new Map<string, FacetItem>()
+    const tagFacetMap = new Map<string, FacetItem>()
+
+    let minimumPrice = Number.POSITIVE_INFINITY
+    let maximumPrice = 0
+    let currencyCode: string | null = null
+
+    for (const product of products) {
+        const seenCategoryIds = new Set<string>()
+        const seenTagIds = new Set<string>()
+        const productMinimumPrice = getAggregatedProductPrice(product, "min")
+        const productMaximumPrice = getAggregatedProductPrice(product, "max")
+
+        if (productMinimumPrice !== null) {
+            minimumPrice = Math.min(minimumPrice, productMinimumPrice)
+        }
+
+        if (productMaximumPrice !== null) {
+            maximumPrice = Math.max(maximumPrice, productMaximumPrice)
+        }
+
+        if (!currencyCode) {
+            currencyCode = getProductCurrencyCode(product)
+        }
+
+        addFacetCount(collectionFacetMap, product.collection)
+        addFacetCount(typeFacetMap, product.type)
+
+        for (const category of product.categories ?? []) {
+            if (seenCategoryIds.has(category.id)) {
+                continue
+            }
+
+            seenCategoryIds.add(category.id)
+            addFacetCount(categoryFacetMap, category)
+        }
+
+        for (const tag of product.tags ?? []) {
+            if (seenTagIds.has(tag.id)) {
+                continue
+            }
+
+            seenTagIds.add(tag.id)
+            addFacetCount(tagFacetMap, tag)
+        }
+    }
+
+    return {
+        categories: [...categoryFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
+        collections: [...collectionFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
+        types: [...typeFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
+        tags: [...tagFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
+        price: {
+            min: Number.isFinite(minimumPrice) ? minimumPrice : 0,
+            max: maximumPrice,
+            currencyCode
+        }
+    }
+}
+
+function filterProducts(
+    products: ProductWithRelations[],
+    filters: {
+        selectedChildCategoryIds: string[]
+        selectedCollectionIds: string[]
+        selectedTypeIds: string[]
+        selectedTagIds: string[]
+        inStockOnly: boolean
+        minPrice: number | null
+        maxPrice: number | null
+    }
+) {
+    return products.filter((product) => {
+        if (filters.selectedChildCategoryIds.length) {
+            const categoryIds = new Set((product.categories ?? []).map((category) => category.id))
+            if (!filters.selectedChildCategoryIds.some((categoryId) => categoryIds.has(categoryId))) {
+                return false
+            }
+        }
+
+        if (
+            filters.selectedCollectionIds.length &&
+            (!product.collection?.id || !filters.selectedCollectionIds.includes(product.collection.id))
+        ) {
+            return false
+        }
+
+        if (filters.selectedTypeIds.length && (!product.type?.id || !filters.selectedTypeIds.includes(product.type.id))) {
+            return false
+        }
+
+        if (filters.selectedTagIds.length) {
+            const tagIds = new Set((product.tags ?? []).map((tag) => tag.id))
+            if (!filters.selectedTagIds.some((tagId) => tagIds.has(tagId))) {
+                return false
+            }
+        }
+
+        if (filters.inStockOnly && !isProductInStock(product)) {
+            return false
+        }
+
+        const minimumProductPrice = getAggregatedProductPrice(product, "min")
+        if ((filters.minPrice !== null || filters.maxPrice !== null) && minimumProductPrice === null) {
+            return false
+        }
+
+        if (filters.minPrice !== null && minimumProductPrice !== null && minimumProductPrice < filters.minPrice) {
+            return false
+        }
+
+        return !(filters.maxPrice !== null && minimumProductPrice !== null && minimumProductPrice > filters.maxPrice);
     })
+}
 
-    if (categoryId) {
-        params.set("category_id", categoryId)
-    }
+export default defineCachedEventHandler(
+    async (event) => {
+        const query = getQuery(event)
 
-    if (countryCode) {
-        params.set("country_code", countryCode)
-    }
+        const regionId = query.region_id ? String(query.region_id) : null
+        const countryCode = query.country_code ? String(query.country_code) : null
+        const categoryId = query.category_id ? String(query.category_id) : null
 
-    const baseUrl = `${config.public.MEDUSA_URL}/store/products?${params.toString()}`
+        if (!regionId) {
+            throw createError({ statusCode: 400, statusMessage: "region_id is required" })
+        }
 
-    try {
-        const allProducts: ProductWithRelations[] = []
+        const limit = parsePositiveInteger(query.limit, 9)
+        const offset = parsePositiveInteger(query.offset, 0)
+        const order = query.order ? String(query.order) : "-created_at"
 
-        const firstResponse = await fetchWithTimeout(`${baseUrl}&limit=${PAGE_SIZE}&offset=0`, {
-            method: "GET",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
-            }
+        const filters = {
+            selectedChildCategoryIds: parseIds(query.child_category_ids),
+            selectedCollectionIds: parseIds(query.collection_ids),
+            selectedTypeIds: parseIds(query.type_ids),
+            selectedTagIds: parseIds(query.tag_ids),
+            inStockOnly: String(query.in_stock_only ?? "false") === "true",
+            minPrice: parseNumber(query.min_price),
+            maxPrice: parseNumber(query.max_price)
+        }
+
+        const searchParams = new URLSearchParams({
+            fields: "+metadata,*collection,*type,*tags,*categories,*variants.calculated_price,+variants.inventory_quantity",
+            region_id: regionId
         })
 
-        if (!firstResponse.ok) {
-            throw createError({ statusCode: firstResponse.status, statusMessage: "Failed to fetch category products" })
+        if (categoryId) {
+            searchParams.set("category_id", categoryId)
         }
 
-        const firstJson = (await firstResponse.json()) as StoreProductsResponse
-        const firstProducts = Array.isArray(firstJson.products) ? firstJson.products : []
-        const total = Number(firstJson.count ?? firstProducts.length)
-        const target = Math.min(total, MAX_FETCH)
-
-        allProducts.push(...firstProducts)
-
-        let internalOffset = firstProducts.length
-
-        while (internalOffset < target) {
-            const take = Math.min(PAGE_SIZE, target - internalOffset)
-            const response = await fetchWithTimeout(`${baseUrl}&limit=${take}&offset=${internalOffset}`, {
-                method: "GET",
-                headers: {
-                    "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                    "Content-Type": "application/json"
-                }
-            })
-
-            if (!response.ok) {
-                throw createError({ statusCode: response.status, statusMessage: "Failed to fetch additional category products" })
-            }
-
-            const payload = (await response.json()) as StoreProductsResponse
-            const products = Array.isArray(payload.products) ? payload.products : []
-
-            allProducts.push(...products)
-            internalOffset += products.length
-
-            if (!products.length) {
-                break
-            }
+        if (countryCode) {
+            searchParams.set("country_code", countryCode)
         }
 
-        const categoryMap = new Map<string, FacetItem>()
-        const collectionMap = new Map<string, FacetItem>()
-        const typeMap = new Map<string, FacetItem>()
-        const tagMap = new Map<string, FacetItem>()
+        try {
+            const { products } = await fetchAllStoreProducts<ProductWithRelations>(event, searchParams)
+            const filteredProducts = filterProducts(products, filters)
+            const sortedProducts = [...filteredProducts].sort((leftProduct, rightProduct) =>
+                compareProducts(leftProduct, rightProduct, order)
+            )
 
-        let priceMin = Number.POSITIVE_INFINITY
-        let priceMax = 0
-        let currencyCode: string | null = null
+            setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
 
-        allProducts.forEach((product) => {
-            const seenCategoryIds = new Set<string>()
-            const seenTagIds = new Set<string>()
-
-            const minProductPrice = getProductPrice(product, "min")
-            const maxProductPrice = getProductPrice(product, "max")
-
-            if (minProductPrice) {
-                priceMin = Math.min(priceMin, minProductPrice)
+            return {
+                products: sortedProducts.slice(offset, offset + limit),
+                count: filteredProducts.length,
+                facets: buildFacets(products)
             }
-
-            if (maxProductPrice) {
-                priceMax = Math.max(priceMax, maxProductPrice)
-            }
-
-            if (!currencyCode) {
-                currencyCode =
-                    product.variants?.find((variant) => variant.calculated_price?.currency_code)?.calculated_price?.currency_code ?? null
-            }
-
-            addFacetCount(collectionMap, product.collection)
-            addFacetCount(typeMap, product.type)
-            ;(product.categories ?? []).forEach((item) => {
-                if (seenCategoryIds.has(item.id)) {
-                    return
-                }
-
-                seenCategoryIds.add(item.id)
-                addFacetCount(categoryMap, item)
-            })
-            ;(product.tags ?? []).forEach((item) => {
-                if (seenTagIds.has(item.id)) {
-                    return
-                }
-
-                seenTagIds.add(item.id)
-                addFacetCount(tagMap, item)
-            })
-        })
-
-        const filtered = allProducts.filter((product) => {
-            if (selectedChildCategoryIds.length) {
-                const categoryIds = new Set((product.categories ?? []).map((item) => item.id))
-                if (!selectedChildCategoryIds.some((id) => categoryIds.has(id))) {
-                    return false
-                }
-            }
-
-            if (selectedCollectionIds.length && (!product.collection?.id || !selectedCollectionIds.includes(product.collection.id))) {
-                return false
-            }
-
-            if (selectedTypeIds.length && (!product.type?.id || !selectedTypeIds.includes(product.type.id))) {
-                return false
-            }
-
-            if (selectedTagIds.length) {
-                const productTagIds = new Set((product.tags ?? []).map((item) => item.id))
-                if (!selectedTagIds.some((id) => productTagIds.has(id))) {
-                    return false
-                }
-            }
-
-            if (inStockOnly && !isInStock(product)) {
-                return false
-            }
-
-            const price = getProductPrice(product, "min")
-
-            if (minPrice && price && price < minPrice) {
-                return false
-            }
-
-            if (maxPrice && price && price > maxPrice) {
-                return false
-            }
-
-            return !((minPrice || maxPrice) && price === null)
-        })
-
-        const sorted = [...filtered].sort((a, b) => compareProducts(a, b, order))
-        const paginated = sorted.slice(offset, offset + limit)
-
-        setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
-
-        return {
-            products: paginated,
-            count: filtered.length,
-            facets: {
-                categories: [...categoryMap.values()].sort((a, b) => a.label.localeCompare(b.label)),
-                collections: [...collectionMap.values()].sort((a, b) => a.label.localeCompare(b.label)),
-                types: [...typeMap.values()].sort((a, b) => a.label.localeCompare(b.label)),
-                tags: [...tagMap.values()].sort((a, b) => a.label.localeCompare(b.label)),
-                price: {
-                    min: Number.isFinite(priceMin) ? priceMin : 0,
-                    max: priceMax,
-                    currencyCode
-                }
-            }
+        } catch (error: unknown) {
+            setHeader(event, "Cache-Control", "no-store")
+            throw toUpstreamError(error, "Failed to fetch category products")
         }
-    } catch (error: unknown) {
-        console.error("Error fetching category products:", error)
-
-        setHeader(event, "Cache-Control", "no-store")
-
-        const typedError = error as ErrorShape
-        const code = typedError.cause?.code || typedError.code
-
-        if (code === "ECONNREFUSED" || code === "ENOTFOUND" || typedError.name === "AbortError") {
-            throw createError({ statusCode: 503, statusMessage: "Medusa is unavailable" })
-        }
-
-        if (typedError.statusCode && typedError.statusMessage) {
-            throw error
-        }
-
-        throw createError({ statusCode: 500, statusMessage: "Failed to fetch category products" })
+    },
+    {
+        name: "category-products-cache",
+        maxAge: 300,
+        swr: true,
+        getKey: (event) => getQueryCacheKey(event, "category-products-v2")
     }
-})
+)

@@ -1,108 +1,89 @@
 import type { ProductDTO } from "@medusajs/types"
 
 import { LIMIT } from "@/utils/consts"
+import { getQueryCacheKey } from "#server/utils/cache"
+import { fetchAllStoreProducts, getAggregatedProductPrice } from "#server/utils/products"
+import { toUpstreamError } from "#server/utils/medusa-proxy"
 
-const PAGE_SIZE = 200
-const MAX_FETCH = 3000
+type VariantPriceField = "calculated_amount" | "original_amount"
 
-type VariantWithPrice = ProductDTO["variants"][number] & {
-    calculated_price?: Record<string, number>
+function parsePriceField(order: string): VariantPriceField {
+    const normalizedOrder = order.replace(/^-/, "")
+    const segments = normalizedOrder.split(".")
+    const candidateField = segments[segments.length - 1]
+
+    return candidateField === "original_amount" ? "original_amount" : "calculated_amount"
 }
 
-export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
-    const q = getQuery(event)
+function parsePositiveInteger(value: unknown, fallbackValue: number) {
+    const parsedValue = Number(value)
 
-    const limit = q.limit != null ? Number(q.limit) : Number(LIMIT)
-    const offset = q.offset != null ? Number(q.offset) : 0
-    const categoryId = q.category_id != null ? String(q.category_id) : null
-    const regionId = q.region_id ? String(q.region_id) : null
-    const handle = q.handle ? String(q.handle) : null
-    const order = q.order ? String(q.order) : "variants.calculated_price.calculated_amount"
-
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
+    if (!Number.isFinite(parsedValue) || parsedValue < 0) {
+        return fallbackValue
     }
 
-    const isDesc = order.startsWith("-")
+    return Math.floor(parsedValue)
+}
 
-    const orderNoSign = order.replace(/^-/, "")
-    const parts = orderNoSign.split(".")
-    const candidate = parts[parts.length - 1] || "calculated_amount"
-    const allowed = new Set(["calculated_amount", "original_amount"])
-    const priceField = allowed.has(candidate) ? candidate : "calculated_amount"
+export default defineCachedEventHandler(
+    async (event) => {
+        const query = getQuery(event)
 
-    const agg = (q.agg === "max" ? "max" : "min") as "min" | "max"
+        const limit = parsePositiveInteger(query.limit, Number(LIMIT))
+        const offset = parsePositiveInteger(query.offset, 0)
+        const categoryId = query.category_id != null ? String(query.category_id) : null
+        const regionId = query.region_id ? String(query.region_id) : null
+        const handle = query.handle ? String(query.handle) : null
+        const order = query.order ? String(query.order) : "variants.calculated_price.calculated_amount"
 
-    const baseParams = new URLSearchParams({
-        fields: "+metadata,*variants.calculated_price,*variants.inventory_quantity",
-        region_id: regionId
-    })
-    if (handle) baseParams.set("handle", handle)
-    if (categoryId) baseParams.set("category_id", categoryId)
+        if (!regionId) {
+            throw createError({ statusCode: 400, statusMessage: "region_id is required" })
+        }
 
-    const all = []
-    let internalOffset = 0
-    let total = 0
+        const isDescending = order.startsWith("-")
+        const priceField = parsePriceField(order)
+        const aggregateMode = query.agg === "max" ? "max" : "min"
 
-    try {
-        const firstRes = await fetch(`${config.public.MEDUSA_URL}/store/products?${baseParams.toString()}&limit=${PAGE_SIZE}&offset=0`, {
-            method: "GET",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
-            }
+        const searchParams = new URLSearchParams({
+            fields: "+metadata,*variants.calculated_price,*variants.inventory_quantity",
+            region_id: regionId
         })
 
-        const firstJson = await firstRes.json()
-        const firstProducts = Array.isArray(firstJson?.products) ? firstJson.products : []
-        total = Number(firstJson?.count ?? firstProducts.length)
-        all.push(...firstProducts)
-        internalOffset = firstProducts.length
-
-        const target = Math.min(total, MAX_FETCH)
-        while (internalOffset < target) {
-            const take = Math.min(PAGE_SIZE, target - internalOffset)
-            const res = await fetch(
-                `${config.public.MEDUSA_URL}/store/products?${baseParams.toString()}&limit=${take}&offset=${internalOffset}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                        "Content-Type": "application/json"
-                    }
-                }
-            )
-
-            const json = await res.json()
-            const prods = Array.isArray(json?.products) ? json.products : []
-            all.push(...prods)
-            internalOffset += prods.length
-            total = Number(json?.count ?? total)
+        if (handle) {
+            searchParams.set("handle", handle)
         }
 
-        const missingSentinel = isDesc ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
-
-        const perProductValue = (p: ProductDTO) => {
-            const nums = ((p.variants as VariantWithPrice[]) ?? [])
-                .map((v) => v?.calculated_price?.[priceField])
-                .filter((n) => typeof n === "number")
-            if (!nums.length) return missingSentinel
-            return agg === "max" ? Math.max(...nums) : Math.min(...nums)
+        if (categoryId) {
+            searchParams.set("category_id", categoryId)
         }
 
-        const sorted = all
-            .map((p) => ({ p, _val: perProductValue(p) }))
-            .sort((a, b) => (isDesc ? b._val - a._val : a._val - b._val))
-            .map(({ p }) => p)
+        try {
+            const { products, count } = await fetchAllStoreProducts<ProductDTO>(event, searchParams)
+            const missingPriceSentinel = isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
 
-        const sliced = sorted.slice(offset, offset + limit)
+            const sortedProducts = products
+                .map((product) => ({
+                    product,
+                    sortValue: getAggregatedProductPrice(product, aggregateMode, priceField) ?? missingPriceSentinel
+                }))
+                .sort((left, right) => (isDescending ? right.sortValue - left.sortValue : left.sortValue - right.sortValue))
+                .map(({ product }) => product)
 
-        setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
-        return { products: sliced, count: total }
-    } catch (err) {
-        console.error("Error fetching price-sorted products:", err)
-        setHeader(event, "Cache-Control", "no-store")
-        throw err
+            setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
+
+            return {
+                products: sortedProducts.slice(offset, offset + limit),
+                count
+            }
+        } catch (error: unknown) {
+            setHeader(event, "Cache-Control", "no-store")
+            throw toUpstreamError(error, "Failed to fetch price-sorted products")
+        }
+    },
+    {
+        name: "products-price-cache",
+        maxAge: 300,
+        swr: true,
+        getKey: (event) => getQueryCacheKey(event, "products-price-v2")
     }
-})
+)

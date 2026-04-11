@@ -1,84 +1,70 @@
 import { LIMIT } from "@/utils/consts"
+import { getQueryCacheKey } from "#server/utils/cache"
+import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
-async function fetchWithTimeout(input: RequestInfo, init: RequestInit & { timeoutMs?: number } = {}) {
-    const { timeoutMs = 8000, ...rest } = init
-    const controller = new AbortController()
-    const t = setTimeout(() => controller.abort(), timeoutMs)
-    try {
-        return await fetch(input, { ...rest, signal: controller.signal })
-    } finally {
-        clearTimeout(t)
-    }
+type ProductsResponse = {
+    products?: unknown[]
+    count?: number
 }
 
-export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
-    const query = getQuery(event)
+export default defineCachedEventHandler(
+    async (event) => {
+        const query = getQuery(event)
 
-    const limit = query.limit != null ? String(query.limit) : LIMIT
-    const offset = query.offset != null ? String(query.offset) : "0"
-    const categoryId = query.category_id != null ? String(query.category_id) : null
-    const handle = query.handle ? String(query.handle) : null
-    const order = query.order ? String(query.order) : "-created_at"
+        const limit = query.limit != null ? String(query.limit) : LIMIT
+        const offset = query.offset != null ? String(query.offset) : "0"
+        const categoryId = query.category_id != null ? String(query.category_id) : null
+        const handle = query.handle ? String(query.handle) : null
+        const order = query.order ? String(query.order) : "-created_at"
 
-    const regionId = query.region_id ? String(query.region_id) : null
-    const countryCode = query.country_code ? String(query.country_code) : ''
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
-    }
+        const regionId = query.region_id ? String(query.region_id) : null
+        const countryCode = query.country_code ? String(query.country_code) : ""
+        if (!regionId) {
+            throw createError({ statusCode: 400, statusMessage: "region_id is required" })
+        }
 
-    const queryParams = new URLSearchParams({
-        fields: `*variants.calculated_price,+variants.inventory_quantity,*categories,+metadata`,
-        region_id: regionId,
-        country_code: countryCode,
-        order
-    })
-
-    console.log("queryParams", queryParams.toString())
-
-    if (handle) queryParams.set("handle", handle)
-    if (categoryId) queryParams.set("category_id", categoryId)
-    if (countryCode) queryParams.set("country_code", countryCode)
-
-    if (!countryCode) {
-        throw createError({ statusCode: 400, statusMessage: "country_code is required for tax pricing" })
-    }
-
-    const url = `${config.public.MEDUSA_URL}/store/products?${queryParams.toString()}&limit=${limit}&offset=${offset}`
-
-    try {
-        const response = await fetchWithTimeout(url, {
-            method: "GET",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
-            },
-            timeoutMs: 8000
+        const queryParams = new URLSearchParams({
+            fields: `*variants.calculated_price,+variants.inventory_quantity,*categories,+metadata`,
+            region_id: regionId,
+            country_code: countryCode,
+            order
         })
 
-        if (!response.ok) {
-            setHeader(event, "Cache-Control", "no-store")
+        if (handle) queryParams.set("handle", handle)
+        if (categoryId) queryParams.set("category_id", categoryId)
+        if (countryCode) queryParams.set("country_code", countryCode)
 
-            const bodyText = await response.text().catch(() => "")
-            throw createError({
-                statusCode: response.status,
-                statusMessage: bodyText || `Failed to fetch products: ${response.status} ${response.statusText}`
+        if (!countryCode) {
+            throw createError({ statusCode: 400, statusMessage: "country_code is required for tax pricing" })
+        }
+
+        const path = `/store/products?${queryParams.toString()}&limit=${limit}&offset=${offset}`
+
+        try {
+            const response = await fetchMedusaResponse(event, path, {
+                method: "GET",
+                timeoutMs: 8000
             })
+
+            await assertMedusaResponse(response, "Failed to fetch products")
+
+            setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
+            const payload = await safeJson<ProductsResponse>(response)
+
+            if (payload === null) {
+                throw createError({ statusCode: 502, statusMessage: "Invalid Medusa response" })
+            }
+
+            return payload
+        } catch (error: unknown) {
+            setHeader(event, "Cache-Control", "no-store")
+            throw toUpstreamError(error, "Failed to fetch products")
         }
-
-        setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
-        return await response.json()
-    } catch (err: unknown) {
-        console.error("Error fetching products:", err)
-
-        setHeader(event, "Cache-Control", "no-store")
-
-        const typedError = err as { cause?: { code?: string }; code?: string; name?: string }
-        const code = typedError.cause?.code || typedError.code
-        if (code === "ECONNREFUSED" || code === "ENOTFOUND" || typedError.name === "AbortError") {
-            throw createError({ statusCode: 503, statusMessage: "Medusa is unavailable" })
-        }
-
-        throw createError({ statusCode: 500, statusMessage: "Failed to fetch products" })
+    },
+    {
+        name: "products-cache",
+        maxAge: 300,
+        swr: true,
+        getKey: (event) => getQueryCacheKey(event, "products-v2")
     }
-})
+)

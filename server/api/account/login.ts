@@ -1,75 +1,71 @@
+import type { CustomerDTO } from "@medusajs/types"
+
+import {
+    assertMedusaResponse,
+    fetchMedusaJson,
+    fetchMedusaResponse,
+    forwardSetCookies,
+    getIncomingCookie,
+    getSetCookieHeaders,
+    mergeCookieHeader,
+    toUpstreamError
+} from "#server/utils/medusa-proxy"
+
+type LoginBody = {
+    email?: string
+    password?: string
+}
+
+type AuthTokenResponse = {
+    token?: string
+}
+
+type CustomerResponse = {
+    customer?: CustomerDTO | null
+}
+
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
-    const body = await readBody<{ email?: string; password?: string }>(event)
+    const body = await readBody<LoginBody>(event)
 
     if (!body?.email || !body?.password) {
         throw createError({ statusCode: 400, statusMessage: "Email and password are required" })
     }
 
-    const tokenRes = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: body.email, password: body.password })
-    })
-
-    if (!tokenRes.ok) {
-        const err = await safeJson(tokenRes)
-        throw createError({
-            statusCode: tokenRes.status,
-            statusMessage: err?.message || "Invalid credentials"
+    try {
+        const tokenData = await fetchMedusaJson<AuthTokenResponse>(event, "/auth/customer/emailpass", {
+            method: "POST",
+            includePublishableKey: false,
+            body: JSON.stringify({ email: body.email, password: body.password })
         })
-    }
 
-    const tokenData = (await tokenRes.json()) as { token?: string }
-    if (!tokenData.token) {
-        throw createError({ statusCode: 401, statusMessage: "Invalid credentials" })
-    }
-
-    const incomingCookie = getIncomingCookie(event)
-
-    const sessionRes = await fetch(`${config.public.MEDUSA_URL}/auth/session`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenData.token}`,
-            cookie: incomingCookie
+        if (!tokenData.token) {
+            throw createError({ statusCode: 401, statusMessage: "Invalid credentials" })
         }
-    })
 
-    const setCookies = getSetCookieHeaders(sessionRes)
-    forwardSetCookies(event, setCookies)
-
-    if (!sessionRes.ok) {
-        const err = await safeJson(sessionRes)
-        throw createError({
-            statusCode: sessionRes.status,
-            statusMessage: err?.message || "Could not start session"
+        const incomingCookie = getIncomingCookie(event)
+        const sessionResponse = await fetchMedusaResponse(event, "/auth/session", {
+            method: "POST",
+            includePublishableKey: false,
+            cookie: incomingCookie,
+            headers: {
+                Authorization: `Bearer ${tokenData.token}`
+            }
         })
-    }
 
-    const mergedCookie = mergeCookieHeader(incomingCookie, setCookies)
+        const setCookieHeaders = getSetCookieHeaders(sessionResponse)
+        forwardSetCookies(event, setCookieHeaders)
+        await assertMedusaResponse(sessionResponse, "Could not start session")
 
-    const meRes = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            cookie: mergedCookie
+        const customerData = await fetchMedusaJson<CustomerResponse>(event, "/store/customers/me", {
+            method: "GET",
+            cookie: mergeCookieHeader(incomingCookie, setCookieHeaders)
+        })
+
+        return {
+            success: true,
+            customer: customerData.customer ?? null
         }
-    })
-
-    if (!meRes.ok) {
-        const err = await safeJson(meRes)
-        throw createError({
-            statusCode: meRes.status,
-            statusMessage: err?.message || "Failed to fetch customer"
-        })
-    }
-
-    const meData = (await meRes.json())
-
-    return {
-        success: true,
-        customer: meData.customer ?? null
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Login failed")
     }
 })

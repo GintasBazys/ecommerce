@@ -1,34 +1,31 @@
-export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
-    const cookie = getHeader(event, "cookie") ?? ""
+import type { CustomerDTO } from "@medusajs/types"
 
+import { fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
+
+type CustomerResponse = {
+    customer?: CustomerDTO | null
+}
+
+export default defineEventHandler(async (event) => {
     try {
-        const res = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                cookie
-            }
+        const response = await fetchMedusaResponse(event, "/store/customers/me", {
+            method: "GET"
         })
 
-        if (res.status === 401) {
+        if (response.status === 401) {
             return { success: true, customer: null }
         }
 
-        if (!res.ok) {
-            return { success: false, customer: null }
+        if (!response.ok) {
+            throw createError({
+                statusCode: response.status,
+                statusMessage: "Failed to fetch customer"
+            })
         }
 
-        const data = await res.json()
-        return { success: true, customer: data.customer ?? null }
-    } catch (err: any) {
-        console.error("Medusa unreachable in /account/me:", err?.cause?.code || err)
-
-        return {
-            success: false,
-            customer: null,
-            unavailable: true
-        }
+        const data = await safeJson<CustomerResponse>(response)
+        return { success: true, customer: data?.customer ?? null }
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Failed to fetch customer")
     }
 })

@@ -1,28 +1,36 @@
+import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
+
+type ResetPasswordBody = {
+    token?: string
+    email?: string
+    password?: string
+}
+
+type ResetPasswordResponse = {
+    success?: boolean
+    message?: string
+}
+
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event)
+    const body = await readBody<ResetPasswordBody>(event)
     const { token, email, password } = body
-    const config = useRuntimeConfig()
 
     if (!token || !email || !password) {
-        event.node.res.statusCode = 400
-        return { success: false, message: "Token, email, and password are required" }
+        throw createError({ statusCode: 400, statusMessage: "Token, email, and password are required" })
     }
 
     try {
-        const response = await fetch(`${config.public.MEDUSA_URL}/auth/customer/emailpass/update`, {
+        const response = await fetchMedusaResponse(event, "/auth/customer/emailpass/update", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            includePublishableKey: false,
             body: JSON.stringify({ email, password, token })
         })
 
-        if (!response.ok) throw new Error("Failed to reset password")
+        await assertMedusaResponse(response, "Failed to reset password")
+        const result = await safeJson<ResetPasswordResponse>(response)
 
-        const result = await response.json()
-
-        event.node.res.statusCode = 200
-        return { success: result.success, message: result.message || "Password reset successful" }
-    } catch {
-        event.node.res.statusCode = 500
-        return { success: false, message: "Error resetting password" }
+        return { success: result?.success ?? true, message: result?.message || "Password reset successful" }
+    } catch (error: unknown) {
+        throw toUpstreamError(error, "Error resetting password")
     }
 })

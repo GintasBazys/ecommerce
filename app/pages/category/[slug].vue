@@ -90,9 +90,10 @@ const inStockOnly = ref(false)
 const priceRange = ref<PriceRange>([0, 0])
 const appliedPriceRange = ref<PriceRange>([0, 0])
 const initialPriceRangeApplied = ref(false)
+const isChangingCategoryPage = ref(false)
 const isAllProductsPage = computed(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
 
-const hasMore = computed(() => offset.value + limit < totalCount.value)
+const hasMore = computed(() => products.value.length < totalCount.value)
 const activeFilterCount = computed(() => {
     let count = 0
 
@@ -215,6 +216,36 @@ function createPriceRange(min: number, max: number): PriceRange {
     return [min, max]
 }
 
+function createEmptyFacets(): CategoryProductsResponse["facets"] {
+    return {
+        categories: [],
+        collections: [],
+        types: [],
+        tags: [],
+        price: {
+            min: 0,
+            max: 0,
+            currencyCode: null
+        }
+    }
+}
+
+function resetCategoryPageState() {
+    category.value = null
+    products.value = []
+    totalCount.value = 0
+    offset.value = 0
+    facets.value = createEmptyFacets()
+    selectedChildCategoryIds.value = []
+    selectedCollectionIds.value = []
+    selectedTypeIds.value = []
+    selectedTagIds.value = []
+    inStockOnly.value = false
+    priceRange.value = createPriceRange(0, 0)
+    appliedPriceRange.value = createPriceRange(0, 0)
+    initialPriceRangeApplied.value = false
+}
+
 function syncPriceRange(force = false) {
     const nextMin = facets.value.price.min
     const nextMax = facets.value.price.max
@@ -303,18 +334,30 @@ async function applyPriceRange() {
     appliedPriceRange.value = createPriceRange(priceRange.value[0], priceRange.value[1])
 }
 
-if (!isAllProductsPage.value) {
-    const { data } = await useFetch<ProductCategoryDTO | null>(`/api/categories/${route.params.slug}`)
+async function loadCategoryPage() {
+    isChangingCategoryPage.value = true
+    resetCategoryPageState()
 
-    if (!data.value) {
-        await navigateTo("/page-not-found")
-    } else {
+    if (!isAllProductsPage.value) {
+        const { data } = await useFetch<ProductCategoryDTO | null>(() => `/api/categories/${String(route.params.slug || "")}`)
+
+        if (!data.value) {
+            isChangingCategoryPage.value = false
+            await navigateTo("/page-not-found")
+            return
+        }
+
         category.value = data.value
-        await fetchProducts("initial")
     }
-} else {
-    await fetchProducts("initial")
+
+    try {
+        await fetchProducts("initial")
+    } finally {
+        isChangingCategoryPage.value = false
+    }
 }
+
+await loadCategoryPage()
 
 useHead(() => ({ title: `${pageTitle.value} | Ecommerce` }))
 
@@ -359,9 +402,24 @@ watch(
             price: appliedPriceRange.value
         }),
     async () => {
+        if (isChangingCategoryPage.value) {
+            return
+        }
+
         offset.value = 0
         await fetchProducts("filters")
         scrollToResults()
+    }
+)
+
+watch(
+    () => String(route.params.slug || ""),
+    async (nextSlug, previousSlug) => {
+        if (!nextSlug || nextSlug === previousSlug) {
+            return
+        }
+
+        await loadCategoryPage()
     }
 )
 
