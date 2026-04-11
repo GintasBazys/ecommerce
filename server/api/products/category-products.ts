@@ -149,8 +149,8 @@ export default defineEventHandler(async (event) => {
     const countryCode = query.country_code ? String(query.country_code) : null
     const categoryId = query.category_id ? String(query.category_id) : null
 
-    if (!regionId || !categoryId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id and category_id are required" })
+    if (!regionId) {
+        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
     }
 
     const limit = query.limit ? Number(query.limit) : 9
@@ -166,9 +166,12 @@ export default defineEventHandler(async (event) => {
 
     const params = new URLSearchParams({
         fields: "+metadata,*collection,*type,*tags,*categories,*variants.calculated_price,+variants.inventory_quantity",
-        region_id: regionId,
-        category_id: categoryId
+        region_id: regionId
     })
+
+    if (categoryId) {
+        params.set("category_id", categoryId)
+    }
 
     if (countryCode) {
         params.set("country_code", countryCode)

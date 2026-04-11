@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Returns" }])
+
 useHead({
     title: "Returns | Ecommerce"
 })
@@ -60,11 +62,12 @@ const faqPanels = ref<number[]>([0])
             <VContainer class="returnsPage__container">
                 <div class="returnsPage__heroGrid">
                     <div class="returnsPage__heroCopy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="returnsPage__breadcrumbs" />
                         <span class="returnsPage__eyebrow">Returns Center</span>
                         <h1 class="returnsPage__title">A return process designed to feel as calm and clear as the updated storefront.</h1>
                         <p class="returnsPage__description">
-                            If something is not quite right, we keep the process simple: request the return, send the item back, and we will handle the
-                            refund or exchange with a straightforward follow-up.
+                            If something is not quite right, we keep the process simple: request the return, send the item back, and we will
+                            handle the refund or exchange with a straightforward follow-up.
                         </p>
                         <div class="returnsPage__heroActions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/contact">Contact support</VBtn>
@@ -79,7 +82,8 @@ const faqPanels = ref<number[]>([0])
                         <span class="returnsPage__panelLabel">What to expect</span>
                         <h2 class="returnsPage__panelTitle">Three steps, transparent timing, and real help if anything feels unclear.</h2>
                         <p class="returnsPage__panelText">
-                            We review returns promptly, confirm receipt, and keep communication direct if an item needs replacement or a refund.
+                            We review returns promptly, confirm receipt, and keep communication direct if an item needs replacement or a
+                            refund.
                         </p>
                     </div>
                 </div>
@@ -99,8 +103,8 @@ const faqPanels = ref<number[]>([0])
                         <span class="returnsPage__sectionEyebrow">Policy Overview</span>
                         <h2 class="returnsPage__sectionTitle">Key return guidelines without the clutter.</h2>
                         <p class="returnsPage__sectionText">
-                            We want you to feel confident ordering from us. If a product does not work out, the return process should stay predictable and
-                            easy to understand.
+                            We want you to feel confident ordering from us. If a product does not work out, the return process should stay
+                            predictable and easy to understand.
                         </p>
                         <div class="returnsPage__highlightGrid">
                             <article v-for="item in policyHighlights" :key="item.title" class="returnsPage__highlightCard">
@@ -110,12 +114,12 @@ const faqPanels = ref<number[]>([0])
                         </div>
                         <div class="returnsPage__policyText">
                             <p>
-                                To initiate a return, use your account order history and follow the return instructions for the relevant item. If the return
-                                is approved, you will receive the next steps and any applicable shipping label details.
+                                To initiate a return, use your account order history and follow the return instructions for the relevant
+                                item. If the return is approved, you will receive the next steps and any applicable shipping label details.
                             </p>
                             <p>
-                                Returns should include the original packaging where possible and be sent back in unused condition. This helps us approve
-                                refunds faster and keeps exchange handling smoother.
+                                Returns should include the original packaging where possible and be sent back in unused condition. This
+                                helps us approve refunds faster and keeps exchange handling smoother.
                             </p>
                         </div>
                     </section>
@@ -145,7 +149,8 @@ const faqPanels = ref<number[]>([0])
                         <span class="returnsPage__sidebarLabel">Need help first?</span>
                         <h2 class="returnsPage__sidebarTitle">Talk to support before sending anything back.</h2>
                         <p class="returnsPage__sidebarText">
-                            If your item is damaged, incorrect, or you are not sure whether it is eligible, contact us and include your order number.
+                            If your item is damaged, incorrect, or you are not sure whether it is eligible, contact us and include your
+                            order number.
                         </p>
                         <div class="returnsPage__sidebarMeta">Mon-Fri | 09:00 - 17:00</div>
                         <VBtn color="primary" rounded="pill" size="large" class="text-none mt-6" block to="/contact">Get in touch</VBtn>
@@ -194,6 +199,10 @@ const faqPanels = ref<number[]>([0])
 .returnsPage__heroPanel,
 .returnsPage__sidebar {
     animation-delay: 0.12s;
+}
+
+.returnsPage__breadcrumbs {
+    margin-bottom: 1rem;
 }
 
 .returnsPage__eyebrow,

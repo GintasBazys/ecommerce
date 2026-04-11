@@ -1,4 +1,18 @@
 <script setup lang="ts">
+import type { SchemaNode } from "~/composables/useStructuredData"
+
+type BlogArticle = {
+    title?: string
+    path?: string
+    description?: string
+    image?: string
+    date?: string
+    author?: string
+}
+
+const route = useRoute()
+const { siteName, absoluteUrl } = useSiteIdentity()
+
 useHead({
     title: `Blog | Ecommerce`
 })
@@ -7,17 +21,55 @@ const limit = 12
 const page = ref<number>(1)
 const skip = computed<number>(() => (page.value - 1) * limit)
 
-const { data: articles, refresh: refreshArticles } = useAsyncData(`articles-page-${page.value}`, () =>
-    queryCollection("content").order("date", "DESC").limit(limit).skip(skip.value).select("title", "path", "description", "image").all()
+const { data: articles, refresh: refreshArticles } = useAsyncData<BlogArticle[]>(`articles-page-${page.value}`, () =>
+    queryCollection("content")
+        .order("date", "DESC")
+        .limit(limit)
+        .skip(skip.value)
+        .select("title", "path", "description", "image", "date", "author")
+        .all()
 )
 
 const { data: allArticles } = useAsyncData("all-content", () => queryCollection("content").select("path").all())
 
 const total = computed<number>(() => allArticles.value?.length ?? 0)
 const totalPages = computed<number>(() => Math.ceil(total.value / limit))
-
-const route = useRoute()
 const router = useRouter()
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Blog" }])
+
+const blogSchema = computed<SchemaNode>(() => ({
+    "@type": "Blog",
+    "@id": `${absoluteUrl(route.path)}#blog`,
+    name: `${siteName.value} Blog`,
+    description: "Editorial stories, ecommerce guidance, and product-focused insights from the store.",
+    url: absoluteUrl(route.path)
+}))
+
+const blogListSchema = computed<SchemaNode | null>(() => {
+    if (!articles.value?.length) {
+        return null
+    }
+
+    return {
+        "@type": "ItemList",
+        itemListElement: articles.value.map((article, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: absoluteUrl(article.path ? `/blog${article.path}` : route.path),
+            name: article.title || `Blog post ${index + 1}`
+        }))
+    }
+})
+
+const breadcrumbSchema = computed<SchemaNode>(() =>
+    createBreadcrumbSchema(
+        [
+            { name: "Home", path: "/" },
+            { name: "Blog", path: route.path }
+        ],
+        absoluteUrl
+    )
+)
 
 page.value = parseInt(route.query.page as string) || 1
 
@@ -35,6 +87,8 @@ watch(page, (newPage) => {
     router.push({ query: { ...route.query, page: newPage } })
     refreshArticles()
 })
+
+useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchema.value], "blog-index-structured-data")
 </script>
 
 <template>
@@ -42,6 +96,7 @@ watch(page, (newPage) => {
         <VContainer class="blogIndex__container">
             <section class="blogIndex__hero">
                 <div class="blogIndex__heroCopy">
+                    <AppBreadcrumbs :items="breadcrumbItems" class="blogIndex__breadcrumbs" />
                     <span class="blogIndex__eyebrow">Journal</span>
                     <h1 class="blogIndex__title">Explore the latest posts with a cleaner reading and browsing experience.</h1>
                     <p class="blogIndex__description">
@@ -69,8 +124,7 @@ watch(page, (newPage) => {
     min-height: 100vh;
     padding: clamp(4rem, 7vw, 6rem) 0;
     background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%), linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
 
     &__container {
         position: relative;
@@ -93,6 +147,10 @@ watch(page, (newPage) => {
         width: 100%;
         max-width: 860px;
         text-align: center;
+    }
+
+    &__breadcrumbs {
+        margin: 0 auto 1rem;
     }
 
     &__col {

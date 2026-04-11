@@ -1,14 +1,17 @@
 <script setup lang="ts">
+const breadcrumbItems = [{ label: "Home", to: "/" }, { label: "Privacy Policy" }]
+
 useHead({
     title: "Privacy | Ecommerce"
 })
 </script>
 
 <template>
-    <VContainer class="py-12">
+    <VContainer class="privacyPage py-12">
         <VRow justify="center">
             <VCol cols="12" md="9">
                 <VCard flat class="pa-4">
+                    <AppBreadcrumbs :items="breadcrumbItems" class="privacyPage__breadcrumbs" />
                     <VCardTitle class="text-h4 mb-6">Privacy Policy</VCardTitle>
                     <VCardText>
                         <p class="mb-4">Effective date: [Date]</p>
@@ -77,3 +80,9 @@ useHead({
         </VRow>
     </VContainer>
 </template>
+
+<style scoped lang="scss">
+.privacyPage__breadcrumbs {
+    margin-bottom: 1rem;
+}
+</style>

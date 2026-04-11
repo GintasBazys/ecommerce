@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Payment & Shipping" }])
+
 useHead({
     title: "Payment & Shipping | Ecommerce"
 })
@@ -57,10 +59,12 @@ const faqPanels = ref<number[]>([0])
             <VContainer class="shippingPage__container">
                 <div class="shippingPage__heroGrid">
                     <div class="shippingPage__heroCopy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="shippingPage__breadcrumbs" />
                         <span class="shippingPage__eyebrow">Payment & Shipping</span>
                         <h1 class="shippingPage__title">Delivery and checkout guidance shaped to match the refreshed storefront.</h1>
                         <p class="shippingPage__description">
-                            This page covers how orders move, which payment methods we support, and what to expect from confirmation through delivery.
+                            This page covers how orders move, which payment methods we support, and what to expect from confirmation through
+                            delivery.
                         </p>
                         <div class="shippingPage__heroActions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/contact">Ask a question</VBtn>
@@ -72,7 +76,9 @@ const faqPanels = ref<number[]>([0])
                     </div>
                     <div class="shippingPage__heroCard">
                         <span class="shippingPage__heroLabel">Quick overview</span>
-                        <h2 class="shippingPage__heroTitle">Trusted payment methods, clear rates, and delivery updates once an order ships.</h2>
+                        <h2 class="shippingPage__heroTitle">
+                            Trusted payment methods, clear rates, and delivery updates once an order ships.
+                        </h2>
                         <ul class="shippingPage__methodList">
                             <li v-for="method in paymentMethods" :key="method" class="shippingPage__methodItem">
                                 <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
@@ -123,7 +129,8 @@ const faqPanels = ref<number[]>([0])
                         <span class="shippingPage__sidebarLabel">Need order help?</span>
                         <h2 class="shippingPage__sidebarTitle">Reach support for billing or delivery questions.</h2>
                         <p class="shippingPage__sidebarText">
-                            If payment does not go through or you need clarification about shipping timing, contact the team and include your order number if available.
+                            If payment does not go through or you need clarification about shipping timing, contact the team and include
+                            your order number if available.
                         </p>
                         <div class="shippingPage__sidebarMeta">Support hours | Mon-Fri 09:00 - 17:00</div>
                         <VBtn color="primary" rounded="pill" size="large" class="text-none mt-6" block to="/contact">Get in touch</VBtn>
@@ -172,6 +179,10 @@ const faqPanels = ref<number[]>([0])
 .shippingPage__heroCard,
 .shippingPage__sidebar {
     animation-delay: 0.12s;
+}
+
+.shippingPage__breadcrumbs {
+    margin-bottom: 1rem;
 }
 
 .shippingPage__eyebrow,

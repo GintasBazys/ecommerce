@@ -4,6 +4,8 @@ import { register } from "swiper/element/bundle"
 import AppFooter from "@/components/Footer/AppFooter.vue"
 import BaseHeader from "@/components/Header/BaseHeader.vue"
 
+const { organizationSchema, websiteSchema } = useSiteIdentity()
+
 useHead({
     link: [
         { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
@@ -12,6 +14,8 @@ useHead({
         { rel: "manifest", href: "/site.webmanifest" }
     ]
 })
+
+useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global-structured-data")
 
 const nuxtApp = useNuxtApp()
 

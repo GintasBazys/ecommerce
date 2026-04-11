@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { Review, ReviewApiResponse } from "@/types/interfaces"
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
+import type { SchemaNode } from "~/composables/useStructuredData"
 
 import { useProductPrice } from "~/composables/useProductPrice"
+import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 interface ProductListResponse {
     products?: ProductDTO[]
@@ -14,6 +16,7 @@ interface ProductCategory {
 }
 
 const route = useRoute()
+const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { openCartDrawer } = storeToRefs(useCartStore())
 const { customer } = storeToRefs(useCustomerStore())
@@ -92,6 +95,17 @@ const selectedVariant = computed<ProductVariantDTO | null>(
     () => product.value?.variants.find((variant) => variant.id === selectedVariantId.value) ?? null
 )
 
+const productPath = computed<string>(() => {
+    if (product.value?.handle) {
+        return `${PRODUCT_URL_HANDLE}/${product.value.handle}`
+    }
+
+    return route.path
+})
+
+const productUrl = computed<string>(() => absoluteUrl(productPath.value))
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: product.value?.title || "Product" }])
+
 const productImages = computed(() => product.value?.images ?? [])
 
 const activeImage = computed(() => {
@@ -119,6 +133,94 @@ const reviewAverage = computed<number>(() => {
 
     const total = reviews.value.reduce((sum, review) => sum + Number(review.rating || 0), 0)
     return Number((total / reviews.value.length).toFixed(1))
+})
+
+const schemaReviews = computed<SchemaNode[]>(() =>
+    reviews.value.map((review) => ({
+        "@type": "Review",
+        author: {
+            "@type": "Person",
+            name: `${review.first_name} ${review.last_name}`.trim()
+        },
+        datePublished: normalizeSchemaDate(review.created_at),
+        reviewBody: review.content,
+        name: review.title,
+        reviewRating: {
+            "@type": "Rating",
+            ratingValue: review.rating,
+            bestRating: 5,
+            worstRating: 1
+        }
+    }))
+)
+
+const schemaImages = computed<string[]>(() => {
+    const images = product.value?.images?.map((image) => image.url).filter((url): url is string => Boolean(url)) ?? []
+
+    if (product.value?.thumbnail && !images.includes(product.value.thumbnail)) {
+        images.unshift(product.value.thumbnail)
+    }
+
+    return images.map((image) => absoluteUrl(image))
+})
+
+const schemaPrice = computed<number | null>(() => selectedVariant.value?.calculated_price?.calculated_amount ?? null)
+const schemaCurrency = computed<string>(() => selectedVariant.value?.calculated_price?.currency_code?.toUpperCase() || DEFAULT_CURENCY)
+
+const productSchema = computed<SchemaNode | null>(() => {
+    if (!product.value || schemaPrice.value == null) {
+        return null
+    }
+
+    return {
+        "@type": "Product",
+        "@id": `${productUrl.value}#product`,
+        name: product.value.title,
+        description: product.value.description || product.value.subtitle || undefined,
+        url: productUrl.value,
+        image: schemaImages.value.length ? schemaImages.value : undefined,
+        sku: selectedVariant.value?.sku || selectedVariant.value?.id,
+        category: primaryCategory.value?.name || undefined,
+        brand: {
+            "@type": "Brand",
+            name: siteName.value
+        },
+        aggregateRating: reviews.value.length
+            ? {
+                  "@type": "AggregateRating",
+                  ratingValue: reviewAverage.value,
+                  reviewCount: reviews.value.length,
+                  bestRating: 5,
+                  worstRating: 1
+              }
+            : undefined,
+        review: schemaReviews.value.length ? schemaReviews.value : undefined,
+        offers: {
+            "@type": "Offer",
+            url: productUrl.value,
+            priceCurrency: schemaCurrency.value,
+            price: schemaPrice.value,
+            availability: inStock.value ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            itemCondition: "https://schema.org/NewCondition",
+            seller: {
+                "@id": organizationId.value
+            }
+        }
+    }
+})
+
+const breadcrumbSchema = computed<SchemaNode | null>(() => {
+    if (!product.value) {
+        return null
+    }
+
+    return createBreadcrumbSchema(
+        [
+            { name: "Home", path: "/" },
+            { name: product.value.title, path: productPath.value }
+        ],
+        absoluteUrl
+    )
 })
 
 const productFacts = computed(() => [
@@ -215,6 +317,8 @@ watch(
     },
     { immediate: true }
 )
+
+useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-structured-data")
 </script>
 
 <template>
@@ -255,7 +359,10 @@ watch(
                     <div class="productPage__content">
                         <div class="productPage__introCard">
                             <div class="productPage__introTop">
-                                <span class="productPage__eyebrow">Product detail</span>
+                                <div>
+                                    <AppBreadcrumbs :items="breadcrumbItems" class="productPage__breadcrumbs" />
+                                    <span class="productPage__eyebrow">Product detail</span>
+                                </div>
                                 <div v-if="reviews.length" class="productPage__ratingSummary">
                                     <VIcon v-for="star in 5" :key="star" size="16" class="productPage__ratingStar">
                                         {{ star <= Math.round(reviewAverage) ? "mdi-star" : "mdi-star-outline" }}
@@ -265,12 +372,7 @@ watch(
                             </div>
                             <h1 class="productPage__title">{{ product.title }}</h1>
                             <p v-if="product.subtitle" class="productPage__subtitle">{{ product.subtitle }}</p>
-                            <p class="productPage__description">
-                                {{
-                                    product.description ||
-                                        "A refined product pick designed to feel premium, practical, and easy to wear every day."
-                                }}
-                            </p>
+                            <p class="productPage__description">{{ product.description || "A refined product pick designed to feel premium, practical, and easy to wear every day." }}</p>
                             <div v-if="product.tags.length" class="productPage__tagRow">
                                 <VChip v-for="tag in product.tags" :key="tag.id" class="productPage__tag" size="small" label>
                                     {{ tag.value }}
@@ -367,12 +469,7 @@ watch(
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Description</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <p class="productPage__detailText">
-                                        {{
-                                            product.description ||
-                                                "A carefully selected product with balanced styling, everyday function, and a polished finish."
-                                        }}
-                                    </p>
+                                    <p class="productPage__detailText">{{ product.description || "A carefully selected product with balanced styling, everyday function, and a polished finish." }}</p>
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                             <VExpansionPanel>
@@ -568,6 +665,10 @@ watch(
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+}
+
+.productPage__breadcrumbs {
+    margin-bottom: 0.9rem;
 }
 
 .productPage__introTop,

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { NavLink } from "@/types/interfaces"
 
+import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
+
 const expandedPanels = ref<number[][]>([[0], [0], [0]])
 const { categories } = useProductStore()
 
@@ -71,6 +73,9 @@ const paymentIcons = [
                             <VExpansionPanelTitle class="footerPanel__panelTitle">Categories</VExpansionPanelTitle>
                             <VExpansionPanelText class="footerPanel__panelText">
                                 <ul class="footerPanel__links">
+                                    <li class="footerPanel__item">
+                                        <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="footerPanel__link">All products</NuxtLink>
+                                    </li>
                                     <li v-for="category in categories" :key="category.id" class="footerPanel__item">
                                         <NuxtLink :to="`${CATEGORY_HANDLE}/${category.handle}`" class="footerPanel__link">
                                             {{ category.name }}
@@ -143,8 +148,7 @@ const paymentIcons = [
     overflow: hidden;
     padding: clamp(3.5rem, 6vw, 5rem) 0 2rem;
     background:
-        radial-gradient(circle at top left, rgba(0, 128, 255, 0.14), transparent 26%),
-        linear-gradient(180deg, #07153f 0%, #030c26 100%);
+        radial-gradient(circle at top left, rgba(0, 128, 255, 0.14), transparent 26%), linear-gradient(180deg, #07153f 0%, #030c26 100%);
     color: #ffffff;
 
     &__container {

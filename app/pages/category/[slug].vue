@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ProductCategoryDTO, ProductDTO } from "@medusajs/types"
+import type { SchemaNode } from "~/composables/useStructuredData"
 
 import { formatPrice } from "@/utils/formatPrice"
+import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 definePageMeta({ layout: "default" })
 
@@ -41,7 +43,12 @@ type CategoryProductsResponse = {
     }
 }
 
+const ALL_PRODUCTS_SLUG = "all-products"
+const ALL_PRODUCTS_DESCRIPTION =
+    "Browse the full product catalog with the same filters, sorting, and endless discovery flow as every other category page."
+
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const { absoluteUrl } = useSiteIdentity()
 
 const route = useRoute()
 const disablePanelTransitions = ref(false)
@@ -83,6 +90,7 @@ const inStockOnly = ref(false)
 const priceRange = ref<PriceRange>([0, 0])
 const appliedPriceRange = ref<PriceRange>([0, 0])
 const initialPriceRangeApplied = ref(false)
+const isAllProductsPage = computed(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
 
 const hasMore = computed(() => offset.value + limit < totalCount.value)
 const activeFilterCount = computed(() => {
@@ -105,18 +113,79 @@ const activeFilterCount = computed(() => {
 })
 
 const directChildCategoryIds = computed(() =>
-    (((category.value as ProductCategoryDTO & { category_children?: { id: string }[] })?.category_children ?? []) as { id: string }[]).map(
-        (item) => item.id
-    )
+    isAllProductsPage.value
+        ? []
+        : (
+              ((category.value as ProductCategoryDTO & { category_children?: { id: string }[] })?.category_children ?? []) as {
+                  id: string
+              }[]
+          ).map((item) => item.id)
 )
 
 const childCategoryFacets = computed(() => facets.value.categories.filter((item) => directChildCategoryIds.value.includes(item.id)))
 
 const categoryThumbnail = computed(() => {
+    if (isAllProductsPage.value) {
+        return null
+    }
+
     const images = ((category.value as ProductCategoryDTO & { product_category_image?: CategoryImage[] })?.product_category_image ??
         []) as CategoryImage[]
     return images.find((image) => image.type === "thumbnail")?.url || null
 })
+
+const categoryPath = computed<string>(() =>
+    isAllProductsPage.value ? ALL_PRODUCTS_URL_HANDLE : `${CATEGORY_HANDLE}/${String(route.params.slug || "")}`
+)
+const pageTitle = computed<string>(() => (isAllProductsPage.value ? "All Products" : category.value?.name || "Category"))
+const pageDescription = computed<string>(() => (isAllProductsPage.value ? ALL_PRODUCTS_DESCRIPTION : category.value?.description || ""))
+const sidebarTitle = computed<string>(() => (isAllProductsPage.value ? "Refine every product" : "Refine this category"))
+const emptyStateText = computed<string>(() =>
+    isAllProductsPage.value
+        ? "Try clearing some filters or adjusting the selected price range."
+        : "Try clearing some filters or adjusting the selected price range."
+)
+const footerEndText = computed<string>(() =>
+    isAllProductsPage.value ? "You have reached the end of all products." : "You have reached the end of this category."
+)
+
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: pageTitle.value }])
+
+const collectionSchema = computed<SchemaNode | null>(() => {
+    if (!pageTitle.value) {
+        return null
+    }
+
+    return {
+        "@type": "CollectionPage",
+        "@id": `${absoluteUrl(categoryPath.value)}#collection`,
+        name: pageTitle.value,
+        description: pageDescription.value || undefined,
+        url: absoluteUrl(categoryPath.value),
+        mainEntity: products.value.length
+            ? {
+                  "@type": "ItemList",
+                  numberOfItems: totalCount.value,
+                  itemListElement: products.value.map((product, index) => ({
+                      "@type": "ListItem",
+                      position: index + 1,
+                      url: absoluteUrl(product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : categoryPath.value),
+                      name: product.title
+                  }))
+              }
+            : undefined
+    }
+})
+
+const breadcrumbSchema = computed<SchemaNode | null>(() =>
+    createBreadcrumbSchema(
+        [
+            { name: "Home", path: "/" },
+            { name: pageTitle.value, path: categoryPath.value }
+        ],
+        absoluteUrl
+    )
+)
 
 const priceSummary = computed(() => {
     if (!facets.value.price.currencyCode) {
@@ -159,7 +228,7 @@ function syncPriceRange(force = false) {
 
 function buildProductQuery() {
     return {
-        category_id: category.value?.id,
+        category_id: isAllProductsPage.value ? undefined : category.value?.id,
         region_id: regionStoreId.value,
         country_code: selectedCountryCode.value,
         limit,
@@ -176,7 +245,7 @@ function buildProductQuery() {
 }
 
 async function fetchProducts(source: "initial" | "sort" | "filters" | "pagination" = "initial") {
-    if (!category.value?.id || !regionStoreId.value) {
+    if (!regionStoreId.value || (!isAllProductsPage.value && !category.value?.id)) {
         return
     }
 
@@ -234,15 +303,20 @@ async function applyPriceRange() {
     appliedPriceRange.value = createPriceRange(priceRange.value[0], priceRange.value[1])
 }
 
-const { data } = await useFetch<ProductCategoryDTO>(`/api/categories/${route.params.slug}`)
-if (data.value && "error" in data.value) {
-    await navigateTo("/page-not-found")
+if (!isAllProductsPage.value) {
+    const { data } = await useFetch<ProductCategoryDTO | null>(`/api/categories/${route.params.slug}`)
+
+    if (!data.value) {
+        await navigateTo("/page-not-found")
+    } else {
+        category.value = data.value
+        await fetchProducts("initial")
+    }
 } else {
-    category.value = data.value || null
     await fetchProducts("initial")
 }
 
-useHead({ title: `${category.value?.name} | Ecommerce` })
+useHead(() => ({ title: `${pageTitle.value} | Ecommerce` }))
 
 const onIntersectLast = async (isIntersecting: boolean, entries: IntersectionObserverEntry[]) => {
     if (!isIntersecting || loadingRef.value || !hasMore.value) {
@@ -299,6 +373,8 @@ onMounted(() => {
     const userAgent = window.navigator.userAgent || ""
     disablePanelTransitions.value = /Android/i.test(userAgent)
 })
+
+useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "category-structured-data")
 </script>
 
 <template>
@@ -312,9 +388,10 @@ onMounted(() => {
             "
         >
             <VContainer class="categoryPage__heroContainer">
-                <span class="categoryPage__eyebrow">Category Edit</span>
-                <h1 class="categoryPage__title">{{ category?.name }}</h1>
-                <p class="categoryPage__description">{{ category?.description }}</p>
+                <AppBreadcrumbs :items="breadcrumbItems" tone="inverse" class="categoryPage__breadcrumbs" />
+                <span class="categoryPage__eyebrow">{{ isAllProductsPage ? "Store Catalog" : "Category Edit" }}</span>
+                <h1 class="categoryPage__title">{{ pageTitle }}</h1>
+                <p class="categoryPage__description">{{ pageDescription }}</p>
             </VContainer>
         </div>
         <VContainer class="categoryPage__container">
@@ -324,7 +401,7 @@ onMounted(() => {
                         <div class="categoryPage__sidebarHeader">
                             <div>
                                 <span class="categoryPage__sidebarEyebrow">Filters</span>
-                                <h2 class="categoryPage__sidebarTitle">Refine this category</h2>
+                                <h2 class="categoryPage__sidebarTitle">{{ sidebarTitle }}</h2>
                             </div>
                             <VBtn v-if="activeFilterCount" variant="text" color="primary" class="text-none px-0" @click="clearAllFilters">
                                 Clear all
@@ -486,12 +563,12 @@ onMounted(() => {
                     </div>
                     <div v-else class="categoryPage__emptyState">
                         <h2 class="categoryPage__emptyTitle">No products match these filters.</h2>
-                        <p class="categoryPage__emptyText">Try clearing some filters or adjusting the selected price range.</p>
+                        <p class="categoryPage__emptyText">{{ emptyStateText }}</p>
                         <VBtn color="primary" rounded="pill" class="text-none" @click="clearAllFilters">Reset filters</VBtn>
                     </div>
                     <div v-if="products.length" class="categoryPage__footer">
                         <VProgressCircular v-if="loadingRef && hasMore" indeterminate color="primary" />
-                        <span v-else-if="!hasMore">You have reached the end of this category.</span>
+                        <span v-else-if="!hasMore">{{ footerEndText }}</span>
                     </div>
                 </div>
             </div>
@@ -515,6 +592,10 @@ onMounted(() => {
 .categoryPage__heroContainer {
     padding: clamp(4.5rem, 8vw, 6.75rem) 1rem;
     text-align: center;
+}
+
+.categoryPage__breadcrumbs {
+    margin: 0 auto 1rem;
 }
 
 .categoryPage__eyebrow,

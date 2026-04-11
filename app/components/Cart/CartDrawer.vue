@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CartLineItemDTO } from "@medusajs/types"
 
-import { DEFAULT_CURENCY } from "~/utils/consts"
+import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
 
 const { cart, openCartDrawer } = storeToRefs(useCartStore())
@@ -202,7 +202,7 @@ router.afterEach(() => {
                         </div>
                         <h3 class="cartDrawer__emptyTitle">Your cart is empty</h3>
                         <p class="cartDrawer__emptyText">Add a few pieces you love and they will appear here for a quick final review.</p>
-                        <VBtn color="primary" rounded="pill" class="text-none px-6" to="/">Keep shopping</VBtn>
+                        <VBtn color="primary" rounded="pill" class="text-none px-6" :to="ALL_PRODUCTS_URL_HANDLE">Keep shopping</VBtn>
                     </div>
                 </div>
 

@@ -152,7 +152,7 @@ async function handleRegister(): Promise<void> {
 }
 
 .registerPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+    padding: 0 0 clamp(4rem, 7vw, 6rem);
 }
 
 .registerPage__container {
@@ -301,7 +301,7 @@ async function handleRegister(): Promise<void> {
 
 @media screen and (max-width: 700px) {
     .registerPage__hero {
-        padding: 3.75rem 0 3.5rem;
+        padding: 0 0 3.5rem;
     }
 
     .registerPage__title {

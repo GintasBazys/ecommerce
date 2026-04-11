@@ -1,5 +1,17 @@
 <script setup lang="ts">
+import type { SchemaNode } from "~/composables/useStructuredData"
+
+type BlogPost = {
+    title?: string
+    path?: string
+    description?: string
+    image?: string
+    author?: string
+    date?: string
+}
+
 const route = useRoute()
+const { organizationId, absoluteUrl } = useSiteIdentity()
 const slug = computed<string[] | string>(() => {
     if (route.params.slug) {
         return route.params.slug
@@ -8,7 +20,9 @@ const slug = computed<string[] | string>(() => {
     return parts[parts.length - 1] || ""
 })
 
-const { data: currentPost } = await useAsyncData(`post-${slug.value}`, () => queryCollection("content").path(`/${slug.value}`).first())
+const { data: currentPost } = await useAsyncData<BlogPost | null>(`post-${slug.value}`, () =>
+    queryCollection("content").path(`/${slug.value}`).first()
+)
 
 const relatedQuery = queryCollection("content")
     .order("date", "DESC")
@@ -20,6 +34,57 @@ const { data: relatedPosts } = await useAsyncData(`related-${slug.value}`, () =>
 useHead({
     title: `${currentPost.value?.title ?? "Shop"} | Ecommerce`
 })
+
+const articleUrl = computed<string>(() => absoluteUrl(route.path))
+const breadcrumbItems = computed(() => [
+    { label: "Home", to: "/" },
+    { label: "Blog", to: "/blog" },
+    { label: currentPost.value?.title || "Article" }
+])
+
+const articleSchema = computed<SchemaNode | null>(() => {
+    if (!currentPost.value?.title) {
+        return null
+    }
+
+    const image = currentPost.value.image ? absoluteUrl(currentPost.value.image) : undefined
+
+    return {
+        "@type": "BlogPosting",
+        "@id": `${articleUrl.value}#article`,
+        headline: currentPost.value.title,
+        description: currentPost.value.description || undefined,
+        url: articleUrl.value,
+        mainEntityOfPage: articleUrl.value,
+        image: image ? [image] : undefined,
+        datePublished: normalizeSchemaDate(currentPost.value.date),
+        dateModified: normalizeSchemaDate(currentPost.value.date),
+        author: {
+            "@type": "Person",
+            name: currentPost.value.author || "Admin"
+        },
+        publisher: {
+            "@id": organizationId.value
+        }
+    }
+})
+
+const breadcrumbSchema = computed<SchemaNode | null>(() => {
+    if (!currentPost.value?.title) {
+        return null
+    }
+
+    return createBreadcrumbSchema(
+        [
+            { name: "Home", path: "/" },
+            { name: "Blog", path: "/blog" },
+            { name: currentPost.value.title, path: route.path }
+        ],
+        absoluteUrl
+    )
+})
+
+useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-post-structured-data")
 </script>
 
 <template>
@@ -27,6 +92,7 @@ useHead({
         <VContainer class="blogPost__container">
             <section class="blogPost__hero">
                 <div class="blogPost__heroCopy">
+                    <AppBreadcrumbs :items="breadcrumbItems" class="blogPost__breadcrumbs" />
                     <span class="blogPost__eyebrow">Journal</span>
                     <h1 class="blogPost__title">{{ currentPost?.title }}</h1>
                     <div class="blogPost__meta">
@@ -77,8 +143,7 @@ useHead({
     min-height: 100vh;
     padding: clamp(4rem, 7vw, 6rem) 0;
     background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%), linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
 
     &__container {
         position: relative;
@@ -101,6 +166,10 @@ useHead({
         width: 100%;
         max-width: 880px;
         text-align: center;
+    }
+
+    &__breadcrumbs {
+        margin: 0 auto 1rem;
     }
 
     &__eyebrow {

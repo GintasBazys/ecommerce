@@ -6,6 +6,7 @@ interface ProductListResponse {
 }
 
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Special Offers" }])
 
 const saleHighlights = [
     "Curated discounts across the current catalog",
@@ -42,6 +43,7 @@ useHead({
             <VContainer class="specialOffersPage__container">
                 <div class="specialOffersPage__heroGrid">
                     <div class="specialOffersPage__heroCopy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="specialOffersPage__breadcrumbs" />
                         <span class="specialOffersPage__eyebrow">Special offers</span>
                         <h1 class="specialOffersPage__title">All current sale products, gathered into one calmer place to browse.</h1>
                         <p class="specialOffersPage__description">
@@ -142,6 +144,10 @@ useHead({
 .specialOffersPage__results,
 .specialOffersPage__emptyState {
     animation-delay: 0.12s;
+}
+
+.specialOffersPage__breadcrumbs {
+    margin-bottom: 1rem;
 }
 
 .specialOffersPage__eyebrow,

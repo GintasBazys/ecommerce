@@ -4,7 +4,7 @@ import debounce from "lodash/debounce"
 import type { SearchResponse } from "@/types/interfaces"
 import type { ProductDTO } from "@medusajs/types"
 
-import { CATEGORY_HANDLE, BLOG_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const bannerHidden = ref<boolean>(false)
 const drawer = ref<boolean>(false)
@@ -152,6 +152,7 @@ async function updateLocation(value: string): Promise<void> {
                     </VCol>
 
                     <nav class="hidden-md-and-down siteHeader__nav">
+                        <NuxtLink class="siteHeader__navLink" :to="ALL_PRODUCTS_URL_HANDLE">All products</NuxtLink>
                         <NuxtLink class="siteHeader__navLink" to="/special-offers">Special offers</NuxtLink>
                         <NuxtLink
                             v-for="cat in categories"
@@ -161,8 +162,6 @@ async function updateLocation(value: string): Promise<void> {
                         >
                             {{ cat.name }}
                         </NuxtLink>
-                        <NuxtLink class="siteHeader__navLink" :to="BLOG_HANDLE">Blog</NuxtLink>
-                        <NuxtLink class="siteHeader__navLink" to="/about">About us</NuxtLink>
                     </nav>
 
                     <VCol cols="auto" class="d-flex align-center">
@@ -241,18 +240,15 @@ async function updateLocation(value: string): Promise<void> {
                     />
                 </VListItem>
                 <VListItem>
+                    <NuxtLink class="siteHeader__drawerLink" :to="ALL_PRODUCTS_URL_HANDLE">All products</NuxtLink>
+                </VListItem>
+                <VListItem>
                     <NuxtLink class="siteHeader__drawerLink" to="/special-offers">Special offers</NuxtLink>
                 </VListItem>
                 <VListItem v-for="cat in categories" :key="cat.id">
                     <NuxtLink class="siteHeader__drawerLink" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
                         {{ cat.name }}
                     </NuxtLink>
-                </VListItem>
-                <VListItem>
-                    <NuxtLink class="siteHeader__drawerLink" :to="BLOG_HANDLE">Blog</NuxtLink>
-                </VListItem>
-                <VListItem>
-                    <NuxtLink class="siteHeader__drawerLink" to="/about">About us</NuxtLink>
                 </VListItem>
                 <VListItem>
                     <NuxtLink v-if="customer?.id" class="siteHeader__drawerLink" to="/account">Profile</NuxtLink>
@@ -446,7 +442,7 @@ async function updateLocation(value: string): Promise<void> {
     }
 
     &__drawerSelect {
-        margin-bottom: 0.35rem;
+        margin: 0.35rem 0;
     }
 }
 

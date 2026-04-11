@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import ContactForm from "~/components/Forms/ContactForm.vue"
 
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Contact" }])
+
 const contactChannels = [
     {
         icon: "mdi-facebook-messenger",
@@ -39,12 +41,13 @@ useHead({
             <VContainer class="contactPage__container">
                 <div class="contactPage__heroGrid">
                     <div class="contactPage__heroCopy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="contactPage__breadcrumbs" />
                         <span class="contactPage__eyebrow">Customer Care</span>
                         <h1 class="contactPage__title">Talk to a team that keeps shopping support calm, clear, and fast.</h1>
                         <p class="contactPage__description">
                             If you want a quick answer first, browse our
-                            <NuxtLink to="/faq" class="contactPage__inlineLink">FAQ</NuxtLink>.
-                            If you still need us, send a message and we will help with products, delivery, returns, or order updates.
+                            <NuxtLink to="/faq" class="contactPage__inlineLink">FAQ</NuxtLink>. If you still need us, send a message and we
+                            will help with products, delivery, returns, or order updates.
                         </p>
                         <div class="contactPage__heroActions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/faq">Browse FAQ</VBtn>
@@ -58,7 +61,8 @@ useHead({
                         <span class="contactPage__panelLabel">Support desk</span>
                         <h2 class="contactPage__panelTitle">Built to feel as considered as the new homepage.</h2>
                         <p class="contactPage__panelText">
-                            Reach out for delivery updates, product advice, or help with a recent order. We keep replies direct and practical.
+                            Reach out for delivery updates, product advice, or help with a recent order. We keep replies direct and
+                            practical.
                         </p>
                         <ul class="contactPage__promiseList">
                             <li v-for="promise in supportPromises" :key="promise" class="contactPage__promiseItem">
@@ -101,7 +105,8 @@ useHead({
                         <span class="contactPage__sidebarLabel">Visit us</span>
                         <h2 class="contactPage__sidebarTitle">Vilnius support base</h2>
                         <p class="contactPage__sidebarText">
-                            Our team works from Vilnius and supports customers across product questions, order issues, and post-purchase help.
+                            Our team works from Vilnius and supports customers across product questions, order issues, and post-purchase
+                            help.
                         </p>
                         <div class="contactPage__sidebarMeta">Open on weekdays | Closed on public holidays</div>
                     </div>
@@ -161,6 +166,10 @@ useHead({
 .contactPage__heroPanel,
 .contactPage__sidebar {
     animation-delay: 0.12s;
+}
+
+.contactPage__breadcrumbs {
+    margin-bottom: 1rem;
 }
 
 .contactPage__eyebrow,

@@ -198,7 +198,7 @@ async function handleReset(): Promise<void> {
 }
 
 .authPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+    padding: 0 0 clamp(4rem, 7vw, 6rem);
 }
 
 .authPage__container {
@@ -408,7 +408,7 @@ async function handleReset(): Promise<void> {
 
 @media screen and (max-width: 700px) {
     .authPage__hero {
-        padding: 3.75rem 0 3.5rem;
+        padding: 0 0 3.5rem;
     }
 
     .authPage__title {

@@ -47,7 +47,9 @@ export default defineNuxtConfig({
         public: {
             MEDUSA_URL: process.env.MEDUSA_URL,
             PUBLISHABLE_KEY: process.env.PUBLISHABLE_KEY,
-            STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY
+            STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
+            SITE_NAME: process.env.SITE_NAME || "Ecommerce",
+            SITE_URL: process.env.SITE_URL || ""
         },
         secret: {
             mailchimpApiKey: process.env.MAILCHIMP_API_KEY,

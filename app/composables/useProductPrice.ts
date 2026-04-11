@@ -23,6 +23,11 @@ export function useProductPrice(selectedVariant: Ref<ProductVariantDTO | null>) 
     const taxLabel = computed(() => {
         if (amountWithTax.value != null && amountWithoutTax.value != null) {
             const tax = amountWithTax.value - amountWithoutTax.value
+
+            if (tax <= 0) {
+                return ""
+            }
+
             return `Incl. ${formatPrice(tax, "EUR")} tax`
         }
 

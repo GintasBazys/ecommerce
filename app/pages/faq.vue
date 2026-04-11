@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SchemaNode } from "~/composables/useStructuredData"
+
 type FaqSection = {
     id: string
     eyebrow: string
@@ -9,6 +11,10 @@ type FaqSection = {
         answer: string
     }[]
 }
+
+const route = useRoute()
+const { absoluteUrl } = useSiteIdentity()
+const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "FAQ" }])
 
 const faqSections: FaqSection[] = [
     {
@@ -53,19 +59,40 @@ const faqSections: FaqSection[] = [
     }
 ]
 
-const quickTopics = [
-    "Order tracking and delivery timing",
-    "Returns or exchange guidance",
-    "Product recommendations before checkout"
-]
+const quickTopics = ["Order tracking and delivery timing", "Returns or exchange guidance", "Product recommendations before checkout"]
 
-const panelState = reactive<Record<string, number[]>>(
-    Object.fromEntries(faqSections.map((section) => [section.id, [0]]))
-)
+const panelState = reactive<Record<string, number[]>>(Object.fromEntries(faqSections.map((section) => [section.id, [0]])))
 
 useHead({
     title: "FAQ | Ecommerce"
 })
+
+const faqSchema = computed<SchemaNode>(() => ({
+    "@type": "FAQPage",
+    "@id": `${absoluteUrl(route.path)}#faq`,
+    mainEntity: faqSections.flatMap((section) =>
+        section.items.map((item) => ({
+            "@type": "Question",
+            name: item.question,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer
+            }
+        }))
+    )
+}))
+
+const breadcrumbSchema = computed<SchemaNode>(() =>
+    createBreadcrumbSchema(
+        [
+            { name: "Home", path: "/" },
+            { name: "FAQ", path: route.path }
+        ],
+        absoluteUrl
+    )
+)
+
+useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structured-data")
 </script>
 
 <template>
@@ -74,6 +101,7 @@ useHead({
             <VContainer class="faqPage__container">
                 <div class="faqPage__heroGrid">
                     <div class="faqPage__heroCopy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="faqPage__breadcrumbs" />
                         <span class="faqPage__eyebrow">Help Center</span>
                         <h1 class="faqPage__title">Answers shaped to match the cleaner, calmer storefront experience.</h1>
                         <p class="faqPage__description">
@@ -128,7 +156,8 @@ useHead({
                         <span class="faqPage__sidebarLabel">Still need help?</span>
                         <h2 class="faqPage__sidebarTitle">Talk to the support team directly.</h2>
                         <p class="faqPage__sidebarText">
-                            If your question is about a current order or a product choice, send us a message and we will point you in the right direction.
+                            If your question is about a current order or a product choice, send us a message and we will point you in the
+                            right direction.
                         </p>
                         <div class="faqPage__sidebarMeta">Mon-Fri | 09:00 - 17:00</div>
                         <VBtn color="primary" rounded="pill" size="large" class="text-none mt-6" block to="/contact">Get in touch</VBtn>
@@ -171,6 +200,10 @@ useHead({
 .faqPage__sectionCard,
 .faqPage__sidebar {
     animation: faq-rise 0.8s ease both;
+}
+
+.faqPage__breadcrumbs {
+    margin-bottom: 1rem;
 }
 
 .faqPage__heroCard,

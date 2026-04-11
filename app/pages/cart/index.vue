@@ -5,7 +5,7 @@ import TaxedLinePrice from "../../components/Cart/TaxedLinePrice.vue"
 
 import type { CartLineItemDTO } from "@medusajs/types"
 
-import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
 
 definePageMeta({ layout: "checkout" })
@@ -223,7 +223,7 @@ async function updateCart(): Promise<void> {
 </script>
 
 <template>
-    <section class="cartPage">
+    <main class="cartPage">
         <div class="cartPage__hero">
             <VContainer class="cartPage__container">
                 <div v-if="isCartLoading" class="cartPage__loadingState">
@@ -240,7 +240,9 @@ async function updateCart(): Promise<void> {
                                 rest of the shop.
                             </p>
                             <div class="cartPage__heroActions">
-                                <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/"> Continue shopping </VBtn>
+                                <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" :to="ALL_PRODUCTS_URL_HANDLE">
+                                    Continue shopping
+                                </VBtn>
                                 <div class="cartPage__statCard">
                                     <span class="cartPage__statLabel">Current total</span>
                                     <strong class="cartPage__statValue">{{ formatPrice(Number(cart?.total || 0), currencyCode) }}</strong>
@@ -369,7 +371,9 @@ async function updateCart(): Promise<void> {
                                 <p class="cartPage__emptyText">
                                     Add a few products you love and come back here to review everything before checkout.
                                 </p>
-                                <VBtn color="primary" rounded="pill" class="text-none px-6" to="/">Browse products</VBtn>
+                                <VBtn color="primary" rounded="pill" class="text-none px-6" :to="ALL_PRODUCTS_URL_HANDLE">
+                                    Browse products
+                                </VBtn>
                             </div>
                         </div>
                         <aside class="cartPage__summaryColumn">
@@ -461,7 +465,7 @@ async function updateCart(): Promise<void> {
                 </template>
             </VContainer>
         </div>
-    </section>
+    </main>
 </template>
 
 <style scoped lang="scss">
