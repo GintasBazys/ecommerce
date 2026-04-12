@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url"
+
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
 
@@ -69,6 +71,14 @@ export default defineNuxtConfig({
     plugins: ["~/plugins/init-app", "~/plugins/silktide.client.js"],
 
     vite: {
+        resolve: {
+            alias: [
+                {
+                    find: /^vue$/,
+                    replacement: fileURLToPath(new URL("./app/shims/vue.ts", import.meta.url))
+                }
+            ]
+        },
         optimizeDeps: {
             include: ["@stripe/stripe-js"]
         }
