@@ -11,6 +11,12 @@ definePageMeta({
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
+const medusaBaseUrl = String(config.public.MEDUSA_URL || "").replace(/\/+$/, "")
+
+function getMedusaUrl(path: string): string {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`
+    return `${medusaBaseUrl}${normalizedPath}`
+}
 
 const email = ref<string>("")
 const firstName = ref<string>("")
@@ -37,7 +43,7 @@ async function sendCallback(): Promise<string | null> {
 
     try {
         loadingMessage.value = "Contacting authentication server..."
-        const url = `${config.public.MEDUSA_URL}/auth/customer/${provider.value}/callback?${new URLSearchParams(queryParams).toString()}`
+        const url = `${getMedusaUrl(`/auth/customer/${provider.value}/callback`)}?${new URLSearchParams(queryParams).toString()}`
         const response = await fetch(url, { credentials: "include", method: "POST" })
 
         if (!response.ok) {
@@ -58,7 +64,7 @@ async function sendCallback(): Promise<string | null> {
 async function createCustomer(token: string, email: string, first_name: string, last_name: string): Promise<Response | null> {
     try {
         loadingMessage.value = "Creating customer account..."
-        const response = await fetch(`${config.public.MEDUSA_URL}/store/customers`, {
+        const response = await fetch(getMedusaUrl("/store/customers"), {
             credentials: "include",
             method: "POST",
             headers: {
@@ -83,7 +89,7 @@ async function createCustomer(token: string, email: string, first_name: string, 
 async function refreshToken(token: string): Promise<string | null> {
     try {
         loadingMessage.value = "Refreshing session token..."
-        const response = await fetch(`${config.public.MEDUSA_URL}/auth/token/refresh`, {
+        const response = await fetch(getMedusaUrl("/auth/token/refresh"), {
             credentials: "include",
             method: "POST",
             headers: {
@@ -138,7 +144,7 @@ const validateCallback = async () => {
             }
 
             loadingMessage.value = "Retrieving identity information..."
-            const identityResponse = await fetch(`${config.public.MEDUSA_URL}/store/identity`, {
+            const identityResponse = await fetch(getMedusaUrl("/store/identity"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -178,7 +184,7 @@ const validateCallback = async () => {
             }
 
             loadingMessage.value = "Establishing session..."
-            const sessionResponse = await fetch(`${config.public.MEDUSA_URL}/auth/session`, {
+            const sessionResponse = await fetch(getMedusaUrl("/auth/session"), {
                 credentials: "include",
                 method: "POST",
                 headers: {
@@ -192,7 +198,7 @@ const validateCallback = async () => {
             }
 
             loadingMessage.value = "Fetching customer details..."
-            const response = await fetch(`${config.public.MEDUSA_URL}/store/customers/me`, {
+            const response = await fetch(getMedusaUrl("/store/customers/me"), {
                 credentials: "include",
                 method: "GET",
                 headers: {
