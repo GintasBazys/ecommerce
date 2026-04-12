@@ -1136,6 +1136,8 @@ watch(cartFingerprint, scheduleRefresh)
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+}
+
 .checkout-page__title,
 .checkout-page__section-title,
 .checkout-page__summary-title {
@@ -1243,6 +1245,8 @@ watch(cartFingerprint, scheduleRefresh)
     border-radius: 999px;
     background: rgba(247, 250, 255, 0.9);
     padding: 0.25rem;
+}
+
 .checkout-page__window,
 .checkout-page__form,
 .checkout-page__social-buttons,
