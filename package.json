@@ -1,6 +1,7 @@
 {
     "name": "nuxt-app",
     "private": true,
+    "packageManager": "pnpm@10.10.0",
     "type": "module",
     "scripts": {
         "build": "nuxt build",
@@ -16,7 +17,7 @@
         "@medusajs/types": "^2.13.6",
         "@nuxt/content": "^3.12.0",
         "@nuxt/eslint": "^1.15.2",
-        "@nuxt/image": "npm:@nuxt/image-nightly@latest",
+        "@nuxt/image": "npm:@nuxt/image-nightly@2.0.1-20260123-155459-93de8a9",
         "@nuxtjs/sitemap": "^8.0.12",
         "@pinia/nuxt": "^0.11.3",
         "@stripe/stripe-js": "^9.1.0",
