@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
 
+    nitro: {
+        preset: process.env.VERCEL ? "vercel" : undefined
+    },
+
     app: {
         layoutTransition: {
             name: "page",
