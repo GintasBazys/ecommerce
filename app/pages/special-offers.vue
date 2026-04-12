@@ -38,25 +38,25 @@ useHead({
 </script>
 
 <template>
-    <section class="specialOffersPage">
-        <div class="specialOffersPage__hero">
-            <VContainer class="specialOffersPage__container">
-                <div class="specialOffersPage__heroGrid">
-                    <div class="specialOffersPage__heroCopy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="specialOffersPage__breadcrumbs" />
-                        <span class="specialOffersPage__eyebrow">Special offers</span>
-                        <h1 class="specialOffersPage__title">All current sale products, gathered into one calmer place to browse.</h1>
-                        <p class="specialOffersPage__description">
+    <section class="special-offers-page">
+        <div class="special-offers-page__hero">
+            <VContainer class="special-offers-page__container">
+                <div class="special-offers-page__hero-grid">
+                    <div class="special-offers-page__hero-copy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="special-offers-page__breadcrumbs" />
+                        <span class="special-offers-page__eyebrow">Special offers</span>
+                        <h1 class="special-offers-page__title">All current sale products, gathered into one calmer place to browse.</h1>
+                        <p class="special-offers-page__description">
                             Explore every discounted product in the catalog without jumping through categories. The page keeps the same
                             polished feel as the newer shop experience.
                         </p>
                     </div>
 
-                    <div class="specialOffersPage__heroPanel">
-                        <span class="specialOffersPage__panelLabel">What to expect</span>
-                        <h2 class="specialOffersPage__panelTitle">Designed like a campaign page, powered by live sale pricing.</h2>
-                        <ul class="specialOffersPage__promiseList">
-                            <li v-for="highlight in saleHighlights" :key="highlight" class="specialOffersPage__promiseItem">
+                    <div class="special-offers-page__hero-panel">
+                        <span class="special-offers-page__panel-label">What to expect</span>
+                        <h2 class="special-offers-page__panel-title">Designed like a campaign page, powered by live sale pricing.</h2>
+                        <ul class="special-offers-page__promise-list">
+                            <li v-for="highlight in saleHighlights" :key="highlight" class="special-offers-page__promise-item">
                                 <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
                                 <span>{{ highlight }}</span>
                             </li>
@@ -64,43 +64,43 @@ useHead({
                     </div>
                 </div>
 
-                <div class="specialOffersPage__statRow">
-                    <div class="specialOffersPage__statCard">
-                        <span class="specialOffersPage__statLabel">Sale products</span>
-                        <strong class="specialOffersPage__statValue">{{ saleProducts.length }}</strong>
+                <div class="special-offers-page__stat-row">
+                    <div class="special-offers-page__stat-card">
+                        <span class="special-offers-page__stat-label">Sale products</span>
+                        <strong class="special-offers-page__stat-value">{{ saleProducts.length }}</strong>
                     </div>
-                    <div class="specialOffersPage__statCard">
-                        <span class="specialOffersPage__statLabel">Sorted by</span>
-                        <strong class="specialOffersPage__statValue">Newest offers first</strong>
+                    <div class="special-offers-page__stat-card">
+                        <span class="special-offers-page__stat-label">Sorted by</span>
+                        <strong class="special-offers-page__stat-value">Newest offers first</strong>
                     </div>
                 </div>
 
-                <div v-if="pending" class="specialOffersPage__loadingState">
+                <div v-if="pending" class="special-offers-page__loading-state">
                     <VProgressCircular indeterminate color="primary" size="40" />
-                    <p class="specialOffersPage__loadingText">Loading sale products...</p>
+                    <p class="special-offers-page__loading-text">Loading sale products...</p>
                 </div>
 
                 <VAlert v-else-if="error" type="error" variant="tonal"> Could not load special offers right now. </VAlert>
 
-                <div v-else-if="saleProducts.length" class="specialOffersPage__results">
-                    <div class="specialOffersPage__sectionIntro">
-                        <span class="specialOffersPage__sectionEyebrow">On sale now</span>
-                        <h2 class="specialOffersPage__sectionTitle">Every discounted product currently available.</h2>
+                <div v-else-if="saleProducts.length" class="special-offers-page__results">
+                    <div class="special-offers-page__section-intro">
+                        <span class="special-offers-page__section-eyebrow">On sale now</span>
+                        <h2 class="special-offers-page__section-title">Every discounted product currently available.</h2>
                     </div>
 
-                    <VRow align="stretch" class="specialOffersPage__grid">
+                    <VRow align="stretch" class="special-offers-page__grid">
                         <VCol v-for="product in saleProducts" :key="product.id" cols="12" sm="6" lg="4" xl="3">
                             <ProductCard :product="product" />
                         </VCol>
                     </VRow>
                 </div>
 
-                <div v-else class="specialOffersPage__emptyState">
-                    <div class="specialOffersPage__emptyIcon">
+                <div v-else class="special-offers-page__empty-state">
+                    <div class="special-offers-page__empty-icon">
                         <VIcon size="26">mdi-tag-outline</VIcon>
                     </div>
-                    <h2 class="specialOffersPage__emptyTitle">No sale products live right now</h2>
-                    <p class="specialOffersPage__emptyText">
+                    <h2 class="special-offers-page__empty-title">No sale products live right now</h2>
+                    <p class="special-offers-page__empty-text">
                         The next offer drop will appear here automatically once discounted products are available.
                     </p>
                     <VBtn color="primary" rounded="pill" class="text-none px-6" to="/">Browse the full shop</VBtn>
@@ -111,48 +111,48 @@ useHead({
 </template>
 
 <style scoped lang="scss">
-.specialOffersPage {
+.special-offers-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.specialOffersPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+.special-offers-page__hero {
+    padding: 5.5rem 0 5rem;
 }
 
-.specialOffersPage__container {
+.special-offers-page__container {
     position: relative;
     z-index: 1;
 }
 
-.specialOffersPage__heroGrid {
+.special-offers-page__hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
     align-items: end;
 }
 
-.specialOffersPage__heroCopy,
-.specialOffersPage__heroPanel,
-.specialOffersPage__results,
-.specialOffersPage__emptyState {
+.special-offers-page__hero-copy,
+.special-offers-page__hero-panel,
+.special-offers-page__results,
+.special-offers-page__empty-state {
     animation: offers-rise 0.8s ease both;
 }
 
-.specialOffersPage__heroPanel,
-.specialOffersPage__results,
-.specialOffersPage__emptyState {
+.special-offers-page__hero-panel,
+.special-offers-page__results,
+.special-offers-page__empty-state {
     animation-delay: 0.12s;
 }
 
-.specialOffersPage__breadcrumbs {
+.special-offers-page__breadcrumbs {
     margin-bottom: 1rem;
 }
 
-.specialOffersPage__eyebrow,
-.specialOffersPage__panelLabel,
-.specialOffersPage__sectionEyebrow {
+.special-offers-page__eyebrow,
+.special-offers-page__panel-label,
+.special-offers-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -166,33 +166,33 @@ useHead({
     text-transform: uppercase;
 }
 
-.specialOffersPage__title,
-.specialOffersPage__panelTitle,
-.specialOffersPage__sectionTitle,
-.specialOffersPage__emptyTitle {
+.special-offers-page__title,
+.special-offers-page__panel-title,
+.special-offers-page__section-title,
+.special-offers-page__empty-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.specialOffersPage__title {
+.special-offers-page__title {
     max-width: 11ch;
     margin: 1rem 0;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 4.5rem;
     line-height: 0.95;
 }
 
-.specialOffersPage__description,
-.specialOffersPage__emptyText,
-.specialOffersPage__loadingText {
+.special-offers-page__description,
+.special-offers-page__empty-text,
+.special-offers-page__loading-text {
     margin: 0;
     color: #4b5874;
     line-height: 1.75;
 }
 
-.specialOffersPage__heroPanel,
-.specialOffersPage__statCard,
-.specialOffersPage__emptyState {
+.special-offers-page__hero-panel,
+.special-offers-page__stat-card,
+.special-offers-page__empty-state {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.82);
@@ -200,23 +200,23 @@ useHead({
     backdrop-filter: blur(14px);
 }
 
-.specialOffersPage__heroPanel {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.special-offers-page__hero-panel {
+    padding: 1.9rem;
 }
 
-.specialOffersPage__panelLabel {
+.special-offers-page__panel-label {
     margin-bottom: 1rem;
 }
 
-.specialOffersPage__panelTitle,
-.specialOffersPage__sectionTitle,
-.specialOffersPage__emptyTitle {
+.special-offers-page__panel-title,
+.special-offers-page__section-title,
+.special-offers-page__empty-title {
     margin-bottom: 0.85rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 2.2rem;
     line-height: 1.08;
 }
 
-.specialOffersPage__promiseList {
+.special-offers-page__promise-list {
     display: grid;
     gap: 0.85rem;
     margin: 1.2rem 0 0;
@@ -224,7 +224,7 @@ useHead({
     list-style: none;
 }
 
-.specialOffersPage__promiseItem {
+.special-offers-page__promise-item {
     display: flex;
     align-items: flex-start;
     gap: 0.7rem;
@@ -232,46 +232,46 @@ useHead({
     line-height: 1.6;
 }
 
-.specialOffersPage__statRow {
+.special-offers-page__stat-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    margin: clamp(1.5rem, 3vw, 2rem) 0 clamp(2rem, 4vw, 3rem);
+    margin: 2rem 0 3rem;
 }
 
-.specialOffersPage__statCard {
+.special-offers-page__stat-card {
     display: grid;
     gap: 0.2rem;
     padding: 0.95rem 1.1rem;
 }
 
-.specialOffersPage__statLabel {
+.special-offers-page__stat-label {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.specialOffersPage__statValue {
+.special-offers-page__stat-value {
     color: #08173f;
     font-size: 1rem;
     line-height: 1.45;
 }
 
-.specialOffersPage__sectionIntro {
+.special-offers-page__section-intro {
     margin-bottom: 1.35rem;
 }
 
-.specialOffersPage__grid {
+.special-offers-page__grid {
     margin-top: 0;
 }
 
-.specialOffersPage__emptyState {
+.special-offers-page__empty-state {
     display: grid;
     justify-items: start;
     gap: 0.85rem;
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+    padding: 1.9rem;
 }
 
-.specialOffersPage__emptyIcon {
+.special-offers-page__empty-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -282,7 +282,7 @@ useHead({
     color: #010c80;
 }
 
-.specialOffersPage__loadingState {
+.special-offers-page__loading-state {
     display: grid;
     justify-items: center;
     gap: 0.9rem;
@@ -302,38 +302,68 @@ useHead({
 }
 
 @media screen and (max-width: 1100px) {
-    .specialOffersPage__heroGrid,
-    .specialOffersPage__statRow {
+    .special-offers-page__hero-grid,
+    .special-offers-page__stat-row {
         grid-template-columns: 1fr;
     }
 
-    .specialOffersPage__title {
+    .special-offers-page__hero {
+        padding: 5rem 0 4.5rem;
+    }
+
+    .special-offers-page__hero-grid {
+        gap: 1.5rem;
+    }
+
+    .special-offers-page__title {
         max-width: 100%;
+        font-size: 3.2rem;
+    }
+
+    .special-offers-page__panel-title,
+    .special-offers-page__section-title,
+    .special-offers-page__empty-title {
+        font-size: 1.9rem;
     }
 }
 
 @media screen and (max-width: 700px) {
-    .specialOffersPage__hero {
+    .special-offers-page__hero {
         padding: 3.75rem 0 3.5rem;
     }
 
-    .specialOffersPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .special-offers-page__title {
+        font-size: 2.4rem;
         line-height: 1;
     }
 
-    .specialOffersPage__heroPanel,
-    .specialOffersPage__statCard,
-    .specialOffersPage__emptyState {
+    .special-offers-page__hero-panel,
+    .special-offers-page__stat-card,
+    .special-offers-page__empty-state {
         border-radius: 1.2rem;
+    }
+
+    .special-offers-page__hero-panel,
+    .special-offers-page__empty-state {
+        padding: 1.4rem;
+    }
+
+    .special-offers-page__stat-row {
+        margin: 1.5rem 0 2rem;
+    }
+
+    .special-offers-page__panel-title,
+    .special-offers-page__section-title,
+    .special-offers-page__empty-title {
+        font-size: 1.6rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .specialOffersPage__heroCopy,
-    .specialOffersPage__heroPanel,
-    .specialOffersPage__results,
-    .specialOffersPage__emptyState {
+    .special-offers-page__hero-copy,
+    .special-offers-page__hero-panel,
+    .special-offers-page__results,
+    .special-offers-page__empty-state {
         animation: none;
     }
 }

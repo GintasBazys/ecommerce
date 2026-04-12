@@ -436,30 +436,30 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 </script>
 
 <template>
-    <section class="categoryPage">
+    <section class="category-page">
         <div
-            class="categoryPage__hero"
+            class="category-page__hero"
             :style="
                 categoryThumbnail
                     ? `background-image: linear-gradient(180deg, rgba(8, 24, 73, 0.6), rgba(8, 24, 73, 0.72)), url(${categoryThumbnail});`
                     : ''
             "
         >
-            <VContainer class="categoryPage__heroContainer">
-                <AppBreadcrumbs :items="breadcrumbItems" tone="inverse" class="categoryPage__breadcrumbs" />
-                <span class="categoryPage__eyebrow">{{ isAllProductsPage ? "Store Catalog" : "Category Edit" }}</span>
-                <h1 class="categoryPage__title">{{ pageTitle }}</h1>
-                <p class="categoryPage__description">{{ pageDescription }}</p>
+            <VContainer class="category-page__hero-container">
+                <AppBreadcrumbs :items="breadcrumbItems" tone="inverse" class="category-page__breadcrumbs" />
+                <span class="category-page__eyebrow">{{ isAllProductsPage ? "Store Catalog" : "Category Edit" }}</span>
+                <h1 class="category-page__title">{{ pageTitle }}</h1>
+                <p class="category-page__description">{{ pageDescription }}</p>
             </VContainer>
         </div>
-        <VContainer class="categoryPage__container">
-            <div class="categoryPage__layout">
-                <aside class="categoryPage__sidebar">
-                    <div class="categoryPage__sidebarCard">
-                        <div class="categoryPage__sidebarHeader">
+        <VContainer class="category-page__container">
+            <div class="category-page__layout">
+                <aside class="category-page__sidebar">
+                    <div class="category-page__sidebar-card">
+                        <div class="category-page__sidebar-header">
                             <div>
-                                <span class="categoryPage__sidebarEyebrow">Filters</span>
-                                <h2 class="categoryPage__sidebarTitle">{{ sidebarTitle }}</h2>
+                                <span class="category-page__sidebar-eyebrow">Filters</span>
+                                <h2 class="category-page__sidebar-title">{{ sidebarTitle }}</h2>
                             </div>
                             <VBtn v-if="activeFilterCount" variant="text" color="primary" class="text-none px-0" @click="clearAllFilters">
                                 Clear all
@@ -468,13 +468,13 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
                         <VExpansionPanels
                             multiple
-                            class="categoryPage__filterPanels"
-                            :class="{ 'categoryPage__filterPanels--reducedMotion': disablePanelTransitions }"
+                            class="category-page__filter-panels"
+                            :class="{ 'category-page__filter-panels--reduced-motion': disablePanelTransitions }"
                         >
                             <VExpansionPanel v-if="childCategoryFacets.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Subcategories</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <div class="categoryPage__filterList">
+                                    <div class="category-page__filter-list">
                                         <VCheckbox
                                             v-for="item in childCategoryFacets"
                                             :key="item.id"
@@ -491,7 +491,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             <VExpansionPanel v-if="facets.types.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Product types</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <div class="categoryPage__filterList">
+                                    <div class="category-page__filter-list">
                                         <VCheckbox
                                             v-for="item in facets.types"
                                             :key="item.id"
@@ -508,7 +508,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             <VExpansionPanel v-if="facets.collections.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Collections</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <div class="categoryPage__filterList">
+                                    <div class="category-page__filter-list">
                                         <VCheckbox
                                             v-for="item in facets.collections"
                                             :key="item.id"
@@ -525,7 +525,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             <VExpansionPanel v-if="facets.tags.length" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Tags</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <div class="categoryPage__filterList">
+                                    <div class="category-page__filter-list">
                                         <VCheckbox
                                             v-for="item in facets.tags"
                                             :key="item.id"
@@ -554,8 +554,8 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             <VExpansionPanel v-if="facets.price.max > facets.price.min" elevation="0" rounded="xl">
                                 <VExpansionPanelTitle>Price</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <div class="categoryPage__priceBox">
-                                        <div class="categoryPage__priceSummary">{{ priceSummary }}</div>
+                                    <div class="category-page__price-box">
+                                        <div class="category-page__price-summary">{{ priceSummary }}</div>
                                         <VRangeSlider
                                             v-model="priceRange"
                                             :min="facets.price.min"
@@ -565,7 +565,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                             thumb-label="always"
                                             hide-details
                                         />
-                                        <div class="categoryPage__priceActions">
+                                        <div class="category-page__price-actions">
                                             <VBtn variant="outlined" rounded="pill" class="text-none" @click="resetPriceRange">Reset</VBtn>
                                             <VBtn color="primary" rounded="pill" class="text-none" @click="applyPriceRange">Apply</VBtn>
                                         </div>
@@ -575,11 +575,11 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         </VExpansionPanels>
                     </div>
                 </aside>
-                <div class="categoryPage__content">
-                    <div class="categoryPage__toolbar">
-                        <div class="categoryPage__toolbarCopy">
-                            <span class="categoryPage__results">{{ totalCount }} products</span>
-                            <p class="categoryPage__resultsMeta">
+                <div class="category-page__content">
+                    <div class="category-page__toolbar">
+                        <div class="category-page__toolbar-copy">
+                            <span class="category-page__results">{{ totalCount }} products</span>
+                            <p class="category-page__results-meta">
                                 <template v-if="sortLoading">Updating sort order...</template>
                                 <template v-else-if="filterLoading">Refreshing filtered results...</template>
                                 <template v-else-if="activeFilterCount">{{ activeFilterCount }} active filters</template>
@@ -596,16 +596,16 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             label="Sort by"
                             variant="outlined"
                             density="comfortable"
-                            class="categoryPage__sortSelect"
+                            class="category-page__sort-select"
                             :loading="sortLoading"
                             :disabled="loadingRef"
                         />
                     </div>
-                    <VProgressLinear v-if="loadingRef" indeterminate color="primary" class="categoryPage__progress" />
-                    <div v-if="gridIsInitialLoading" class="categoryPage__grid categoryPage__grid--skeleton">
-                        <VSkeletonLoader v-for="n in 6" :key="n" type="image, article, actions" class="categoryPage__skeleton" />
+                    <VProgressLinear v-if="loadingRef" indeterminate color="primary" class="category-page__progress" />
+                    <div v-if="gridIsInitialLoading" class="category-page__grid category-page__grid--skeleton">
+                        <VSkeletonLoader v-for="n in 6" :key="n" type="image, article, actions" class="category-page__skeleton" />
                     </div>
-                    <div v-else-if="products.length" class="categoryPage__grid">
+                    <div v-else-if="products.length" class="category-page__grid">
                         <div
                             v-for="(product, index) in products"
                             :key="product.id"
@@ -613,18 +613,18 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                 handler: onIntersectLast,
                                 options: {}
                             }"
-                            class="categoryPage__gridItem"
+                            class="category-page__grid-item"
                             :class="{ 'js-last-item': index === products.length - 1 }"
                         >
                             <ProductCard :product="product" />
                         </div>
                     </div>
-                    <div v-else class="categoryPage__emptyState">
-                        <h2 class="categoryPage__emptyTitle">No products match these filters.</h2>
-                        <p class="categoryPage__emptyText">{{ emptyStateText }}</p>
+                    <div v-else class="category-page__empty-state">
+                        <h2 class="category-page__empty-title">No products match these filters.</h2>
+                        <p class="category-page__empty-text">{{ emptyStateText }}</p>
                         <VBtn color="primary" rounded="pill" class="text-none" @click="clearAllFilters">Reset filters</VBtn>
                     </div>
-                    <div v-if="products.length" class="categoryPage__footer">
+                    <div v-if="products.length" class="category-page__footer">
                         <VProgressCircular v-if="loadingRef && hasMore" indeterminate color="primary" />
                         <span v-else-if="!hasMore">{{ footerEndText }}</span>
                     </div>
@@ -635,29 +635,29 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 </template>
 
 <style scoped lang="scss">
-.categoryPage {
+.category-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f7faff 0%, #ffffff 36%, #f6f9ff 100%);
 }
 
-.categoryPage__hero {
+.category-page__hero {
     background: linear-gradient(180deg, rgba(8, 24, 73, 0.74), rgba(8, 24, 73, 0.8)), linear-gradient(130deg, #102a77 0%, #08173f 100%);
     background-position: center;
     background-size: cover;
 }
 
-.categoryPage__heroContainer {
-    padding: clamp(4.5rem, 8vw, 6.75rem) 1rem;
+.category-page__hero-container {
+    padding: 6.75rem 1rem;
     text-align: center;
 }
 
-.categoryPage__breadcrumbs {
+.category-page__breadcrumbs {
     margin: 0 auto 1rem;
 }
 
-.categoryPage__eyebrow,
-.categoryPage__sidebarEyebrow {
+.category-page__eyebrow,
+.category-page__sidebar-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -672,23 +672,23 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     text-transform: uppercase;
 }
 
-.categoryPage__sidebarEyebrow {
+.category-page__sidebar-eyebrow {
     margin-bottom: 0.55rem;
     background: rgba(1, 12, 128, 0.07);
     color: #010c80;
 }
 
-.categoryPage__title {
+.category-page__title {
     max-width: 13ch;
     margin: 0 auto 1rem;
     color: #ffffff;
-    font-size: clamp(2.3rem, 4.6vw, 4.45rem);
+    font-size: 4.45rem;
     line-height: 0.96;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.categoryPage__description {
+.category-page__description {
     max-width: 44rem;
     margin: 0 auto;
     color: rgba(255, 255, 255, 0.88);
@@ -696,26 +696,26 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     line-height: 1.8;
 }
 
-.categoryPage__container {
+.category-page__container {
     padding-top: 2rem;
-    padding-bottom: clamp(4rem, 7vw, 6rem);
+    padding-bottom: 6rem;
 }
 
-.categoryPage__layout {
+.category-page__layout {
     display: grid;
     grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
     gap: 1.5rem;
     align-items: start;
 }
 
-.categoryPage__sidebar {
+.category-page__sidebar {
     position: sticky;
     top: 1.5rem;
 }
 
-.categoryPage__sidebarCard,
-.categoryPage__toolbar,
-.categoryPage__emptyState {
+.category-page__sidebar-card,
+.category-page__toolbar,
+.category-page__empty-state {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.5rem;
     background: rgba(255, 255, 255, 0.84);
@@ -723,11 +723,11 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     backdrop-filter: blur(14px);
 }
 
-.categoryPage__sidebarCard {
+.category-page__sidebar-card {
     padding: 1.15rem;
 }
 
-.categoryPage__sidebarHeader {
+.category-page__sidebar-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -735,64 +735,64 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     margin-bottom: 1rem;
 }
 
-.categoryPage__sidebarTitle {
+.category-page__sidebar-title {
     color: #08173f;
     font-size: 1.3rem;
     line-height: 1.15;
 }
 
-.categoryPage__filterPanels {
+.category-page__filter-panels {
     gap: 0.8rem;
     background: transparent;
 }
 
-.categoryPage__filterPanels :deep(.v-expansion-panel) {
+.category-page__filter-panels :deep(.v-expansion-panel) {
     border: 1px solid rgba(8, 23, 63, 0.08);
     background: #ffffff;
     box-shadow: none;
 }
 
-.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-text__wrapper),
-.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-title),
-.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-title__icon) {
+.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-text__wrapper),
+.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-title),
+.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-title__icon) {
     transition: none !important;
 }
 
-.categoryPage__filterPanels--reducedMotion :deep(.v-expansion-panel-text__wrapper) {
+.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-text__wrapper) {
     will-change: auto;
 }
 
-.categoryPage__filterList {
+.category-page__filter-list {
     display: grid;
     gap: 0.35rem;
 }
 
-.categoryPage__priceBox {
+.category-page__price-box {
     display: grid;
     gap: 1rem;
 }
 
-.categoryPage__priceSummary,
-.categoryPage__results,
-.categoryPage__sidebarTitle,
-.categoryPage__emptyTitle {
+.category-page__price-summary,
+.category-page__results,
+.category-page__sidebar-title,
+.category-page__empty-title {
     color: #08173f;
 }
 
-.categoryPage__priceSummary {
+.category-page__price-summary {
     font-weight: 700;
 }
 
-.categoryPage__priceActions {
+.category-page__price-actions {
     display: flex;
     gap: 0.75rem;
 }
 
-.categoryPage__content {
+.category-page__content {
     min-width: 0;
 }
 
-.categoryPage__toolbar {
+.category-page__toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -801,53 +801,53 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     margin-bottom: 1rem;
 }
 
-.categoryPage__toolbarCopy {
+.category-page__toolbar-copy {
     min-width: 0;
 }
 
-.categoryPage__results {
+.category-page__results {
     display: block;
     font-size: 1.05rem;
     font-weight: 700;
 }
 
-.categoryPage__resultsMeta,
-.categoryPage__emptyText {
+.category-page__results-meta,
+.category-page__empty-text {
     margin: 0.25rem 0 0;
     color: #5a6580;
     font-size: 0.95rem;
     line-height: 1.65;
 }
 
-.categoryPage__sortSelect {
+.category-page__sort-select {
     flex: 0 0 17rem;
     max-width: 17rem;
 }
 
-.categoryPage__progress {
+.category-page__progress {
     margin-bottom: 1rem;
     border-radius: 999px;
 }
 
-.categoryPage__grid {
+.category-page__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.25rem;
 }
 
-.categoryPage__gridItem {
+.category-page__grid-item {
     min-width: 0;
 }
 
-.categoryPage__grid--skeleton {
+.category-page__grid--skeleton {
     align-items: stretch;
 }
 
-.categoryPage__skeleton {
+.category-page__skeleton {
     border-radius: 1.2rem;
 }
 
-.categoryPage__footer {
+.category-page__footer {
     display: flex;
     justify-content: center;
     padding-top: 1.5rem;
@@ -855,7 +855,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     font-size: 0.95rem;
 }
 
-.categoryPage__emptyState {
+.category-page__empty-state {
     display: grid;
     justify-items: center;
     gap: 0.75rem;
@@ -863,62 +863,78 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
     text-align: center;
 }
 
-.categoryPage__emptyTitle {
+.category-page__empty-title {
     font-size: 1.4rem;
     line-height: 1.15;
 }
 
-.categoryPage :deep(.productCard) {
+.category-page :deep(.product-card) {
     box-shadow: 0 16px 44px rgba(8, 27, 90, 0.08);
 }
 
 @media screen and (max-width: 1280px) {
-    .categoryPage__grid {
+    .category-page__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media screen and (max-width: 1100px) {
-    .categoryPage__layout {
+    .category-page__hero-container {
+        padding: 5rem 1rem;
+    }
+
+    .category-page__title {
+        font-size: 3.5rem;
+    }
+
+    .category-page__container {
+        padding-bottom: 4.5rem;
+    }
+
+    .category-page__layout {
         grid-template-columns: 1fr;
     }
 
-    .categoryPage__sidebar {
+    .category-page__sidebar {
         position: static;
     }
 
-    .categoryPage__sidebarCard,
-    .categoryPage__toolbar,
-    .categoryPage__emptyState {
+    .category-page__sidebar-card,
+    .category-page__toolbar,
+    .category-page__empty-state {
         backdrop-filter: none;
     }
 }
 
 @media screen and (max-width: 767px) {
-    .categoryPage__heroContainer {
+    .category-page__hero-container {
         padding: 3.75rem 1rem;
     }
 
-    .categoryPage__title {
-        font-size: clamp(2rem, 9vw, 2.9rem);
+    .category-page__title {
+        font-size: 2.9rem;
         line-height: 1;
     }
 
-    .categoryPage__toolbar {
+    .category-page__container {
+        padding-bottom: 4rem;
+    }
+
+    .category-page__toolbar {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .categoryPage__sortSelect {
+    .category-page__sort-select {
         flex-basis: auto;
         max-width: 100%;
     }
 
-    .categoryPage__grid {
+    .category-page__grid {
         grid-template-columns: 1fr;
     }
 
-    .categoryPage__priceActions {
+    .category-page__price-actions {
         flex-direction: column;
     }
 }

@@ -63,34 +63,34 @@ async function handleRegister(): Promise<void> {
 </script>
 
 <template>
-    <main class="registerPage">
-        <div class="registerPage__hero">
-            <VContainer class="registerPage__container">
-                <div class="registerPage__grid">
-                    <div class="registerPage__copy">
-                        <span class="registerPage__eyebrow">Create an account</span>
-                        <h1 class="registerPage__title">Join the shop and keep every order detail in one calm place.</h1>
-                        <p class="registerPage__description">
+    <main class="register-page">
+        <div class="register-page__hero">
+            <VContainer class="register-page__container">
+                <div class="register-page__grid">
+                    <div class="register-page__copy">
+                        <span class="register-page__eyebrow">Create an account</span>
+                        <h1 class="register-page__title">Join the shop and keep every order detail in one calm place.</h1>
+                        <p class="register-page__description">
                             Save your profile, move through checkout faster, and make future orders feel easier from the very first click.
                         </p>
 
-                        <div class="registerPage__statCard">
-                            <span class="registerPage__statLabel">Why create one?</span>
-                            <strong class="registerPage__statValue"
-                            >Saved customer details, easier reorders, and a smoother path from cart to delivery</strong
-                            >
+                        <div class="register-page__stat-card">
+                            <span class="register-page__stat-label">Why create one?</span>
+                            <strong class="register-page__stat-value">
+                                Saved customer details, easier reorders, and a smoother path from cart to delivery
+                            </strong>
                         </div>
                     </div>
 
-                    <div class="registerPage__panel">
-                        <span class="registerPage__sectionEyebrow">Account details</span>
-                        <h2 class="registerPage__sectionTitle">Set up your profile in a minute.</h2>
-                        <p class="registerPage__sectionText">
+                    <div class="register-page__panel">
+                        <span class="register-page__section-eyebrow">Account details</span>
+                        <h2 class="register-page__section-title">Set up your profile in a minute.</h2>
+                        <p class="register-page__section-text">
                             Add your basic information and choose a password to start shopping with a saved account.
                         </p>
 
-                        <VForm ref="registerFormRef" class="registerPage__form" @submit.prevent="handleRegister">
-                            <div class="registerPage__nameGrid">
+                        <VForm ref="registerFormRef" class="register-page__form" @submit.prevent="handleRegister">
+                            <div class="register-page__name-grid">
                                 <VTextField
                                     v-model="firstName"
                                     name="firstName"
@@ -129,9 +129,9 @@ async function handleRegister(): Promise<void> {
                             <VBtn type="submit" color="primary" rounded="pill" class="text-none" block>Register</VBtn>
                         </VForm>
 
-                        <p class="registerPage__footerText">
+                        <p class="register-page__footer-text">
                             Already have an account?
-                            <NuxtLink to="/signin" class="registerPage__link">Login here</NuxtLink>
+                            <NuxtLink to="/signin" class="register-page__link">Login here</NuxtLink>
                         </p>
                     </div>
                 </div>
@@ -145,39 +145,39 @@ async function handleRegister(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.registerPage {
+.register-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.registerPage__hero {
-    padding: 0 0 clamp(4rem, 7vw, 6rem);
+.register-page__hero {
+    padding: 0 0 4rem;
 }
 
-.registerPage__container {
+.register-page__container {
     position: relative;
     z-index: 1;
 }
 
-.registerPage__grid {
+.register-page__grid {
     display: grid;
     grid-template-columns: minmax(0, 1.08fr) minmax(19rem, 0.92fr);
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 1.5rem;
     align-items: center;
 }
 
-.registerPage__copy,
-.registerPage__panel {
+.register-page__copy,
+.register-page__panel {
     animation: register-rise 0.8s ease both;
 }
 
-.registerPage__panel {
+.register-page__panel {
     animation-delay: 0.12s;
 }
 
-.registerPage__eyebrow,
-.registerPage__sectionEyebrow {
+.register-page__eyebrow,
+.register-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -191,30 +191,30 @@ async function handleRegister(): Promise<void> {
     text-transform: uppercase;
 }
 
-.registerPage__title,
-.registerPage__sectionTitle {
+.register-page__title,
+.register-page__section-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.registerPage__title {
+.register-page__title {
     max-width: 11ch;
     margin: 1rem 0;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 2.75rem;
     line-height: 0.95;
 }
 
-.registerPage__description,
-.registerPage__sectionText,
-.registerPage__footerText {
+.register-page__description,
+.register-page__section-text,
+.register-page__footer-text {
     margin: 0;
     color: #4b5874;
     line-height: 1.75;
 }
 
-.registerPage__statCard,
-.registerPage__panel {
+.register-page__stat-card,
+.register-page__panel {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.84);
@@ -222,7 +222,7 @@ async function handleRegister(): Promise<void> {
     backdrop-filter: blur(14px);
 }
 
-.registerPage__statCard {
+.register-page__stat-card {
     display: grid;
     gap: 0.2rem;
     max-width: 27rem;
@@ -230,49 +230,49 @@ async function handleRegister(): Promise<void> {
     padding: 0.9rem 1.05rem;
 }
 
-.registerPage__statLabel {
+.register-page__stat-label {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.registerPage__statValue {
+.register-page__stat-value {
     color: #08173f;
     font-size: 1rem;
     line-height: 1.45;
 }
 
-.registerPage__panel {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.register-page__panel {
+    padding: 1.4rem;
 }
 
-.registerPage__sectionEyebrow {
+.register-page__section-eyebrow {
     margin-bottom: 1rem;
 }
 
-.registerPage__sectionTitle {
+.register-page__section-title {
     margin: 0 0 0.75rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 1.75rem;
     line-height: 1.08;
 }
 
-.registerPage__form {
+.register-page__form {
     display: grid;
     gap: 0.9rem;
     margin-top: 1.35rem;
 }
 
-.registerPage__nameGrid {
+.register-page__name-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
 }
 
-.registerPage__footerText {
+.register-page__footer-text {
     margin-top: 1.25rem;
     text-align: center;
 }
 
-.registerPage__link {
+.register-page__link {
     color: #010c80;
     font-weight: 700;
 }
@@ -290,38 +290,60 @@ async function handleRegister(): Promise<void> {
 }
 
 @media screen and (max-width: 1100px) {
-    .registerPage__grid {
+    .register-page__grid {
         grid-template-columns: 1fr;
     }
 
-    .registerPage__title {
+    .register-page__title {
         max-width: 100%;
     }
 }
 
+@media screen and (min-width: 701px) {
+    .register-page__hero {
+        padding-bottom: 5rem;
+    }
+
+    .register-page__grid {
+        gap: 2rem;
+    }
+
+    .register-page__panel {
+        padding: 1.75rem;
+    }
+
+    .register-page__title {
+        font-size: 3.5rem;
+    }
+
+    .register-page__section-title {
+        font-size: 2rem;
+    }
+}
+
 @media screen and (max-width: 700px) {
-    .registerPage__hero {
+    .register-page__hero {
         padding: 0 0 3.5rem;
     }
 
-    .registerPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .register-page__title {
+        font-size: 2.4rem;
         line-height: 1;
     }
 
-    .registerPage__panel,
-    .registerPage__statCard {
+    .register-page__panel,
+    .register-page__stat-card {
         border-radius: 1.2rem;
     }
 
-    .registerPage__nameGrid {
+    .register-page__name-grid {
         grid-template-columns: 1fr;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .registerPage__copy,
-    .registerPage__panel {
+    .register-page__copy,
+    .register-page__panel {
         animation: none;
     }
 }

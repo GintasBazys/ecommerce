@@ -54,33 +54,33 @@ const faqPanels = ref<number[]>([0])
 </script>
 
 <template>
-    <section class="shippingPage">
-        <div class="shippingPage__hero">
-            <VContainer class="shippingPage__container">
-                <div class="shippingPage__heroGrid">
-                    <div class="shippingPage__heroCopy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="shippingPage__breadcrumbs" />
-                        <span class="shippingPage__eyebrow">Payment & Shipping</span>
-                        <h1 class="shippingPage__title">Delivery and checkout guidance shaped to match the refreshed storefront.</h1>
-                        <p class="shippingPage__description">
+    <section class="shipping-page">
+        <div class="shipping-page__hero">
+            <VContainer class="shipping-page__container">
+                <div class="shipping-page__hero-grid">
+                    <div class="shipping-page__hero-copy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="shipping-page__breadcrumbs" />
+                        <span class="shipping-page__eyebrow">Payment & Shipping</span>
+                        <h1 class="shipping-page__title">Delivery and checkout guidance shaped to match the refreshed storefront.</h1>
+                        <p class="shipping-page__description">
                             This page covers how orders move, which payment methods we support, and what to expect from confirmation through
                             delivery.
                         </p>
-                        <div class="shippingPage__heroActions">
+                        <div class="shipping-page__hero-actions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/contact">Ask a question</VBtn>
-                            <div class="shippingPage__responseCard">
-                                <span class="shippingPage__responseLabel">Order processing</span>
-                                <strong class="shippingPage__responseValue">Usually within 1-2 business days</strong>
+                            <div class="shipping-page__response-card">
+                                <span class="shipping-page__response-label">Order processing</span>
+                                <strong class="shipping-page__response-value">Usually within 1-2 business days</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="shippingPage__heroCard">
-                        <span class="shippingPage__heroLabel">Quick overview</span>
-                        <h2 class="shippingPage__heroTitle">
+                    <div class="shipping-page__hero-card">
+                        <span class="shipping-page__hero-label">Quick overview</span>
+                        <h2 class="shipping-page__hero-title">
                             Trusted payment methods, clear rates, and delivery updates once an order ships.
                         </h2>
-                        <ul class="shippingPage__methodList">
-                            <li v-for="method in paymentMethods" :key="method" class="shippingPage__methodItem">
+                        <ul class="shipping-page__method-list">
+                            <li v-for="method in paymentMethods" :key="method" class="shipping-page__method-item">
                                 <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
                                 <span>{{ method }}</span>
                             </li>
@@ -89,50 +89,50 @@ const faqPanels = ref<number[]>([0])
                 </div>
             </VContainer>
         </div>
-        <VContainer class="shippingPage__container">
-            <div class="shippingPage__optionGrid">
-                <article v-for="option in shippingOptions" :key="option.title" class="shippingPage__optionCard">
-                    <h2 class="shippingPage__optionTitle">{{ option.title }}</h2>
-                    <p class="shippingPage__optionDetail">{{ option.detail }}</p>
+        <VContainer class="shipping-page__container">
+            <div class="shipping-page__option-grid">
+                <article v-for="option in shippingOptions" :key="option.title" class="shipping-page__option-card">
+                    <h2 class="shipping-page__option-title">{{ option.title }}</h2>
+                    <p class="shipping-page__option-detail">{{ option.detail }}</p>
                 </article>
             </div>
-            <div class="shippingPage__contentGrid">
-                <div class="shippingPage__main">
-                    <section v-for="block in policyBlocks" :key="block.title" class="shippingPage__sectionCard">
-                        <span class="shippingPage__sectionEyebrow">{{ block.eyebrow }}</span>
-                        <h2 class="shippingPage__sectionTitle">{{ block.title }}</h2>
-                        <p class="shippingPage__sectionText">{{ block.text }}</p>
+            <div class="shipping-page__content-grid">
+                <div class="shipping-page__main">
+                    <section v-for="block in policyBlocks" :key="block.title" class="shipping-page__section-card">
+                        <span class="shipping-page__section-eyebrow">{{ block.eyebrow }}</span>
+                        <h2 class="shipping-page__section-title">{{ block.title }}</h2>
+                        <p class="shipping-page__section-text">{{ block.text }}</p>
                     </section>
-                    <section class="shippingPage__sectionCard">
-                        <span class="shippingPage__sectionEyebrow">Frequently Asked</span>
-                        <h2 class="shippingPage__sectionTitle">Common delivery and payment questions</h2>
-                        <VExpansionPanels v-model="faqPanels" multiple class="shippingPage__panels">
+                    <section class="shipping-page__section-card">
+                        <span class="shipping-page__section-eyebrow">Frequently Asked</span>
+                        <h2 class="shipping-page__section-title">Common delivery and payment questions</h2>
+                        <VExpansionPanels v-model="faqPanels" multiple class="shipping-page__panels">
                             <VExpansionPanel
                                 v-for="item in shippingFaq"
                                 :key="item.question"
-                                class="shippingPage__panel"
+                                class="shipping-page__panel"
                                 rounded="xl"
                                 elevation="0"
                             >
-                                <VExpansionPanelTitle class="shippingPage__panelTitle">
+                                <VExpansionPanelTitle class="shipping-page__panel-title">
                                     {{ item.question }}
                                 </VExpansionPanelTitle>
-                                <VExpansionPanelText class="shippingPage__panelText">
+                                <VExpansionPanelText class="shipping-page__panel-text">
                                     {{ item.answer }}
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                         </VExpansionPanels>
                     </section>
                 </div>
-                <aside class="shippingPage__sidebar">
-                    <div class="shippingPage__sidebarCard">
-                        <span class="shippingPage__sidebarLabel">Need order help?</span>
-                        <h2 class="shippingPage__sidebarTitle">Reach support for billing or delivery questions.</h2>
-                        <p class="shippingPage__sidebarText">
+                <aside class="shipping-page__sidebar">
+                    <div class="shipping-page__sidebar-card">
+                        <span class="shipping-page__sidebar-label">Need order help?</span>
+                        <h2 class="shipping-page__sidebar-title">Reach support for billing or delivery questions.</h2>
+                        <p class="shipping-page__sidebar-text">
                             If payment does not go through or you need clarification about shipping timing, contact the team and include
                             your order number if available.
                         </p>
-                        <div class="shippingPage__sidebarMeta">Support hours | Mon-Fri 09:00 - 17:00</div>
+                        <div class="shipping-page__sidebar-meta">Support hours | Mon-Fri 09:00 - 17:00</div>
                         <VBtn color="primary" rounded="pill" size="large" class="text-none mt-6" block to="/contact">Get in touch</VBtn>
                     </div>
                 </aside>
@@ -142,53 +142,53 @@ const faqPanels = ref<number[]>([0])
 </template>
 
 <style scoped lang="scss">
-.shippingPage {
+.shipping-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f7faff 0%, #ffffff 36%, #f6f9ff 100%);
 }
 
-.shippingPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 2.5rem;
+.shipping-page__hero {
+    padding: 6rem 0 2.5rem;
 }
 
-.shippingPage__container {
+.shipping-page__container {
     position: relative;
     z-index: 1;
 }
 
-.shippingPage__heroGrid,
-.shippingPage__contentGrid {
+.shipping-page__hero-grid,
+.shipping-page__content-grid {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
 }
 
-.shippingPage__heroGrid {
+.shipping-page__hero-grid {
     grid-template-columns: minmax(0, 1.12fr) minmax(18rem, 0.88fr);
     align-items: end;
 }
 
-.shippingPage__heroCopy,
-.shippingPage__heroCard,
-.shippingPage__optionCard,
-.shippingPage__sectionCard,
-.shippingPage__sidebar {
+.shipping-page__hero-copy,
+.shipping-page__hero-card,
+.shipping-page__option-card,
+.shipping-page__section-card,
+.shipping-page__sidebar {
     animation: shipping-rise 0.8s ease both;
 }
 
-.shippingPage__heroCard,
-.shippingPage__sidebar {
+.shipping-page__hero-card,
+.shipping-page__sidebar {
     animation-delay: 0.12s;
 }
 
-.shippingPage__breadcrumbs {
+.shipping-page__breadcrumbs {
     margin-bottom: 1rem;
 }
 
-.shippingPage__eyebrow,
-.shippingPage__heroLabel,
-.shippingPage__sectionEyebrow,
-.shippingPage__sidebarLabel {
+.shipping-page__eyebrow,
+.shipping-page__hero-label,
+.shipping-page__section-eyebrow,
+.shipping-page__sidebar-label {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -203,40 +203,40 @@ const faqPanels = ref<number[]>([0])
     text-transform: uppercase;
 }
 
-.shippingPage__title,
-.shippingPage__heroTitle,
-.shippingPage__sectionTitle,
-.shippingPage__sidebarTitle,
-.shippingPage__optionTitle {
+.shipping-page__title,
+.shipping-page__hero-title,
+.shipping-page__section-title,
+.shipping-page__sidebar-title,
+.shipping-page__option-title {
     color: #08173f;
 }
 
-.shippingPage__title {
+.shipping-page__title {
     max-width: 13ch;
     margin-bottom: 1rem;
-    font-size: clamp(2.35rem, 4.2vw, 4.35rem);
+    font-size: 4.35rem;
     line-height: 0.96;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.shippingPage__description,
-.shippingPage__sectionText,
-.shippingPage__sidebarText,
-.shippingPage__optionDetail {
+.shipping-page__description,
+.shipping-page__section-text,
+.shipping-page__sidebar-text,
+.shipping-page__option-detail {
     color: #4c5975;
     font-size: 1rem;
     line-height: 1.75;
 }
 
-.shippingPage__description,
-.shippingPage__sectionText,
-.shippingPage__sidebarText,
-.shippingPage__optionDetail {
+.shipping-page__description,
+.shipping-page__section-text,
+.shipping-page__sidebar-text,
+.shipping-page__option-detail {
     margin-bottom: 0;
 }
 
-.shippingPage__heroActions {
+.shipping-page__hero-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -244,12 +244,12 @@ const faqPanels = ref<number[]>([0])
     margin-top: 1.75rem;
 }
 
-.shippingPage__responseCard,
-.shippingPage__heroCard,
-.shippingPage__optionCard,
-.shippingPage__sectionCard,
-.shippingPage__sidebarCard,
-.shippingPage__panel {
+.shipping-page__response-card,
+.shipping-page__hero-card,
+.shipping-page__option-card,
+.shipping-page__section-card,
+.shipping-page__sidebar-card,
+.shipping-page__panel {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.82);
@@ -257,40 +257,40 @@ const faqPanels = ref<number[]>([0])
     backdrop-filter: blur(14px);
 }
 
-.shippingPage__responseCard {
+.shipping-page__response-card {
     display: grid;
     gap: 0.2rem;
     padding: 0.9rem 1.05rem;
 }
 
-.shippingPage__responseLabel,
-.shippingPage__sidebarMeta {
+.shipping-page__response-label,
+.shipping-page__sidebar-meta {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.shippingPage__responseValue {
+.shipping-page__response-value {
     color: #08173f;
     font-size: 1rem;
     line-height: 1.4;
 }
 
-.shippingPage__heroCard,
-.shippingPage__sectionCard,
-.shippingPage__sidebarCard {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.shipping-page__hero-card,
+.shipping-page__section-card,
+.shipping-page__sidebar-card {
+    padding: 1.9rem;
 }
 
-.shippingPage__heroTitle,
-.shippingPage__sectionTitle,
-.shippingPage__sidebarTitle {
+.shipping-page__hero-title,
+.shipping-page__section-title,
+.shipping-page__sidebar-title {
     margin-bottom: 0.85rem;
-    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    font-size: 2rem;
     line-height: 1.08;
     letter-spacing: -0.04rem;
 }
 
-.shippingPage__methodList {
+.shipping-page__method-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem 1rem;
@@ -299,7 +299,7 @@ const faqPanels = ref<number[]>([0])
     list-style: none;
 }
 
-.shippingPage__methodItem {
+.shipping-page__method-item {
     display: flex;
     align-items: flex-start;
     gap: 0.7rem;
@@ -307,14 +307,14 @@ const faqPanels = ref<number[]>([0])
     line-height: 1.6;
 }
 
-.shippingPage__optionGrid {
+.shipping-page__option-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
-    margin-bottom: clamp(2.25rem, 4vw, 3rem);
+    margin-bottom: 3rem;
 }
 
-.shippingPage__optionCard {
+.shipping-page__option-card {
     min-height: 100%;
     padding: 1.35rem;
     transition:
@@ -323,51 +323,51 @@ const faqPanels = ref<number[]>([0])
         border-color 0.25s ease;
 }
 
-.shippingPage__optionCard:hover {
+.shipping-page__option-card:hover {
     transform: translateY(-4px);
     border-color: rgba(1, 12, 128, 0.14);
     box-shadow: 0 22px 54px rgba(8, 27, 90, 0.12);
 }
 
-.shippingPage__optionTitle {
+.shipping-page__option-title {
     margin-bottom: 0.65rem;
     font-size: 1.12rem;
     line-height: 1.3;
 }
 
-.shippingPage__contentGrid {
+.shipping-page__content-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
     align-items: start;
-    padding-bottom: clamp(4rem, 7vw, 6rem);
+    padding-bottom: 6rem;
 }
 
-.shippingPage__main {
+.shipping-page__main {
     display: grid;
     gap: 1.25rem;
 }
 
-.shippingPage__panels {
+.shipping-page__panels {
     gap: 0.8rem;
     background: transparent;
 }
 
-.shippingPage__panel {
+.shipping-page__panel {
     overflow: hidden;
     background: #ffffff;
     box-shadow: 0 10px 28px rgba(8, 27, 90, 0.05);
 }
 
-.shippingPage__sidebar {
+.shipping-page__sidebar {
     position: sticky;
     top: 1.5rem;
 }
 
-.shippingPage__sidebarMeta {
+.shipping-page__sidebar-meta {
     margin-top: 1rem;
     font-weight: 700;
 }
 
-:deep(.shippingPage__panelTitle) {
+:deep(.shipping-page__panel-title) {
     min-height: 4.2rem;
     color: #08173f;
     font-size: 1rem;
@@ -375,7 +375,7 @@ const faqPanels = ref<number[]>([0])
     line-height: 1.5;
 }
 
-:deep(.shippingPage__panelText) {
+:deep(.shipping-page__panel-text) {
     color: #52607c;
     line-height: 1.75;
 }
@@ -393,50 +393,75 @@ const faqPanels = ref<number[]>([0])
 }
 
 @media screen and (max-width: 1100px) {
-    .shippingPage__heroGrid,
-    .shippingPage__contentGrid,
-    .shippingPage__optionGrid {
+    .shipping-page__hero-grid,
+    .shipping-page__content-grid,
+    .shipping-page__option-grid {
         grid-template-columns: 1fr;
     }
 
-    .shippingPage__title,
-    .shippingPage__methodList {
+    .shipping-page__title,
+    .shipping-page__method-list {
         max-width: 100%;
     }
 
-    .shippingPage__sidebar {
+    .shipping-page__sidebar {
         position: static;
     }
 }
 
 @media screen and (max-width: 767px) {
-    .shippingPage__hero {
+    .shipping-page__hero {
         padding: 3.75rem 0 2rem;
     }
 
-    .shippingPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .shipping-page__hero-grid,
+    .shipping-page__content-grid {
+        gap: 1.5rem;
+    }
+
+    .shipping-page__title {
+        font-size: 2.8rem;
         line-height: 1;
     }
 
-    .shippingPage__methodList {
+    .shipping-page__hero-card,
+    .shipping-page__section-card,
+    .shipping-page__sidebar-card {
+        padding: 1.4rem;
+    }
+
+    .shipping-page__hero-title,
+    .shipping-page__section-title,
+    .shipping-page__sidebar-title {
+        font-size: 1.5rem;
+    }
+
+    .shipping-page__option-grid {
+        margin-bottom: 2.25rem;
+    }
+
+    .shipping-page__content-grid {
+        padding-bottom: 4rem;
+    }
+
+    .shipping-page__method-list {
         grid-template-columns: 1fr;
     }
 
-    .shippingPage__heroCard,
-    .shippingPage__optionCard,
-    .shippingPage__sectionCard,
-    .shippingPage__sidebarCard {
+    .shipping-page__hero-card,
+    .shipping-page__option-card,
+    .shipping-page__section-card,
+    .shipping-page__sidebar-card {
         border-radius: 1.2rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .shippingPage__heroCopy,
-    .shippingPage__heroCard,
-    .shippingPage__optionCard,
-    .shippingPage__sectionCard,
-    .shippingPage__sidebar {
+    .shipping-page__hero-copy,
+    .shipping-page__hero-card,
+    .shipping-page__option-card,
+    .shipping-page__section-card,
+    .shipping-page__sidebar {
         animation: none;
         transition: none;
     }

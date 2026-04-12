@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "scss-best-practices": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "16ac9e8bf135304254a358776c5fac043799c1c3ac40221da1338ee972506de5"
+    }
+  }
+}

@@ -65,24 +65,24 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-    <div class="profileContent">
-        <section class="profileContent__stats">
-            <div class="profileContent__statCard">
-                <span class="profileContent__statLabel">Account email</span>
-                <strong class="profileContent__statValue">{{ customer?.email || "Saved to your account" }}</strong>
+    <div class="profile-content">
+        <section class="profile-content__stats">
+            <div class="profile-content__stat-card">
+                <span class="profile-content__stat-label">Account email</span>
+                <strong class="profile-content__stat-value">{{ customer?.email || "Saved to your account" }}</strong>
             </div>
-            <div class="profileContent__statCard">
-                <span class="profileContent__statLabel">Customer name</span>
-                <strong class="profileContent__statValue">
+            <div class="profile-content__stat-card">
+                <span class="profile-content__stat-label">Customer name</span>
+                <strong class="profile-content__stat-value">
                     {{ customerData.first_name || "First" }} {{ customerData.last_name || "Last" }}
                 </strong>
             </div>
         </section>
-        <section class="profileContent__panel">
-            <h2 class="profileContent__title">Profile details</h2>
-            <p class="profileContent__text">Update the core information attached to your account.</p>
-            <VForm ref="formRef" class="profileContent__form" @submit.prevent="onSubmit">
-                <div class="profileContent__grid">
+        <section class="profile-content__panel">
+            <h2 class="profile-content__title">Profile details</h2>
+            <p class="profile-content__text">Update the core information attached to your account.</p>
+            <VForm ref="formRef" class="profile-content__form" @submit.prevent="onSubmit">
+                <div class="profile-content__grid">
                     <VTextField
                         v-model="customerData.first_name"
                         label="First name"
@@ -98,7 +98,7 @@ async function onSubmit(): Promise<void> {
                         variant="outlined"
                     />
                 </div>
-                <div class="profileContent__grid">
+                <div class="profile-content__grid">
                     <VTextField v-model="customerData.phone" label="Phone" prepend-inner-icon="mdi-phone-outline" variant="outlined" />
                     <VTextField
                         v-model="customerData.company_name"
@@ -117,72 +117,68 @@ async function onSubmit(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.profileContent {
+.profile-content {
     display: grid;
     gap: 1.25rem;
 }
 
-.profileContent__stats,
-.profileContent__grid {
+.profile-content__stats,
+.profile-content__grid {
     display: grid;
     gap: 1rem;
-}
-
-.profileContent__stats,
-.profileContent__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.profileContent__statCard,
-.profileContent__panel {
+.profile-content__stat-card,
+.profile-content__panel {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.4rem;
     background: rgba(247, 250, 255, 0.92);
 }
 
-.profileContent__statCard {
+.profile-content__stat-card {
     display: grid;
     gap: 0.2rem;
     padding: 1rem 1.1rem;
 }
 
-.profileContent__statLabel,
-.profileContent__text {
+.profile-content__stat-label,
+.profile-content__text {
     color: #4b5874;
 }
 
-.profileContent__statLabel {
+.profile-content__stat-label {
     font-size: 0.88rem;
 }
 
-.profileContent__statValue,
-.profileContent__title {
+.profile-content__stat-value,
+.profile-content__title {
     color: #08173f;
 }
 
-.profileContent__panel {
+.profile-content__panel {
     padding: 1.35rem;
 }
 
-.profileContent__title {
+.profile-content__title {
     margin: 0 0 0.5rem;
     font-size: 1.45rem;
 }
 
-.profileContent__text {
+.profile-content__text {
     margin: 0;
     line-height: 1.7;
 }
 
-.profileContent__form {
+.profile-content__form {
     display: grid;
     gap: 1rem;
     margin-top: 1rem;
 }
 
 @media screen and (max-width: 900px) {
-    .profileContent__stats,
-    .profileContent__grid {
+    .profile-content__stats,
+    .profile-content__grid {
         grid-template-columns: 1fr;
     }
 }

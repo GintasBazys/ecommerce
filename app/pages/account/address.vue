@@ -87,16 +87,16 @@ function onEdit(address: CustomerAddressDTO): void {
 </script>
 
 <template>
-    <div class="accountAddressesContent">
-        <div class="accountAddressesContent__toolbar">
-            <div class="accountAddressesContent__statCard">
-                <span class="accountAddressesContent__statLabel">Saved entries</span>
-                <strong class="accountAddressesContent__statValue">{{ totalCount }}</strong>
+    <div class="account-addresses-content">
+        <div class="account-addresses-content__toolbar">
+            <div class="account-addresses-content__stat-card">
+                <span class="account-addresses-content__stat-label">Saved entries</span>
+                <strong class="account-addresses-content__stat-value">{{ totalCount }}</strong>
             </div>
 
             <VBtn color="primary" rounded="pill" class="text-none px-7" @click="showAdd = true">Add new address</VBtn>
         </div>
-        <section class="accountAddressesContent__panel">
+        <section class="account-addresses-content__panel">
             <VRow v-if="loading" justify="center" class="my-6">
                 <VProgressCircular indeterminate color="primary" size="48" />
             </VRow>
@@ -106,12 +106,12 @@ function onEdit(address: CustomerAddressDTO): void {
                         <AddressCard :address="address" @edit="onEdit" @delete="deleteAddress" />
                     </VCol>
                 </VRow>
-                <div v-else class="accountAddressesContent__emptyState">
-                    <div class="accountAddressesContent__emptyIcon">
+                <div v-else class="account-addresses-content__empty-state">
+                    <div class="account-addresses-content__empty-icon">
                         <VIcon size="26">mdi-map-marker-outline</VIcon>
                     </div>
-                    <h2 class="accountAddressesContent__emptyTitle">No addresses saved yet</h2>
-                    <p class="accountAddressesContent__emptyText">Add your first address to make future checkout steps faster.</p>
+                    <h2 class="account-addresses-content__empty-title">No addresses saved yet</h2>
+                    <p class="account-addresses-content__empty-text">Add your first address to make future checkout steps faster.</p>
                 </div>
             </template>
             <VRow v-if="totalCount > limit" class="mt-6" justify="center">
@@ -127,58 +127,58 @@ function onEdit(address: CustomerAddressDTO): void {
 </template>
 
 <style scoped lang="scss">
-.accountAddressesContent {
+.account-addresses-content {
     display: grid;
     gap: 1.25rem;
 }
 
-.accountAddressesContent__toolbar {
+.account-addresses-content__toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
 }
 
-.accountAddressesContent__statCard,
-.accountAddressesContent__panel,
-.accountAddressesContent__emptyState {
+.account-addresses-content__stat-card,
+.account-addresses-content__panel,
+.account-addresses-content__empty-state {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.4rem;
     background: rgba(247, 250, 255, 0.92);
 }
 
-.accountAddressesContent__statCard {
+.account-addresses-content__stat-card {
     display: grid;
     gap: 0.2rem;
     padding: 1rem 1.1rem;
 }
 
-.accountAddressesContent__statLabel,
-.accountAddressesContent__emptyText {
+.account-addresses-content__stat-label,
+.account-addresses-content__empty-text {
     color: #4b5874;
 }
 
-.accountAddressesContent__statLabel {
+.account-addresses-content__stat-label {
     font-size: 0.88rem;
 }
 
-.accountAddressesContent__statValue,
-.accountAddressesContent__emptyTitle {
+.account-addresses-content__stat-value,
+.account-addresses-content__empty-title {
     color: #08173f;
 }
 
-.accountAddressesContent__panel,
-.accountAddressesContent__emptyState {
+.account-addresses-content__panel,
+.account-addresses-content__empty-state {
     padding: 1.35rem;
 }
 
-.accountAddressesContent__emptyState {
+.account-addresses-content__empty-state {
     display: grid;
     justify-items: start;
     gap: 0.85rem;
 }
 
-.accountAddressesContent__emptyIcon {
+.account-addresses-content__empty-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -189,17 +189,17 @@ function onEdit(address: CustomerAddressDTO): void {
     color: #010c80;
 }
 
-.accountAddressesContent__emptyTitle {
+.account-addresses-content__empty-title {
     margin: 0;
 }
 
-.accountAddressesContent__emptyText {
+.account-addresses-content__empty-text {
     margin: 0;
     line-height: 1.7;
 }
 
 @media screen and (max-width: 700px) {
-    .accountAddressesContent__toolbar {
+    .account-addresses-content__toolbar {
         flex-direction: column;
         align-items: stretch;
     }

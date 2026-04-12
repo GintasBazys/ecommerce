@@ -57,31 +57,31 @@ const faqPanels = ref<number[]>([0])
 </script>
 
 <template>
-    <section class="returnsPage">
-        <div class="returnsPage__hero">
-            <VContainer class="returnsPage__container">
-                <div class="returnsPage__heroGrid">
-                    <div class="returnsPage__heroCopy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="returnsPage__breadcrumbs" />
-                        <span class="returnsPage__eyebrow">Returns Center</span>
-                        <h1 class="returnsPage__title">A return process designed to feel as calm and clear as the updated storefront.</h1>
-                        <p class="returnsPage__description">
+    <section class="returns-page">
+        <div class="returns-page__hero">
+            <VContainer class="returns-page__container">
+                <div class="returns-page__hero-grid">
+                    <div class="returns-page__hero-copy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="returns-page__breadcrumbs" />
+                        <span class="returns-page__eyebrow">Returns Center</span>
+                        <h1 class="returns-page__title">A return process designed to feel as calm and clear as the updated storefront.</h1>
+                        <p class="returns-page__description">
                             If something is not quite right, we keep the process simple: request the return, send the item back, and we will
                             handle the refund or exchange with a straightforward follow-up.
                         </p>
-                        <div class="returnsPage__heroActions">
+                        <div class="returns-page__hero-actions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/contact">Contact support</VBtn>
-                            <div class="returnsPage__responseCard">
-                                <span class="returnsPage__responseLabel">Return window</span>
-                                <strong class="returnsPage__responseValue">30 days from delivery</strong>
+                            <div class="returns-page__response-card">
+                                <span class="returns-page__response-label">Return window</span>
+                                <strong class="returns-page__response-value">30 days from delivery</strong>
                             </div>
                         </div>
                     </div>
 
-                    <div class="returnsPage__heroPanel">
-                        <span class="returnsPage__panelLabel">What to expect</span>
-                        <h2 class="returnsPage__panelTitle">Three steps, transparent timing, and real help if anything feels unclear.</h2>
-                        <p class="returnsPage__panelText">
+                    <div class="returns-page__hero-panel">
+                        <span class="returns-page__panel-label">What to expect</span>
+                        <h2 class="returns-page__panel-title">Three steps, transparent timing, and real help if anything feels unclear.</h2>
+                        <p class="returns-page__panel-text">
                             We review returns promptly, confirm receipt, and keep communication direct if an item needs replacement or a
                             refund.
                         </p>
@@ -89,30 +89,30 @@ const faqPanels = ref<number[]>([0])
                 </div>
             </VContainer>
         </div>
-        <VContainer class="returnsPage__container">
-            <div class="returnsPage__stepsGrid">
-                <article v-for="step in returnSteps" :key="step.number" class="returnsPage__stepCard">
-                    <span class="returnsPage__stepNumber">{{ step.number }}</span>
-                    <h2 class="returnsPage__stepTitle">{{ step.title }}</h2>
-                    <p class="returnsPage__stepDetail">{{ step.detail }}</p>
+        <VContainer class="returns-page__container">
+            <div class="returns-page__steps-grid">
+                <article v-for="step in returnSteps" :key="step.number" class="returns-page__step-card">
+                    <span class="returns-page__step-number">{{ step.number }}</span>
+                    <h2 class="returns-page__step-title">{{ step.title }}</h2>
+                    <p class="returns-page__step-detail">{{ step.detail }}</p>
                 </article>
             </div>
-            <div class="returnsPage__contentGrid">
-                <div class="returnsPage__main">
-                    <section class="returnsPage__sectionCard">
-                        <span class="returnsPage__sectionEyebrow">Policy Overview</span>
-                        <h2 class="returnsPage__sectionTitle">Key return guidelines without the clutter.</h2>
-                        <p class="returnsPage__sectionText">
+            <div class="returns-page__content-grid">
+                <div class="returns-page__main">
+                    <section class="returns-page__section-card">
+                        <span class="returns-page__section-eyebrow">Policy Overview</span>
+                        <h2 class="returns-page__section-title">Key return guidelines without the clutter.</h2>
+                        <p class="returns-page__section-text">
                             We want you to feel confident ordering from us. If a product does not work out, the return process should stay
                             predictable and easy to understand.
                         </p>
-                        <div class="returnsPage__highlightGrid">
-                            <article v-for="item in policyHighlights" :key="item.title" class="returnsPage__highlightCard">
-                                <h3 class="returnsPage__highlightTitle">{{ item.title }}</h3>
-                                <p class="returnsPage__highlightText">{{ item.text }}</p>
+                        <div class="returns-page__highlight-grid">
+                            <article v-for="item in policyHighlights" :key="item.title" class="returns-page__highlight-card">
+                                <h3 class="returns-page__highlight-title">{{ item.title }}</h3>
+                                <p class="returns-page__highlight-text">{{ item.text }}</p>
                             </article>
                         </div>
-                        <div class="returnsPage__policyText">
+                        <div class="returns-page__policy-text">
                             <p>
                                 To initiate a return, use your account order history and follow the return instructions for the relevant
                                 item. If the return is approved, you will receive the next steps and any applicable shipping label details.
@@ -123,36 +123,36 @@ const faqPanels = ref<number[]>([0])
                             </p>
                         </div>
                     </section>
-                    <section class="returnsPage__sectionCard">
-                        <span class="returnsPage__sectionEyebrow">Questions</span>
-                        <h2 class="returnsPage__sectionTitle">Return policy FAQ</h2>
-                        <VExpansionPanels v-model="faqPanels" multiple class="returnsPage__panels">
+                    <section class="returns-page__section-card">
+                        <span class="returns-page__section-eyebrow">Questions</span>
+                        <h2 class="returns-page__section-title">Return policy FAQ</h2>
+                        <VExpansionPanels v-model="faqPanels" multiple class="returns-page__panels">
                             <VExpansionPanel
                                 v-for="item in returnFaq"
                                 :key="item.question"
-                                class="returnsPage__panel"
+                                class="returns-page__panel"
                                 rounded="xl"
                                 elevation="0"
                             >
-                                <VExpansionPanelTitle class="returnsPage__panelTitle">
+                                <VExpansionPanelTitle class="returns-page__panel-title">
                                     {{ item.question }}
                                 </VExpansionPanelTitle>
-                                <VExpansionPanelText class="returnsPage__panelText">
+                                <VExpansionPanelText class="returns-page__panel-text">
                                     {{ item.answer }}
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                         </VExpansionPanels>
                     </section>
                 </div>
-                <aside class="returnsPage__sidebar">
-                    <div class="returnsPage__sidebarCard">
-                        <span class="returnsPage__sidebarLabel">Need help first?</span>
-                        <h2 class="returnsPage__sidebarTitle">Talk to support before sending anything back.</h2>
-                        <p class="returnsPage__sidebarText">
+                <aside class="returns-page__sidebar">
+                    <div class="returns-page__sidebar-card">
+                        <span class="returns-page__sidebar-label">Need help first?</span>
+                        <h2 class="returns-page__sidebar-title">Talk to support before sending anything back.</h2>
+                        <p class="returns-page__sidebar-text">
                             If your item is damaged, incorrect, or you are not sure whether it is eligible, contact us and include your
                             order number.
                         </p>
-                        <div class="returnsPage__sidebarMeta">Mon-Fri | 09:00 - 17:00</div>
+                        <div class="returns-page__sidebar-meta">Mon-Fri | 09:00 - 17:00</div>
                         <VBtn color="primary" rounded="pill" size="large" class="text-none mt-6" block to="/contact">Get in touch</VBtn>
                     </div>
                 </aside>
@@ -162,53 +162,53 @@ const faqPanels = ref<number[]>([0])
 </template>
 
 <style scoped lang="scss">
-.returnsPage {
+.returns-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 38%, #f7faff 100%);
 }
 
-.returnsPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 2.5rem;
+.returns-page__hero {
+    padding: 6.5rem 0 2.5rem;
 }
 
-.returnsPage__container {
+.returns-page__container {
     position: relative;
     z-index: 1;
 }
 
-.returnsPage__heroGrid,
-.returnsPage__contentGrid {
+.returns-page__hero-grid,
+.returns-page__content-grid {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
 }
 
-.returnsPage__heroGrid {
+.returns-page__hero-grid {
     grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
     align-items: end;
 }
 
-.returnsPage__heroCopy,
-.returnsPage__heroPanel,
-.returnsPage__stepCard,
-.returnsPage__sectionCard,
-.returnsPage__sidebar {
+.returns-page__hero-copy,
+.returns-page__hero-panel,
+.returns-page__step-card,
+.returns-page__section-card,
+.returns-page__sidebar {
     animation: returns-rise 0.8s ease both;
 }
 
-.returnsPage__heroPanel,
-.returnsPage__sidebar {
+.returns-page__hero-panel,
+.returns-page__sidebar {
     animation-delay: 0.12s;
 }
 
-.returnsPage__breadcrumbs {
+.returns-page__breadcrumbs {
     margin-bottom: 1rem;
 }
 
-.returnsPage__eyebrow,
-.returnsPage__sectionEyebrow,
-.returnsPage__panelLabel,
-.returnsPage__sidebarLabel {
+.returns-page__eyebrow,
+.returns-page__section-eyebrow,
+.returns-page__panel-label,
+.returns-page__sidebar-label {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -223,46 +223,46 @@ const faqPanels = ref<number[]>([0])
     text-transform: uppercase;
 }
 
-.returnsPage__title,
-.returnsPage__panelTitle,
-.returnsPage__sectionTitle,
-.returnsPage__sidebarTitle,
-.returnsPage__stepTitle,
-.returnsPage__highlightTitle {
+.returns-page__title,
+.returns-page__panel-title,
+.returns-page__section-title,
+.returns-page__sidebar-title,
+.returns-page__step-title,
+.returns-page__highlight-title {
     color: #08173f;
 }
 
-.returnsPage__title {
+.returns-page__title {
     max-width: 12ch;
     margin-bottom: 1rem;
-    font-size: clamp(2.35rem, 4.2vw, 4.35rem);
+    font-size: 4.35rem;
     line-height: 0.96;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.returnsPage__description,
-.returnsPage__panelText,
-.returnsPage__sectionText,
-.returnsPage__sidebarText,
-.returnsPage__stepDetail,
-.returnsPage__highlightText,
-.returnsPage__policyText {
+.returns-page__description,
+.returns-page__panel-text,
+.returns-page__section-text,
+.returns-page__sidebar-text,
+.returns-page__step-detail,
+.returns-page__highlight-text,
+.returns-page__policy-text {
     color: #4c5975;
     font-size: 1rem;
     line-height: 1.75;
 }
 
-.returnsPage__description,
-.returnsPage__panelText,
-.returnsPage__sectionText,
-.returnsPage__sidebarText,
-.returnsPage__stepDetail,
-.returnsPage__highlightText {
+.returns-page__description,
+.returns-page__panel-text,
+.returns-page__section-text,
+.returns-page__sidebar-text,
+.returns-page__step-detail,
+.returns-page__highlight-text {
     margin-bottom: 0;
 }
 
-.returnsPage__heroActions {
+.returns-page__hero-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -270,13 +270,13 @@ const faqPanels = ref<number[]>([0])
     margin-top: 1.75rem;
 }
 
-.returnsPage__responseCard,
-.returnsPage__heroPanel,
-.returnsPage__stepCard,
-.returnsPage__sectionCard,
-.returnsPage__sidebarCard,
-.returnsPage__highlightCard,
-.returnsPage__panel {
+.returns-page__response-card,
+.returns-page__hero-panel,
+.returns-page__step-card,
+.returns-page__section-card,
+.returns-page__sidebar-card,
+.returns-page__highlight-card,
+.returns-page__panel {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.82);
@@ -284,48 +284,48 @@ const faqPanels = ref<number[]>([0])
     backdrop-filter: blur(14px);
 }
 
-.returnsPage__responseCard {
+.returns-page__response-card {
     display: grid;
     gap: 0.2rem;
     padding: 0.9rem 1.05rem;
 }
 
-.returnsPage__responseLabel,
-.returnsPage__sidebarMeta,
-.returnsPage__stepNumber {
+.returns-page__response-label,
+.returns-page__sidebar-meta,
+.returns-page__step-number {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.returnsPage__responseValue {
+.returns-page__response-value {
     color: #08173f;
     font-size: 1rem;
     line-height: 1.4;
 }
 
-.returnsPage__heroPanel,
-.returnsPage__sectionCard,
-.returnsPage__sidebarCard {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.returns-page__hero-panel,
+.returns-page__section-card,
+.returns-page__sidebar-card {
+    padding: 1.9rem;
 }
 
-.returnsPage__panelTitle,
-.returnsPage__sectionTitle,
-.returnsPage__sidebarTitle {
+.returns-page__panel-title,
+.returns-page__section-title,
+.returns-page__sidebar-title {
     margin-bottom: 0.85rem;
-    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    font-size: 2rem;
     line-height: 1.08;
     letter-spacing: -0.04rem;
 }
 
-.returnsPage__stepsGrid {
+.returns-page__steps-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
-    margin-bottom: clamp(2.25rem, 4vw, 3rem);
+    margin-bottom: 3rem;
 }
 
-.returnsPage__stepCard {
+.returns-page__step-card {
     min-height: 100%;
     padding: 1.35rem;
     transition:
@@ -334,14 +334,14 @@ const faqPanels = ref<number[]>([0])
         border-color 0.25s ease;
 }
 
-.returnsPage__stepCard:hover,
-.returnsPage__highlightCard:hover {
+.returns-page__step-card:hover,
+.returns-page__highlight-card:hover {
     transform: translateY(-4px);
     border-color: rgba(1, 12, 128, 0.14);
     box-shadow: 0 22px 54px rgba(8, 27, 90, 0.12);
 }
 
-.returnsPage__stepNumber {
+.returns-page__step-number {
     display: inline-flex;
     margin-bottom: 0.9rem;
     font-weight: 700;
@@ -349,31 +349,31 @@ const faqPanels = ref<number[]>([0])
     text-transform: uppercase;
 }
 
-.returnsPage__stepTitle {
+.returns-page__step-title {
     margin-bottom: 0.65rem;
     font-size: 1.15rem;
     line-height: 1.3;
 }
 
-.returnsPage__contentGrid {
+.returns-page__content-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
     align-items: start;
-    padding-bottom: clamp(4rem, 7vw, 6rem);
+    padding-bottom: 6rem;
 }
 
-.returnsPage__main {
+.returns-page__main {
     display: grid;
     gap: 1.25rem;
 }
 
-.returnsPage__highlightGrid {
+.returns-page__highlight-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     margin: 1.4rem 0;
 }
 
-.returnsPage__highlightCard {
+.returns-page__highlight-card {
     padding: 1.1rem 1rem;
     transition:
         transform 0.25s ease,
@@ -381,43 +381,43 @@ const faqPanels = ref<number[]>([0])
         border-color 0.25s ease;
 }
 
-.returnsPage__highlightTitle {
+.returns-page__highlight-title {
     margin-bottom: 0.5rem;
     font-size: 1rem;
     line-height: 1.35;
 }
 
-.returnsPage__policyText {
+.returns-page__policy-text {
     display: grid;
     gap: 1rem;
 }
 
-.returnsPage__policyText p {
+.returns-page__policy-text p {
     margin-bottom: 0;
 }
 
-.returnsPage__panels {
+.returns-page__panels {
     gap: 0.8rem;
     background: transparent;
 }
 
-.returnsPage__panel {
+.returns-page__panel {
     overflow: hidden;
     background: #ffffff;
     box-shadow: 0 10px 28px rgba(8, 27, 90, 0.05);
 }
 
-.returnsPage__sidebar {
+.returns-page__sidebar {
     position: sticky;
     top: 1.5rem;
 }
 
-.returnsPage__sidebarMeta {
+.returns-page__sidebar-meta {
     margin-top: 1rem;
     font-weight: 700;
 }
 
-:deep(.returnsPage__panelTitle) {
+:deep(.returns-page__panel-title) {
     min-height: 4.2rem;
     color: #08173f;
     font-size: 1rem;
@@ -425,7 +425,7 @@ const faqPanels = ref<number[]>([0])
     line-height: 1.5;
 }
 
-:deep(.returnsPage__panelText) {
+:deep(.returns-page__panel-text) {
     color: #52607c;
     line-height: 1.75;
 }
@@ -442,53 +442,112 @@ const faqPanels = ref<number[]>([0])
     }
 }
 
+@media screen and (max-width: 1280px) {
+    .returns-page__hero {
+        padding-top: 5.5rem;
+    }
+
+    .returns-page__title {
+        font-size: 3.5rem;
+    }
+
+    .returns-page__panel-title,
+    .returns-page__section-title,
+    .returns-page__sidebar-title {
+        font-size: 1.75rem;
+    }
+
+    .returns-page__steps-grid {
+        margin-bottom: 2.5rem;
+    }
+
+    .returns-page__content-grid {
+        padding-bottom: 5rem;
+    }
+}
+
 @media screen and (max-width: 1100px) {
-    .returnsPage__heroGrid,
-    .returnsPage__contentGrid,
-    .returnsPage__stepsGrid {
+    .returns-page__hero-grid,
+    .returns-page__content-grid,
+    .returns-page__steps-grid {
         grid-template-columns: 1fr;
     }
 
-    .returnsPage__title,
-    .returnsPage__highlightGrid {
+    .returns-page__hero-grid,
+    .returns-page__content-grid {
+        gap: 1.5rem;
+    }
+
+    .returns-page__title,
+    .returns-page__highlight-grid {
         max-width: 100%;
     }
 
-    .returnsPage__highlightGrid {
+    .returns-page__title {
+        font-size: 3rem;
+    }
+
+    .returns-page__hero-panel,
+    .returns-page__section-card,
+    .returns-page__sidebar-card {
+        padding: 1.6rem;
+    }
+
+    .returns-page__panel-title,
+    .returns-page__section-title,
+    .returns-page__sidebar-title {
+        font-size: 1.5rem;
+    }
+
+    .returns-page__steps-grid {
+        margin-bottom: 2.25rem;
+    }
+
+    .returns-page__highlight-grid {
         grid-template-columns: 1fr;
     }
 
-    .returnsPage__sidebar {
+    .returns-page__content-grid {
+        padding-bottom: 4rem;
+    }
+
+    .returns-page__sidebar {
         position: static;
     }
 }
 
 @media screen and (max-width: 767px) {
-    .returnsPage__hero {
+    .returns-page__hero {
         padding: 3.75rem 0 2rem;
     }
 
-    .returnsPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .returns-page__title {
+        font-size: 2.8rem;
         line-height: 1;
     }
 
-    .returnsPage__heroPanel,
-    .returnsPage__stepCard,
-    .returnsPage__sectionCard,
-    .returnsPage__sidebarCard,
-    .returnsPage__highlightCard {
+    .returns-page__hero-panel,
+    .returns-page__step-card,
+    .returns-page__section-card,
+    .returns-page__sidebar-card,
+    .returns-page__highlight-card {
         border-radius: 1.2rem;
+    }
+
+    .returns-page__hero-panel,
+    .returns-page__section-card,
+    .returns-page__sidebar-card {
+        padding: 1.4rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .returnsPage__heroCopy,
-    .returnsPage__heroPanel,
-    .returnsPage__stepCard,
-    .returnsPage__sectionCard,
-    .returnsPage__sidebar,
-    .returnsPage__highlightCard {
+    .returns-page__hero-copy,
+    .returns-page__hero-panel,
+    .returns-page__step-card,
+    .returns-page__section-card,
+    .returns-page__sidebar,
+    .returns-page__highlight-card {
         animation: none;
         transition: none;
     }

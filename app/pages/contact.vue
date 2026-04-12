@@ -36,36 +36,36 @@ useHead({
 </script>
 
 <template>
-    <section class="contactPage">
-        <div class="contactPage__hero">
-            <VContainer class="contactPage__container">
-                <div class="contactPage__heroGrid">
-                    <div class="contactPage__heroCopy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="contactPage__breadcrumbs" />
-                        <span class="contactPage__eyebrow">Customer Care</span>
-                        <h1 class="contactPage__title">Talk to a team that keeps shopping support calm, clear, and fast.</h1>
-                        <p class="contactPage__description">
+    <section class="contact-page">
+        <div class="contact-page__hero">
+            <VContainer class="contact-page__container">
+                <div class="contact-page__hero-grid">
+                    <div class="contact-page__hero-copy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="contact-page__breadcrumbs" />
+                        <span class="contact-page__eyebrow">Customer Care</span>
+                        <h1 class="contact-page__title">Talk to a team that keeps shopping support calm, clear, and fast.</h1>
+                        <p class="contact-page__description">
                             If you want a quick answer first, browse our
-                            <NuxtLink to="/faq" class="contactPage__inlineLink">FAQ</NuxtLink>. If you still need us, send a message and we
-                            will help with products, delivery, returns, or order updates.
+                            <NuxtLink to="/faq" class="contact-page__inline-link">FAQ</NuxtLink>. If you still need us, send a message and
+                            we will help with products, delivery, returns, or order updates.
                         </p>
-                        <div class="contactPage__heroActions">
+                        <div class="contact-page__hero-actions">
                             <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/faq">Browse FAQ</VBtn>
-                            <div class="contactPage__responseCard">
-                                <span class="contactPage__responseLabel">Average response</span>
-                                <strong class="contactPage__responseValue">Within one business day</strong>
+                            <div class="contact-page__response-card">
+                                <span class="contact-page__response-label">Average response</span>
+                                <strong class="contact-page__response-value">Within one business day</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="contactPage__heroPanel">
-                        <span class="contactPage__panelLabel">Support desk</span>
-                        <h2 class="contactPage__panelTitle">Built to feel as considered as the new homepage.</h2>
-                        <p class="contactPage__panelText">
+                    <div class="contact-page__hero-panel">
+                        <span class="contact-page__panel-label">Support desk</span>
+                        <h2 class="contact-page__panel-title">Built to feel as considered as the new homepage.</h2>
+                        <p class="contact-page__panel-text">
                             Reach out for delivery updates, product advice, or help with a recent order. We keep replies direct and
                             practical.
                         </p>
-                        <ul class="contactPage__promiseList">
-                            <li v-for="promise in supportPromises" :key="promise" class="contactPage__promiseItem">
+                        <ul class="contact-page__promise-list">
+                            <li v-for="promise in supportPromises" :key="promise" class="contact-page__promise-item">
                                 <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
                                 <span>{{ promise }}</span>
                             </li>
@@ -74,48 +74,48 @@ useHead({
                 </div>
             </VContainer>
         </div>
-        <VContainer class="contactPage__container">
-            <div class="contactPage__channelGrid">
-                <article v-for="channel in contactChannels" :key="channel.title" class="contactPage__channelCard">
-                    <div class="contactPage__channelIcon">
+        <VContainer class="contact-page__container">
+            <div class="contact-page__channel-grid">
+                <article v-for="channel in contactChannels" :key="channel.title" class="contact-page__channel-card">
+                    <div class="contact-page__channel-icon">
                         <VIcon size="22">{{ channel.icon }}</VIcon>
                     </div>
                     <div>
-                        <h2 class="contactPage__channelTitle">{{ channel.title }}</h2>
-                        <p class="contactPage__channelDetail">{{ channel.detail }}</p>
-                        <p class="contactPage__channelMeta">{{ channel.meta }}</p>
+                        <h2 class="contact-page__channel-title">{{ channel.title }}</h2>
+                        <p class="contact-page__channel-detail">{{ channel.detail }}</p>
+                        <p class="contact-page__channel-meta">{{ channel.meta }}</p>
                     </div>
                 </article>
             </div>
-            <div class="contactPage__contentGrid">
-                <div class="contactPage__formPanel">
-                    <div class="contactPage__sectionIntro">
-                        <span class="contactPage__sectionEyebrow">Send a message</span>
-                        <h2 class="contactPage__sectionTitle">Share the details and we will take it from there.</h2>
-                        <p class="contactPage__sectionText">
+            <div class="contact-page__content-grid">
+                <div class="contact-page__form-panel">
+                    <div class="contact-page__section-intro">
+                        <span class="contact-page__section-eyebrow">Send a message</span>
+                        <h2 class="contact-page__section-title">Share the details and we will take it from there.</h2>
+                        <p class="contact-page__section-text">
                             Add your order number if you have one. That helps us respond faster and keeps follow-up straightforward.
                         </p>
                     </div>
-                    <div class="contactPage__formCard">
+                    <div class="contact-page__form-card">
                         <ContactForm />
                     </div>
                 </div>
-                <aside class="contactPage__sidebar">
-                    <div class="contactPage__sidebarCard">
-                        <span class="contactPage__sidebarLabel">Visit us</span>
-                        <h2 class="contactPage__sidebarTitle">Vilnius support base</h2>
-                        <p class="contactPage__sidebarText">
+                <aside class="contact-page__sidebar">
+                    <div class="contact-page__sidebar-card">
+                        <span class="contact-page__sidebar-label">Visit us</span>
+                        <h2 class="contact-page__sidebar-title">Vilnius support base</h2>
+                        <p class="contact-page__sidebar-text">
                             Our team works from Vilnius and supports customers across product questions, order issues, and post-purchase
                             help.
                         </p>
-                        <div class="contactPage__sidebarMeta">Open on weekdays | Closed on public holidays</div>
+                        <div class="contact-page__sidebar-meta">Open on weekdays | Closed on public holidays</div>
                     </div>
-                    <div class="contactPage__mapCard">
+                    <div class="contact-page__map-card">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d203269.51871892938!2d25.088231590205528!3d54.700572672503455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46dd93fb5c6408f5%3A0x400d18c70e9dc40!2sVilnius%2C%20Vilniaus%20m.%20sav.!5e1!3m2!1slt!2slt!4v1727009719782!5m2!1slt!2slt"
                             width="100%"
                             height="100%"
-                            class="contactPage__map"
+                            class="contact-page__map"
                             style="border: 0"
                             allowfullscreen
                             loading="lazy"
@@ -129,53 +129,53 @@ useHead({
 </template>
 
 <style scoped lang="scss">
-.contactPage {
+.contact-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.contactPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 2.5rem;
+.contact-page__hero {
+    padding: 5.5rem 0 2.5rem;
 }
 
-.contactPage__container {
+.contact-page__container {
     position: relative;
     z-index: 1;
 }
 
-.contactPage__heroGrid,
-.contactPage__contentGrid {
+.contact-page__hero-grid,
+.contact-page__content-grid {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
 }
 
-.contactPage__heroGrid {
+.contact-page__hero-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.8fr);
     align-items: end;
 }
 
-.contactPage__heroCopy,
-.contactPage__heroPanel,
-.contactPage__channelCard,
-.contactPage__formPanel,
-.contactPage__sidebar {
+.contact-page__hero-copy,
+.contact-page__hero-panel,
+.contact-page__channel-card,
+.contact-page__form-panel,
+.contact-page__sidebar {
     animation: contact-rise 0.8s ease both;
 }
 
-.contactPage__heroPanel,
-.contactPage__sidebar {
+.contact-page__hero-panel,
+.contact-page__sidebar {
     animation-delay: 0.12s;
 }
 
-.contactPage__breadcrumbs {
+.contact-page__breadcrumbs {
     margin-bottom: 1rem;
 }
 
-.contactPage__eyebrow,
-.contactPage__sectionEyebrow,
-.contactPage__panelLabel,
-.contactPage__sidebarLabel {
+.contact-page__eyebrow,
+.contact-page__section-eyebrow,
+.contact-page__panel-label,
+.contact-page__sidebar-label {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -189,51 +189,51 @@ useHead({
     text-transform: uppercase;
 }
 
-.contactPage__eyebrow,
-.contactPage__sectionEyebrow {
+.contact-page__eyebrow,
+.contact-page__section-eyebrow {
     margin-bottom: 1rem;
 }
 
-.contactPage__title,
-.contactPage__sectionTitle {
+.contact-page__title,
+.contact-page__section-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.contactPage__title {
+.contact-page__title {
     max-width: 12ch;
     margin-bottom: 1rem;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 4rem;
     line-height: 0.95;
 }
 
-.contactPage__description,
-.contactPage__panelText,
-.contactPage__sectionText,
-.contactPage__sidebarText,
-.contactPage__channelDetail {
+.contact-page__description,
+.contact-page__panel-text,
+.contact-page__section-text,
+.contact-page__sidebar-text,
+.contact-page__channel-detail {
     color: #4b5874;
     font-size: 1rem;
     line-height: 1.75;
 }
 
-.contactPage__description {
+.contact-page__description {
     max-width: 40rem;
     margin-bottom: 0;
 }
 
-.contactPage__inlineLink {
+.contact-page__inline-link {
     color: #010c80;
     font-weight: 700;
     text-decoration: none;
 }
 
-.contactPage__inlineLink:hover {
+.contact-page__inline-link:hover {
     text-decoration: underline;
 }
 
-.contactPage__heroActions {
+.contact-page__hero-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -241,12 +241,12 @@ useHead({
     margin-top: 1.75rem;
 }
 
-.contactPage__responseCard,
-.contactPage__heroPanel,
-.contactPage__channelCard,
-.contactPage__formCard,
-.contactPage__sidebarCard,
-.contactPage__mapCard {
+.contact-page__response-card,
+.contact-page__hero-panel,
+.contact-page__channel-card,
+.contact-page__form-card,
+.contact-page__sidebar-card,
+.contact-page__map-card {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.82);
@@ -254,56 +254,56 @@ useHead({
     backdrop-filter: blur(14px);
 }
 
-.contactPage__responseCard {
+.contact-page__response-card {
     display: grid;
     gap: 0.2rem;
     padding: 0.9rem 1.05rem;
 }
 
-.contactPage__responseLabel,
-.contactPage__channelMeta,
-.contactPage__sidebarMeta {
+.contact-page__response-label,
+.contact-page__channel-meta,
+.contact-page__sidebar-meta {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.contactPage__responseValue,
-.contactPage__panelTitle,
-.contactPage__sectionTitle,
-.contactPage__sidebarTitle,
-.contactPage__channelTitle {
+.contact-page__response-value,
+.contact-page__panel-title,
+.contact-page__section-title,
+.contact-page__sidebar-title,
+.contact-page__channel-title {
     color: #08173f;
 }
 
-.contactPage__responseValue {
+.contact-page__response-value {
     font-size: 1rem;
     line-height: 1.4;
 }
 
-.contactPage__heroPanel,
-.contactPage__sidebarCard {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.contact-page__hero-panel,
+.contact-page__sidebar-card {
+    padding: 1.75rem;
 }
 
-.contactPage__panelLabel,
-.contactPage__sidebarLabel {
+.contact-page__panel-label,
+.contact-page__sidebar-label {
     margin-bottom: 1rem;
 }
 
-.contactPage__panelTitle,
-.contactPage__sectionTitle {
+.contact-page__panel-title,
+.contact-page__section-title {
     margin-bottom: 0.85rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 2rem;
     line-height: 1.08;
 }
 
-.contactPage__panelText,
-.contactPage__sectionText,
-.contactPage__sidebarText {
+.contact-page__panel-text,
+.contact-page__section-text,
+.contact-page__sidebar-text {
     margin-bottom: 0;
 }
 
-.contactPage__promiseList {
+.contact-page__promise-list {
     display: grid;
     gap: 0.85rem;
     margin: 1.4rem 0 0;
@@ -311,7 +311,7 @@ useHead({
     list-style: none;
 }
 
-.contactPage__promiseItem {
+.contact-page__promise-item {
     display: flex;
     align-items: flex-start;
     gap: 0.7rem;
@@ -319,14 +319,14 @@ useHead({
     line-height: 1.6;
 }
 
-.contactPage__channelGrid {
+.contact-page__channel-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
-    margin-bottom: clamp(2.25rem, 4vw, 3rem);
+    margin-bottom: 2.75rem;
 }
 
-.contactPage__channelCard {
+.contact-page__channel-card {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 1rem;
@@ -338,13 +338,13 @@ useHead({
         border-color 0.25s ease;
 }
 
-.contactPage__channelCard:hover {
+.contact-page__channel-card:hover {
     transform: translateY(-4px);
     border-color: rgba(1, 12, 128, 0.14);
     box-shadow: 0 22px 54px rgba(8, 27, 90, 0.12);
 }
 
-.contactPage__channelIcon {
+.contact-page__channel-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -355,62 +355,62 @@ useHead({
     color: #010c80;
 }
 
-.contactPage__channelTitle {
+.contact-page__channel-title {
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
 }
 
-.contactPage__channelDetail {
+.contact-page__channel-detail {
     margin-bottom: 0.75rem;
 }
 
-.contactPage__channelMeta {
+.contact-page__channel-meta {
     margin-bottom: 0;
     font-weight: 700;
 }
 
-.contactPage__contentGrid {
+.contact-page__content-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
     align-items: start;
-    padding-bottom: clamp(4rem, 7vw, 6rem);
+    padding-bottom: 5rem;
 }
 
-.contactPage__formPanel {
+.contact-page__form-panel {
     min-width: 0;
 }
 
-.contactPage__formCard {
-    padding: clamp(1.2rem, 2vw, 1.8rem);
+.contact-page__form-card {
+    padding: 1.5rem;
 }
 
-.contactPage__sectionIntro {
+.contact-page__section-intro {
     margin-bottom: 1.25rem;
 }
 
-.contactPage__sidebar {
+.contact-page__sidebar {
     display: grid;
     gap: 1rem;
     position: sticky;
     top: 1.5rem;
 }
 
-.contactPage__sidebarTitle {
+.contact-page__sidebar-title {
     margin-bottom: 0.75rem;
     font-size: 1.5rem;
     line-height: 1.1;
 }
 
-.contactPage__sidebarMeta {
+.contact-page__sidebar-meta {
     margin-top: 1.1rem;
     font-weight: 700;
 }
 
-.contactPage__mapCard {
+.contact-page__map-card {
     overflow: hidden;
     min-height: 22rem;
 }
 
-.contactPage__map {
+.contact-page__map {
     display: block;
     min-height: 22rem;
 }
@@ -428,49 +428,73 @@ useHead({
 }
 
 @media screen and (max-width: 1100px) {
-    .contactPage__heroGrid,
-    .contactPage__contentGrid,
-    .contactPage__channelGrid {
+    .contact-page__hero-grid,
+    .contact-page__content-grid,
+    .contact-page__channel-grid {
         grid-template-columns: 1fr;
     }
 
-    .contactPage__title {
+    .contact-page__title {
         max-width: 100%;
     }
 
-    .contactPage__sidebar {
+    .contact-page__sidebar {
         position: static;
     }
 }
 
 @media screen and (max-width: 600px) {
-    .contactPage__hero {
+    .contact-page__hero {
         padding: 3.75rem 0 2rem;
     }
 
-    .contactPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .contact-page__title {
+        font-size: 2.5rem;
         line-height: 1;
     }
 
-    .contactPage__heroPanel,
-    .contactPage__channelCard,
-    .contactPage__formCard,
-    .contactPage__sidebarCard {
+    .contact-page__hero-panel,
+    .contact-page__channel-card,
+    .contact-page__form-card,
+    .contact-page__sidebar-card {
         border-radius: 1.2rem;
+    }
+
+    .contact-page__hero-grid,
+    .contact-page__content-grid {
+        gap: 1.5rem;
+    }
+
+    .contact-page__hero-panel,
+    .contact-page__sidebar-card,
+    .contact-page__form-card {
+        padding: 1.4rem;
+    }
+
+    .contact-page__panel-title,
+    .contact-page__section-title {
+        font-size: 1.7rem;
+    }
+
+    .contact-page__channel-grid {
+        margin-bottom: 2.25rem;
+    }
+
+    .contact-page__content-grid {
+        padding-bottom: 4rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .contactPage__heroCopy,
-    .contactPage__heroPanel,
-    .contactPage__channelCard,
-    .contactPage__formPanel,
-    .contactPage__sidebar {
+    .contact-page__hero-copy,
+    .contact-page__hero-panel,
+    .contact-page__channel-card,
+    .contact-page__form-panel,
+    .contact-page__sidebar {
         animation: none;
     }
 
-    .contactPage__channelCard {
+    .contact-page__channel-card {
         transition: none;
     }
 }

@@ -21,15 +21,15 @@ function onDelete(): void {
 </script>
 
 <template>
-    <article class="addressCard">
+    <article class="address-card">
         <div>
-            <div class="addressCard__top">
+            <div class="address-card__top">
                 <div>
-                    <span class="addressCard__label">{{ props.address.address_name?.toUpperCase() || "UNNAMED ADDRESS" }}</span>
-                    <h3 class="addressCard__name">{{ props.address.first_name }} {{ props.address.last_name }}</h3>
+                    <span class="address-card__label">{{ props.address.address_name?.toUpperCase() || "UNNAMED ADDRESS" }}</span>
+                    <h3 class="address-card__name">{{ props.address.first_name }} {{ props.address.last_name }}</h3>
                 </div>
 
-                <div class="addressCard__actions">
+                <div class="address-card__actions">
                     <VBtn icon size="small" variant="text" @click="onEdit">
                         <VIcon>mdi-pencil</VIcon>
                     </VBtn>
@@ -39,20 +39,20 @@ function onDelete(): void {
                 </div>
             </div>
 
-            <div class="addressCard__body">
-                <p class="addressCard__line">{{ props.address.address_1 }}</p>
-                <p v-if="props.address.address_2" class="addressCard__line">{{ props.address.address_2 }}</p>
-                <p class="addressCard__line">{{ props.address.city }}, {{ props.address.province }}</p>
-                <p class="addressCard__line">{{ props.address.postal_code }} - {{ props.address.country_code?.toUpperCase() }}</p>
-                <p v-if="props.address.phone" class="addressCard__line">{{ props.address.phone }}</p>
-                <p v-if="props.address.company" class="addressCard__line">{{ props.address.company }}</p>
+            <div class="address-card__body">
+                <p class="address-card__line">{{ props.address.address_1 }}</p>
+                <p v-if="props.address.address_2" class="address-card__line">{{ props.address.address_2 }}</p>
+                <p class="address-card__line">{{ props.address.city }}, {{ props.address.province }}</p>
+                <p class="address-card__line">{{ props.address.postal_code }} - {{ props.address.country_code?.toUpperCase() }}</p>
+                <p v-if="props.address.phone" class="address-card__line">{{ props.address.phone }}</p>
+                <p v-if="props.address.company" class="address-card__line">{{ props.address.company }}</p>
             </div>
         </div>
     </article>
 </template>
 
 <style scoped lang="scss">
-.addressCard {
+.address-card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -63,7 +63,7 @@ function onDelete(): void {
     background: rgba(247, 250, 255, 0.92);
 }
 
-.addressCard__top {
+.address-card__top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -71,7 +71,7 @@ function onDelete(): void {
     margin-bottom: 0.9rem;
 }
 
-.addressCard__label {
+.address-card__label {
     color: #010c80;
     font-size: 0.74rem;
     font-weight: 700;
@@ -79,23 +79,23 @@ function onDelete(): void {
     text-transform: uppercase;
 }
 
-.addressCard__name {
+.address-card__name {
     margin: 0.45rem 0 0;
     color: #08173f;
     font-size: 1rem;
 }
 
-.addressCard__actions {
+.address-card__actions {
     display: inline-flex;
     gap: 0.1rem;
 }
 
-.addressCard__body {
+.address-card__body {
     display: grid;
     gap: 0.3rem;
 }
 
-.addressCard__line {
+.address-card__line {
     margin: 0;
     color: #4b5874;
     line-height: 1.6;

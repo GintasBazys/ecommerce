@@ -327,114 +327,114 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
 </script>
 
 <template>
-    <section v-if="product" class="productPage">
-        <div class="productPage__hero">
-            <VContainer class="productPage__container">
-                <div class="productPage__heroGrid">
-                    <div class="productPage__galleryShell">
-                        <div class="productPage__galleryCard">
-                            <div v-if="isOnSale" class="productPage__saleBadge">Sale</div>
-                            <div class="productPage__mainImageWrap">
+    <section v-if="product" class="product-page">
+        <div class="product-page__hero">
+            <VContainer class="product-page__container">
+                <div class="product-page__hero-grid">
+                    <div class="product-page__gallery-shell">
+                        <div class="product-page__gallery-card">
+                            <div v-if="isOnSale" class="product-page__sale-badge">Sale</div>
+                            <div class="product-page__main-image-wrap">
                                 <VImg
                                     :src="activeImage?.url || product.thumbnail || '/images/placeholder.png'"
                                     :alt="activeImage?.url ? `${product.title} image` : product.title"
-                                    class="productPage__mainImage"
+                                    class="product-page__main-image"
                                     cover
                                 />
                             </div>
-                            <div v-if="productImages.length > 1" class="productPage__thumbGrid">
+                            <div v-if="productImages.length > 1" class="product-page__thumb-grid">
                                 <button
                                     v-for="(image, index) in productImages"
                                     :key="image.id || image.url || index"
                                     type="button"
-                                    class="productPage__thumbButton"
-                                    :class="{ 'productPage__thumbButton--active': index === activeImageIndex }"
+                                    class="product-page__thumb-button"
+                                    :class="{ 'product-page__thumb-button--active': index === activeImageIndex }"
                                     @click="selectImage(index)"
                                 >
                                     <VImg
                                         :src="image.url"
                                         :alt="`${product.title} thumbnail ${index + 1}`"
-                                        class="productPage__thumbImage"
+                                        class="product-page__thumb-image"
                                         cover
                                     />
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="productPage__content">
-                        <div class="productPage__introCard">
-                            <div class="productPage__introTop">
+                    <div class="product-page__content">
+                        <div class="product-page__intro-card">
+                            <div class="product-page__intro-top">
                                 <div>
-                                    <AppBreadcrumbs :items="breadcrumbItems" class="productPage__breadcrumbs" />
-                                    <span class="productPage__eyebrow">Product detail</span>
+                                    <AppBreadcrumbs :items="breadcrumbItems" class="product-page__breadcrumbs" />
+                                    <span class="product-page__eyebrow">Product detail</span>
                                 </div>
-                                <div v-if="reviews.length" class="productPage__ratingSummary">
-                                    <VIcon v-for="star in 5" :key="star" size="16" class="productPage__ratingStar">
+                                <div v-if="reviews.length" class="product-page__rating-summary">
+                                    <VIcon v-for="star in 5" :key="star" size="16" class="product-page__rating-star">
                                         {{ star <= Math.round(reviewAverage) ? "mdi-star" : "mdi-star-outline" }}
                                     </VIcon>
                                     <span>{{ reviewAverage }} / 5</span>
                                 </div>
                             </div>
-                            <h1 class="productPage__title">{{ product.title }}</h1>
-                            <p v-if="product.subtitle" class="productPage__subtitle">{{ product.subtitle }}</p>
-                            <p class="productPage__description">
+                            <h1 class="product-page__title">{{ product.title }}</h1>
+                            <p v-if="product.subtitle" class="product-page__subtitle">{{ product.subtitle }}</p>
+                            <p class="product-page__description">
                                 {{
                                     product.description ||
                                         "A refined product pick designed to feel premium, practical, and easy to wear every day."
                                 }}
                             </p>
-                            <div v-if="product.tags.length" class="productPage__tagRow">
-                                <VChip v-for="tag in product.tags" :key="tag.id" class="productPage__tag" size="small" label>
+                            <div v-if="product.tags.length" class="product-page__tag-row">
+                                <VChip v-for="tag in product.tags" :key="tag.id" class="product-page__tag" size="small" label>
                                     {{ tag.value }}
                                 </VChip>
                             </div>
-                            <div v-if="selectedVariant" class="productPage__priceBlock">
-                                <div class="productPage__priceRow">
-                                    <span class="productPage__price">{{ displayPrice }}</span>
-                                    <del v-if="isOnSale && originalPrice" class="productPage__originalPrice">{{ originalPrice }}</del>
+                            <div v-if="selectedVariant" class="product-page__price-block">
+                                <div class="product-page__price-row">
+                                    <span class="product-page__price">{{ displayPrice }}</span>
+                                    <del v-if="isOnSale && originalPrice" class="product-page__original-price">{{ originalPrice }}</del>
                                 </div>
-                                <p class="productPage__taxMeta">{{ taxLabel }}</p>
+                                <p class="product-page__tax-meta">{{ taxLabel }}</p>
                                 <p
-                                    class="productPage__inventory"
-                                    :class="inStock ? 'productPage__inventory--in' : 'productPage__inventory--out'"
+                                    class="product-page__inventory"
+                                    :class="inStock ? 'product-page__inventory--in' : 'product-page__inventory--out'"
                                 >
                                     {{ inStock ? "Ready to ship" : "Currently unavailable" }}
                                 </p>
                             </div>
                         </div>
-                        <div class="productPage__purchaseCard">
-                            <div v-if="product.variants.length" class="productPage__variantBlock">
-                                <div class="productPage__labelRow">
-                                    <span class="productPage__label">Select option</span>
-                                    <span class="productPage__labelValue">{{ selectedVariant?.title || "Choose a variant" }}</span>
+                        <div class="product-page__purchase-card">
+                            <div v-if="product.variants.length" class="product-page__variant-block">
+                                <div class="product-page__label-row">
+                                    <span class="product-page__label">Select option</span>
+                                    <span class="product-page__label-value">{{ selectedVariant?.title || "Choose a variant" }}</span>
                                 </div>
-                                <VBtnToggle v-model="selectedVariantId" mandatory divided class="productPage__variantToggle">
+                                <VBtnToggle v-model="selectedVariantId" mandatory divided class="product-page__variant-toggle">
                                     <VBtn
                                         v-for="variant in product.variants"
                                         :key="variant.id"
                                         :value="variant.id"
                                         variant="text"
                                         rounded="pill"
-                                        class="productPage__variantBtn text-none"
+                                        class="product-page__variant-btn text-none"
                                     >
                                         {{ variant.title }}
                                     </VBtn>
                                 </VBtnToggle>
                             </div>
-                            <div class="productPage__factsGrid">
-                                <div v-for="fact in productFacts" :key="fact.label" class="productPage__factCard">
-                                    <span class="productPage__factLabel">{{ fact.label }}</span>
-                                    <strong class="productPage__factValue">{{ fact.value }}</strong>
+                            <div class="product-page__facts-grid">
+                                <div v-for="fact in productFacts" :key="fact.label" class="product-page__fact-card">
+                                    <span class="product-page__fact-label">{{ fact.label }}</span>
+                                    <strong class="product-page__fact-value">{{ fact.value }}</strong>
                                 </div>
                             </div>
-                            <div v-if="selectedVariant && inStock" class="productPage__ctaRow">
-                                <div class="productPage__qtyBlock">
-                                    <span class="productPage__label">Quantity</span>
-                                    <div class="productPage__qtyControl">
+                            <div v-if="selectedVariant && inStock" class="product-page__cta-row">
+                                <div class="product-page__qty-block">
+                                    <span class="product-page__label">Quantity</span>
+                                    <div class="product-page__qty-control">
                                         <VBtn icon size="x-small" variant="text" :disabled="quantity <= 1" @click="decrement">
                                             <VIcon size="18">mdi-minus</VIcon>
                                         </VBtn>
-                                        <span class="productPage__qtyValue">{{ quantity }}</span>
+                                        <span class="product-page__qty-value">{{ quantity }}</span>
                                         <VBtn icon size="x-small" variant="text" :disabled="quantity >= maxStock" @click="increment">
                                             <VIcon size="18">mdi-plus</VIcon>
                                         </VBtn>
@@ -443,7 +443,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                                 <VBtn
                                     color="primary"
                                     rounded="pill"
-                                    class="productPage__cartBtn text-none"
+                                    class="product-page__cart-btn text-none"
                                     :disabled="!selectedVariant || quantity < 1 || quantity > maxStock"
                                     :loading="adding"
                                     @click="addToCart"
@@ -451,19 +451,19 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                                     Add to cart
                                 </VBtn>
                             </div>
-                            <div v-else class="productPage__outOfStockCard">
+                            <div v-else class="product-page__out-of-stock-card">
                                 This variant is currently unavailable. Try another option or browse related products below.
                             </div>
-                            <div class="productPage__serviceGrid">
-                                <div class="productPage__serviceItem">
+                            <div class="product-page__service-grid">
+                                <div class="product-page__service-item">
                                     <VIcon size="18" color="primary">mdi-truck-fast-outline</VIcon>
                                     <span>Fast regional delivery</span>
                                 </div>
-                                <div class="productPage__serviceItem">
+                                <div class="product-page__service-item">
                                     <VIcon size="18" color="primary">mdi-refresh</VIcon>
                                     <span>Easy returns and exchanges</span>
                                 </div>
-                                <div class="productPage__serviceItem">
+                                <div class="product-page__service-item">
                                     <VIcon size="18" color="primary">mdi-shield-check-outline</VIcon>
                                     <span>Secure checkout experience</span>
                                 </div>
@@ -471,15 +471,15 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                         </div>
                     </div>
                 </div>
-                <div class="productPage__detailsGrid">
-                    <div class="productPage__detailsCard">
-                        <span class="productPage__sectionEyebrow">Product details</span>
-                        <h2 class="productPage__sectionTitle">More context before you commit.</h2>
-                        <VExpansionPanels v-model="panel" multiple variant="accordion" class="productPage__accordion">
+                <div class="product-page__details-grid">
+                    <div class="product-page__details-card">
+                        <span class="product-page__section-eyebrow">Product details</span>
+                        <h2 class="product-page__section-title">More context before you commit.</h2>
+                        <VExpansionPanels v-model="panel" multiple variant="accordion" class="product-page__accordion">
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Description</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <p class="productPage__detailText">
+                                    <p class="product-page__detail-text">
                                         {{
                                             product.description ||
                                                 "A carefully selected product with balanced styling, everyday function, and a polished finish."
@@ -490,7 +490,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Buying notes</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <ul class="productPage__detailList">
+                                    <ul class="product-page__detail-list">
                                         <li>Choose your preferred option before adjusting quantity.</li>
                                         <li>Pricing updates instantly based on the selected variant.</li>
                                         <li>Shipping updates at checkout, and tax display follows the selected region.</li>
@@ -500,7 +500,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             <VExpansionPanel>
                                 <VExpansionPanelTitle>Why customers like it</VExpansionPanelTitle>
                                 <VExpansionPanelText>
-                                    <p class="productPage__detailText">
+                                    <p class="product-page__detail-text">
                                         Designed to feel premium without becoming fussy, this product balances presentation, utility, and
                                         easy everyday use.
                                     </p>
@@ -508,11 +508,11 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             </VExpansionPanel>
                         </VExpansionPanels>
                     </div>
-                    <div class="productPage__reviewsCard">
-                        <div class="productPage__reviewsHeader">
+                    <div class="product-page__reviews-card">
+                        <div class="product-page__reviews-header">
                             <div>
-                                <span class="productPage__sectionEyebrow">Customer feedback</span>
-                                <h2 class="productPage__sectionTitle">What shoppers are saying.</h2>
+                                <span class="product-page__section-eyebrow">Customer feedback</span>
+                                <h2 class="product-page__section-title">What shoppers are saying.</h2>
                             </div>
                             <VBtn
                                 v-if="customer"
@@ -528,15 +528,15 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                         <ProductReviews :reviews="reviews" />
                     </div>
                 </div>
-                <section v-if="relatedProducts.length" class="productPage__related">
-                    <div class="productPage__relatedIntro">
-                        <span class="productPage__sectionEyebrow">Related products</span>
-                        <h2 class="productPage__sectionTitle">More from the same shopping lane.</h2>
-                        <p class="productPage__sectionText">
+                <section v-if="relatedProducts.length" class="product-page__related">
+                    <div class="product-page__related-intro">
+                        <span class="product-page__section-eyebrow">Related products</span>
+                        <h2 class="product-page__section-title">More from the same shopping lane.</h2>
+                        <p class="product-page__section-text">
                             Picked from the same category so the next suggestion still feels aligned with what you are viewing now.
                         </p>
                     </div>
-                    <VRow class="productPage__relatedGrid" align="stretch">
+                    <VRow class="product-page__related-grid" align="stretch">
                         <VCol v-for="relatedProduct in relatedProducts" :key="relatedProduct.id" cols="12" sm="6" lg="3">
                             <ProductCard :product="relatedProduct" />
                         </VCol>
@@ -560,42 +560,42 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
 </template>
 
 <style scoped lang="scss">
-.productPage {
+.product-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 42%, #f7faff 100%);
 }
 
-.productPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+.product-page__hero {
+    padding: 6.5rem 0 6rem;
 }
 
-.productPage__container {
+.product-page__container {
     position: relative;
     z-index: 1;
 }
 
-.productPage__heroGrid,
-.productPage__detailsGrid {
+.product-page__hero-grid,
+.product-page__details-grid {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
 }
 
-.productPage__heroGrid {
+.product-page__hero-grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
     align-items: start;
 }
 
-.productPage__content {
+.product-page__content {
     display: grid;
     gap: 1rem;
 }
 
-.productPage__galleryCard,
-.productPage__introCard,
-.productPage__purchaseCard,
-.productPage__detailsCard,
-.productPage__reviewsCard {
+.product-page__gallery-card,
+.product-page__intro-card,
+.product-page__purchase-card,
+.product-page__details-card,
+.product-page__reviews-card {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.84);
@@ -603,13 +603,13 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     backdrop-filter: blur(14px);
 }
 
-.productPage__galleryCard {
+.product-page__gallery-card {
     position: sticky;
     top: 1.5rem;
     padding: 1rem;
 }
 
-.productPage__saleBadge {
+.product-page__sale-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -624,7 +624,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     text-transform: uppercase;
 }
 
-.productPage__mainImageWrap {
+.product-page__main-image-wrap {
     overflow: hidden;
     margin-top: 0.9rem;
     border-radius: 1.25rem;
@@ -632,19 +632,19 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     background: radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 34%), linear-gradient(180deg, #eef5ff 0%, #dfeafc 100%);
 }
 
-.productPage__mainImage {
+.product-page__main-image {
     width: 100%;
     height: 100%;
 }
 
-.productPage__thumbGrid {
+.product-page__thumb-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.75rem;
     margin-top: 0.9rem;
 }
 
-.productPage__thumbButton {
+.product-page__thumb-button {
     padding: 0.2rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1rem;
@@ -655,44 +655,44 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
         border-color 0.25s ease;
 }
 
-.productPage__thumbButton:hover,
-.productPage__thumbButton--active {
+.product-page__thumb-button:hover,
+.product-page__thumb-button--active {
     transform: translateY(-2px);
     border-color: rgba(1, 12, 128, 0.18);
 }
 
-.productPage__thumbImage {
+.product-page__thumb-image {
     aspect-ratio: 1;
     border-radius: 0.8rem;
 }
 
-.productPage__introCard,
-.productPage__purchaseCard,
-.productPage__detailsCard,
-.productPage__reviewsCard {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.product-page__intro-card,
+.product-page__purchase-card,
+.product-page__details-card,
+.product-page__reviews-card {
+    padding: 1.9rem;
 }
 
-.productPage__introTop,
-.productPage__priceRow,
-.productPage__labelRow,
-.productPage__reviewsHeader {
+.product-page__intro-top,
+.product-page__price-row,
+.product-page__label-row,
+.product-page__reviews-header {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
 }
 
-.productPage__breadcrumbs {
+.product-page__breadcrumbs {
     margin-bottom: 0.9rem;
 }
 
-.productPage__introTop,
-.productPage__reviewsHeader {
+.product-page__intro-top,
+.product-page__reviews-header {
     align-items: center;
 }
 
-.productPage__eyebrow,
-.productPage__sectionEyebrow {
+.product-page__eyebrow,
+.product-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -706,7 +706,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     text-transform: uppercase;
 }
 
-.productPage__ratingSummary {
+.product-page__rating-summary {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
@@ -714,123 +714,123 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     font-size: 0.92rem;
 }
 
-.productPage__ratingStar {
+.product-page__rating-star {
     color: #f7ae2b;
 }
 
-.productPage__title,
-.productPage__sectionTitle {
+.product-page__title,
+.product-page__section-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.productPage__title {
+.product-page__title {
     margin: 1rem 0 0.75rem;
-    font-size: clamp(2.4rem, 4.4vw, 4.25rem);
+    font-size: 4.25rem;
     line-height: 0.95;
 }
 
-.productPage__subtitle,
-.productPage__description,
-.productPage__sectionText,
-.productPage__detailText,
-.productPage__outOfStockCard {
+.product-page__subtitle,
+.product-page__description,
+.product-page__section-text,
+.product-page__detail-text,
+.product-page__out-of-stock-card {
     margin: 0;
     color: #4b5874;
     line-height: 1.75;
 }
 
-.productPage__subtitle {
+.product-page__subtitle {
     margin-bottom: 0.75rem;
     color: #08173f;
     font-size: 1rem;
     font-weight: 700;
 }
 
-.productPage__tagRow {
+.product-page__tag-row {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 1.25rem;
 }
 
-.productPage__tag {
+.product-page__tag {
     border: 1px solid rgba(8, 23, 63, 0.08);
     background: rgba(247, 250, 255, 0.95);
     color: #08173f;
 }
 
-.productPage__priceBlock {
+.product-page__price-block {
     margin-top: 1.4rem;
 }
 
-.productPage__priceRow {
+.product-page__price-row {
     align-items: baseline;
     justify-content: flex-start;
     gap: 0.75rem;
 }
 
-.productPage__price {
+.product-page__price {
     color: #08173f;
-    font-size: clamp(1.8rem, 3vw, 2.3rem);
+    font-size: 2.3rem;
     font-weight: 700;
     line-height: 1;
 }
 
-.productPage__originalPrice {
+.product-page__original-price {
     color: #d9424e;
     font-size: 1rem;
 }
 
-.productPage__inventory {
+.product-page__inventory {
     margin-top: 0.55rem;
     font-size: 0.92rem;
     font-weight: 700;
 }
 
-.productPage__taxMeta {
+.product-page__tax-meta {
     margin-top: 0.6rem;
     color: #5a6480;
     font-size: 0.92rem;
     line-height: 1.5;
 }
 
-.productPage__inventory--in {
+.product-page__inventory--in {
     color: #1e8b58;
 }
 
-.productPage__inventory--out {
+.product-page__inventory--out {
     color: #d9424e;
 }
 
-.productPage__variantBlock {
+.product-page__variant-block {
     display: grid;
     gap: 0.9rem;
 }
 
-.productPage__labelRow {
+.product-page__label-row {
     align-items: center;
 }
 
-.productPage__label,
-.productPage__factLabel,
-.productPage__labelValue {
+.product-page__label,
+.product-page__fact-label,
+.product-page__label-value {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.productPage__labelValue {
+.product-page__label-value {
     font-weight: 700;
 }
 
-.productPage__variantToggle {
+.product-page__variant-toggle {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
 }
 
-.productPage__variantBtn {
+.product-page__variant-btn {
     min-height: 2.6rem;
     padding-inline: 1rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
@@ -840,14 +840,14 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     font-weight: 700;
 }
 
-.productPage__factsGrid {
+.product-page__facts-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
     margin-top: 1.25rem;
 }
 
-.productPage__factCard {
+.product-page__fact-card {
     display: grid;
     gap: 0.35rem;
     padding: 0.95rem;
@@ -856,24 +856,24 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     background: rgba(247, 250, 255, 0.92);
 }
 
-.productPage__factValue {
+.product-page__fact-value {
     color: #08173f;
     line-height: 1.4;
 }
 
-.productPage__ctaRow {
+.product-page__cta-row {
     display: flex;
     align-items: end;
     gap: 1rem;
     margin-top: 1.35rem;
 }
 
-.productPage__qtyBlock {
+.product-page__qty-block {
     display: grid;
     gap: 0.55rem;
 }
 
-.productPage__qtyControl {
+.product-page__qty-control {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem;
@@ -882,20 +882,20 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     background: rgba(247, 250, 255, 0.95);
 }
 
-.productPage__qtyValue {
+.product-page__qty-value {
     min-width: 2.2rem;
     color: #08173f;
     font-weight: 700;
     text-align: center;
 }
 
-.productPage__cartBtn {
+.product-page__cart-btn {
     min-width: min(18rem, 100%);
     min-height: 3.1rem;
     font-weight: 700;
 }
 
-.productPage__outOfStockCard {
+.product-page__out-of-stock-card {
     margin-top: 1.35rem;
     padding: 1rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
@@ -903,119 +903,147 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     background: rgba(247, 250, 255, 0.92);
 }
 
-.productPage__serviceGrid {
+.product-page__service-grid {
     display: grid;
     gap: 0.85rem;
     margin-top: 1.35rem;
 }
 
-.productPage__serviceItem {
+.product-page__service-item {
     display: flex;
     align-items: center;
     gap: 0.65rem;
     color: #33415f;
 }
 
-.productPage__detailsGrid {
+.product-page__details-grid {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-top: 3rem;
 }
 
-.productPage__sectionTitle {
+.product-page__section-title {
     margin: 1rem 0 0.75rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 2.2rem;
     line-height: 1.08;
 }
 
-.productPage__accordion {
+.product-page__accordion {
     margin-top: 1.15rem;
 }
 
-.productPage__detailList {
+.product-page__detail-list {
     margin: 0;
     padding-left: 1.15rem;
     color: #4b5874;
     line-height: 1.8;
 }
 
-.productPage__related {
-    margin-top: clamp(2.25rem, 4vw, 3.5rem);
+.product-page__related {
+    margin-top: 3.5rem;
 }
 
-.productPage__relatedIntro {
+.product-page__related-intro {
     max-width: 38rem;
     margin-bottom: 1.5rem;
 }
 
-.productPage__relatedGrid {
+.product-page__related-grid {
     margin-top: 0;
 }
 
 @media screen and (max-width: 1200px) {
-    .productPage__heroGrid,
-    .productPage__detailsGrid {
+    .product-page__hero-grid,
+    .product-page__details-grid {
         grid-template-columns: 1fr;
     }
 
-    .productPage__galleryCard {
+    .product-page__gallery-card {
         position: static;
     }
 }
 
 @media screen and (max-width: 800px) {
-    .productPage__hero {
+    .product-page__hero {
         padding: 3.75rem 0 3.5rem;
     }
 
-    .productPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .product-page__hero-grid,
+    .product-page__details-grid {
+        gap: 1.5rem;
+    }
+
+    .product-page__title {
+        font-size: 2.8rem;
         line-height: 1;
     }
 
-    .productPage__galleryCard,
-    .productPage__introCard,
-    .productPage__purchaseCard,
-    .productPage__detailsCard,
-    .productPage__reviewsCard {
+    .product-page__intro-card,
+    .product-page__purchase-card,
+    .product-page__details-card,
+    .product-page__reviews-card {
+        padding: 1.4rem;
+    }
+
+    .product-page__gallery-card,
+    .product-page__intro-card,
+    .product-page__purchase-card,
+    .product-page__details-card,
+    .product-page__reviews-card {
         border-radius: 1.2rem;
     }
 
-    .productPage__thumbGrid,
-    .productPage__factsGrid {
+    .product-page__price {
+        font-size: 1.8rem;
+    }
+
+    .product-page__details-grid {
+        margin-top: 2rem;
+    }
+
+    .product-page__section-title {
+        font-size: 1.6rem;
+    }
+
+    .product-page__related {
+        margin-top: 2.25rem;
+    }
+
+    .product-page__thumb-grid,
+    .product-page__facts-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .productPage__ctaRow,
-    .productPage__reviewsHeader,
-    .productPage__introTop,
-    .productPage__labelRow {
+    .product-page__cta-row,
+    .product-page__reviews-header,
+    .product-page__intro-top,
+    .product-page__label-row {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .productPage__cartBtn {
+    .product-page__cart-btn {
         width: 100%;
     }
 }
 
 @media screen and (max-width: 560px) {
-    .productPage__thumbGrid,
-    .productPage__factsGrid {
+    .product-page__thumb-grid,
+    .product-page__facts-grid {
         grid-template-columns: 1fr;
     }
 
-    .productPage__variantToggle {
+    .product-page__variant-toggle {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .productPage__variantBtn {
+    .product-page__variant-btn {
         width: 100%;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .productPage__thumbButton {
+    .product-page__thumb-button {
         transition: none;
     }
 }

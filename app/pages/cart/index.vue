@@ -223,92 +223,95 @@ async function updateCart(): Promise<void> {
 </script>
 
 <template>
-    <main class="cartPage">
-        <div class="cartPage__hero">
-            <VContainer class="cartPage__container">
-                <div v-if="isCartLoading" class="cartPage__loadingState">
+    <main class="cart-page">
+        <div class="cart-page__hero">
+            <VContainer class="cart-page__container">
+                <div v-if="isCartLoading" class="cart-page__loading-state">
                     <VProgressCircular indeterminate color="primary" size="40" />
-                    <p class="cartPage__loadingText">Loading your cart...</p>
+                    <p class="cart-page__loading-text">Loading your cart...</p>
                 </div>
                 <template v-else>
-                    <div class="cartPage__heroGrid">
-                        <div class="cartPage__heroCopy">
-                            <span class="cartPage__eyebrow">Shopping cart</span>
-                            <h1 class="cartPage__title">Review your picks before you head to checkout.</h1>
-                            <p class="cartPage__description">
+                    <div class="cart-page__hero-grid">
+                        <div class="cart-page__hero-copy">
+                            <span class="cart-page__eyebrow">Shopping cart</span>
+                            <h1 class="cart-page__title">Review your picks before you head to checkout.</h1>
+                            <p class="cart-page__description">
                                 Fine-tune quantities, remove anything that no longer fits, and keep your order feeling as considered as the
                                 rest of the shop.
                             </p>
-                            <div class="cartPage__heroActions">
+                            <div class="cart-page__hero-actions">
                                 <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" :to="ALL_PRODUCTS_URL_HANDLE">
                                     Continue shopping
                                 </VBtn>
-                                <div class="cartPage__statCard">
-                                    <span class="cartPage__statLabel">Current total</span>
-                                    <strong class="cartPage__statValue">{{ formatPrice(Number(cart?.total || 0), currencyCode) }}</strong>
+                                <div class="cart-page__stat-card">
+                                    <span class="cart-page__stat-label">Current total</span>
+                                    <strong class="cart-page__stat-value">{{ formatPrice(Number(cart?.total || 0), currencyCode) }}</strong>
                                 </div>
                             </div>
                         </div>
-                        <div class="cartPage__heroPanel">
-                            <span class="cartPage__panelLabel">Checkout notes</span>
-                            <h2 class="cartPage__panelTitle">Everything stays editable until the final step.</h2>
-                            <p class="cartPage__panelText">
+                        <div class="cart-page__hero-panel">
+                            <span class="cart-page__panel-label">Checkout notes</span>
+                            <h2 class="cart-page__panel-title">Everything stays editable until the final step.</h2>
+                            <p class="cart-page__panel-text">
                                 Confirm quantities here, apply a promotion if you have one, and continue when your basket looks right.
                             </p>
-                            <ul class="cartPage__promiseList">
-                                <li class="cartPage__promiseItem">
+                            <ul class="cart-page__promise-list">
+                                <li class="cart-page__promise-item">
                                     <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
                                     <span>Live totals update after cart changes are applied</span>
                                 </li>
-                                <li class="cartPage__promiseItem">
+                                <li class="cart-page__promise-item">
                                     <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
                                     <span>Promo codes can be added before checkout</span>
                                 </li>
-                                <li class="cartPage__promiseItem">
+                                <li class="cart-page__promise-item">
                                     <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
                                     <span>Shipping is confirmed in the next step</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <div class="cartPage__contentGrid">
-                        <div class="cartPage__itemsPanel">
-                            <div v-if="cart?.items?.length" class="cartPage__itemList">
-                                <article v-for="item in cart?.items || []" :key="item.id" class="cartPage__itemCard">
-                                    <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="cartPage__imageLink">
+                    <div class="cart-page__content-grid">
+                        <div class="cart-page__items-panel">
+                            <div v-if="cart?.items?.length" class="cart-page__item-list">
+                                <article v-for="item in cart?.items || []" :key="item.id" class="cart-page__item-card">
+                                    <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="cart-page__image-link">
                                         <VImg
                                             :src="item.thumbnail || '/images/placeholder.png'"
                                             :alt="item.product_title ?? ''"
                                             width="116"
                                             height="136"
-                                            class="cartPage__itemImage"
+                                            class="cart-page__item-image"
                                             cover
                                         />
                                     </NuxtLink>
-                                    <div class="cartPage__itemBody">
-                                        <div class="cartPage__itemTop">
+                                    <div class="cart-page__item-body">
+                                        <div class="cart-page__item-top">
                                             <div>
-                                                <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`" class="cartPage__itemTitle">
+                                                <NuxtLink
+                                                    :to="`${PRODUCT_URL_HANDLE}/${item.product_handle}`"
+                                                    class="cart-page__item-title"
+                                                >
                                                     {{ item.product_title }}
                                                 </NuxtLink>
-                                                <p class="cartPage__itemDescription">{{ item.product_description }}</p>
-                                                <p class="cartPage__itemMeta">Option: {{ item.variant_title || "Standard option" }}</p>
-                                                <p class="cartPage__itemMeta">Code: {{ item.variant_sku ?? "N/A" }}</p>
+                                                <p class="cart-page__item-description">{{ item.product_description }}</p>
+                                                <p class="cart-page__item-meta">Option: {{ item.variant_title || "Standard option" }}</p>
+                                                <p class="cart-page__item-meta">Code: {{ item.variant_sku ?? "N/A" }}</p>
                                             </div>
                                             <VBtn
                                                 icon
                                                 variant="text"
-                                                class="cartPage__removeBtn"
+                                                class="cart-page__remove-btn"
                                                 aria-label="Remove"
                                                 @click="removeItem(item.id)"
                                             >
                                                 <VIcon>mdi-delete-outline</VIcon>
                                             </VBtn>
                                         </div>
-                                        <div class="cartPage__itemFooter">
-                                            <div class="cartPage__qtySection">
-                                                <span class="cartPage__qtyLabel">Quantity</span>
-                                                <div class="cartPage__qtyControl">
+                                        <div class="cart-page__item-footer">
+                                            <div class="cart-page__qty-section">
+                                                <span class="cart-page__qty-label">Quantity</span>
+                                                <div class="cart-page__qty-control">
                                                     <VBtn
                                                         icon
                                                         size="x-small"
@@ -324,7 +327,7 @@ async function updateCart(): Promise<void> {
                                                         hide-details
                                                         variant="plain"
                                                         density="compact"
-                                                        class="cartPage__qtyInput"
+                                                        class="cart-page__qty-input"
                                                         @update:model-value="
                                                             (val) =>
                                                                 debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
@@ -341,8 +344,8 @@ async function updateCart(): Promise<void> {
                                                     </VBtn>
                                                 </div>
                                             </div>
-                                            <div class="cartPage__priceBlock">
-                                                <span class="cartPage__priceLabel">Line total</span>
+                                            <div class="cart-page__price-block">
+                                                <span class="cart-page__price-label">Line total</span>
                                                 <TaxedLinePrice
                                                     :amount-with-tax="getAmountWithTax(item)"
                                                     :amount-without-tax="getAmountWithoutTax(item)"
@@ -354,7 +357,7 @@ async function updateCart(): Promise<void> {
                                 <VBtn
                                     color="primary"
                                     rounded="pill"
-                                    class="cartPage__updateBtn text-none"
+                                    class="cart-page__update-btn text-none"
                                     block
                                     :loading="isUpdatingCart"
                                     :disabled="!isCartDirty || isUpdatingCart"
@@ -363,12 +366,12 @@ async function updateCart(): Promise<void> {
                                     Update cart
                                 </VBtn>
                             </div>
-                            <div v-else class="cartPage__emptyState">
-                                <div class="cartPage__emptyIcon">
+                            <div v-else class="cart-page__empty-state">
+                                <div class="cart-page__empty-icon">
                                     <VIcon size="26">mdi-cart-outline</VIcon>
                                 </div>
-                                <h2 class="cartPage__emptyTitle">Your cart is empty</h2>
-                                <p class="cartPage__emptyText">
+                                <h2 class="cart-page__empty-title">Your cart is empty</h2>
+                                <p class="cart-page__empty-text">
                                     Add a few products you love and come back here to review everything before checkout.
                                 </p>
                                 <VBtn color="primary" rounded="pill" class="text-none px-6" :to="ALL_PRODUCTS_URL_HANDLE">
@@ -376,15 +379,15 @@ async function updateCart(): Promise<void> {
                                 </VBtn>
                             </div>
                         </div>
-                        <aside class="cartPage__summaryColumn">
-                            <div class="cartPage__summaryCard">
-                                <span class="cartPage__sectionEyebrow">Order summary</span>
-                                <h2 class="cartPage__sectionTitle">A clean view of what you are about to order.</h2>
-                                <p class="cartPage__sectionText">
+                        <aside class="cart-page__summary-column">
+                            <div class="cart-page__summary-card">
+                                <span class="cart-page__section-eyebrow">Order summary</span>
+                                <h2 class="cart-page__section-title">A clean view of what you are about to order.</h2>
+                                <p class="cart-page__section-text">
                                     Apply a promotion, review the totals, and continue once cart updates are saved.
                                 </p>
 
-                                <VForm class="cartPage__couponForm" @submit.prevent="applyCoupon">
+                                <VForm class="cart-page__coupon-form" @submit.prevent="applyCoupon">
                                     <VTextField
                                         v-model="couponCode"
                                         name="couponTextInput"
@@ -406,13 +409,13 @@ async function updateCart(): Promise<void> {
                                         Apply code
                                     </VBtn>
                                 </VForm>
-                                <p class="cartPage__couponHint">{{ couponHint }}</p>
-                                <div v-if="cart?.promotions?.length" class="cartPage__promoList">
-                                    <h3 class="cartPage__promoHeading">Applied promotions</h3>
-                                    <div v-for="promo in cart?.promotions" :key="promo.id" class="cartPage__promoItem">
+                                <p class="cart-page__coupon-hint">{{ couponHint }}</p>
+                                <div v-if="cart?.promotions?.length" class="cart-page__promo-list">
+                                    <h3 class="cart-page__promo-heading">Applied promotions</h3>
+                                    <div v-for="promo in cart?.promotions" :key="promo.id" class="cart-page__promo-item">
                                         <div>
-                                            <strong class="cartPage__promoCode">{{ promo.code }}</strong>
-                                            <p class="cartPage__promoValue">
+                                            <strong class="cart-page__promo-code">{{ promo.code }}</strong>
+                                            <p class="cart-page__promo-value">
                                                 {{ formatPrice(Number(promo.application_method?.value) ?? 0, currencyCode) }}
                                             </p>
                                         </div>
@@ -428,27 +431,27 @@ async function updateCart(): Promise<void> {
                                     </div>
                                 </div>
                                 <VDivider class="my-5" />
-                                <div class="cartPage__totals">
-                                    <div class="cartPage__totalRow">
-                                        <span class="cartPage__totalLabel">Subtotal</span>
-                                        <span class="cartPage__totalValue">{{
+                                <div class="cart-page__totals">
+                                    <div class="cart-page__total-row">
+                                        <span class="cart-page__total-label">Subtotal</span>
+                                        <span class="cart-page__total-value">{{
                                             formatPrice(Number(cart?.subtotal || 0), currencyCode)
                                         }}</span>
                                     </div>
-                                    <div class="cartPage__totalRow">
-                                        <span class="cartPage__totalLabel">Tax</span>
-                                        <span class="cartPage__totalValue">{{
+                                    <div class="cart-page__total-row">
+                                        <span class="cart-page__total-label">Tax</span>
+                                        <span class="cart-page__total-value">{{
                                             formatPrice(Number(cart?.tax_total || 0), currencyCode)
                                         }}</span>
                                     </div>
-                                    <div class="cartPage__totalRow">
-                                        <span class="cartPage__totalLabel">Total</span>
-                                        <strong class="cartPage__grandTotal">{{
+                                    <div class="cart-page__total-row">
+                                        <span class="cart-page__total-label">Total</span>
+                                        <strong class="cart-page__grand-total">{{
                                             formatPrice(Number(cart?.total || 0), currencyCode)
                                         }}</strong>
                                     </div>
                                 </div>
-                                <p class="cartPage__summaryNote">Shipping is calculated during the next step.</p>
+                                <p class="cart-page__summary-note">Shipping is calculated during the next step.</p>
                                 <VBtn
                                     color="primary"
                                     rounded="pill"
@@ -469,48 +472,48 @@ async function updateCart(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.cartPage {
+.cart-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.cartPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+.cart-page__hero {
+    padding: 6.5rem 0 6rem;
 }
 
-.cartPage__container {
+.cart-page__container {
     position: relative;
     z-index: 1;
 }
 
-.cartPage__heroGrid,
-.cartPage__contentGrid {
+.cart-page__hero-grid,
+.cart-page__content-grid {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
 }
 
-.cartPage__heroGrid {
+.cart-page__hero-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
     align-items: end;
-    margin-bottom: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 3rem;
 }
 
-.cartPage__heroCopy,
-.cartPage__heroPanel,
-.cartPage__itemsPanel,
-.cartPage__summaryColumn {
+.cart-page__hero-copy,
+.cart-page__hero-panel,
+.cart-page__items-panel,
+.cart-page__summary-column {
     animation: cart-rise 0.8s ease both;
 }
 
-.cartPage__heroPanel,
-.cartPage__summaryColumn {
+.cart-page__hero-panel,
+.cart-page__summary-column {
     animation-delay: 0.12s;
 }
 
-.cartPage__eyebrow,
-.cartPage__panelLabel,
-.cartPage__sectionEyebrow {
+.cart-page__eyebrow,
+.cart-page__panel-label,
+.cart-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -524,37 +527,37 @@ async function updateCart(): Promise<void> {
     text-transform: uppercase;
 }
 
-.cartPage__title,
-.cartPage__panelTitle,
-.cartPage__sectionTitle,
-.cartPage__emptyTitle {
+.cart-page__title,
+.cart-page__panel-title,
+.cart-page__section-title,
+.cart-page__empty-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.cartPage__title {
+.cart-page__title {
     max-width: 11ch;
     margin: 1rem 0;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 4.5rem;
     line-height: 0.95;
 }
 
-.cartPage__description,
-.cartPage__panelText,
-.cartPage__sectionText,
-.cartPage__itemDescription,
-.cartPage__itemMeta,
-.cartPage__summaryNote,
-.cartPage__emptyText,
-.cartPage__loadingText {
+.cart-page__description,
+.cart-page__panel-text,
+.cart-page__section-text,
+.cart-page__item-description,
+.cart-page__item-meta,
+.cart-page__summary-note,
+.cart-page__empty-text,
+.cart-page__loading-text {
     margin: 0;
     color: #4b5874;
     font-size: 1rem;
     line-height: 1.75;
 }
 
-.cartPage__heroActions {
+.cart-page__hero-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -562,11 +565,11 @@ async function updateCart(): Promise<void> {
     margin-top: 1.75rem;
 }
 
-.cartPage__statCard,
-.cartPage__heroPanel,
-.cartPage__itemCard,
-.cartPage__summaryCard,
-.cartPage__emptyState {
+.cart-page__stat-card,
+.cart-page__hero-panel,
+.cart-page__item-card,
+.cart-page__summary-card,
+.cart-page__empty-state {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.82);
@@ -574,63 +577,63 @@ async function updateCart(): Promise<void> {
     backdrop-filter: blur(14px);
 }
 
-.cartPage__statCard {
+.cart-page__stat-card {
     display: grid;
     gap: 0.2rem;
     padding: 0.9rem 1.05rem;
 }
 
-.cartPage__statLabel,
-.cartPage__priceLabel,
-.cartPage__qtyLabel,
-.cartPage__totalLabel,
-.cartPage__promoValue {
+.cart-page__stat-label,
+.cart-page__price-label,
+.cart-page__qty-label,
+.cart-page__total-label,
+.cart-page__promo-value {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.cartPage__statValue,
-.cartPage__itemTitle,
-.cartPage__priceValue,
-.cartPage__grandTotal,
-.cartPage__promoCode {
+.cart-page__stat-value,
+.cart-page__item-title,
+.cart-page__price-value,
+.cart-page__grand-total,
+.cart-page__promo-code {
     color: #08173f;
 }
 
-.cartPage__heroPanel,
-.cartPage__summaryCard,
-.cartPage__emptyState {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.cart-page__hero-panel,
+.cart-page__summary-card,
+.cart-page__empty-state {
+    padding: 1.9rem;
 }
 
-.cartPage__panelLabel,
-.cartPage__sectionEyebrow {
+.cart-page__panel-label,
+.cart-page__section-eyebrow {
     margin-bottom: 1rem;
 }
 
-.cartPage__panelTitle,
-.cartPage__sectionTitle,
-.cartPage__emptyTitle {
+.cart-page__panel-title,
+.cart-page__section-title,
+.cart-page__empty-title {
     margin-bottom: 0.85rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 2.2rem;
     line-height: 1.08;
 }
 
-.cartPage__promiseList,
-.cartPage__itemList,
-.cartPage__promoList,
-.cartPage__totals {
+.cart-page__promise-list,
+.cart-page__item-list,
+.cart-page__promo-list,
+.cart-page__totals {
     display: grid;
     gap: 1rem;
 }
 
-.cartPage__promiseList {
+.cart-page__promise-list {
     margin: 1.4rem 0 0;
     padding: 0;
     list-style: none;
 }
 
-.cartPage__promiseItem {
+.cart-page__promise-item {
     display: flex;
     align-items: flex-start;
     gap: 0.7rem;
@@ -638,51 +641,51 @@ async function updateCart(): Promise<void> {
     line-height: 1.6;
 }
 
-.cartPage__contentGrid {
+.cart-page__content-grid {
     grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
     align-items: start;
 }
 
-.cartPage__itemCard {
+.cart-page__item-card {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 1.15rem;
     padding: 1.2rem;
 }
 
-.cartPage__imageLink {
+.cart-page__image-link {
     display: block;
 }
 
-.cartPage__itemImage {
+.cart-page__item-image {
     border-radius: 1.1rem;
     background: #edf2ff;
 }
 
-.cartPage__itemBody {
+.cart-page__item-body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     min-width: 0;
 }
 
-.cartPage__itemTop,
-.cartPage__itemFooter,
-.cartPage__promoItem,
-.cartPage__totalRow {
+.cart-page__item-top,
+.cart-page__item-footer,
+.cart-page__promo-item,
+.cart-page__total-row {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
 }
 
-.cartPage__itemTop,
-.cartPage__itemFooter,
-.cartPage__promoItem,
-.cartPage__totalRow {
+.cart-page__item-top,
+.cart-page__item-footer,
+.cart-page__promo-item,
+.cart-page__total-row {
     align-items: flex-start;
 }
 
-.cartPage__itemTitle {
+.cart-page__item-title {
     display: inline-block;
     margin-bottom: 0.45rem;
     font-size: 1.1rem;
@@ -691,34 +694,34 @@ async function updateCart(): Promise<void> {
     text-decoration: none;
 }
 
-.cartPage__itemTitle:hover {
+.cart-page__item-title:hover {
     text-decoration: underline;
 }
 
-.cartPage__itemDescription {
+.cart-page__item-description {
     margin-bottom: 0.45rem;
 }
 
-.cartPage__itemMeta {
+.cart-page__item-meta {
     font-size: 0.92rem;
     line-height: 1.55;
 }
 
-.cartPage__removeBtn {
+.cart-page__remove-btn {
     color: #08173f;
 }
 
-.cartPage__qtySection,
-.cartPage__priceBlock {
+.cart-page__qty-section,
+.cart-page__price-block {
     display: grid;
     gap: 0.45rem;
 }
 
-.cartPage__priceBlock {
+.cart-page__price-block {
     justify-items: end;
 }
 
-.cartPage__qtyControl {
+.cart-page__qty-control {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem;
@@ -727,46 +730,46 @@ async function updateCart(): Promise<void> {
     background: rgba(247, 250, 255, 0.95);
 }
 
-.cartPage__qtyInput {
+.cart-page__qty-input {
     max-width: 3.2rem;
 }
 
-.cartPage__qtyInput :deep(input) {
+.cart-page__qty-input :deep(input) {
     text-align: center;
     color: #08173f;
     font-weight: 700;
     padding: 0;
 }
 
-.cartPage__updateBtn {
+.cart-page__update-btn {
     margin-top: 0.25rem;
 }
 
-.cartPage__summaryColumn {
+.cart-page__summary-column {
     position: sticky;
     top: 1.5rem;
 }
 
-.cartPage__couponForm {
+.cart-page__coupon-form {
     display: grid;
     gap: 0.9rem;
     margin-top: 1.25rem;
 }
 
-.cartPage__couponHint {
+.cart-page__coupon-hint {
     margin: 0.75rem 0 0;
     color: rgba(8, 23, 63, 0.72);
     font-size: 0.95rem;
     line-height: 1.5;
 }
 
-.cartPage__promoHeading {
+.cart-page__promo-heading {
     margin: 0;
     color: #08173f;
     font-size: 1rem;
 }
 
-.cartPage__promoItem {
+.cart-page__promo-item {
     padding: 0.95rem 1rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1rem;
@@ -774,31 +777,31 @@ async function updateCart(): Promise<void> {
     align-items: center;
 }
 
-.cartPage__promoValue {
+.cart-page__promo-value {
     margin-top: 0.2rem;
 }
 
-.cartPage__totalValue,
-.cartPage__priceValue,
-.cartPage__grandTotal {
+.cart-page__total-value,
+.cart-page__price-value,
+.cart-page__grand-total {
     font-weight: 700;
 }
 
-.cartPage__grandTotal {
+.cart-page__grand-total {
     font-size: 1.1rem;
 }
 
-.cartPage__summaryNote {
+.cart-page__summary-note {
     margin: 0.25rem 0 0;
 }
 
-.cartPage__emptyState {
+.cart-page__empty-state {
     display: grid;
     justify-items: start;
     gap: 0.85rem;
 }
 
-.cartPage__emptyIcon {
+.cart-page__empty-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -809,7 +812,7 @@ async function updateCart(): Promise<void> {
     color: #010c80;
 }
 
-.cartPage__loadingState {
+.cart-page__loading-state {
     display: grid;
     justify-items: center;
     gap: 0.9rem;
@@ -829,63 +832,97 @@ async function updateCart(): Promise<void> {
 }
 
 @media screen and (max-width: 1100px) {
-    .cartPage__heroGrid,
-    .cartPage__contentGrid {
+    .cart-page__hero {
+        padding: 4.75rem 0 4rem;
+    }
+
+    .cart-page__hero-grid,
+    .cart-page__content-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
-    .cartPage__title {
+    .cart-page__hero-grid {
+        margin-bottom: 2rem;
+    }
+
+    .cart-page__title {
         max-width: 100%;
+        font-size: 3.25rem;
     }
 
-    .cartPage__summaryColumn {
+    .cart-page__hero-panel,
+    .cart-page__summary-card,
+    .cart-page__empty-state {
+        padding: 1.5rem;
+    }
+
+    .cart-page__panel-title,
+    .cart-page__section-title,
+    .cart-page__empty-title {
+        font-size: 1.8rem;
+    }
+
+    .cart-page__summary-column {
         position: static;
     }
 }
 
 @media screen and (max-width: 700px) {
-    .cartPage__hero {
+    .cart-page__hero {
         padding: 3.75rem 0 3.5rem;
     }
 
-    .cartPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .cart-page__title {
+        font-size: 2.4rem;
         line-height: 1;
     }
 
-    .cartPage__heroPanel,
-    .cartPage__summaryCard,
-    .cartPage__itemCard,
-    .cartPage__emptyState {
+    .cart-page__hero-panel,
+    .cart-page__summary-card,
+    .cart-page__item-card,
+    .cart-page__empty-state {
         border-radius: 1.2rem;
     }
 
-    .cartPage__itemCard {
+    .cart-page__hero-panel,
+    .cart-page__summary-card,
+    .cart-page__empty-state {
+        padding: 1.4rem;
+    }
+
+    .cart-page__panel-title,
+    .cart-page__section-title,
+    .cart-page__empty-title {
+        font-size: 1.6rem;
+    }
+
+    .cart-page__item-card {
         grid-template-columns: 1fr;
     }
 
-    .cartPage__itemImage {
+    .cart-page__item-image {
         width: 100% !important;
         height: 14rem !important;
     }
 
-    .cartPage__itemTop,
-    .cartPage__itemFooter,
-    .cartPage__promoItem,
-    .cartPage__totalRow {
+    .cart-page__item-top,
+    .cart-page__item-footer,
+    .cart-page__promo-item,
+    .cart-page__total-row {
         flex-direction: column;
     }
 
-    .cartPage__priceBlock {
+    .cart-page__price-block {
         justify-items: start;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .cartPage__heroCopy,
-    .cartPage__heroPanel,
-    .cartPage__itemsPanel,
-    .cartPage__summaryColumn {
+    .cart-page__hero-copy,
+    .cart-page__hero-panel,
+    .cart-page__items-panel,
+    .cart-page__summary-column {
         animation: none;
     }
 }

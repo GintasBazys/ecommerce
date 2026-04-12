@@ -1,9 +1,9 @@
-.bannerSection {
+.banner-section {
     background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
     overflow: visible;
 }
 
-.bannerSwiper {
+.banner-swiper {
     --header-offset: 96px;
     --banner-primary: #010c80;
     --banner-secondary: #0023ff;
@@ -24,7 +24,13 @@
         isolation: isolate;
         background:
             radial-gradient(circle at top right, rgba(0, 128, 255, 0.28), transparent 30%),
-            linear-gradient(110deg, rgba(1, 12, 128, 0.9) 0%, rgba(1, 12, 128, 0.62) 42%, rgba(1, 12, 128, 0.2) 70%, rgba(1, 12, 128, 0.08) 100%);
+            linear-gradient(
+                110deg,
+                rgba(1, 12, 128, 0.9) 0%,
+                rgba(1, 12, 128, 0.62) 42%,
+                rgba(1, 12, 128, 0.2) 70%,
+                rgba(1, 12, 128, 0.08) 100%
+            );
     }
 
     &__image {
@@ -140,7 +146,7 @@
         box-shadow: 0 18px 60px rgba(0, 10, 60, 0.22);
     }
 
-    &__cardLabel {
+    &__card-label {
         display: inline-block;
         margin-bottom: 0.85rem;
         color: #dce7ff;
@@ -150,14 +156,14 @@
         text-transform: uppercase;
     }
 
-    &__cardText {
+    &__card-text {
         margin-bottom: 1.25rem;
         color: #ffffff;
         font-size: 1.05rem;
         line-height: 1.7;
     }
 
-    &__cardAccent {
+    &__card-accent {
         width: 100%;
         height: 0.4rem;
         border-radius: 999px;
@@ -165,15 +171,15 @@
     }
 }
 
-.bannerSwiper .swiper-slide-active .bannerSwiper__image {
+.banner-swiper .swiper-slide-active .banner-swiper__image {
     transform: scale(1.08);
 }
 
-.bannerSwiper .swiper-slide-active .bannerSwiper__content {
+.banner-swiper .swiper-slide-active .banner-swiper__content {
     animation: banner-rise 0.8s ease forwards;
 }
 
-.bannerSwiper .swiper-slide-active .bannerSwiper__card {
+.banner-swiper .swiper-slide-active .banner-swiper__card {
     animation: banner-rise 0.8s ease 0.18s forwards;
 }
 
@@ -190,7 +196,7 @@
 }
 
 @media screen and (max-width: 1024px) {
-    .bannerSwiper {
+    .banner-swiper {
         --banner-min-height: calc(100svh - var(--header-offset));
 
         &__inner {
@@ -215,7 +221,7 @@
 }
 
 @media screen and (max-width: 767px) {
-    .bannerSwiper {
+    .banner-swiper {
         --header-offset: 96px;
         --banner-min-height: calc(100svh - var(--header-offset));
         min-height: var(--banner-min-height);
@@ -264,7 +270,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .bannerSwiper {
+    .banner-swiper {
         &__image,
         &__content,
         &__card {

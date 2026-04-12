@@ -35,28 +35,28 @@ const hasTax = computed(() => props.amountWithTax > props.amountWithoutTax)
 </script>
 
 <template>
-    <div class="taxedLinePrice">
-        <strong class="taxedLinePrice__amount">{{ displayPrice }}</strong>
-        <span v-if="showTaxLabel && hasTax && taxLabel" class="taxedLinePrice__tax">{{ taxLabel }}</span>
+    <div class="taxed-line-price">
+        <strong class="taxed-line-price__amount">{{ displayPrice }}</strong>
+        <span v-if="showTaxLabel && hasTax && taxLabel" class="taxed-line-price__tax">{{ taxLabel }}</span>
     </div>
 </template>
 
 <style scoped lang="scss">
-.taxedLinePrice {
+.taxed-line-price {
     display: grid;
     gap: 0.2rem;
     justify-items: end;
+}
 
-    &__amount {
-        color: inherit;
-        font: inherit;
-        font-weight: 700;
-    }
+.taxed-line-price__amount {
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+}
 
-    &__tax {
-        color: #5a6480;
-        font-size: 0.82rem;
-        line-height: 1.4;
-    }
+.taxed-line-price__tax {
+    color: #5a6480;
+    font-size: 0.82rem;
+    line-height: 1.4;
 }
 </style>

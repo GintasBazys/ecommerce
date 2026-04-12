@@ -21,19 +21,19 @@ const policies = ref<Policies[]>([
 </script>
 
 <template>
-    <section class="policiesStrip">
-        <VContainer class="policiesStrip__container">
-            <VRow class="policiesStrip__grid" align="stretch">
-                <VCol v-for="policy in policies" :key="policy.title" cols="12" md="4" class="policiesStrip__col">
-                    <article class="policiesStrip__card">
-                        <div class="policiesStrip__iconWrap">
-                            <VIcon size="26" class="policiesStrip__icon">
+    <section class="policies-strip">
+        <VContainer class="policies-strip__container">
+            <VRow class="policies-strip__grid" align="stretch">
+                <VCol v-for="policy in policies" :key="policy.title" cols="12" md="4" class="policies-strip__col">
+                    <article class="policies-strip__card">
+                        <div class="policies-strip__icon-wrap">
+                            <VIcon size="26" class="policies-strip__icon">
                                 {{ policy.icon }}
                             </VIcon>
                         </div>
-                        <div class="policiesStrip__content">
-                            <h3 class="policiesStrip__title">{{ policy.title }}</h3>
-                            <p class="policiesStrip__description">{{ policy.description }}</p>
+                        <div class="policies-strip__content">
+                            <h3 class="policies-strip__title">{{ policy.title }}</h3>
+                            <p class="policies-strip__description">{{ policy.description }}</p>
                         </div>
                     </article>
                 </VCol>
@@ -43,85 +43,84 @@ const policies = ref<Policies[]>([
 </template>
 
 <style scoped lang="scss">
-.policiesStrip {
+.policies-strip {
     position: relative;
     overflow: hidden;
     padding: clamp(3rem, 5vw, 4.5rem) 0;
-    background:
-        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
 
-    &__container {
-        position: relative;
-        z-index: 1;
-    }
+.policies-strip__container {
+    position: relative;
+    z-index: 1;
+}
 
-    &__grid {
-        row-gap: 1rem;
-    }
+.policies-strip__grid {
+    row-gap: 1rem;
+}
 
-    &__col {
-        animation: policies-rise 0.72s ease both;
+.policies-strip__col {
+    animation: policies-rise 0.72s ease both;
+}
 
-        &:nth-child(2) {
-            animation-delay: 0.08s;
-        }
+.policies-strip__col:nth-child(2) {
+    animation-delay: 0.08s;
+}
 
-        &:nth-child(3) {
-            animation-delay: 0.14s;
-        }
-    }
+.policies-strip__col:nth-child(3) {
+    animation-delay: 0.14s;
+}
 
-    &__card {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        align-items: start;
-        gap: 1rem;
-        height: 100%;
-        padding: 1.2rem;
-        border: 1px solid rgba(8, 23, 63, 0.08);
-        border-radius: 1.35rem;
-        background: rgba(255, 255, 255, 0.88);
-        transition:
-            transform 0.28s ease,
-            border-color 0.28s ease,
-            background-color 0.28s ease;
+.policies-strip__card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 1rem;
+    height: 100%;
+    padding: 1.2rem;
+    border: 1px solid rgba(8, 23, 63, 0.08);
+    border-radius: 1.35rem;
+    background: rgba(255, 255, 255, 0.88);
+    transition:
+        transform 0.28s ease,
+        border-color 0.28s ease,
+        background-color 0.28s ease;
+}
 
-        &:hover {
-            transform: translateY(-3px);
-            border-color: rgba(1, 12, 128, 0.16);
-            background: #ffffff;
-        }
-    }
+.policies-strip__card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(1, 12, 128, 0.16);
+    background: #ffffff;
+}
 
-    &__iconWrap {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        width: 3rem;
-        height: 3rem;
-        border-radius: 1rem;
-        background: linear-gradient(135deg, rgba(1, 12, 128, 0.08), rgba(0, 128, 255, 0.14));
-        color: #010c80;
-        flex-shrink: 0;
-    }
+.policies-strip__icon-wrap {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(1, 12, 128, 0.08), rgba(0, 128, 255, 0.14));
+    color: #010c80;
+    flex-shrink: 0;
+}
 
-    &__content {
-        min-width: 0;
-    }
+.policies-strip__content {
+    min-width: 0;
+}
 
-    &__title {
-        margin-bottom: 0.35rem;
-        color: #08173f;
-        font-size: 1rem;
-        line-height: 1.35;
-    }
+.policies-strip__title {
+    margin-bottom: 0.35rem;
+    color: #08173f;
+    font-size: 1rem;
+    line-height: 1.35;
+}
 
-    &__description {
-        margin-bottom: 0;
-        color: #5a6480;
-        font-size: 0.92rem;
-        line-height: 1.65;
-    }
+.policies-strip__description {
+    margin-bottom: 0;
+    color: #5a6480;
+    font-size: 0.92rem;
+    line-height: 1.65;
 }
 
 @keyframes policies-rise {
@@ -137,23 +136,21 @@ const policies = ref<Policies[]>([
 }
 
 @media screen and (max-width: 767px) {
-    .policiesStrip {
+    .policies-strip {
         padding: 2.5rem 0;
+    }
 
-        &__card {
-            grid-template-columns: 1fr;
-            gap: 0.85rem;
-        }
+    .policies-strip__card {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .policiesStrip {
-        &__col,
-        &__card {
-            animation: none;
-            transition: none;
-        }
+    .policies-strip__col,
+    .policies-strip__card {
+        animation: none;
+        transition: none;
     }
 }
 </style>

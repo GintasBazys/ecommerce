@@ -638,53 +638,56 @@ watch(cartFingerprint, scheduleRefresh)
 </script>
 
 <template>
-    <section class="checkoutPage">
-        <div class="checkoutPage__hero">
-            <VContainer class="checkoutPage__container">
-                <div v-if="isBooting" class="checkoutPage__loadingState">
+    <section class="checkout-page">
+        <div class="checkout-page__hero">
+            <VContainer class="checkout-page__container">
+                <div v-if="isBooting" class="checkout-page__loading-state">
                     <VProgressCircular indeterminate color="primary" size="40" />
-                    <p class="checkoutPage__loadingText">Preparing your checkout...</p>
+                    <p class="checkout-page__loading-text">Preparing your checkout...</p>
                 </div>
                 <template v-else>
-                    <div class="checkoutPage__heroGrid">
-                        <div class="checkoutPage__copy">
-                            <span class="checkoutPage__eyebrow">Single-page checkout</span>
-                            <h1 class="checkoutPage__title">Move from cart to confirmation in one calm, guided flow.</h1>
-                            <p class="checkoutPage__description">
+                    <div class="checkout-page__hero-grid">
+                        <div class="checkout-page__copy">
+                            <span class="checkout-page__eyebrow">Single-page checkout</span>
+                            <h1 class="checkout-page__title">Move from cart to confirmation in one calm, guided flow.</h1>
+                            <p class="checkout-page__description">
                                 Sign in or continue as a guest, add your delivery details, pick shipping, and finish payment without hopping
                                 across separate pages.
                             </p>
                         </div>
-                        <div class="checkoutPage__progressCard">
-                            <div v-for="(step, index) in stepItems" :key="step.key" class="checkoutPage__stepItem">
+                        <div class="checkout-page__progress-card">
+                            <div v-for="(step, index) in stepItems" :key="step.key" class="checkout-page__step-item">
                                 <div
-                                    class="checkoutPage__stepNumber"
-                                    :class="{ 'checkoutPage__stepNumber--active': currentStep === step.key }"
+                                    class="checkout-page__step-number"
+                                    :class="{ 'checkout-page__step-number--active': currentStep === step.key }"
                                 >
                                     {{ index + 1 }}
                                 </div>
                                 <div>
-                                    <div class="checkoutPage__stepLabel">{{ step.label }}</div>
-                                    <div class="checkoutPage__stepText">{{ step.description }}</div>
+                                    <div class="checkout-page__step-label">{{ step.label }}</div>
+                                    <div class="checkout-page__step-text">{{ step.description }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="checkoutPage__contentGrid">
-                        <div class="checkoutPage__main">
+                    <div class="checkout-page__content-grid">
+                        <div class="checkout-page__main">
                             <VAlert v-if="errorMessage" type="error" variant="tonal" class="mb-4">
                                 {{ errorMessage }}
                             </VAlert>
-                            <section class="checkoutPage__section" :class="{ 'checkoutPage__section--active': currentStep === 'account' }">
-                                <div class="checkoutPage__sectionIntro">
-                                    <span class="checkoutPage__sectionEyebrow">Step 1</span>
-                                    <h2 class="checkoutPage__sectionTitle">Account or guest</h2>
-                                    <p class="checkoutPage__sectionText">Choose the quickest way to continue with this order.</p>
+                            <section
+                                class="checkout-page__section"
+                                :class="{ 'checkout-page__section--active': currentStep === 'account' }"
+                            >
+                                <div class="checkout-page__section-intro">
+                                    <span class="checkout-page__section-eyebrow">Step 1</span>
+                                    <h2 class="checkout-page__section-title">Account or guest</h2>
+                                    <p class="checkout-page__section-text">Choose the quickest way to continue with this order.</p>
                                 </div>
-                                <div v-if="identityCompleted" class="checkoutPage__statusCard">
+                                <div v-if="identityCompleted" class="checkout-page__status-card">
                                     <div>
-                                        <strong class="checkoutPage__statusTitle">Checkout identity ready</strong>
-                                        <p class="checkoutPage__statusText">
+                                        <strong class="checkout-page__status-title">Checkout identity ready</strong>
+                                        <p class="checkout-page__status-text">
                                             {{ customer?.email || checkoutEmail }}
                                         </p>
                                     </div>
@@ -692,18 +695,18 @@ watch(cartFingerprint, scheduleRefresh)
                                         Continue
                                     </VBtn>
                                 </div>
-                                <div v-else class="checkoutPage__sectionCard">
-                                    <VTabs v-model="authTab" grow class="checkoutPage__tabs">
+                                <div v-else class="checkout-page__section-card">
+                                    <VTabs v-model="authTab" grow class="checkout-page__tabs">
                                         <VTab value="login" class="text-none">Login</VTab>
                                         <VTab value="register" class="text-none">Create account</VTab>
                                         <VTab value="guest" class="text-none">Guest</VTab>
                                     </VTabs>
-                                    <VWindow v-model="authTab" class="checkoutPage__window">
+                                    <VWindow v-model="authTab" class="checkout-page__window">
                                         <VWindowItem value="login">
-                                            <div class="checkoutPage__socialButtons">
+                                            <div class="checkout-page__social-buttons">
                                                 <VBtn
                                                     block
-                                                    class="checkoutPage__socialBtn text-none"
+                                                    class="checkout-page__social-btn text-none"
                                                     color="white"
                                                     @click="handleCheckoutSocialLogin('google')"
                                                 >
@@ -712,7 +715,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                 </VBtn>
                                                 <VBtn
                                                     block
-                                                    class="checkoutPage__socialBtn text-none"
+                                                    class="checkout-page__social-btn text-none"
                                                     color="white"
                                                     @click="handleCheckoutSocialLogin('facebook')"
                                                 >
@@ -720,8 +723,8 @@ watch(cartFingerprint, scheduleRefresh)
                                                     Login with Facebook
                                                 </VBtn>
                                             </div>
-                                            <div class="checkoutPage__divider"><span>Or continue with email</span></div>
-                                            <VForm ref="loginFormRef" class="checkoutPage__form" @submit.prevent="handleCheckoutLogin">
+                                            <div class="checkout-page__divider"><span>Or continue with email</span></div>
+                                            <VForm ref="loginFormRef" class="checkout-page__form" @submit.prevent="handleCheckoutLogin">
                                                 <VTextField v-model="loginEmail" :rules="emailRules" label="Email" variant="outlined" />
                                                 <VTextField
                                                     v-model="loginPassword"
@@ -743,8 +746,8 @@ watch(cartFingerprint, scheduleRefresh)
                                             </VForm>
                                         </VWindowItem>
                                         <VWindowItem value="register">
-                                            <VForm class="checkoutPage__form" @submit.prevent="submitRegister">
-                                                <div class="checkoutPage__nameGrid">
+                                            <VForm class="checkout-page__form" @submit.prevent="submitRegister">
+                                                <div class="checkout-page__name-grid">
                                                     <VTextField v-model="regFirstName" label="First name" variant="outlined" required />
                                                     <VTextField v-model="regLastName" label="Last name" variant="outlined" required />
                                                 </div>
@@ -777,7 +780,7 @@ watch(cartFingerprint, scheduleRefresh)
                                             </VForm>
                                         </VWindowItem>
                                         <VWindowItem value="guest">
-                                            <VForm class="checkoutPage__form" @submit.prevent="submitGuest">
+                                            <VForm class="checkout-page__form" @submit.prevent="submitGuest">
                                                 <VTextField
                                                     v-model="guestEmail"
                                                     :rules="emailRules"
@@ -801,22 +804,25 @@ watch(cartFingerprint, scheduleRefresh)
                                     </VWindow>
                                 </div>
                             </section>
-                            <section class="checkoutPage__section" :class="{ 'checkoutPage__section--active': currentStep === 'address' }">
-                                <div class="checkoutPage__sectionIntro">
-                                    <span class="checkoutPage__sectionEyebrow">Step 2</span>
-                                    <h2 class="checkoutPage__sectionTitle">Billing and shipping</h2>
-                                    <p class="checkoutPage__sectionText">
+                            <section
+                                class="checkout-page__section"
+                                :class="{ 'checkout-page__section--active': currentStep === 'address' }"
+                            >
+                                <div class="checkout-page__section-intro">
+                                    <span class="checkout-page__section-eyebrow">Step 2</span>
+                                    <h2 class="checkout-page__section-title">Billing and shipping</h2>
+                                    <p class="checkout-page__section-text">
                                         Add the address details for this order without leaving checkout.
                                     </p>
                                 </div>
-                                <div v-if="!identityCompleted" class="checkoutPage__disabledCard">
+                                <div v-if="!identityCompleted" class="checkout-page__disabled-card">
                                     Complete the account step first to unlock the address form.
                                 </div>
-                                <div v-else class="checkoutPage__sectionCard">
-                                    <VForm ref="addressFormRef" class="checkoutPage__form" @submit.prevent="submitAddresses">
-                                        <div class="checkoutPage__subsection">
-                                            <h3 class="checkoutPage__subsectionTitle">Billing address</h3>
-                                            <div class="checkoutPage__nameGrid">
+                                <div v-else class="checkout-page__section-card">
+                                    <VForm ref="addressFormRef" class="checkout-page__form" @submit.prevent="submitAddresses">
+                                        <div class="checkout-page__subsection">
+                                            <h3 class="checkout-page__subsection-title">Billing address</h3>
+                                            <div class="checkout-page__name-grid">
                                                 <VTextField
                                                     v-model="billingAddress.first_name"
                                                     label="First name"
@@ -837,7 +843,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                 variant="outlined"
                                             />
                                             <VTextField v-model="billingAddress.address_2" label="Address line 2" variant="outlined" />
-                                            <div class="checkoutPage__tripleGrid">
+                                            <div class="checkout-page__triple-grid">
                                                 <VTextField
                                                     v-model="billingAddress.postal_code"
                                                     label="Postal code"
@@ -857,7 +863,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                     variant="outlined"
                                                 />
                                             </div>
-                                            <div class="checkoutPage__doubleGrid">
+                                            <div class="checkout-page__double-grid">
                                                 <VSelect
                                                     v-model="billingAddress.country_code"
                                                     :items="regionCountries"
@@ -876,9 +882,9 @@ watch(cartFingerprint, scheduleRefresh)
                                             </div>
                                         </div>
                                         <VCheckbox v-model="useSeparateShipping" label="Use a separate shipping address" hide-details />
-                                        <div v-if="useSeparateShipping" class="checkoutPage__subsection">
-                                            <h3 class="checkoutPage__subsectionTitle">Shipping address</h3>
-                                            <div class="checkoutPage__nameGrid">
+                                        <div v-if="useSeparateShipping" class="checkout-page__subsection">
+                                            <h3 class="checkout-page__subsection-title">Shipping address</h3>
+                                            <div class="checkout-page__name-grid">
                                                 <VTextField
                                                     v-model="shippingAddress.first_name"
                                                     label="First name"
@@ -899,7 +905,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                 variant="outlined"
                                             />
                                             <VTextField v-model="shippingAddress.address_2" label="Address line 2" variant="outlined" />
-                                            <div class="checkoutPage__tripleGrid">
+                                            <div class="checkout-page__triple-grid">
                                                 <VTextField
                                                     v-model="shippingAddress.postal_code"
                                                     label="Postal code"
@@ -919,7 +925,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                     variant="outlined"
                                                 />
                                             </div>
-                                            <div class="checkoutPage__doubleGrid">
+                                            <div class="checkout-page__double-grid">
                                                 <VSelect
                                                     v-model="shippingAddress.country_code"
                                                     :items="regionCountries"
@@ -937,7 +943,7 @@ watch(cartFingerprint, scheduleRefresh)
                                                 />
                                             </div>
                                         </div>
-                                        <div class="checkoutPage__buttonRow">
+                                        <div class="checkout-page__button-row">
                                             <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'account'">
                                                 Back
                                             </VBtn>
@@ -949,23 +955,28 @@ watch(cartFingerprint, scheduleRefresh)
                                 </div>
                             </section>
 
-                            <section class="checkoutPage__section" :class="{ 'checkoutPage__section--active': currentStep === 'payment' }">
-                                <div class="checkoutPage__sectionIntro">
-                                    <span class="checkoutPage__sectionEyebrow">Step 3</span>
-                                    <h2 class="checkoutPage__sectionTitle">Shipping and payment</h2>
-                                    <p class="checkoutPage__sectionText">Choose a delivery method and finish payment on the same screen.</p>
+                            <section
+                                class="checkout-page__section"
+                                :class="{ 'checkout-page__section--active': currentStep === 'payment' }"
+                            >
+                                <div class="checkout-page__section-intro">
+                                    <span class="checkout-page__section-eyebrow">Step 3</span>
+                                    <h2 class="checkout-page__section-title">Shipping and payment</h2>
+                                    <p class="checkout-page__section-text">
+                                        Choose a delivery method and finish payment on the same screen.
+                                    </p>
                                 </div>
-                                <div v-if="!addressCompleted" class="checkoutPage__disabledCard">
+                                <div v-if="!addressCompleted" class="checkout-page__disabled-card">
                                     Save your address details first to unlock shipping options and payment.
                                 </div>
-                                <div v-else class="checkoutPage__sectionCard checkoutPage__paymentGrid">
-                                    <div class="checkoutPage__shippingCard">
-                                        <div class="checkoutPage__subsectionTitle">Shipping method</div>
+                                <div v-else class="checkout-page__section-card checkout-page__payment-grid">
+                                    <div class="checkout-page__shipping-card">
+                                        <div class="checkout-page__subsection-title">Shipping method</div>
                                         <template v-if="isShippingLoading">
                                             <VSkeletonLoader type="list-item" />
                                             <VSkeletonLoader type="list-item" />
                                         </template>
-                                        <VRadioGroup v-else v-model="selectedShippingOptionId" class="checkoutPage__shippingOptions">
+                                        <VRadioGroup v-else v-model="selectedShippingOptionId" class="checkout-page__shipping-options">
                                             <VRadio
                                                 v-for="option in shippingOptions"
                                                 :key="option.id"
@@ -974,11 +985,11 @@ watch(cartFingerprint, scheduleRefresh)
                                             />
                                         </VRadioGroup>
                                     </div>
-                                    <div class="checkoutPage__paymentCard">
-                                        <div class="checkoutPage__subsectionTitle">Payment details</div>
+                                    <div class="checkout-page__payment-card">
+                                        <div class="checkout-page__subsection-title">Payment details</div>
                                         <div id="link-authentication-element"></div>
-                                        <div id="payment-element" class="checkoutPage__paymentElement"></div>
-                                        <div class="checkoutPage__buttonRow checkoutPage__buttonRow--payment">
+                                        <div id="payment-element" class="checkout-page__payment-element"></div>
+                                        <div class="checkout-page__button-row checkout-page__button-row--payment">
                                             <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'">
                                                 Back
                                             </VBtn>
@@ -998,26 +1009,28 @@ watch(cartFingerprint, scheduleRefresh)
                             </section>
                         </div>
 
-                        <aside class="checkoutPage__summaryColumn">
-                            <div class="checkoutPage__summaryCard">
-                                <span class="checkoutPage__sectionEyebrow">Order summary</span>
-                                <h2 class="checkoutPage__summaryTitle">Everything you are checking out with today.</h2>
-                                <div class="checkoutPage__summaryItems">
-                                    <article v-for="item in lineItems" :key="item.id" class="checkoutPage__summaryItem">
+                        <aside class="checkout-page__summary-column">
+                            <div class="checkout-page__summary-card">
+                                <span class="checkout-page__section-eyebrow">Order summary</span>
+                                <h2 class="checkout-page__summary-title">Everything you are checking out with today.</h2>
+                                <div class="checkout-page__summary-items">
+                                    <article v-for="item in lineItems" :key="item.id" class="checkout-page__summary-item">
                                         <VImg
                                             :src="item.thumbnail || '/images/placeholder.png'"
                                             :alt="item.product_title || 'Product image'"
                                             width="72"
                                             height="88"
-                                            class="checkoutPage__summaryImage"
+                                            class="checkout-page__summary-image"
                                             cover
                                         />
-                                        <div class="checkoutPage__summaryItemBody">
-                                            <strong class="checkoutPage__summaryItemTitle">{{ item.product_title }}</strong>
-                                            <span class="checkoutPage__summaryItemMeta">{{ item.variant_title || "Standard option" }}</span>
-                                            <span class="checkoutPage__summaryItemMeta">Qty {{ item.quantity }}</span>
+                                        <div class="checkout-page__summary-item-body">
+                                            <strong class="checkout-page__summary-item-title">{{ item.product_title }}</strong>
+                                            <span class="checkout-page__summary-item-meta">{{
+                                                item.variant_title || "Standard option"
+                                            }}</span>
+                                            <span class="checkout-page__summary-item-meta">Qty {{ item.quantity }}</span>
                                         </div>
-                                        <div class="checkoutPage__summaryItemPrice">
+                                        <div class="checkout-page__summary-item-price">
                                             <TaxedLinePrice
                                                 :amount-with-tax="getAmountWithTax(item)"
                                                 :amount-without-tax="getAmountWithoutTax(item)"
@@ -1025,24 +1038,24 @@ watch(cartFingerprint, scheduleRefresh)
                                         </div>
                                     </article>
                                 </div>
-                                <div class="checkoutPage__totals">
-                                    <div class="checkoutPage__totalRow">
+                                <div class="checkout-page__totals">
+                                    <div class="checkout-page__total-row">
                                         <span>Items</span>
                                         <span>{{ itemCount }}</span>
                                     </div>
-                                    <div class="checkoutPage__totalRow">
+                                    <div class="checkout-page__total-row">
                                         <span>Subtotal</span>
                                         <span>{{ formatPrice(Number(checkoutCart?.subtotal || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="checkoutPage__totalRow">
+                                    <div class="checkout-page__total-row">
                                         <span>Shipping</span>
                                         <span>{{ formatPrice(Number(checkoutCart?.shipping_total || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="checkoutPage__totalRow">
+                                    <div class="checkout-page__total-row">
                                         <span>Tax</span>
                                         <span>{{ formatPrice(Number(checkoutCart?.tax_total || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="checkoutPage__totalRow">
+                                    <div class="checkout-page__total-row">
                                         <span>Total</span>
                                         <strong>{{ formatPrice(Number(checkoutCart?.total || 0), currencyCode) }}</strong>
                                     </div>
@@ -1057,61 +1070,61 @@ watch(cartFingerprint, scheduleRefresh)
 </template>
 
 <style scoped lang="scss">
-.checkoutPage {
+.checkout-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.checkoutPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+.checkout-page__hero {
+    padding: 6rem 0 5.5rem;
 }
 
-.checkoutPage__container {
+.checkout-page__container {
     position: relative;
     z-index: 1;
 }
 
-.checkoutPage__heroGrid,
-.checkoutPage__contentGrid,
-.checkoutPage__paymentGrid,
-.checkoutPage__nameGrid,
-.checkoutPage__doubleGrid,
-.checkoutPage__tripleGrid {
+.checkout-page__hero-grid,
+.checkout-page__content-grid,
+.checkout-page__payment-grid,
+.checkout-page__name-grid,
+.checkout-page__double-grid,
+.checkout-page__triple-grid {
     display: grid;
     gap: 1rem;
 }
 
-.checkoutPage__heroGrid,
-.checkoutPage__contentGrid {
-    gap: clamp(1.5rem, 3vw, 2rem);
+.checkout-page__hero-grid,
+.checkout-page__content-grid {
+    gap: 2rem;
 }
 
-.checkoutPage__heroGrid {
+.checkout-page__hero-grid {
     grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
     align-items: end;
-    margin-bottom: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 3rem;
 }
 
-.checkoutPage__contentGrid {
+.checkout-page__content-grid {
     grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
     align-items: start;
 }
 
-.checkoutPage__copy,
-.checkoutPage__progressCard,
-.checkoutPage__main,
-.checkoutPage__summaryColumn {
+.checkout-page__copy,
+.checkout-page__progress-card,
+.checkout-page__main,
+.checkout-page__summary-column {
     animation: checkout-rise 0.8s ease both;
 }
 
-.checkoutPage__progressCard,
-.checkoutPage__summaryColumn {
+.checkout-page__progress-card,
+.checkout-page__summary-column {
     animation-delay: 0.12s;
 }
 
-.checkoutPage__eyebrow,
-.checkoutPage__sectionEyebrow {
+.checkout-page__eyebrow,
+.checkout-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -1123,39 +1136,37 @@ watch(cartFingerprint, scheduleRefresh)
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-}
-
-.checkoutPage__title,
-.checkoutPage__sectionTitle,
-.checkoutPage__summaryTitle {
+.checkout-page__title,
+.checkout-page__section-title,
+.checkout-page__summary-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.checkoutPage__title {
+.checkout-page__title {
     max-width: 12ch;
     margin: 1rem 0;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 4.5rem;
     line-height: 0.95;
 }
 
-.checkoutPage__description,
-.checkoutPage__sectionText,
-.checkoutPage__loadingText,
-.checkoutPage__stepText,
-.checkoutPage__statusText,
-.checkoutPage__summaryItemMeta {
+.checkout-page__description,
+.checkout-page__section-text,
+.checkout-page__loading-text,
+.checkout-page__step-text,
+.checkout-page__status-text,
+.checkout-page__summary-item-meta {
     margin: 0;
     color: #4b5874;
     line-height: 1.75;
 }
 
-.checkoutPage__progressCard,
-.checkoutPage__sectionCard,
-.checkoutPage__summaryCard,
-.checkoutPage__statusCard,
-.checkoutPage__disabledCard {
+.checkout-page__progress-card,
+.checkout-page__section-card,
+.checkout-page__summary-card,
+.checkout-page__status-card,
+.checkout-page__disabled-card {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.84);
@@ -1163,25 +1174,25 @@ watch(cartFingerprint, scheduleRefresh)
     backdrop-filter: blur(14px);
 }
 
-.checkoutPage__progressCard,
-.checkoutPage__sectionCard,
-.checkoutPage__summaryCard,
-.checkoutPage__statusCard,
-.checkoutPage__disabledCard {
-    padding: clamp(1.3rem, 2vw, 1.8rem);
+.checkout-page__progress-card,
+.checkout-page__section-card,
+.checkout-page__summary-card,
+.checkout-page__status-card,
+.checkout-page__disabled-card {
+    padding: 1.8rem;
 }
 
-.checkoutPage__stepItem {
+.checkout-page__step-item {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.85rem;
 }
 
-.checkoutPage__stepItem + .checkoutPage__stepItem {
+.checkout-page__step-item + .checkout-page__step-item {
     margin-top: 0.95rem;
 }
 
-.checkoutPage__stepNumber {
+.checkout-page__step-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1193,62 +1204,60 @@ watch(cartFingerprint, scheduleRefresh)
     font-weight: 700;
 }
 
-.checkoutPage__stepNumber--active {
+.checkout-page__step-number--active {
     background: #010c80;
     color: #ffffff;
 }
 
-.checkoutPage__stepLabel,
-.checkoutPage__statusTitle,
-.checkoutPage__subsectionTitle,
-.checkoutPage__summaryItemTitle {
+.checkout-page__step-label,
+.checkout-page__status-title,
+.checkout-page__subsection-title,
+.checkout-page__summary-item-title {
     color: #08173f;
     font-weight: 700;
 }
 
-.checkoutPage__main {
+.checkout-page__main {
     display: grid;
     gap: 1.25rem;
 }
 
-.checkoutPage__section {
+.checkout-page__section {
     display: grid;
     gap: 0.9rem;
 }
 
-.checkoutPage__section--active .checkoutPage__sectionTitle {
+.checkout-page__section--active .checkout-page__section-title {
     color: #010c80;
 }
 
-.checkoutPage__sectionTitle,
-.checkoutPage__summaryTitle {
+.checkout-page__section-title,
+.checkout-page__summary-title {
     margin: 1rem 0 0.75rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.15rem);
+    font-size: 2.15rem;
     line-height: 1.08;
 }
 
-.checkoutPage__tabs {
+.checkout-page__tabs {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 999px;
     background: rgba(247, 250, 255, 0.9);
     padding: 0.25rem;
-}
-
-.checkoutPage__window,
-.checkoutPage__form,
-.checkoutPage__socialButtons,
-.checkoutPage__subsection,
-.checkoutPage__summaryItems,
-.checkoutPage__totals {
+.checkout-page__window,
+.checkout-page__form,
+.checkout-page__social-buttons,
+.checkout-page__subsection,
+.checkout-page__summary-items,
+.checkout-page__totals {
     display: grid;
     gap: 0.9rem;
 }
 
-.checkoutPage__window {
+.checkout-page__window {
     margin-top: 1rem;
 }
 
-.checkoutPage__socialBtn {
+.checkout-page__social-btn {
     justify-content: flex-start;
     min-height: 3.2rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
@@ -1256,7 +1265,7 @@ watch(cartFingerprint, scheduleRefresh)
     box-shadow: none;
 }
 
-.checkoutPage__divider {
+.checkout-page__divider {
     position: relative;
     margin: 1.2rem 0;
     color: #6a7590;
@@ -1264,109 +1273,109 @@ watch(cartFingerprint, scheduleRefresh)
     text-align: center;
 }
 
-.checkoutPage__divider::before {
+.checkout-page__divider::before {
     content: "";
     position: absolute;
     inset: 50% 0 auto;
     border-top: 1px solid rgba(8, 23, 63, 0.08);
 }
 
-.checkoutPage__divider span {
+.checkout-page__divider span {
     position: relative;
     display: inline-block;
     padding: 0 0.9rem;
     background: rgba(255, 255, 255, 0.96);
 }
 
-.checkoutPage__nameGrid {
+.checkout-page__name-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.checkoutPage__doubleGrid {
+.checkout-page__double-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.checkoutPage__tripleGrid {
+.checkout-page__triple-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.checkoutPage__statusCard,
-.checkoutPage__buttonRow,
-.checkoutPage__summaryItem,
-.checkoutPage__totalRow {
+.checkout-page__status-card,
+.checkout-page__button-row,
+.checkout-page__summary-item,
+.checkout-page__total-row {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
 }
 
-.checkoutPage__statusCard,
-.checkoutPage__buttonRow,
-.checkoutPage__summaryItem,
-.checkoutPage__totalRow {
+.checkout-page__status-card,
+.checkout-page__button-row,
+.checkout-page__summary-item,
+.checkout-page__total-row {
     align-items: center;
 }
 
-.checkoutPage__disabledCard {
+.checkout-page__disabled-card {
     color: #4b5874;
 }
 
-.checkoutPage__paymentGrid {
+.checkout-page__payment-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.checkoutPage__shippingCard,
-.checkoutPage__paymentCard {
+.checkout-page__shipping-card,
+.checkout-page__payment-card {
     display: grid;
     gap: 1rem;
 }
 
-.checkoutPage__paymentElement {
+.checkout-page__payment-element {
     margin-top: 0.4rem;
 }
 
-.checkoutPage__buttonRow {
+.checkout-page__button-row {
     margin-top: 0.5rem;
 }
 
-.checkoutPage__buttonRow--payment {
+.checkout-page__button-row--payment {
     margin-top: 1rem;
 }
 
-.checkoutPage__summaryColumn {
+.checkout-page__summary-column {
     position: sticky;
     top: 1.5rem;
 }
 
-.checkoutPage__summaryItem {
+.checkout-page__summary-item {
     align-items: flex-start;
     padding-bottom: 0.9rem;
     border-bottom: 1px solid rgba(8, 23, 63, 0.08);
 }
 
-.checkoutPage__summaryImage {
+.checkout-page__summary-image {
     border-radius: 1rem;
     background: #edf2ff;
 }
 
-.checkoutPage__summaryItemBody {
+.checkout-page__summary-item-body {
     display: grid;
     flex: 1;
     gap: 0.15rem;
 }
 
-.checkoutPage__summaryItemPrice {
+.checkout-page__summary-item-price {
     color: #08173f;
 }
 
-.checkoutPage__totalRow {
+.checkout-page__total-row {
     color: #4b5874;
 }
 
-.checkoutPage__totalRow strong {
+.checkout-page__total-row strong {
     color: #08173f;
 }
 
-.checkoutPage__loadingState {
+.checkout-page__loading-state {
     display: grid;
     justify-items: center;
     gap: 0.9rem;
@@ -1386,59 +1395,75 @@ watch(cartFingerprint, scheduleRefresh)
 }
 
 @media screen and (max-width: 1100px) {
-    .checkoutPage__heroGrid,
-    .checkoutPage__contentGrid,
-    .checkoutPage__paymentGrid {
+    .checkout-page__hero {
+        padding: 5rem 0 4.5rem;
+    }
+
+    .checkout-page__hero-grid,
+    .checkout-page__content-grid,
+    .checkout-page__payment-grid {
         grid-template-columns: 1fr;
     }
 
-    .checkoutPage__title {
+    .checkout-page__title {
+        font-size: 3.5rem;
         max-width: 100%;
     }
 
-    .checkoutPage__summaryColumn {
+    .checkout-page__summary-column {
         position: static;
+    }
+
+    .checkout-page__section-title,
+    .checkout-page__summary-title {
+        font-size: 1.9rem;
     }
 }
 
 @media screen and (max-width: 700px) {
-    .checkoutPage__hero {
+    .checkout-page__hero {
         padding: 3.75rem 0 3.5rem;
     }
 
-    .checkoutPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .checkout-page__title {
+        font-size: 2.8rem;
         line-height: 1;
     }
 
-    .checkoutPage__progressCard,
-    .checkoutPage__sectionCard,
-    .checkoutPage__summaryCard,
-    .checkoutPage__statusCard,
-    .checkoutPage__disabledCard {
+    .checkout-page__progress-card,
+    .checkout-page__section-card,
+    .checkout-page__summary-card,
+    .checkout-page__status-card,
+    .checkout-page__disabled-card {
         border-radius: 1.2rem;
+        padding: 1.3rem;
     }
 
-    .checkoutPage__nameGrid,
-    .checkoutPage__doubleGrid,
-    .checkoutPage__tripleGrid {
+    .checkout-page__name-grid,
+    .checkout-page__double-grid,
+    .checkout-page__triple-grid {
         grid-template-columns: 1fr;
     }
 
-    .checkoutPage__statusCard,
-    .checkoutPage__buttonRow,
-    .checkoutPage__summaryItem,
-    .checkoutPage__totalRow {
+    .checkout-page__status-card,
+    .checkout-page__button-row,
+    .checkout-page__summary-item,
+    .checkout-page__total-row {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .checkout-page__section-title,
+    .checkout-page__summary-title {
+        font-size: 1.6rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .checkoutPage__copy,
-    .checkoutPage__progressCard,
-    .checkoutPage__main,
-    .checkoutPage__summaryColumn {
+    .checkout-page__copy,
+    .checkout-page__progress-card,
+    .checkout-page__main,
+    .checkout-page__summary-column {
         animation: none;
     }
 }

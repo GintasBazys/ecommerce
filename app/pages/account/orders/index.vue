@@ -50,8 +50,8 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
 </script>
 
 <template>
-    <div class="accountOrdersContent">
-        <section class="accountOrdersContent__panel">
+    <div class="account-orders-content">
+        <section class="account-orders-content__panel">
             <VDataTableServer
                 v-model:page="page"
                 v-model:items-per-page="perPage"
@@ -61,7 +61,7 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                 :items-length="ordersData?.total || 0"
                 :loading="pending"
                 item-key="id"
-                class="accountOrdersContent__table"
+                class="account-orders-content__table"
                 :items-per-page-options="[5, 10, 20, 50]"
             >
                 <template #loading>
@@ -77,7 +77,7 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                     {{ Number(item.total).toLocaleString(undefined, { style: "currency", currency: item.currency_code }) }}
                 </template>
                 <template #[`item.fulfillment_status`]="{ item }">
-                    <VChip size="small" class="accountOrdersContent__statusChip">
+                    <VChip size="small" class="account-orders-content__status-chip">
                         {{ ORDER_STATUS[item.fulfillment_status as keyof typeof ORDER_STATUS] || item.fulfillment_status }}
                     </VChip>
                 </template>
@@ -92,14 +92,14 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
 </template>
 
 <style scoped lang="scss">
-.accountOrdersContent__panel {
+.account-orders-content__panel {
     padding: 1.35rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.4rem;
     background: rgba(247, 250, 255, 0.92);
 }
 
-.accountOrdersContent__statusChip {
+.account-orders-content__status-chip {
     background: rgba(1, 12, 128, 0.08);
     color: #08173f;
     font-weight: 700;

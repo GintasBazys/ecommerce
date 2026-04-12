@@ -96,25 +96,25 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
 </script>
 
 <template>
-    <section class="faqPage">
-        <div class="faqPage__hero">
-            <VContainer class="faqPage__container">
-                <div class="faqPage__heroGrid">
-                    <div class="faqPage__heroCopy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="faqPage__breadcrumbs" />
-                        <span class="faqPage__eyebrow">Help Center</span>
-                        <h1 class="faqPage__title">Answers shaped to match the cleaner, calmer storefront experience.</h1>
-                        <p class="faqPage__description">
+    <section class="faq-page">
+        <div class="faq-page__hero">
+            <VContainer class="faq-page__container">
+                <div class="faq-page__hero-grid">
+                    <div class="faq-page__hero-copy">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="faq-page__breadcrumbs" />
+                        <span class="faq-page__eyebrow">Help Center</span>
+                        <h1 class="faq-page__title">Answers shaped to match the cleaner, calmer storefront experience.</h1>
+                        <p class="faq-page__description">
                             Start here for the questions customers ask most often. If you need something more specific, our
-                            <NuxtLink to="/contact" class="faqPage__inlineLink">contact page</NuxtLink>
+                            <NuxtLink to="/contact" class="faq-page__inline-link">contact page</NuxtLink>
                             is ready for follow-up.
                         </p>
                     </div>
-                    <div class="faqPage__heroCard">
-                        <span class="faqPage__heroLabel">Fast paths</span>
-                        <h2 class="faqPage__heroTitle">Most requests fit into three quick support tracks.</h2>
-                        <ul class="faqPage__quickList">
-                            <li v-for="topic in quickTopics" :key="topic" class="faqPage__quickItem">
+                    <div class="faq-page__hero-card">
+                        <span class="faq-page__hero-label">Fast paths</span>
+                        <h2 class="faq-page__hero-title">Most requests fit into three quick support tracks.</h2>
+                        <ul class="faq-page__quick-list">
+                            <li v-for="topic in quickTopics" :key="topic" class="faq-page__quick-item">
                                 <VIcon size="18" color="primary">mdi-arrow-top-right</VIcon>
                                 <span>{{ topic }}</span>
                             </li>
@@ -123,43 +123,43 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                 </div>
             </VContainer>
         </div>
-        <VContainer class="faqPage__container">
-            <div class="faqPage__contentGrid">
-                <div class="faqPage__sections">
-                    <article v-for="section in faqSections" :key="section.id" class="faqPage__sectionCard">
-                        <div class="faqPage__sectionHeader">
-                            <span class="faqPage__sectionEyebrow">{{ section.eyebrow }}</span>
-                            <h2 class="faqPage__sectionTitle">{{ section.title }}</h2>
-                            <p class="faqPage__sectionDescription">{{ section.description }}</p>
+        <VContainer class="faq-page__container">
+            <div class="faq-page__content-grid">
+                <div class="faq-page__sections">
+                    <article v-for="section in faqSections" :key="section.id" class="faq-page__section-card">
+                        <div class="faq-page__section-header">
+                            <span class="faq-page__section-eyebrow">{{ section.eyebrow }}</span>
+                            <h2 class="faq-page__section-title">{{ section.title }}</h2>
+                            <p class="faq-page__section-description">{{ section.description }}</p>
                         </div>
 
-                        <VExpansionPanels v-model="panelState[section.id]" multiple class="faqPage__panels">
+                        <VExpansionPanels v-model="panelState[section.id]" multiple class="faq-page__panels">
                             <VExpansionPanel
                                 v-for="item in section.items"
                                 :key="item.question"
-                                class="faqPage__panel"
+                                class="faq-page__panel"
                                 rounded="xl"
                                 elevation="0"
                             >
-                                <VExpansionPanelTitle class="faqPage__panelTitle">
+                                <VExpansionPanelTitle class="faq-page__panel-title">
                                     {{ item.question }}
                                 </VExpansionPanelTitle>
-                                <VExpansionPanelText class="faqPage__panelText">
+                                <VExpansionPanelText class="faq-page__panel-text">
                                     {{ item.answer }}
                                 </VExpansionPanelText>
                             </VExpansionPanel>
                         </VExpansionPanels>
                     </article>
                 </div>
-                <aside class="faqPage__sidebar">
-                    <div class="faqPage__contactCard">
-                        <span class="faqPage__sidebarLabel">Still need help?</span>
-                        <h2 class="faqPage__sidebarTitle">Talk to the support team directly.</h2>
-                        <p class="faqPage__sidebarText">
+                <aside class="faq-page__sidebar">
+                    <div class="faq-page__contact-card">
+                        <span class="faq-page__sidebar-label">Still need help?</span>
+                        <h2 class="faq-page__sidebar-title">Talk to the support team directly.</h2>
+                        <p class="faq-page__sidebar-text">
                             If your question is about a current order or a product choice, send us a message and we will point you in the
                             right direction.
                         </p>
-                        <div class="faqPage__sidebarMeta">Mon-Fri | 09:00 - 17:00</div>
+                        <div class="faq-page__sidebar-meta">Mon-Fri | 09:00 - 17:00</div>
                         <VBtn color="primary" rounded="pill" size="large" class="text-none mt-6" block to="/contact">Get in touch</VBtn>
                     </div>
                 </aside>
@@ -169,52 +169,52 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
 </template>
 
 <style scoped lang="scss">
-.faqPage {
+.faq-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 22%),
         linear-gradient(180deg, #f7faff 0%, #ffffff 34%, #f6f9ff 100%);
 }
 
-.faqPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.4rem) 0 2.25rem;
+.faq-page__hero {
+    padding: 6.4rem 0 2.25rem;
 }
 
-.faqPage__container {
+.faq-page__container {
     position: relative;
     z-index: 1;
 }
 
-.faqPage__heroGrid,
-.faqPage__contentGrid {
+.faq-page__hero-grid,
+.faq-page__content-grid {
     display: grid;
-    gap: clamp(1.4rem, 3vw, 2rem);
+    gap: 2rem;
 }
 
-.faqPage__heroGrid {
+.faq-page__hero-grid {
     grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
     align-items: end;
 }
 
-.faqPage__heroCopy,
-.faqPage__heroCard,
-.faqPage__sectionCard,
-.faqPage__sidebar {
+.faq-page__hero-copy,
+.faq-page__hero-card,
+.faq-page__section-card,
+.faq-page__sidebar {
     animation: faq-rise 0.8s ease both;
 }
 
-.faqPage__breadcrumbs {
+.faq-page__breadcrumbs {
     margin-bottom: 1rem;
 }
 
-.faqPage__heroCard,
-.faqPage__sidebar {
+.faq-page__hero-card,
+.faq-page__sidebar {
     animation-delay: 0.12s;
 }
 
-.faqPage__eyebrow,
-.faqPage__sectionEyebrow,
-.faqPage__heroLabel,
-.faqPage__sidebarLabel {
+.faq-page__eyebrow,
+.faq-page__section-eyebrow,
+.faq-page__hero-label,
+.faq-page__sidebar-label {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -228,55 +228,55 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
     text-transform: uppercase;
 }
 
-.faqPage__eyebrow,
-.faqPage__heroLabel,
-.faqPage__sectionEyebrow,
-.faqPage__sidebarLabel {
+.faq-page__eyebrow,
+.faq-page__hero-label,
+.faq-page__section-eyebrow,
+.faq-page__sidebar-label {
     margin-bottom: 1rem;
 }
 
-.faqPage__title,
-.faqPage__heroTitle,
-.faqPage__sectionTitle,
-.faqPage__sidebarTitle {
+.faq-page__title,
+.faq-page__hero-title,
+.faq-page__section-title,
+.faq-page__sidebar-title {
     color: #08173f;
     letter-spacing: -0.05rem;
     text-wrap: balance;
 }
 
-.faqPage__title {
+.faq-page__title {
     max-width: 13ch;
     margin-bottom: 1rem;
-    font-size: clamp(2.35rem, 4.2vw, 4.25rem);
+    font-size: 4.25rem;
     line-height: 0.96;
 }
 
-.faqPage__description,
-.faqPage__sectionDescription,
-.faqPage__sidebarText {
+.faq-page__description,
+.faq-page__section-description,
+.faq-page__sidebar-text {
     color: #4d5976;
     font-size: 1rem;
     line-height: 1.75;
 }
 
-.faqPage__description {
+.faq-page__description {
     max-width: 40rem;
     margin-bottom: 0;
 }
 
-.faqPage__inlineLink {
+.faq-page__inline-link {
     color: #010c80;
     font-weight: 700;
     text-decoration: none;
 }
 
-.faqPage__inlineLink:hover {
+.faq-page__inline-link:hover {
     text-decoration: underline;
 }
 
-.faqPage__heroCard,
-.faqPage__sectionCard,
-.faqPage__contactCard {
+.faq-page__hero-card,
+.faq-page__section-card,
+.faq-page__contact-card {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.82);
@@ -284,20 +284,20 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
     backdrop-filter: blur(14px);
 }
 
-.faqPage__heroCard,
-.faqPage__sectionCard,
-.faqPage__contactCard {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.faq-page__hero-card,
+.faq-page__section-card,
+.faq-page__contact-card {
+    padding: 1.9rem;
 }
 
-.faqPage__heroTitle,
-.faqPage__sidebarTitle {
+.faq-page__hero-title,
+.faq-page__sidebar-title {
     margin-bottom: 0.85rem;
-    font-size: clamp(1.45rem, 2.1vw, 2rem);
+    font-size: 2rem;
     line-height: 1.1;
 }
 
-.faqPage__quickList {
+.faq-page__quick-list {
     display: grid;
     gap: 0.85rem;
     margin: 1.4rem 0 0;
@@ -305,7 +305,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
     list-style: none;
 }
 
-.faqPage__quickItem {
+.faq-page__quick-item {
     display: flex;
     align-items: flex-start;
     gap: 0.7rem;
@@ -313,56 +313,56 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
     line-height: 1.6;
 }
 
-.faqPage__contentGrid {
+.faq-page__content-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
     align-items: start;
-    padding-bottom: clamp(4rem, 7vw, 6rem);
+    padding-bottom: 6rem;
 }
 
-.faqPage__sections {
+.faq-page__sections {
     display: grid;
     gap: 1.25rem;
 }
 
-.faqPage__sectionTitle {
+.faq-page__section-title {
     margin-bottom: 0.7rem;
-    font-size: clamp(1.6rem, 2.3vw, 2.1rem);
+    font-size: 2.1rem;
     line-height: 1.08;
 }
 
-.faqPage__sectionDescription {
+.faq-page__section-description {
     margin-bottom: 1.15rem;
 }
 
-.faqPage__panels {
+.faq-page__panels {
     gap: 0.8rem;
     background: transparent;
 }
 
-.faqPage__panel {
+.faq-page__panel {
     overflow: hidden;
     border: 1px solid rgba(8, 23, 63, 0.08);
     background: #ffffff;
     box-shadow: 0 10px 28px rgba(8, 27, 90, 0.05);
 }
 
-.faqPage__sidebar {
+.faq-page__sidebar {
     position: sticky;
     top: 1.5rem;
 }
 
-.faqPage__sidebarText {
+.faq-page__sidebar-text {
     margin-bottom: 0;
 }
 
-.faqPage__sidebarMeta {
+.faq-page__sidebar-meta {
     margin-top: 1rem;
     color: #6a7590;
     font-size: 0.88rem;
     font-weight: 700;
 }
 
-:deep(.faqPage__panelTitle) {
+:deep(.faq-page__panel-title) {
     min-height: 4.25rem;
     color: #08173f;
     font-size: 1rem;
@@ -370,7 +370,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
     line-height: 1.5;
 }
 
-:deep(.faqPage__panelText) {
+:deep(.faq-page__panel-text) {
     color: #52607c;
     line-height: 1.75;
 }
@@ -388,42 +388,78 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
 }
 
 @media screen and (max-width: 1100px) {
-    .faqPage__heroGrid,
-    .faqPage__contentGrid {
+    .faq-page__hero-grid,
+    .faq-page__content-grid {
         grid-template-columns: 1fr;
+        gap: 1.6rem;
     }
 
-    .faqPage__title {
+    .faq-page__title {
         max-width: 100%;
+        font-size: 3.25rem;
     }
 
-    .faqPage__sidebar {
+    .faq-page__hero-card,
+    .faq-page__section-card,
+    .faq-page__contact-card {
+        padding: 1.6rem;
+    }
+
+    .faq-page__hero-title,
+    .faq-page__sidebar-title {
+        font-size: 1.7rem;
+    }
+
+    .faq-page__section-title {
+        font-size: 1.85rem;
+    }
+
+    .faq-page__content-grid {
+        padding-bottom: 4.75rem;
+    }
+
+    .faq-page__sidebar {
         position: static;
     }
 }
 
 @media screen and (max-width: 600px) {
-    .faqPage__hero {
+    .faq-page__hero {
         padding: 3.75rem 0 2rem;
     }
 
-    .faqPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .faq-page__title {
+        font-size: 2.8rem;
         line-height: 1;
     }
 
-    .faqPage__heroCard,
-    .faqPage__sectionCard,
-    .faqPage__contactCard {
+    .faq-page__hero-card,
+    .faq-page__section-card,
+    .faq-page__contact-card {
         border-radius: 1.2rem;
+        padding: 1.4rem;
+    }
+
+    .faq-page__hero-title,
+    .faq-page__sidebar-title {
+        font-size: 1.45rem;
+    }
+
+    .faq-page__section-title {
+        font-size: 1.6rem;
+    }
+
+    .faq-page__content-grid {
+        gap: 1.4rem;
+        padding-bottom: 4rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .faqPage__heroCopy,
-    .faqPage__heroCard,
-    .faqPage__sectionCard,
-    .faqPage__sidebar {
+    .faq-page__hero-copy,
+    .faq-page__hero-card,
+    .faq-page__section-card,
+    .faq-page__sidebar {
         animation: none;
     }
 }

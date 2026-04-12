@@ -66,32 +66,32 @@ function save(): void {
 
 <template>
     <VDialog v-model="model" max-width="720">
-        <VCard class="addressForm">
-            <VCardTitle class="addressForm__title">{{ props.title }}</VCardTitle>
+        <VCard class="address-form">
+            <VCardTitle class="address-form__title">{{ props.title }}</VCardTitle>
             <VCardText>
-                <div class="addressForm__grid">
-                    <div class="addressForm__double">
+                <div class="address-form__grid">
+                    <div class="address-form__double">
                         <VTextField v-model="local.first_name" label="First name" variant="outlined" />
                         <VTextField v-model="local.last_name" label="Last name" variant="outlined" />
                     </div>
-                    <div class="addressForm__double">
+                    <div class="address-form__double">
                         <VTextField v-model="local.phone" label="Phone" variant="outlined" />
                         <VTextField v-model="local.company" label="Company" variant="outlined" />
                     </div>
                     <VTextField v-model="local.address_1" label="Address line 1" variant="outlined" />
                     <VTextField v-model="local.address_2" label="Address line 2" variant="outlined" />
-                    <div class="addressForm__double">
+                    <div class="address-form__double">
                         <VTextField v-model="local.city" label="City" variant="outlined" />
                         <VTextField v-model="local.postal_code" label="Postal code" variant="outlined" />
                     </div>
-                    <div class="addressForm__double">
+                    <div class="address-form__double">
                         <VTextField v-model="local.country_code" label="Country code" variant="outlined" />
                         <VTextField v-model="local.province" label="Province" variant="outlined" />
                     </div>
                     <VTextField v-model="local.address_name" label="Label (Home, Work, etc.)" variant="outlined" />
                 </div>
             </VCardText>
-            <VCardActions class="addressForm__actions">
+            <VCardActions class="address-form__actions">
                 <VBtn variant="text" class="text-none" @click="close">Cancel</VBtn>
                 <VBtn color="primary" rounded="pill" class="text-none px-6" @click="save">Save</VBtn>
             </VCardActions>
@@ -100,35 +100,35 @@ function save(): void {
 </template>
 
 <style scoped lang="scss">
-.addressForm {
+.address-form {
     border-radius: 1.4rem;
 }
 
-.addressForm__title {
+.address-form__title {
     padding: 1.35rem 1.35rem 0.5rem;
     color: #08173f;
     font-size: 1.25rem;
     font-weight: 700;
 }
 
-.addressForm__grid {
+.address-form__grid {
     display: grid;
     gap: 0.9rem;
 }
 
-.addressForm__double {
+.address-form__double {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
 }
 
-.addressForm__actions {
+.address-form__actions {
     justify-content: flex-end;
     padding: 0.5rem 1.35rem 1.35rem;
 }
 
 @media screen and (max-width: 700px) {
-    .addressForm__double {
+    .address-form__double {
         grid-template-columns: 1fr;
     }
 }

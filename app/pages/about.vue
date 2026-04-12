@@ -7,14 +7,14 @@ useHead({
 </script>
 
 <template>
-    <section class="aboutPage">
-        <div class="aboutPage__hero">
-            <VContainer class="aboutPage__container">
-                <div class="aboutPage__heroCopy">
-                    <AppBreadcrumbs :items="breadcrumbItems" class="aboutPage__breadcrumbs" />
-                    <span class="aboutPage__eyebrow">About the store</span>
-                    <h1 class="aboutPage__title">Get the story behind the curated storefront experience.</h1>
-                    <p class="aboutPage__description">
+    <section class="about-page">
+        <div class="about-page__hero">
+            <VContainer class="about-page__container">
+                <div class="about-page__hero-copy">
+                    <AppBreadcrumbs :items="breadcrumbItems" class="about-page__breadcrumbs" />
+                    <span class="about-page__eyebrow">About the store</span>
+                    <h1 class="about-page__title">Get the story behind the curated storefront experience.</h1>
+                    <p class="about-page__description">
                         Learn how the brand approaches product selection, delivery standards, and the overall experience behind the shop.
                     </p>
                 </div>
@@ -27,31 +27,31 @@ useHead({
 </template>
 
 <style scoped lang="scss">
-.aboutPage {
+.about-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f7faff 0%, #ffffff 36%, #f6f9ff 100%);
 }
 
-.aboutPage__hero {
-    padding: clamp(4.25rem, 7vw, 5.75rem) 0 1.5rem;
+.about-page__hero {
+    padding: 5.75rem 0 1.5rem;
 }
 
-.aboutPage__container {
+.about-page__container {
     position: relative;
     z-index: 1;
 }
 
-.aboutPage__heroCopy {
+.about-page__hero-copy {
     max-width: 42rem;
 }
 
-.aboutPage__breadcrumbs,
-.aboutPage__eyebrow {
+.about-page__breadcrumbs,
+.about-page__eyebrow {
     margin-bottom: 1rem;
 }
 
-.aboutPage__eyebrow {
+.about-page__eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -65,29 +65,49 @@ useHead({
     text-transform: uppercase;
 }
 
-.aboutPage__title {
+.about-page__title {
     margin: 0 0 1rem;
     color: #08173f;
-    font-size: clamp(2.25rem, 4.4vw, 4.25rem);
+    font-size: 4.25rem;
     line-height: 0.96;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.aboutPage__description {
+.about-page__description {
     margin: 0;
     color: #4b5874;
     font-size: 1rem;
     line-height: 1.75;
 }
 
+@media screen and (max-width: 1199px) {
+    .about-page__hero {
+        padding-top: 5rem;
+    }
+
+    .about-page__title {
+        font-size: 3.5rem;
+    }
+}
+
+@media screen and (max-width: 959px) {
+    .about-page__hero {
+        padding-top: 4.5rem;
+    }
+
+    .about-page__title {
+        font-size: 2.75rem;
+    }
+}
+
 @media screen and (max-width: 767px) {
-    .aboutPage__hero {
+    .about-page__hero {
         padding: 3.75rem 0 1rem;
     }
 
-    .aboutPage__title {
-        font-size: clamp(2rem, 8vw, 3rem);
+    .about-page__title {
+        font-size: 2rem;
     }
 }
 </style>

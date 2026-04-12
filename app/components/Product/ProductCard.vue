@@ -64,9 +64,9 @@ const debouncedAddToCart = debounce(addToCart, 300)
 </script>
 
 <template>
-    <article class="productCard">
-        <NuxtLink :to="productHref" class="productCard__mediaLink">
-            <div class="productCard__media">
+    <article class="product-card">
+        <NuxtLink :to="productHref" class="product-card__media-link">
+            <div class="product-card__media">
                 <NuxtImg
                     :src="productImage"
                     :alt="product.title || 'Product image'"
@@ -75,47 +75,47 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     height="840"
                     sizes="280px md:33vw xl:22vw"
                     densities="x1 x2"
-                    class="productCard__image"
+                    class="product-card__image"
                 />
-                <div class="productCard__glow"></div>
-                <VChip v-if="isOnSale" class="productCard__badge" color="error" size="small" label> Sale </VChip>
+                <div class="product-card__glow"></div>
+                <VChip v-if="isOnSale" class="product-card__badge" color="error" size="small" label> Sale </VChip>
             </div>
         </NuxtLink>
 
-        <div class="productCard__body">
-            <div class="productCard__top">
-                <div class="productCard__meta">
-                    <span class="productCard__stock">{{ stockLabel }}</span>
-                    <div v-if="averageRating" class="productCard__rating" :aria-label="`Rated ${averageRating} out of 5`">
-                        <VIcon v-for="i in 5" :key="i" size="16" class="productCard__star">
+        <div class="product-card__body">
+            <div class="product-card__top">
+                <div class="product-card__meta">
+                    <span class="product-card__stock">{{ stockLabel }}</span>
+                    <div v-if="averageRating" class="product-card__rating" :aria-label="`Rated ${averageRating} out of 5`">
+                        <VIcon v-for="i in 5" :key="i" size="16" class="product-card__star">
                             {{ i <= Math.round(averageRating) ? "mdi-star" : "mdi-star-outline" }}
                         </VIcon>
                     </div>
                 </div>
 
-                <NuxtLink :to="productHref" class="productCard__titleLink">
-                    <h3 class="productCard__title">{{ product.title }}</h3>
+                <NuxtLink :to="productHref" class="product-card__title-link">
+                    <h3 class="product-card__title">{{ product.title }}</h3>
                 </NuxtLink>
 
-                <p class="productCard__description">
+                <p class="product-card__description">
                     {{ productDescription }}
                 </p>
             </div>
 
-            <div class="productCard__bottom">
-                <div class="productCard__priceBlock">
-                    <div class="productCard__priceRow">
-                        <span class="productCard__price">{{ displayPrice }}</span>
-                        <del v-if="isOnSale && originalPrice" class="productCard__originalPrice">{{ originalPrice }}</del>
+            <div class="product-card__bottom">
+                <div class="product-card__price-block">
+                    <div class="product-card__price-row">
+                        <span class="product-card__price">{{ displayPrice }}</span>
+                        <del v-if="isOnSale && originalPrice" class="product-card__original-price">{{ originalPrice }}</del>
                     </div>
-                    <span class="productCard__taxMeta">{{ taxLabel }}</span>
-                    <span class="productCard__variant">{{ variantLabel }}</span>
+                    <span class="product-card__tax-meta">{{ taxLabel }}</span>
+                    <span class="product-card__variant">{{ variantLabel }}</span>
                 </div>
 
                 <VBtn
                     color="primary"
                     rounded="pill"
-                    class="productCard__button text-none"
+                    class="product-card__button text-none"
                     :loading="loading"
                     :disabled="!selectedVariant?.inventory_quantity"
                     @click="debouncedAddToCart"
@@ -131,7 +131,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
 </template>
 
 <style scoped lang="scss">
-.productCard {
+.product-card {
     display: grid;
     grid-template-rows: auto 1fr;
     height: 100%;
@@ -142,215 +142,210 @@ const debouncedAddToCart = debounce(addToCart, 300)
     transition:
         transform 0.28s ease,
         border-color 0.28s ease;
+}
 
-    &:hover {
-        transform: translateY(-4px);
-        border-color: rgba(1, 12, 128, 0.16);
-    }
+.product-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(1, 12, 128, 0.16);
+}
 
-    &__mediaLink,
-    &__titleLink {
-        text-decoration: none;
-        color: inherit;
-    }
+.product-card__media-link,
+.product-card__title-link {
+    text-decoration: none;
+    color: inherit;
+}
 
-    &__media {
-        position: relative;
-        overflow: hidden;
-        aspect-ratio: 1;
-        background:
-            radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 36%), linear-gradient(180deg, #eef5ff 0%, #dfeafc 100%);
-    }
+.product-card__media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 36%), linear-gradient(180deg, #eef5ff 0%, #dfeafc 100%);
+}
 
-    &__image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.45s ease;
-    }
+.product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+}
 
-    &:hover &__image {
-        transform: scale(1.04);
-    }
+.product-card:hover .product-card__image {
+    transform: scale(1.04);
+}
 
-    &__glow {
-        position: absolute;
-        inset: auto auto 0 0;
-        width: 100%;
-        height: 45%;
-        background: linear-gradient(180deg, transparent 0%, rgba(8, 23, 63, 0.18) 100%);
-        pointer-events: none;
-    }
+.product-card__glow {
+    position: absolute;
+    inset: auto auto 0 0;
+    width: 100%;
+    height: 45%;
+    background: linear-gradient(180deg, transparent 0%, rgba(8, 23, 63, 0.18) 100%);
+    pointer-events: none;
+}
 
-    &__badge {
-        position: absolute;
-        top: 0.9rem;
-        right: 0.9rem;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-    }
+.product-card__badge {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
 
-    &__body {
-        display: grid;
-        grid-template-rows: 1fr auto;
-        gap: 0.85rem;
-        padding: 1rem;
-    }
+.product-card__body {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 0.85rem;
+    padding: 1rem;
+}
 
-    &__top {
-        display: grid;
-        gap: 0.75rem;
-        min-width: 0;
-    }
+.product-card__top {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+}
 
-    &__meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 0.75rem;
-        min-width: 0;
-        margin-bottom: 0.1rem;
-    }
+.product-card__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    margin-bottom: 0.1rem;
+}
 
-    &__stock {
-        color: #010c80;
-        font-size: 0.74rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-    }
+.product-card__stock {
+    color: #010c80;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
 
-    &__rating {
-        display: inline-flex;
-        align-items: center;
-        color: #f7ae2b;
-        flex-shrink: 0;
-    }
+.product-card__rating {
+    display: inline-flex;
+    align-items: center;
+    color: #f7ae2b;
+    flex-shrink: 0;
+}
 
-    &__star {
-        margin-right: 0.1rem;
-    }
+.product-card__star {
+    margin-right: 0.1rem;
+}
 
-    &__title {
-        display: -webkit-box;
-        overflow: hidden;
-        margin: 0;
-        color: #08173f;
-        font-size: 0.98rem;
-        line-height: 1.3;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-    }
+.product-card__title {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: #08173f;
+    font-size: 0.98rem;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
 
-    &__description {
-        display: -webkit-box;
-        overflow: hidden;
-        min-height: 2.55rem;
-        margin: 0;
-        color: #5a6480;
-        font-size: 0.86rem;
-        line-height: 1.48;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-    }
+.product-card__description {
+    display: -webkit-box;
+    overflow: hidden;
+    min-height: 2.55rem;
+    margin: 0;
+    color: #5a6480;
+    font-size: 0.86rem;
+    line-height: 1.48;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
 
-    &__bottom {
-        display: grid;
-        grid-template-columns: 1fr;
-        align-items: stretch;
-        gap: 0.75rem;
-        min-width: 0;
-        padding-top: 0.1rem;
-    }
+.product-card__bottom {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 0.75rem;
+    min-width: 0;
+    padding-top: 0.1rem;
+}
 
-    &__priceBlock {
-        display: grid;
-        gap: 0.3rem;
-        min-width: 0;
-    }
+.product-card__price-block {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+}
 
-    &__priceRow {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.55rem;
-    }
+.product-card__price-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+}
 
-    &__price {
-        color: #08173f;
-        font-size: 1rem;
-        font-weight: 700;
-        line-height: 1.2;
-    }
+.product-card__price {
+    color: #08173f;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
 
-    &__originalPrice {
-        color: #cc3344;
-        font-size: 0.92rem;
-    }
+.product-card__original-price {
+    color: #cc3344;
+    font-size: 0.92rem;
+}
 
-    &__variant {
-        display: block;
-        overflow: hidden;
-        color: #6a758f;
-        font-size: 0.83rem;
-        line-height: 1.4;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+.product-card__variant {
+    display: block;
+    overflow: hidden;
+    color: #6a758f;
+    font-size: 0.83rem;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    &__taxMeta {
-        color: #5f6d8a;
-        font-size: 0.8rem;
-        line-height: 1.4;
-    }
+.product-card__tax-meta {
+    color: #5f6d8a;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
 
-    &__button {
-        min-width: 0;
-        max-width: none;
-        min-height: 2.5rem;
-        padding-inline: 0.9rem;
-        font-weight: 700;
-        white-space: nowrap;
-    }
+.product-card__button {
+    min-width: 0;
+    max-width: none;
+    min-height: 2.5rem;
+    padding-inline: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 @media screen and (max-width: 1200px) {
-    .productCard {
-        &__bottom {
-            gap: 0.7rem;
-        }
+    .product-card__bottom {
+        gap: 0.7rem;
+    }
 
-        &__meta {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 0.35rem;
-        }
+    .product-card__meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.35rem;
     }
 }
 
 @media screen and (max-width: 767px) {
-    .productCard {
-        &__body {
-            padding: 0.9rem;
-        }
+    .product-card__body {
+        padding: 0.9rem;
+    }
 
-        &__title {
-            font-size: 0.95rem;
-        }
+    .product-card__title {
+        font-size: 0.95rem;
+    }
 
-        &__description {
-            min-height: auto;
-        }
+    .product-card__description {
+        min-height: auto;
+    }
 
-        &__priceRow {
-            gap: 0.4rem;
-        }
+    .product-card__price-row {
+        gap: 0.4rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .productCard,
-    .productCard__image {
+    .product-card,
+    .product-card__image {
         transition: none;
     }
 }

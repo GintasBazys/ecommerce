@@ -25,21 +25,21 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
 </script>
 
 <template>
-    <div class="orderInvoiceContent">
+    <div class="order-invoice-content">
         <VSkeletonLoader v-if="pending" type="card" />
         <VAlert v-else-if="error" type="error" variant="tonal">Failed to load order.</VAlert>
         <template v-else-if="order">
-            <div class="orderInvoiceContent__grid">
-                <div class="orderInvoiceContent__main">
-                    <section class="orderInvoiceContent__panel orderInvoiceContent__panel--muted">
-                        <div class="orderInvoiceContent__detailsGrid">
-                            <div class="orderInvoiceContent__detailCard">
-                                <span class="orderInvoiceContent__label">Order</span>
-                                <strong class="orderInvoiceContent__value">#{{ order.display_id || order.id }}</strong>
+            <div class="order-invoice-content__grid">
+                <div class="order-invoice-content__main">
+                    <section class="order-invoice-content__panel order-invoice-content__panel--muted">
+                        <div class="order-invoice-content__details-grid">
+                            <div class="order-invoice-content__detail-card">
+                                <span class="order-invoice-content__label">Order</span>
+                                <strong class="order-invoice-content__value">#{{ order.display_id || order.id }}</strong>
                             </div>
-                            <div class="orderInvoiceContent__detailCard">
-                                <span class="orderInvoiceContent__label">Placed on</span>
-                                <strong class="orderInvoiceContent__value">
+                            <div class="order-invoice-content__detail-card">
+                                <span class="order-invoice-content__label">Placed on</span>
+                                <strong class="order-invoice-content__value">
                                     {{
                                         new Date(order.created_at ?? new Date()).toLocaleDateString("en-US", {
                                             year: "numeric",
@@ -49,70 +49,72 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
                                     }}
                                 </strong>
                             </div>
-                            <div class="orderInvoiceContent__detailCard">
-                                <span class="orderInvoiceContent__label">Status</span>
-                                <strong class="orderInvoiceContent__value">
+                            <div class="order-invoice-content__detail-card">
+                                <span class="order-invoice-content__label">Status</span>
+                                <strong class="order-invoice-content__value">
                                     {{ ORDER_STATUS[order.fulfillment_status as keyof typeof ORDER_STATUS] || order.fulfillment_status }}
                                 </strong>
                             </div>
                         </div>
                     </section>
-                    <section class="orderInvoiceContent__panel">
-                        <h2 class="orderInvoiceContent__title">Items in this order</h2>
-                        <div class="orderInvoiceContent__itemsList">
-                            <article v-for="item in order.items" :key="item.id" class="orderInvoiceContent__itemCard">
+                    <section class="order-invoice-content__panel">
+                        <h2 class="order-invoice-content__title">Items in this order</h2>
+                        <div class="order-invoice-content__items-list">
+                            <article v-for="item in order.items" :key="item.id" class="order-invoice-content__item-card">
                                 <NuxtImg
                                     :src="item.thumbnail || '/images/placeholder.png'"
                                     width="72"
-                                    class="orderInvoiceContent__itemImage"
+                                    class="order-invoice-content__item-image"
                                 />
-                                <div class="orderInvoiceContent__itemBody">
-                                    <strong class="orderInvoiceContent__itemTitle">{{ item.product_title }}</strong>
-                                    <p class="orderInvoiceContent__itemMeta">{{ item.variant_title }}</p>
-                                    <p class="orderInvoiceContent__itemMeta">Qty {{ item.quantity }}</p>
+                                <div class="order-invoice-content__item-body">
+                                    <strong class="order-invoice-content__item-title">{{ item.product_title }}</strong>
+                                    <p class="order-invoice-content__item-meta">{{ item.variant_title }}</p>
+                                    <p class="order-invoice-content__item-meta">Qty {{ item.quantity }}</p>
                                 </div>
-                                <div class="orderInvoiceContent__itemPricing">
+                                <div class="order-invoice-content__item-pricing">
                                     <span>{{ formatPrice(Number(item.unit_price || 0), order.currency_code) }}</span>
                                     <strong>{{ formatPrice(Number(item.total || 0), order.currency_code) }}</strong>
                                 </div>
                             </article>
                         </div>
                     </section>
-                    <section class="orderInvoiceContent__panel">
-                        <h2 class="orderInvoiceContent__title">Shipping and payment</h2>
-                        <div class="orderInvoiceContent__detailsGrid">
-                            <div class="orderInvoiceContent__detailCard">
-                                <span class="orderInvoiceContent__label">Email</span>
-                                <strong class="orderInvoiceContent__value">{{ order.email }}</strong>
+                    <section class="order-invoice-content__panel">
+                        <h2 class="order-invoice-content__title">Shipping and payment</h2>
+                        <div class="order-invoice-content__details-grid">
+                            <div class="order-invoice-content__detail-card">
+                                <span class="order-invoice-content__label">Email</span>
+                                <strong class="order-invoice-content__value">{{ order.email }}</strong>
                             </div>
-                            <div class="orderInvoiceContent__detailCard">
-                                <span class="orderInvoiceContent__label">Payment status</span>
-                                <strong class="orderInvoiceContent__value">{{ order.payment_status }}</strong>
+                            <div class="order-invoice-content__detail-card">
+                                <span class="order-invoice-content__label">Payment status</span>
+                                <strong class="order-invoice-content__value">{{ order.payment_status }}</strong>
                             </div>
-                            <div class="orderInvoiceContent__detailCard">
-                                <span class="orderInvoiceContent__label">Shipping method</span>
-                                <strong class="orderInvoiceContent__value">{{ order.shipping_methods?.[0]?.name || "Unavailable" }}</strong>
+                            <div class="order-invoice-content__detail-card">
+                                <span class="order-invoice-content__label">Shipping method</span>
+                                <strong class="order-invoice-content__value">{{
+                                    order.shipping_methods?.[0]?.name || "Unavailable"
+                                }}</strong>
                             </div>
                         </div>
                     </section>
                 </div>
-                <aside class="orderInvoiceContent__summary">
-                    <section class="orderInvoiceContent__panel orderInvoiceContent__panel--sticky">
-                        <h2 class="orderInvoiceContent__title">Totals</h2>
-                        <div class="orderInvoiceContent__totals">
-                            <div class="orderInvoiceContent__totalRow">
+                <aside class="order-invoice-content__summary">
+                    <section class="order-invoice-content__panel order-invoice-content__panel--sticky">
+                        <h2 class="order-invoice-content__title">Totals</h2>
+                        <div class="order-invoice-content__totals">
+                            <div class="order-invoice-content__total-row">
                                 <span>Subtotal</span>
                                 <span>{{ formatPrice(Number(order.subtotal || 0), order.currency_code) }}</span>
                             </div>
-                            <div class="orderInvoiceContent__totalRow">
+                            <div class="order-invoice-content__total-row">
                                 <span>Shipping</span>
                                 <span>{{ formatPrice(Number(order.shipping_total || 0), order.currency_code) }}</span>
                             </div>
-                            <div class="orderInvoiceContent__totalRow">
+                            <div class="order-invoice-content__total-row">
                                 <span>Tax</span>
                                 <span>{{ formatPrice(Number(order.tax_total || 0), order.currency_code) }}</span>
                             </div>
-                            <div class="orderInvoiceContent__totalRow orderInvoiceContent__totalRow--grand">
+                            <div class="order-invoice-content__total-row order-invoice-content__total-row--grand">
                                 <span>Total</span>
                                 <strong>{{ formatPrice(Number(order.total || 0), order.currency_code) }}</strong>
                             </div>
@@ -126,135 +128,135 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
 </template>
 
 <style scoped lang="scss">
-.orderInvoiceContent__grid,
-.orderInvoiceContent__detailsGrid {
+.order-invoice-content__grid,
+.order-invoice-content__details-grid {
     display: grid;
     gap: 1.25rem;
 }
 
-.orderInvoiceContent__grid {
+.order-invoice-content__grid {
     grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
 }
 
-.orderInvoiceContent__main,
-.orderInvoiceContent__itemsList,
-.orderInvoiceContent__totals {
+.order-invoice-content__main,
+.order-invoice-content__items-list,
+.order-invoice-content__totals {
     display: grid;
     gap: 1rem;
 }
 
-.orderInvoiceContent__panel,
-.orderInvoiceContent__detailCard,
-.orderInvoiceContent__itemCard {
+.order-invoice-content__panel,
+.order-invoice-content__detail-card,
+.order-invoice-content__item-card {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.4rem;
     background: rgba(255, 255, 255, 0.88);
 }
 
-.orderInvoiceContent__panel {
+.order-invoice-content__panel {
     padding: 1.35rem;
 }
 
-.orderInvoiceContent__panel--muted,
-.orderInvoiceContent__itemCard {
+.order-invoice-content__panel--muted,
+.order-invoice-content__item-card {
     background: rgba(247, 250, 255, 0.92);
 }
 
-.orderInvoiceContent__panel--sticky {
+.order-invoice-content__panel--sticky {
     position: sticky;
     top: 1.5rem;
 }
 
-.orderInvoiceContent__detailsGrid {
+.order-invoice-content__details-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.orderInvoiceContent__detailCard {
+.order-invoice-content__detail-card {
     display: grid;
     gap: 0.2rem;
     padding: 1rem;
 }
 
-.orderInvoiceContent__label,
-.orderInvoiceContent__itemMeta {
+.order-invoice-content__label,
+.order-invoice-content__item-meta {
     color: #4b5874;
 }
 
-.orderInvoiceContent__value,
-.orderInvoiceContent__title,
-.orderInvoiceContent__itemTitle {
+.order-invoice-content__value,
+.order-invoice-content__title,
+.order-invoice-content__item-title {
     color: #08173f;
 }
 
-.orderInvoiceContent__title {
+.order-invoice-content__title {
     margin: 0;
     font-size: 1.35rem;
 }
 
-.orderInvoiceContent__itemCard {
+.order-invoice-content__item-card {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem;
 }
 
-.orderInvoiceContent__itemImage {
+.order-invoice-content__item-image {
     border-radius: 1rem;
 }
 
-.orderInvoiceContent__itemBody {
+.order-invoice-content__item-body {
     display: grid;
     flex: 1;
     gap: 0.2rem;
 }
 
-.orderInvoiceContent__itemMeta {
+.order-invoice-content__item-meta {
     margin: 0;
     line-height: 1.6;
 }
 
-.orderInvoiceContent__itemPricing {
+.order-invoice-content__item-pricing {
     display: grid;
     gap: 0.2rem;
     justify-items: end;
     color: #08173f;
 }
 
-.orderInvoiceContent__totalRow {
+.order-invoice-content__total-row {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
     color: #4b5874;
 }
 
-.orderInvoiceContent__totalRow--grand {
+.order-invoice-content__total-row--grand {
     padding-top: 0.75rem;
     border-top: 1px solid rgba(8, 23, 63, 0.08);
 }
 
-.orderInvoiceContent__totalRow strong {
+.order-invoice-content__total-row strong {
     color: #08173f;
 }
 
 @media screen and (max-width: 1100px) {
-    .orderInvoiceContent__grid,
-    .orderInvoiceContent__detailsGrid {
+    .order-invoice-content__grid,
+    .order-invoice-content__details-grid {
         grid-template-columns: 1fr;
     }
 
-    .orderInvoiceContent__panel--sticky {
+    .order-invoice-content__panel--sticky {
         position: static;
     }
 }
 
 @media screen and (max-width: 700px) {
-    .orderInvoiceContent__itemCard,
-    .orderInvoiceContent__totalRow {
+    .order-invoice-content__item-card,
+    .order-invoice-content__total-row {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .orderInvoiceContent__itemPricing {
+    .order-invoice-content__item-pricing {
         justify-items: start;
     }
 }

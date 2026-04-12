@@ -236,31 +236,31 @@ onMounted(() => {
 </script>
 
 <template>
-    <main class="socialAuthPage">
-        <div class="socialAuthPage__hero">
-            <VContainer class="socialAuthPage__container">
-                <div class="socialAuthPage__grid">
-                    <div class="socialAuthPage__copy">
-                        <span class="socialAuthPage__eyebrow">Social sign-in</span>
-                        <h1 class="socialAuthPage__title">We are connecting your account and preparing your session.</h1>
-                        <p class="socialAuthPage__description">
+    <main class="social-auth-page">
+        <div class="social-auth-page__hero">
+            <VContainer class="social-auth-page__container">
+                <div class="social-auth-page__grid">
+                    <div class="social-auth-page__copy">
+                        <span class="social-auth-page__eyebrow">Social sign-in</span>
+                        <h1 class="social-auth-page__title">We are connecting your account and preparing your session.</h1>
+                        <p class="social-auth-page__description">
                             This step confirms your {{ provider }} login, creates the customer profile if needed, and brings you back into
                             the shop.
                         </p>
                     </div>
 
-                    <div class="socialAuthPage__panel">
-                        <span class="socialAuthPage__sectionEyebrow">Authentication status</span>
-                        <h2 class="socialAuthPage__sectionTitle">Finishing the secure handoff.</h2>
-                        <p class="socialAuthPage__sectionText">
+                    <div class="social-auth-page__panel">
+                        <span class="social-auth-page__section-eyebrow">Authentication status</span>
+                        <h2 class="social-auth-page__section-title">Finishing the secure handoff.</h2>
+                        <p class="social-auth-page__section-text">
                             Please keep this page open for a moment while we complete the sign-in flow.
                         </p>
 
-                        <div v-if="isLoading" class="socialAuthPage__loadingCard">
-                            <div class="socialAuthPage__progressBar">
-                                <div class="socialAuthPage__progress"></div>
+                        <div v-if="isLoading" class="social-auth-page__loading-card">
+                            <div class="social-auth-page__progress-bar">
+                                <div class="social-auth-page__progress"></div>
                             </div>
-                            <p class="socialAuthPage__loadingMessage">{{ loadingMessage }}</p>
+                            <p class="social-auth-page__loading-message">{{ loadingMessage }}</p>
                         </div>
                     </div>
                 </div>
@@ -274,43 +274,43 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.socialAuthPage {
+.social-auth-page {
     min-height: 100vh;
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.socialAuthPage__hero {
+.social-auth-page__hero {
     min-height: 100vh;
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+    padding: 5.5rem 0 5rem;
     display: flex;
     align-items: center;
 }
 
-.socialAuthPage__container {
+.social-auth-page__container {
     position: relative;
     z-index: 1;
 }
 
-.socialAuthPage__grid {
+.social-auth-page__grid {
     display: grid;
     grid-template-columns: minmax(0, 1.08fr) minmax(19rem, 0.92fr);
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
     align-items: center;
 }
 
-.socialAuthPage__copy,
-.socialAuthPage__panel {
+.social-auth-page__copy,
+.social-auth-page__panel {
     animation: social-rise 0.8s ease both;
 }
 
-.socialAuthPage__panel {
+.social-auth-page__panel {
     animation-delay: 0.12s;
 }
 
-.socialAuthPage__eyebrow,
-.socialAuthPage__sectionEyebrow {
+.social-auth-page__eyebrow,
+.social-auth-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -324,30 +324,30 @@ onMounted(() => {
     text-transform: uppercase;
 }
 
-.socialAuthPage__title,
-.socialAuthPage__sectionTitle {
+.social-auth-page__title,
+.social-auth-page__section-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.socialAuthPage__title {
+.social-auth-page__title {
     max-width: 12ch;
     margin: 1rem 0;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 4.5rem;
     line-height: 0.95;
 }
 
-.socialAuthPage__description,
-.socialAuthPage__sectionText,
-.socialAuthPage__loadingMessage {
+.social-auth-page__description,
+.social-auth-page__section-text,
+.social-auth-page__loading-message {
     margin: 0;
     color: #4b5874;
     line-height: 1.75;
 }
 
-.socialAuthPage__panel,
-.socialAuthPage__loadingCard {
+.social-auth-page__panel,
+.social-auth-page__loading-card {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.84);
@@ -355,26 +355,26 @@ onMounted(() => {
     backdrop-filter: blur(14px);
 }
 
-.socialAuthPage__panel {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.social-auth-page__panel {
+    padding: 1.9rem;
 }
 
-.socialAuthPage__sectionEyebrow {
+.social-auth-page__section-eyebrow {
     margin-bottom: 1rem;
 }
 
-.socialAuthPage__sectionTitle {
+.social-auth-page__section-title {
     margin: 0 0 0.75rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 2.2rem;
     line-height: 1.08;
 }
 
-.socialAuthPage__loadingCard {
+.social-auth-page__loading-card {
     margin-top: 1.35rem;
     padding: 1.2rem;
 }
 
-.socialAuthPage__progressBar {
+.social-auth-page__progress-bar {
     width: 100%;
     height: 0.75rem;
     border-radius: 999px;
@@ -382,7 +382,7 @@ onMounted(() => {
     background: rgba(8, 23, 63, 0.08);
 }
 
-.socialAuthPage__progress {
+.social-auth-page__progress {
     width: 0;
     height: 100%;
     border-radius: 999px;
@@ -390,7 +390,7 @@ onMounted(() => {
     animation: social-progress 2s infinite;
 }
 
-.socialAuthPage__loadingMessage {
+.social-auth-page__loading-message {
     margin-top: 1rem;
     font-size: 1rem;
 }
@@ -422,35 +422,49 @@ onMounted(() => {
 }
 
 @media screen and (max-width: 1100px) {
-    .socialAuthPage__grid {
+    .social-auth-page__grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
-    .socialAuthPage__title {
+    .social-auth-page__title {
         max-width: 100%;
+        font-size: 3.2rem;
+    }
+
+    .social-auth-page__panel {
+        padding: 1.5rem;
+    }
+
+    .social-auth-page__section-title {
+        font-size: 1.8rem;
     }
 }
 
 @media screen and (max-width: 700px) {
-    .socialAuthPage__hero {
+    .social-auth-page__hero {
         padding: 3.75rem 0 3.5rem;
     }
 
-    .socialAuthPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .social-auth-page__title {
+        font-size: 2.4rem;
         line-height: 1;
     }
 
-    .socialAuthPage__panel,
-    .socialAuthPage__loadingCard {
+    .social-auth-page__panel,
+    .social-auth-page__loading-card {
         border-radius: 1.2rem;
+    }
+
+    .social-auth-page__section-title {
+        font-size: 1.6rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .socialAuthPage__copy,
-    .socialAuthPage__panel,
-    .socialAuthPage__progress {
+    .social-auth-page__copy,
+    .social-auth-page__panel,
+    .social-auth-page__progress {
         animation: none;
     }
 }

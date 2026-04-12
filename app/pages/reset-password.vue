@@ -48,30 +48,30 @@ async function handleSubmit(): Promise<void> {
 </script>
 
 <template>
-    <section class="resetPage">
-        <div class="resetPage__hero">
-            <VContainer class="resetPage__container">
-                <div class="resetPage__grid">
-                    <div class="resetPage__copy">
-                        <span class="resetPage__eyebrow">Secure your account</span>
-                        <h1 class="resetPage__title">Choose a new password and get back to shopping.</h1>
-                        <p class="resetPage__description">
+    <section class="reset-page">
+        <div class="reset-page__hero">
+            <VContainer class="reset-page__container">
+                <div class="reset-page__grid">
+                    <div class="reset-page__copy">
+                        <span class="reset-page__eyebrow">Secure your account</span>
+                        <h1 class="reset-page__title">Choose a new password and get back to shopping.</h1>
+                        <p class="reset-page__description">
                             Create fresh account access here, then head back into your profile, saved details, and upcoming checkout.
                         </p>
-                        <div class="resetPage__statCard">
-                            <span class="resetPage__statLabel">Next step</span>
-                            <strong class="resetPage__statValue"
-                            >Once your password is updated, you will be redirected to sign in again with the new details.</strong
-                            >
+                        <div class="reset-page__stat-card">
+                            <span class="reset-page__stat-label">Next step</span>
+                            <strong class="reset-page__stat-value">
+                                Once your password is updated, you will be redirected to sign in again with the new details.
+                            </strong>
                         </div>
                     </div>
-                    <div class="resetPage__panel">
-                        <span class="resetPage__sectionEyebrow">Reset password</span>
-                        <h2 class="resetPage__sectionTitle">Set a new password.</h2>
-                        <p class="resetPage__sectionText">
+                    <div class="reset-page__panel">
+                        <span class="reset-page__section-eyebrow">Reset password</span>
+                        <h2 class="reset-page__section-title">Set a new password.</h2>
+                        <p class="reset-page__section-text">
                             Use a password you have not used before so the account feels secure from the next sign-in onward.
                         </p>
-                        <VForm class="resetPage__form" @submit.prevent="handleSubmit">
+                        <VForm class="reset-page__form" @submit.prevent="handleSubmit">
                             <VTextField
                                 v-model="password"
                                 type="password"
@@ -96,39 +96,39 @@ async function handleSubmit(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.resetPage {
+.reset-page {
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
-.resetPage__hero {
-    padding: clamp(4.75rem, 7vw, 6.5rem) 0 clamp(4rem, 7vw, 6rem);
+.reset-page__hero {
+    padding: 6.5rem 0 6rem;
 }
 
-.resetPage__container {
+.reset-page__container {
     position: relative;
     z-index: 1;
 }
 
-.resetPage__grid {
+.reset-page__grid {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(19rem, 0.95fr);
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: 2rem;
     align-items: center;
 }
 
-.resetPage__copy,
-.resetPage__panel {
+.reset-page__copy,
+.reset-page__panel {
     animation: reset-rise 0.8s ease both;
 }
 
-.resetPage__panel {
+.reset-page__panel {
     animation-delay: 0.12s;
 }
 
-.resetPage__eyebrow,
-.resetPage__sectionEyebrow {
+.reset-page__eyebrow,
+.reset-page__section-eyebrow {
     display: inline-flex;
     align-items: center;
     min-height: 2.25rem;
@@ -142,29 +142,29 @@ async function handleSubmit(): Promise<void> {
     text-transform: uppercase;
 }
 
-.resetPage__title,
-.resetPage__sectionTitle {
+.reset-page__title,
+.reset-page__section-title {
     color: #08173f;
     letter-spacing: -0.06rem;
     text-wrap: balance;
 }
 
-.resetPage__title {
+.reset-page__title {
     max-width: 11ch;
     margin: 1rem 0;
-    font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+    font-size: 4.5rem;
     line-height: 0.95;
 }
 
-.resetPage__description,
-.resetPage__sectionText {
+.reset-page__description,
+.reset-page__section-text {
     margin: 0;
     color: #4b5874;
     line-height: 1.75;
 }
 
-.resetPage__statCard,
-.resetPage__panel {
+.reset-page__stat-card,
+.reset-page__panel {
     border: 1px solid rgba(8, 23, 63, 0.08);
     border-radius: 1.6rem;
     background: rgba(255, 255, 255, 0.84);
@@ -172,7 +172,7 @@ async function handleSubmit(): Promise<void> {
     backdrop-filter: blur(14px);
 }
 
-.resetPage__statCard {
+.reset-page__stat-card {
     display: grid;
     gap: 0.2rem;
     max-width: 27rem;
@@ -180,32 +180,32 @@ async function handleSubmit(): Promise<void> {
     padding: 0.9rem 1.05rem;
 }
 
-.resetPage__statLabel {
+.reset-page__stat-label {
     color: #6a7590;
     font-size: 0.88rem;
 }
 
-.resetPage__statValue {
+.reset-page__stat-value {
     color: #08173f;
     font-size: 1rem;
     line-height: 1.45;
 }
 
-.resetPage__panel {
-    padding: clamp(1.4rem, 2vw, 1.9rem);
+.reset-page__panel {
+    padding: 1.9rem;
 }
 
-.resetPage__sectionEyebrow {
+.reset-page__section-eyebrow {
     margin-bottom: 1rem;
 }
 
-.resetPage__sectionTitle {
+.reset-page__section-title {
     margin: 0 0 0.75rem;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-size: 2.2rem;
     line-height: 1.08;
 }
 
-.resetPage__form {
+.reset-page__form {
     display: grid;
     gap: 0.9rem;
     margin-top: 1.35rem;
@@ -224,34 +224,56 @@ async function handleSubmit(): Promise<void> {
 }
 
 @media screen and (max-width: 1100px) {
-    .resetPage__grid {
-        grid-template-columns: 1fr;
+    .reset-page__hero {
+        padding: 5.5rem 0 5rem;
     }
 
-    .resetPage__title {
+    .reset-page__grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .reset-page__title {
         max-width: 100%;
+        font-size: 3.5rem;
+    }
+
+    .reset-page__section-title {
+        font-size: 1.9rem;
+    }
+
+    .reset-page__panel {
+        padding: 1.6rem;
     }
 }
 
 @media screen and (max-width: 700px) {
-    .resetPage__hero {
+    .reset-page__hero {
         padding: 3.75rem 0 3.5rem;
     }
 
-    .resetPage__title {
-        font-size: clamp(2rem, 9vw, 2.8rem);
+    .reset-page__title {
+        font-size: 2.8rem;
         line-height: 1;
     }
 
-    .resetPage__statCard,
-    .resetPage__panel {
+    .reset-page__section-title {
+        font-size: 1.6rem;
+    }
+
+    .reset-page__stat-card,
+    .reset-page__panel {
         border-radius: 1.2rem;
+    }
+
+    .reset-page__panel {
+        padding: 1.4rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .resetPage__copy,
-    .resetPage__panel {
+    .reset-page__copy,
+    .reset-page__panel {
         animation: none;
     }
 }

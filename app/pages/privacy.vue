@@ -7,11 +7,11 @@ useHead({
 </script>
 
 <template>
-    <VContainer class="privacyPage py-12">
+    <VContainer class="privacy-page py-12">
         <VRow justify="center">
             <VCol cols="12" md="9">
                 <VCard flat class="pa-4">
-                    <AppBreadcrumbs :items="breadcrumbItems" class="privacyPage__breadcrumbs" />
+                    <AppBreadcrumbs :items="breadcrumbItems" class="privacy-page__breadcrumbs" />
                     <VCardTitle class="text-h4 mb-6">Privacy Policy</VCardTitle>
                     <VCardText>
                         <p class="mb-4">Effective date: [Date]</p>
@@ -42,8 +42,8 @@ useHead({
                             <VListItem>
                                 <strong>To Improve Our Services:</strong> We use behavior data to enhance our website and services.
                             </VListItem>
-                            <VListItem> <strong>Marketing:</strong> With consent, we may send promotional emails and updates. </VListItem>
-                            <VListItem> <strong>Legal Compliance:</strong> To fulfill legal and regulatory obligations. </VListItem>
+                            <VListItem><strong>Marketing:</strong> With consent, we may send promotional emails and updates.</VListItem>
+                            <VListItem><strong>Legal Compliance:</strong> To fulfill legal and regulatory obligations.</VListItem>
                         </VList>
                         <h2 class="text-h5 mt-8 mb-2">3. Sharing Your Information</h2>
                         <p>We may share your information with third parties such as:</p>
@@ -51,8 +51,8 @@ useHead({
                             <VListItem>
                                 <strong>Service Providers:</strong> Including payment processors, shipping providers, etc.
                             </VListItem>
-                            <VListItem> <strong>Compliance with Laws:</strong> When legally required to do so. </VListItem>
-                            <VListItem> <strong>Business Transfers:</strong> In the event of mergers or acquisitions. </VListItem>
+                            <VListItem><strong>Compliance with Laws:</strong> When legally required to do so.</VListItem>
+                            <VListItem><strong>Business Transfers:</strong> In the event of mergers or acquisitions.</VListItem>
                         </VList>
                         <h2 class="text-h5 mt-8 mb-2">4. Data Security</h2>
                         <p>We implement reasonable safeguards, but no internet method is 100% secure. Use at your own risk.</p>
@@ -82,7 +82,7 @@ useHead({
 </template>
 
 <style scoped lang="scss">
-.privacyPage__breadcrumbs {
+.privacy-page__breadcrumbs {
     margin-bottom: 1rem;
 }
 </style>
