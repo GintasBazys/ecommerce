@@ -1,8 +1,9 @@
 import type { ProductCategoryDTO } from "@medusajs/types"
 
+import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
+
 export default defineCachedEventHandler(
     async (event) => {
-        const config = useRuntimeConfig()
         const handle = event.context.params?.handle
 
         if (!handle) {
@@ -13,18 +14,9 @@ export default defineCachedEventHandler(
         }
 
         try {
-            const data = await $fetch<{ product_categories: ProductCategoryDTO[] }>(
-                `${config.public.MEDUSA_URL}/store/product-categories`,
-                {
-                    method: "GET",
-                    headers: {
-                        "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-                    },
-                    query: {
-                        handle,
-                        fields: "*category_children,*products,*product_category_image"
-                    }
-                }
+            const data = await fetchMedusaJson<{ product_categories: ProductCategoryDTO[] }>(
+                event,
+                `/store/product-categories?handle=${encodeURIComponent(handle)}&fields=*category_children,*products,*product_category_image`
             )
 
             const category = data.product_categories?.[0]
@@ -39,12 +31,9 @@ export default defineCachedEventHandler(
             setHeader(event, "Cache-Control", "public, max-age=300, s-maxage=1800, stale-while-revalidate=86400")
 
             return category
-        } catch (err: any) {
-            console.error("Category fetch failed:", err?.code || err)
-
+        } catch (error: unknown) {
             setHeader(event, "Cache-Control", "no-store")
-
-            return null
+            throw toUpstreamError(error, "Failed to fetch category")
         }
     },
     {
@@ -53,7 +42,7 @@ export default defineCachedEventHandler(
         swr: true,
         getKey: (event) => {
             const h = event.context.params?.handle ?? ""
-            return `product-category:${h}`
+            return `product-category-v2:${h}`
         }
     }
 )
