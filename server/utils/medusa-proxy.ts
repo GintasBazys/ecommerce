@@ -29,7 +29,19 @@ export function getIncomingCookie(event: H3Event) {
 
 export function getMedusaUrl(event: H3Event, path: string) {
     const runtimeConfig = useRuntimeConfig(event)
-    return `${runtimeConfig.public.MEDUSA_URL}${path}`
+    const configuredBaseUrl = String(runtimeConfig.medusaUrl || runtimeConfig.public.MEDUSA_URL || "")
+    const baseUrl = configuredBaseUrl.replace(/\/+$/, "")
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`
+
+    if (!baseUrl) {
+        throw createError({ statusCode: 500, statusMessage: "MEDUSA_URL is not configured" })
+    }
+
+    if (baseUrl.endsWith("/store") && normalizedPath.startsWith("/store/")) {
+        return `${baseUrl}${normalizedPath.slice("/store".length)}`
+    }
+
+    return `${baseUrl}${normalizedPath}`
 }
 
 export function createMedusaHeaders(event: H3Event, options: MedusaRequestOptions = {}) {
