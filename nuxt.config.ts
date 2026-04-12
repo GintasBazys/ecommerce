@@ -1,5 +1,6 @@
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
+
     app: {
         layoutTransition: {
             name: "page",
@@ -16,11 +17,14 @@ export default defineNuxtConfig({
             meta: [{ name: "description", content: "..." }]
         }
     },
+
     css: ["@/assets/scss/main.scss", "swiper/swiper-bundle.css"],
+
     image: {
         inject: true,
-        domains: ["https://medusa-public-images.s3.eu-west-1.amazonaws.com"]
+        domains: ["medusa-public-images.s3.eu-west-1.amazonaws.com"]
     },
+
     modules: [
         "@nuxt/eslint",
         "@pinia/nuxt",
@@ -29,9 +33,9 @@ export default defineNuxtConfig({
         "@nuxtjs/sitemap",
         "@unlok-co/nuxt-stripe",
         "@nuxt/content",
-        "vuetify-nuxt-module",
-        "@nuxt/test-utils/module"
+        "vuetify-nuxt-module"
     ],
+
     stripe: {
         server: {
             key: process.env.STRIPE_SECRET_KEY,
@@ -42,6 +46,7 @@ export default defineNuxtConfig({
             options: {}
         }
     },
+
     runtimeConfig: {
         medusaUrl: process.env.MEDUSA_URL,
         public: {
@@ -56,15 +61,19 @@ export default defineNuxtConfig({
             mailchimpAudienceId: process.env.MAILCHIMP_AUDIENCE_ID
         }
     },
+
     plugins: ["~/plugins/init-app", "~/plugins/silktide.client.js"],
+
     vite: {
         optimizeDeps: {
             include: ["@stripe/stripe-js"]
         }
     },
+
     content: {
         experimental: { nativeSqlite: true }
     },
+
     vue: {
         compilerOptions: {
             isCustomElement: (tag) => tag.startsWith("swiper-")
