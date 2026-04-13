@@ -10,7 +10,6 @@ type MedusaRequestOptions = Omit<RequestInit, "headers"> & {
     headers?: HeadersInit
     includePublishableKey?: boolean
     cookie?: string
-    timeoutMs?: number
 }
 
 type ErrorWithCode = {
@@ -154,20 +153,13 @@ export async function assertMedusaResponse(response: Response, fallbackMessage: 
 }
 
 export async function fetchMedusaResponse(event: H3Event, path: string, options: MedusaRequestOptions = {}) {
-    const { timeoutMs = 8000, ...requestOptions } = options
-    const abortController = new AbortController()
-    const timeoutId = setTimeout(() => abortController.abort(), timeoutMs)
-
     try {
         return await fetch(getMedusaUrl(event, path), {
-            ...requestOptions,
-            headers: createMedusaHeaders(event, options),
-            signal: abortController.signal
+            ...options,
+            headers: createMedusaHeaders(event, options)
         })
     } catch (error: unknown) {
         throw toUpstreamError(error, "Failed to reach Medusa")
-    } finally {
-        clearTimeout(timeoutId)
     }
 }
 

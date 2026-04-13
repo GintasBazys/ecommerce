@@ -7,8 +7,14 @@ import { formatPrice } from "~/utils/formatPrice"
 const { cart, openCartDrawer } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem } = useCartStore()
 
+const isHydrated = ref(false)
+
 const qtyMap = reactive<Record<string, number | undefined>>({})
 const updating = reactive<Record<string, boolean>>({})
+
+onMounted(() => {
+    isHydrated.value = true
+})
 
 watch(
     cart,
@@ -122,7 +128,7 @@ router.afterEach(() => {
 </script>
 
 <template>
-    <VNavigationDrawer v-model="openCartDrawer" location="right" touchless temporary width="420" class="cart-drawer">
+    <VNavigationDrawer v-if="isHydrated" v-model="openCartDrawer" location="right" touchless temporary width="420" class="cart-drawer">
         <div class="cart-drawer__shell">
             <div class="cart-drawer__backdrop"></div>
 

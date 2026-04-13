@@ -1,35 +1,80 @@
 <script setup lang="ts">
 import { jwtDecode } from "jwt-decode"
-import { useRouter, useRoute } from "vue-router"
 
 import type { CustomJwtPayload } from "@/types/interfaces"
+import type { CustomerDTO } from "@medusajs/types"
 
-definePageMeta({
-    layout: "account"
-})
+import { SOCIAL_AUTH_REDIRECT_KEY } from "~/composables/useCustomerAuth"
+
+type SocialProvider = "google" | "facebook"
+type SocialStage = "authenticating" | "error" | "success"
+type IdentityResponse = {
+    authIdentity?: {
+        user_metadata?: Record<string, unknown>
+    }
+}
 
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
+const customerStore = useCustomerStore()
+const cartStore = useCartStore()
+
 const medusaBaseUrl = String(config.public.MEDUSA_URL || "").replace(/\/+$/, "")
+const loadingMessage = ref<string>("Initializing authentication...")
+const errorMessage = ref<string>("")
+const stage = ref<SocialStage>("authenticating")
+const snackbar = ref<boolean>(false)
+const snackbarText = ref<string>("")
+const snackbarColor = ref<string>("success")
+const isRetrying = ref<boolean>(false)
+
+const provider = computed<SocialProvider | null>(() => {
+    const value = String(route.query.provider || "").toLowerCase()
+
+    if (value === "google" || value === "facebook") {
+        return value
+    }
+
+    return null
+})
+
+const providerLabel = computed<string>(() => {
+    if (provider.value === "facebook") {
+        return "Facebook"
+    }
+
+    return "Google"
+})
+
+const isLoading = computed<boolean>(() => stage.value === "authenticating")
+const statusTitle = computed<string>(() => {
+    if (isLoading.value) {
+        return "Finishing the secure handoff."
+    }
+
+    if (stage.value === "error") {
+        return "We could not complete sign-in."
+    }
+
+    return "Session ready."
+})
+const statusText = computed<string>(() => {
+    if (isLoading.value) {
+        return "Please keep this page open while we complete the social authentication flow."
+    }
+
+    if (stage.value === "error") {
+        return errorMessage.value
+    }
+
+    return "You are signed in and will be redirected in a moment."
+})
 
 function getMedusaUrl(path: string): string {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`
     return `${medusaBaseUrl}${normalizedPath}`
 }
-
-const email = ref<string>("")
-const firstName = ref<string>("")
-const lastName = ref<string>("")
-
-const { customer } = storeToRefs(useCustomerStore())
-
-const isLoading = ref<boolean>(true)
-const loadingMessage = ref<string>("Initializing...")
-const snackbar = ref<boolean>(false)
-const snackbarText = ref<string>("")
-const snackbarColor = ref<string>("success")
-const provider = computed(() => (route.query.provider as string) || "google")
 
 function showNotification(message: string, color: "success" | "error"): void {
     snackbarText.value = message
@@ -37,259 +82,368 @@ function showNotification(message: string, color: "success" | "error"): void {
     snackbar.value = true
 }
 
-async function sendCallback(): Promise<string | null> {
+function toText(value: unknown): string | null {
+    return typeof value === "string" && value.trim().length > 0 ? value.trim() : null
+}
+
+function readPayloadMessage(payload: unknown): string | null {
+    if (!payload || typeof payload !== "object") {
+        return null
+    }
+
+    const data = payload as Record<string, unknown>
+    return toText(data.message) || toText(data.statusMessage) || toText(data.error) || toText(data.error_description)
+}
+
+async function parseResponsePayload(response: Response): Promise<unknown> {
+    try {
+        return await response.json()
+    } catch {
+        return null
+    }
+}
+
+function failAuth(message: string): void {
+    stage.value = "error"
+    loadingMessage.value = "Authentication failed"
+    errorMessage.value = message
+    showNotification(message, "error")
+}
+
+function getStoredRedirectPath(): string {
+    if (import.meta.server) {
+        return "/"
+    }
+
+    const value = sessionStorage.getItem(SOCIAL_AUTH_REDIRECT_KEY)
+    if (typeof value === "string" && value.startsWith("/")) {
+        return value
+    }
+
+    return "/"
+}
+
+function consumeStoredRedirectPath(): string {
+    if (import.meta.server) {
+        return "/"
+    }
+
+    const value = getStoredRedirectPath()
+    sessionStorage.removeItem(SOCIAL_AUTH_REDIRECT_KEY)
+    return value
+}
+
+async function sendCallback(activeProvider: SocialProvider): Promise<string> {
     const searchParams = new URLSearchParams(window.location.search)
-    const queryParams = Object.fromEntries(searchParams.entries())
+    const callbackUrl = `${getMedusaUrl(`/auth/customer/${activeProvider}/callback`)}?${searchParams.toString()}`
+
+    const response = await fetch(callbackUrl, {
+        credentials: "include",
+        method: "POST"
+    })
+    const payload = await parseResponsePayload(response)
+
+    if (!response.ok) {
+        throw new Error(readPayloadMessage(payload) || "Could not validate social authentication callback.")
+    }
+
+    const token = toText((payload as { token?: unknown })?.token)
+    if (!token) {
+        throw new Error("Authentication token was not returned by the callback endpoint.")
+    }
+
+    return token
+}
+
+function splitName(name: string): { firstName: string; lastName: string } {
+    const parts = name.trim().split(/\s+/)
+    return {
+        firstName: parts.shift() || "",
+        lastName: parts.join(" ")
+    }
+}
+
+function mapIdentityToCustomerFields(metadata: Record<string, unknown>): {
+    email: string
+    firstName: string
+    lastName: string
+} {
+    const email = toText(metadata.email) || ""
+    const givenName = toText(metadata.given_name) || toText(metadata.first_name) || ""
+    const familyName = toText(metadata.family_name) || toText(metadata.last_name) || ""
+
+    if (givenName || familyName) {
+        return { email, firstName: givenName, lastName: familyName }
+    }
+
+    const fullName = toText(metadata.name)
+    if (!fullName) {
+        return { email, firstName: "", lastName: "" }
+    }
+
+    const parsed = splitName(fullName)
+    return {
+        email,
+        firstName: parsed.firstName,
+        lastName: parsed.lastName
+    }
+}
+
+async function createCustomer(token: string, metadata: Record<string, unknown>): Promise<void> {
+    const customerFields = mapIdentityToCustomerFields(metadata)
+    const response = await fetch(getMedusaUrl("/store/customers"), {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({
+            email: customerFields.email,
+            first_name: customerFields.firstName,
+            last_name: customerFields.lastName
+        })
+    })
+
+    if (!response.ok) {
+        const payload = await parseResponsePayload(response)
+        throw new Error(readPayloadMessage(payload) || "Could not create customer profile.")
+    }
+}
+
+async function refreshToken(token: string): Promise<string> {
+    const response = await fetch(getMedusaUrl("/auth/token/refresh"), {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    const payload = await parseResponsePayload(response)
+
+    if (!response.ok) {
+        throw new Error(readPayloadMessage(payload) || "Could not refresh authentication token.")
+    }
+
+    const refreshedToken = toText((payload as { token?: unknown })?.token)
+    if (!refreshedToken) {
+        throw new Error("Token refresh succeeded but no token was returned.")
+    }
+
+    return refreshedToken
+}
+
+async function fetchIdentity(token: string, authIdentityId: string): Promise<Record<string, unknown>> {
+    const response = await fetch(getMedusaUrl("/store/identity"), {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({ auth_id: authIdentityId })
+    })
+    const payload = await parseResponsePayload(response)
+
+    if (!response.ok) {
+        throw new Error(readPayloadMessage(payload) || "Could not retrieve identity details.")
+    }
+
+    const identityPayload = payload as IdentityResponse
+    return identityPayload.authIdentity?.user_metadata || {}
+}
+
+async function establishSession(token: string): Promise<void> {
+    const response = await fetch(getMedusaUrl("/auth/session"), {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+    })
+
+    if (!response.ok) {
+        const payload = await parseResponsePayload(response)
+        throw new Error(readPayloadMessage(payload) || "Could not establish authenticated session.")
+    }
+}
+
+async function fetchCustomer(token: string): Promise<CustomerDTO> {
+    const response = await fetch(getMedusaUrl("/store/customers/me"), {
+        credentials: "include",
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
+        }
+    })
+    const payload = await parseResponsePayload(response)
+
+    if (!response.ok) {
+        throw new Error(readPayloadMessage(payload) || "Could not fetch your customer profile.")
+    }
+
+    const customerData = (payload as { customer?: CustomerDTO }).customer
+    if (!customerData) {
+        throw new Error("Authentication finished, but customer details were not returned.")
+    }
+
+    return customerData
+}
+
+async function validateAndAuthenticate(): Promise<void> {
+    if (!provider.value) {
+        failAuth("The callback provider is missing or invalid. Please start sign-in again.")
+        return
+    }
+
+    const oauthError = toText(route.query.error)
+    if (oauthError) {
+        const description = toText(route.query.error_description)
+        failAuth(description || `Social sign-in returned an error: ${oauthError}.`)
+        return
+    }
+
+    if (!toText(route.query.state)) {
+        failAuth("The callback is missing required state information. Please try signing in again.")
+        return
+    }
 
     try {
         loadingMessage.value = "Contacting authentication server..."
-        const url = `${getMedusaUrl(`/auth/customer/${provider.value}/callback`)}?${new URLSearchParams(queryParams).toString()}`
-        const response = await fetch(url, { credentials: "include", method: "POST" })
+        let token = await sendCallback(provider.value)
 
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`)
+        loadingMessage.value = "Validating identity token..."
+        const decodedToken = jwtDecode<CustomJwtPayload>(token)
+        const shouldCreateCustomer = !decodedToken.actor_id
+        const authIdentityId = toText(decodedToken.auth_identity_id)
+
+        if (!authIdentityId) {
+            throw new Error("The authentication token is missing identity details.")
         }
 
-        const data = await response.json()
-        if (!data.token) {
-            console.error("No token received from server")
-        }
-        return data.token
-    } catch (error) {
-        console.error("Error during callback:", error)
-        return null
-    }
-}
-
-async function createCustomer(token: string, email: string, first_name: string, last_name: string): Promise<Response | null> {
-    try {
-        loadingMessage.value = "Creating customer account..."
-        const response = await fetch(getMedusaUrl("/store/customers"), {
-            credentials: "include",
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-            },
-            body: JSON.stringify({ email, first_name, last_name })
-        })
-
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`)
+        if (shouldCreateCustomer) {
+            loadingMessage.value = "Creating your customer profile..."
+            const metadata = await fetchIdentity(token, authIdentityId)
+            await createCustomer(token, metadata)
+            token = await refreshToken(token)
         }
 
-        return await response.json()
-    } catch (error) {
-        console.error("Error creating customer:", error)
-        throw error
-    }
-}
+        loadingMessage.value = "Establishing secure session..."
+        await establishSession(token)
 
-async function refreshToken(token: string): Promise<string | null> {
-    try {
-        loadingMessage.value = "Refreshing session token..."
-        const response = await fetch(getMedusaUrl("/auth/token/refresh"), {
-            credentials: "include",
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`)
-            showNotification("Authentication failed: An unknown error occurred.", "error")
-            await router.push("/signin")
-        }
-
-        const data = await response.json()
-        if (!data.token) {
-            console.error("No refresh token received")
-        }
-        return data.token
-    } catch (error) {
-        console.error("Error refreshing token:", error)
-        return null
-    }
-}
-
-const validateCallback = async () => {
-    try {
-        loadingMessage.value = "Validating callback..."
-        const state = route.query.state as string
-
-        if (!state) {
-            console.error("No state found in query parameters.")
-        }
-
-        const token = await sendCallback()
-
-        if (!token) {
-            console.error("Failed to obtain token")
-        }
-        let currentToken = token
+        loadingMessage.value = "Fetching account details..."
+        const customer = await fetchCustomer(token)
+        customerStore.customer = customer
 
         try {
-            if (!currentToken) {
-                return
-            }
-
-            const decodedToken = jwtDecode<CustomJwtPayload>(currentToken)
-            const shouldCreateCustomer = !decodedToken.actor_id
-            const authIdentityId = decodedToken.auth_identity_id
-
-            if (!authIdentityId) {
-                console.error("No auth_identity_id found in token")
-            }
-
-            loadingMessage.value = "Retrieving identity information..."
-            const identityResponse = await fetch(getMedusaUrl("/store/identity"), {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${currentToken}`,
-                    "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-                },
-                body: JSON.stringify({ auth_id: authIdentityId })
-            })
-
-            const { authIdentity } = await identityResponse.json()
-
-            if (shouldCreateCustomer) {
-                const meta = authIdentity.user_metadata || {}
-
-                email.value = meta.email || ""
-
-                const given = meta.given_name || meta.first_name
-                const family = meta.family_name || meta.last_name
-                if (given || family) {
-                    firstName.value = given || ""
-                    lastName.value = family || ""
-                } else if (meta.name) {
-                    const parts = String(meta.name).trim().split(/\s+/)
-                    firstName.value = parts.shift() || ""
-                    lastName.value = parts.join(" ")
-                } else {
-                    firstName.value = ""
-                    lastName.value = ""
-                }
-
-                await createCustomer(currentToken, email.value, firstName.value, lastName.value)
-                const newToken = await refreshToken(currentToken)
-                if (!newToken) {
-                    console.error("Failed to refresh token")
-                }
-                currentToken = newToken
-            }
-
-            loadingMessage.value = "Establishing session..."
-            const sessionResponse = await fetch(getMedusaUrl("/auth/session"), {
-                credentials: "include",
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${currentToken}`
-                }
-            })
-
-            if (!sessionResponse.ok) {
-                console.error(`Failed to set session: ${sessionResponse.status}`)
-            }
-
-            loadingMessage.value = "Fetching customer details..."
-            const response = await fetch(getMedusaUrl("/store/customers/me"), {
-                credentials: "include",
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${currentToken}`,
-                    "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-                }
-            })
-
-            if (!response.ok) {
-                console.error(`HTTP error! status: ${response.status}`)
-            }
-
-            const { customer: customerData } = await response.json()
-            customer.value = customerData
-
-            isLoading.value = false
-            useCustomerStore().customer = customerData
-
-            await assignCustomerToCart(useCartStore())
-            showNotification(`Welcome, ${customer.value?.email}!`, "success")
-            await router.push("/")
-        } catch (decodeError) {
-            console.error("Error decoding token:", decodeError)
+            await assignCustomerToCart(cartStore)
+        } catch (error: unknown) {
+            console.error("Could not assign customer to cart", error)
         }
-    } catch (error) {
-        console.error("Authentication error:", error)
-        isLoading.value = false
-        if (error instanceof Error) {
-            showNotification(`Authentication failed: ${error.message}`, "error")
-        } else {
-            showNotification("Authentication failed: An unknown error occurred.", "error")
-        }
-        await router.push("/signin")
+
+        stage.value = "success"
+        loadingMessage.value = "Signed in successfully. Redirecting..."
+        showNotification(`Welcome, ${customer.email}!`, "success")
+
+        const destination = consumeStoredRedirectPath()
+        await router.replace(destination)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Authentication failed due to an unknown error."
+        failAuth(message)
     }
 }
 
+async function retrySocialLogin(): Promise<void> {
+    if (!provider.value) {
+        failAuth("Cannot retry because the provider is missing.")
+        return
+    }
+
+    isRetrying.value = true
+
+    try {
+        const auth = useCustomerAuth()
+        await auth.startSocialLogin(provider.value, getStoredRedirectPath())
+    } finally {
+        isRetrying.value = false
+    }
+}
+
+useHead({
+    title: "Social Sign-in | Ecommerce"
+})
+
 onMounted(() => {
-    validateCallback()
+    void validateAndAuthenticate()
 })
 </script>
 
 <template>
-    <main class="social-auth-page">
+    <section class="social-auth-page">
         <div class="social-auth-page__hero">
             <VContainer class="social-auth-page__container">
                 <div class="social-auth-page__grid">
                     <div class="social-auth-page__copy">
                         <span class="social-auth-page__eyebrow">Social sign-in</span>
-                        <h1 class="social-auth-page__title">We are connecting your account and preparing your session.</h1>
+                        <h1 class="social-auth-page__title">We are finishing your {{ providerLabel }} authentication.</h1>
                         <p class="social-auth-page__description">
-                            This step confirms your {{ provider }} login, creates the customer profile if needed, and brings you back into
-                            the shop.
+                            This step confirms the callback, starts your secure session, and returns you to the storefront.
                         </p>
                     </div>
 
                     <div class="social-auth-page__panel">
                         <span class="social-auth-page__section-eyebrow">Authentication status</span>
-                        <h2 class="social-auth-page__section-title">Finishing the secure handoff.</h2>
-                        <p class="social-auth-page__section-text">
-                            Please keep this page open for a moment while we complete the sign-in flow.
-                        </p>
+                        <h2 class="social-auth-page__section-title">{{ statusTitle }}</h2>
+                        <p class="social-auth-page__section-text">{{ statusText }}</p>
 
-                        <div v-if="isLoading" class="social-auth-page__loading-card">
-                            <div class="social-auth-page__progress-bar">
+                        <div v-if="isLoading" class="social-auth-page__loading-card" aria-live="polite">
+                            <div class="social-auth-page__progress-bar" role="progressbar" aria-valuetext="Authenticating">
                                 <div class="social-auth-page__progress"></div>
                             </div>
                             <p class="social-auth-page__loading-message">{{ loadingMessage }}</p>
+                        </div>
+
+                        <div v-else-if="stage === 'error'" class="social-auth-page__error-actions">
+                            <VBtn
+                                color="primary"
+                                rounded="pill"
+                                size="large"
+                                class="text-none"
+                                :loading="isRetrying"
+                                @click="retrySocialLogin"
+                            >
+                                Retry {{ providerLabel }} sign-in
+                            </VBtn>
+                            <VBtn color="primary" variant="outlined" rounded="pill" size="large" class="text-none" to="/signin">
+                                Back to sign in
+                            </VBtn>
                         </div>
                     </div>
                 </div>
             </VContainer>
         </div>
 
-        <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4000">
+        <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4500">
             {{ snackbarText }}
         </VSnackbar>
-    </main>
+    </section>
 </template>
 
 <style scoped lang="scss">
 .social-auth-page {
-    min-height: 100vh;
+    min-height: calc(100vh - 98px);
     background:
         radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
         linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
 }
 
 .social-auth-page__hero {
-    min-height: 100vh;
-    padding: 5.5rem 0 5rem;
+    min-height: calc(100vh - 98px);
+    padding: 4.8rem 0 4rem;
     display: flex;
     align-items: center;
 }
@@ -301,8 +455,8 @@ onMounted(() => {
 
 .social-auth-page__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(19rem, 0.92fr);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
+    gap: 1.5rem;
     align-items: center;
 }
 
@@ -340,7 +494,7 @@ onMounted(() => {
 .social-auth-page__title {
     max-width: 12ch;
     margin: 1rem 0;
-    font-size: 4.5rem;
+    font-size: 2.85rem;
     line-height: 0.95;
 }
 
@@ -362,7 +516,7 @@ onMounted(() => {
 }
 
 .social-auth-page__panel {
-    padding: 1.9rem;
+    padding: 1.4rem;
 }
 
 .social-auth-page__section-eyebrow {
@@ -371,7 +525,7 @@ onMounted(() => {
 
 .social-auth-page__section-title {
     margin: 0 0 0.75rem;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     line-height: 1.08;
 }
 
@@ -398,7 +552,13 @@ onMounted(() => {
 
 .social-auth-page__loading-message {
     margin-top: 1rem;
-    font-size: 1rem;
+    font-size: 0.98rem;
+}
+
+.social-auth-page__error-actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.2rem;
 }
 
 @keyframes social-progress {
@@ -418,7 +578,7 @@ onMounted(() => {
 @keyframes social-rise {
     from {
         opacity: 0;
-        transform: translateY(26px);
+        transform: translateY(24px);
     }
 
     to {
@@ -428,32 +588,33 @@ onMounted(() => {
 }
 
 @media screen and (max-width: 1100px) {
+    .social-auth-page__hero {
+        min-height: auto;
+        padding-top: 4.2rem;
+    }
+
     .social-auth-page__grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1.25rem;
     }
 
     .social-auth-page__title {
         max-width: 100%;
-        font-size: 3.2rem;
-    }
-
-    .social-auth-page__panel {
-        padding: 1.5rem;
-    }
-
-    .social-auth-page__section-title {
-        font-size: 1.8rem;
+        font-size: 2.45rem;
     }
 }
 
 @media screen and (max-width: 700px) {
+    .social-auth-page {
+        min-height: auto;
+    }
+
     .social-auth-page__hero {
-        padding: 3.75rem 0 3.5rem;
+        padding: 3.75rem 0 3rem;
     }
 
     .social-auth-page__title {
-        font-size: 2.4rem;
+        font-size: 2rem;
         line-height: 1;
     }
 
@@ -463,7 +624,7 @@ onMounted(() => {
     }
 
     .social-auth-page__section-title {
-        font-size: 1.6rem;
+        font-size: 1.45rem;
     }
 }
 

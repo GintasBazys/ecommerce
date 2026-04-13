@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import EmblaCarousel, { type EmblaCarouselType } from "embla-carousel"
+import Autoplay from "embla-carousel-autoplay"
+
 type BannerSlide = {
     eyebrow: string
     title: string
@@ -49,59 +52,121 @@ const slides: BannerSlide[] = [
         ctaTo: "/special-offers"
     }
 ]
+
+const bannerViewport = ref<HTMLElement | null>(null)
+const bannerApi = ref<EmblaCarouselType | null>(null)
+const selectedSlide = ref<number>(0)
+const snapPoints = ref<number[]>([])
+
+function syncSelectedSlide(): void {
+    if (!bannerApi.value) {
+        return
+    }
+
+    selectedSlide.value = bannerApi.value.selectedScrollSnap()
+}
+
+function goToSlide(index: number): void {
+    bannerApi.value?.scrollTo(index)
+}
+
+onMounted(() => {
+    if (!bannerViewport.value) {
+        return
+    }
+
+    const embla = EmblaCarousel(
+        bannerViewport.value,
+        {
+            align: "start",
+            loop: true
+        },
+        [
+            Autoplay({
+                delay: 7000,
+                stopOnInteraction: false
+            })
+        ]
+    )
+
+    bannerApi.value = embla
+    snapPoints.value = embla.scrollSnapList()
+    syncSelectedSlide()
+
+    embla.on("select", syncSelectedSlide)
+    embla.on("reInit", () => {
+        snapPoints.value = embla.scrollSnapList()
+        syncSelectedSlide()
+    })
+})
+
+onBeforeUnmount(() => {
+    bannerApi.value?.destroy()
+    bannerApi.value = null
+})
 </script>
 
 <template>
     <section class="container-fluid banner-section">
-        <ClientOnly>
-            <swiper-container
-                class="banner-swiper"
-                :slides-per-view="1"
-                :loop="true"
-                :grab-cursor="true"
-                :pagination="{ clickable: true }"
-                :autoplay="{
-                    delay: 7000,
-                    disableOnInteraction: false
-                }"
-            >
-                <swiper-slide v-for="(slide, idx) in slides" :key="slide.title">
-                    <article class="banner-swiper__slide">
-                        <img
-                            class="banner-swiper__image"
-                            :src="slide.image"
-                            :alt="slide.alt"
-                            :style="{ objectPosition: slide.imagePosition }"
-                            :loading="idx === 0 ? 'eager' : 'lazy'"
-                        />
-                        <div class="banner-swiper__veil"></div>
-                        <div class="container banner-swiper__inner">
-                            <div class="banner-swiper__content">
-                                <span class="banner-swiper__eyebrow">{{ slide.eyebrow }}</span>
-                                <h1 class="banner-swiper__title">
-                                    {{ slide.title }}
-                                </h1>
-                                <p class="banner-swiper__description">
-                                    {{ slide.description }}
-                                </p>
-                                <div class="banner-swiper__actions">
-                                    <NuxtLink :to="slide.ctaTo" class="banner-swiper__cta">
-                                        <VBtn color="primary" size="x-large" rounded="pill" class="px-8 text-none font-weight-bold">
-                                            Shop now
-                                        </VBtn>
-                                    </NuxtLink>
-                                    <span class="banner-swiper__detail">{{ slide.detail }}</span>
+        <div class="banner-swiper">
+            <div ref="bannerViewport" class="banner-swiper__viewport">
+                <div class="banner-swiper__track">
+                    <div
+                        v-for="(slide, idx) in slides"
+                        :key="slide.title"
+                        class="banner-swiper__embla-slide"
+                        :class="{ 'banner-swiper__embla-slide--active': idx === selectedSlide }"
+                    >
+                        <article class="banner-swiper__slide">
+                            <img
+                                class="banner-swiper__image"
+                                :src="slide.image"
+                                :alt="slide.alt"
+                                :style="{ objectPosition: slide.imagePosition }"
+                                :loading="idx === 0 ? 'eager' : 'lazy'"
+                            />
+                            <div class="banner-swiper__veil"></div>
+                            <div class="container banner-swiper__inner">
+                                <div class="banner-swiper__content">
+                                    <span class="banner-swiper__eyebrow">{{ slide.eyebrow }}</span>
+                                    <h1 class="banner-swiper__title">
+                                        {{ slide.title }}
+                                    </h1>
+                                    <p class="banner-swiper__description">
+                                        {{ slide.description }}
+                                    </p>
+                                    <div class="banner-swiper__actions">
+                                        <NuxtLink :to="slide.ctaTo" class="banner-swiper__cta">
+                                            <VBtn color="primary" size="x-large" rounded="pill" class="px-8 text-none font-weight-bold">
+                                                Shop now
+                                            </VBtn>
+                                        </NuxtLink>
+                                        <span class="banner-swiper__detail">{{ slide.detail }}</span>
+                                    </div>
+                                </div>
+                                <div class="banner-swiper__card">
+                                    <span class="banner-swiper__card-label">Featured direction</span>
+                                    <p class="banner-swiper__card-text">{{ slide.caption }}</p>
+                                    <div class="banner-swiper__card-accent"></div>
                                 </div>
                             </div>
-                            <div class="banner-swiper__card">
-                                <span class="banner-swiper__card-label">Featured direction</span>
-                                <p class="banner-swiper__card-text">{{ slide.caption }}</p>
-                                <div class="banner-swiper__card-accent"></div>
-                            </div>
-                        </div>
-                    </article>
-                </swiper-slide>
-            </swiper-container>
-        </ClientOnly>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banner-swiper__pagination" aria-label="Homepage hero pagination">
+                <button
+                    v-for="(_, idx) in snapPoints"
+                    :key="`banner-dot-${idx}`"
+                    type="button"
+                    class="banner-swiper__pagination-dot"
+                    :class="{ 'banner-swiper__pagination-dot--active': idx === selectedSlide }"
+                    :aria-label="`Go to slide ${idx + 1}`"
+                    :aria-current="idx === selectedSlide ? 'true' : undefined"
+                    @click="goToSlide(idx)"
+                ></button>
+            </div>
+        </div>
     </section>
 </template>

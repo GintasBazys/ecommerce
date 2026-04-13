@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { register } from "swiper/element/bundle"
-
 import AppFooter from "@/components/Footer/AppFooter.vue"
 import BaseHeader from "@/components/Header/BaseHeader.vue"
 
@@ -22,8 +20,6 @@ const nuxtApp = useNuxtApp()
 nuxtApp.hook("page:finish", () => {
     window.scrollTo(0, 0)
 })
-
-register()
 </script>
 
 <template>

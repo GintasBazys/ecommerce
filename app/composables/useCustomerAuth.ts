@@ -1,6 +1,7 @@
 import type { CustomerDTO } from "@medusajs/types"
 
 type SocialProvider = "google" | "facebook"
+export const SOCIAL_AUTH_REDIRECT_KEY = "social-auth:redirect-path"
 
 function normalizeError(e: any): string {
     return e?.data?.message || e?.data?.statusMessage || e?.statusMessage || e?.message || "Something went wrong"
@@ -110,10 +111,17 @@ export function useCustomerAuth() {
         }
 
         try {
+            const normalizedCallbackPath = callbackPath.startsWith("/") ? callbackPath : "/"
+            sessionStorage.setItem(SOCIAL_AUTH_REDIRECT_KEY, normalizedCallbackPath)
+
+            const callbackUrl = `${window.location.origin}/register/social?provider=${provider}`
 
             const res = await $fetch<{ success: boolean; location: string | null }>(`/api/social/${provider}`, {
                 method: "POST",
                 credentials: "include",
+                body: {
+                    callback_url: callbackUrl
+                }
             })
 
             if (res.location) {

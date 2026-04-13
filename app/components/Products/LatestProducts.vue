@@ -1,10 +1,31 @@
 <script setup lang="ts">
+import EmblaCarousel, { type EmblaCarouselType } from "embla-carousel"
+
 const productStore = useProductStore()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { products } = storeToRefs(useProductStore())
+const sliderViewport = ref<HTMLElement | null>(null)
+const sliderApi = ref<EmblaCarouselType | null>(null)
 
 await callOnce(async () => {
     await productStore.fetchData(regionStoreId.value ?? "", selectedCountryCode.value ?? "")
+})
+
+onMounted(() => {
+    if (!sliderViewport.value) {
+        return
+    }
+
+    sliderApi.value = EmblaCarousel(sliderViewport.value, {
+        align: "start",
+        containScroll: "trimSnaps",
+        dragFree: true
+    })
+})
+
+onBeforeUnmount(() => {
+    sliderApi.value?.destroy()
+    sliderApi.value = null
 })
 </script>
 
@@ -21,23 +42,15 @@ await callOnce(async () => {
                 </div>
             </div>
 
-            <ClientOnly>
-                <swiper-container
-                    class="catalog-section__slider"
-                    :breakpoints="{
-                        280: { slidesPerView: 1.15, spaceBetween: 16 },
-                        640: { slidesPerView: 2.1, spaceBetween: 18 },
-                        960: { slidesPerView: 3.1, spaceBetween: 20 },
-                        1280: { slidesPerView: 4.1, spaceBetween: 22 },
-                        1536: { slidesPerView: 5, spaceBetween: 24 }
-                    }"
-                    :grab-cursor="true"
-                >
-                    <swiper-slide v-for="product in products" :key="product.id" class="catalog-section__slide">
-                        <ProductCard :product="product" />
-                    </swiper-slide>
-                </swiper-container>
-            </ClientOnly>
+            <div class="catalog-section__slider">
+                <div ref="sliderViewport" class="catalog-section__viewport">
+                    <div class="catalog-section__track">
+                        <div v-for="product in products" :key="product.id" class="catalog-section__slide">
+                            <ProductCard :product="product" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </VContainer>
     </section>
 </template>
@@ -131,8 +144,49 @@ await callOnce(async () => {
 }
 
 .catalog-section__slider {
-    display: block;
-    overflow: visible;
+    --catalog-slide-gap: 16px;
+    --catalog-slide-size: 86%;
+}
+
+.catalog-section__viewport {
+    overflow: hidden;
+}
+
+.catalog-section__track {
+    display: flex;
+    gap: var(--catalog-slide-gap);
+}
+
+.catalog-section__slide {
+    flex: 0 0 var(--catalog-slide-size);
+}
+
+@media screen and (min-width: 640px) {
+    .catalog-section__slider {
+        --catalog-slide-gap: 18px;
+        --catalog-slide-size: 47%;
+    }
+}
+
+@media screen and (min-width: 960px) {
+    .catalog-section__slider {
+        --catalog-slide-gap: 20px;
+        --catalog-slide-size: 31%;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .catalog-section__slider {
+        --catalog-slide-gap: 22px;
+        --catalog-slide-size: 24%;
+    }
+}
+
+@media screen and (min-width: 1536px) {
+    .catalog-section__slider {
+        --catalog-slide-gap: 24px;
+        --catalog-slide-size: 20%;
+    }
 }
 
 @keyframes catalog-rise {

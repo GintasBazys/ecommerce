@@ -42,8 +42,7 @@ export default defineCachedEventHandler(
 
         try {
             const response = await fetchMedusaResponse(event, path, {
-                method: "GET",
-                timeoutMs: 8000
+                method: "GET"
             })
 
             await assertMedusaResponse(response, "Failed to fetch products")

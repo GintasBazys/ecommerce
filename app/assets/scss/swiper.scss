@@ -13,9 +13,23 @@
     --banner-min-height: calc(100svh - var(--header-offset));
 
     background: linear-gradient(135deg, #edf3ff 0%, #ffffff 100%);
+    position: relative;
     display: block;
     overflow: hidden;
     box-shadow: 0 20px 70px rgba(7, 25, 88, 0.12);
+
+    &__viewport {
+        overflow: hidden;
+    }
+
+    &__track {
+        display: flex;
+    }
+
+    &__embla-slide {
+        flex: 0 0 100%;
+        min-width: 0;
+    }
 
     &__slide {
         position: relative;
@@ -169,17 +183,48 @@
         border-radius: 999px;
         background: linear-gradient(90deg, #7fb6ff 0%, #c9ddff 50%, #ffffff 100%);
     }
+
+    &__pagination {
+        position: absolute;
+        right: 0;
+        bottom: 1.25rem;
+        left: 0;
+        z-index: 3;
+        display: flex;
+        justify-content: center;
+        gap: 0.35rem;
+    }
+
+    &__pagination-dot {
+        width: 16px;
+        height: 4px;
+        border: 0;
+        border-radius: 8px;
+        background: #ffffff;
+        opacity: 0.85;
+        transition:
+            width 0.24s ease,
+            opacity 0.24s ease,
+            background-color 0.24s ease;
+        cursor: pointer;
+    }
+
+    &__pagination-dot--active {
+        width: 24px;
+        background: #000000;
+        opacity: 1;
+    }
 }
 
-.banner-swiper .swiper-slide-active .banner-swiper__image {
+.banner-swiper__embla-slide--active .banner-swiper__image {
     transform: scale(1.08);
 }
 
-.banner-swiper .swiper-slide-active .banner-swiper__content {
+.banner-swiper__embla-slide--active .banner-swiper__content {
     animation: banner-rise 0.8s ease forwards;
 }
 
-.banner-swiper .swiper-slide-active .banner-swiper__card {
+.banner-swiper__embla-slide--active .banner-swiper__card {
     animation: banner-rise 0.8s ease 0.18s forwards;
 }
 
@@ -266,6 +311,10 @@
             padding: 1.25rem;
             margin-left: 0;
         }
+
+        &__pagination {
+            bottom: 0.9rem;
+        }
     }
 }
 
@@ -280,23 +329,4 @@
             transition: none;
         }
     }
-}
-
-swiper-container {
-    --swiper-theme-color: $primary;
-    --swiper-navigation-size: 22px;
-    --swiper-navigation-top-offset: 10px;
-    --swiper-navigation-sides-offset: 10px;
-    --swiper-pagination-color: #000000;
-    --swiper-pagination-bullet-border-radius: 8px;
-    --swiper-pagination-bullet-horizontal-gap: 4px;
-    --swiper-pagination-bullet-vertical-gap: 4px;
-    --swiper-pagination-bullet-size: 6px;
-    --swiper-pagination-bullet-width: 16px;
-    --swiper-pagination-bullet-height: 4px;
-    --swiper-pagination-bullet-opacity: 1;
-    --swiper-pagination-bullet-inactive-color: #ffffff;
-    --swiper-pagination-bullet-inactive-opacity: 1;
-    --swiper-pagination-bottom: 0rem;
-    --swiper-preloader-color: var(--swiper-theme-color);
 }

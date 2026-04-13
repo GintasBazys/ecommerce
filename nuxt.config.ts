@@ -24,7 +24,7 @@ export default defineNuxtConfig({
         }
     },
 
-    css: ["@/assets/scss/main.scss", "swiper/swiper-bundle.css"],
+    css: ["@/assets/scss/main.scss"],
 
     image: {
         inject: true,
@@ -68,7 +68,7 @@ export default defineNuxtConfig({
         }
     },
 
-    plugins: ["~/plugins/init-app", "~/plugins/silktide.client.js"],
+    plugins: ["~/plugins/init-app"],
 
     vite: {
         resolve: {
@@ -86,11 +86,5 @@ export default defineNuxtConfig({
 
     content: {
         experimental: { nativeSqlite: true }
-    },
-
-    vue: {
-        compilerOptions: {
-            isCustomElement: (tag) => tag.startsWith("swiper-")
-        }
     }
 })

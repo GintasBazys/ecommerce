@@ -420,7 +420,17 @@ async function goToAddressStep(): Promise<void> {
 }
 
 async function attachCustomerToCheckoutCart(): Promise<void> {
-    await $fetch("/api/account/assign-customer", { method: "POST", credentials: "include" })
+    if (!cart.value?.id) {
+        return
+    }
+
+    await $fetch("/api/account/assign-customer", {
+        method: "POST",
+        credentials: "include",
+        body: {
+            cartId: cart.value.id
+        }
+    })
     await cartStore.loadCart()
 }
 
