@@ -1,7 +1,6 @@
 import type { ProductDTO } from "@medusajs/types"
 
 import { LIMIT } from "@/utils/consts"
-import { getQueryCacheKey } from "#server/utils/cache"
 import { fetchAllStoreProducts, getAggregatedProductPrice } from "#server/utils/products"
 import { toUpstreamError } from "#server/utils/medusa-proxy"
 
@@ -25,65 +24,57 @@ function parsePositiveInteger(value: unknown, fallbackValue: number) {
     return Math.floor(parsedValue)
 }
 
-export default defineCachedEventHandler(
-    async (event) => {
-        const query = getQuery(event)
+export default defineEventHandler(async (event) => {
+    const query = getQuery(event)
 
-        const limit = parsePositiveInteger(query.limit, Number(LIMIT))
-        const offset = parsePositiveInteger(query.offset, 0)
-        const categoryId = query.category_id != null ? String(query.category_id) : null
-        const regionId = query.region_id ? String(query.region_id) : null
-        const handle = query.handle ? String(query.handle) : null
-        const order = query.order ? String(query.order) : "variants.calculated_price.calculated_amount"
+    const limit = parsePositiveInteger(query.limit, Number(LIMIT))
+    const offset = parsePositiveInteger(query.offset, 0)
+    const categoryId = query.category_id != null ? String(query.category_id) : null
+    const regionId = query.region_id ? String(query.region_id) : null
+    const handle = query.handle ? String(query.handle) : null
+    const order = query.order ? String(query.order) : "variants.calculated_price.calculated_amount"
 
-        if (!regionId) {
-            throw createError({ statusCode: 400, statusMessage: "region_id is required" })
-        }
-
-        const isDescending = order.startsWith("-")
-        const priceField = parsePriceField(order)
-        const aggregateMode = query.agg === "max" ? "max" : "min"
-
-        const searchParams = new URLSearchParams({
-            fields: "+metadata,*variants.calculated_price,*variants.inventory_quantity",
-            region_id: regionId
-        })
-
-        if (handle) {
-            searchParams.set("handle", handle)
-        }
-
-        if (categoryId) {
-            searchParams.set("category_id", categoryId)
-        }
-
-        try {
-            const { products, count } = await fetchAllStoreProducts<ProductDTO>(event, searchParams)
-            const missingPriceSentinel = isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
-
-            const sortedProducts = products
-                .map((product) => ({
-                    product,
-                    sortValue: getAggregatedProductPrice(product, aggregateMode, priceField) ?? missingPriceSentinel
-                }))
-                .sort((left, right) => (isDescending ? right.sortValue - left.sortValue : left.sortValue - right.sortValue))
-                .map(({ product }) => product)
-
-            setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
-
-            return {
-                products: sortedProducts.slice(offset, offset + limit),
-                count
-            }
-        } catch (error: unknown) {
-            setHeader(event, "Cache-Control", "no-store")
-            throw toUpstreamError(error, "Failed to fetch price-sorted products")
-        }
-    },
-    {
-        name: "products-price-cache",
-        maxAge: 300,
-        swr: true,
-        getKey: (event) => getQueryCacheKey(event, "products-price-v2")
+    if (!regionId) {
+        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
     }
-)
+
+    const isDescending = order.startsWith("-")
+    const priceField = parsePriceField(order)
+    const aggregateMode = query.agg === "max" ? "max" : "min"
+
+    const searchParams = new URLSearchParams({
+        fields: "+metadata,*variants.calculated_price,*variants.inventory_quantity",
+        region_id: regionId
+    })
+
+    if (handle) {
+        searchParams.set("handle", handle)
+    }
+
+    if (categoryId) {
+        searchParams.set("category_id", categoryId)
+    }
+
+    try {
+        const { products, count } = await fetchAllStoreProducts<ProductDTO>(event, searchParams)
+        const missingPriceSentinel = isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
+
+        const sortedProducts = products
+            .map((product) => ({
+                product,
+                sortValue: getAggregatedProductPrice(product, aggregateMode, priceField) ?? missingPriceSentinel
+            }))
+            .sort((left, right) => (isDescending ? right.sortValue - left.sortValue : left.sortValue - right.sortValue))
+            .map(({ product }) => product)
+
+        setHeader(event, "Cache-Control", "no-store")
+
+        return {
+            products: sortedProducts.slice(offset, offset + limit),
+            count
+        }
+    } catch (error: unknown) {
+        setHeader(event, "Cache-Control", "no-store")
+        throw toUpstreamError(error, "Failed to fetch price-sorted products")
+    }
+})

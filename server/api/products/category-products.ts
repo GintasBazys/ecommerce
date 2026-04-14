@@ -1,6 +1,5 @@
 import type { HttpTypes } from "@medusajs/types"
 
-import { getQueryCacheKey } from "#server/utils/cache"
 import { fetchAllStoreProducts, getAggregatedProductPrice, getProductCurrencyCode, isProductInStock } from "#server/utils/products"
 import { toUpstreamError } from "#server/utils/medusa-proxy"
 
@@ -227,72 +226,62 @@ function filterProducts(
             return false
         }
 
-        return !(filters.maxPrice !== null && minimumProductPrice !== null && minimumProductPrice > filters.maxPrice);
+        return !(filters.maxPrice !== null && minimumProductPrice !== null && minimumProductPrice > filters.maxPrice)
     })
 }
 
-export default defineCachedEventHandler(
-    async (event) => {
-        const query = getQuery(event)
+export default defineEventHandler(async (event) => {
+    const query = getQuery(event)
 
-        const regionId = query.region_id ? String(query.region_id) : null
-        const countryCode = query.country_code ? String(query.country_code) : null
-        const categoryId = query.category_id ? String(query.category_id) : null
+    const regionId = query.region_id ? String(query.region_id) : null
+    const countryCode = query.country_code ? String(query.country_code) : null
+    const categoryId = query.category_id ? String(query.category_id) : null
 
-        if (!regionId) {
-            throw createError({ statusCode: 400, statusMessage: "region_id is required" })
-        }
-
-        const limit = parsePositiveInteger(query.limit, 9)
-        const offset = parsePositiveInteger(query.offset, 0)
-        const order = query.order ? String(query.order) : "-created_at"
-
-        const filters = {
-            selectedChildCategoryIds: parseIds(query.child_category_ids),
-            selectedCollectionIds: parseIds(query.collection_ids),
-            selectedTypeIds: parseIds(query.type_ids),
-            selectedTagIds: parseIds(query.tag_ids),
-            inStockOnly: String(query.in_stock_only ?? "false") === "true",
-            minPrice: parseNumber(query.min_price),
-            maxPrice: parseNumber(query.max_price)
-        }
-
-        const searchParams = new URLSearchParams({
-            fields: "+metadata,*collection,*type,*tags,*categories,*variants.calculated_price,+variants.inventory_quantity",
-            region_id: regionId
-        })
-
-        if (categoryId) {
-            searchParams.set("category_id", categoryId)
-        }
-
-        if (countryCode) {
-            searchParams.set("country_code", countryCode)
-        }
-
-        try {
-            const { products } = await fetchAllStoreProducts<ProductWithRelations>(event, searchParams)
-            const filteredProducts = filterProducts(products, filters)
-            const sortedProducts = [...filteredProducts].sort((leftProduct, rightProduct) =>
-                compareProducts(leftProduct, rightProduct, order)
-            )
-
-            setHeader(event, "Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=86400")
-
-            return {
-                products: sortedProducts.slice(offset, offset + limit),
-                count: filteredProducts.length,
-                facets: buildFacets(products)
-            }
-        } catch (error: unknown) {
-            setHeader(event, "Cache-Control", "no-store")
-            throw toUpstreamError(error, "Failed to fetch category products")
-        }
-    },
-    {
-        name: "category-products-cache",
-        maxAge: 300,
-        swr: true,
-        getKey: (event) => getQueryCacheKey(event, "category-products-v2")
+    if (!regionId) {
+        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
     }
-)
+
+    const limit = parsePositiveInteger(query.limit, 9)
+    const offset = parsePositiveInteger(query.offset, 0)
+    const order = query.order ? String(query.order) : "-created_at"
+
+    const filters = {
+        selectedChildCategoryIds: parseIds(query.child_category_ids),
+        selectedCollectionIds: parseIds(query.collection_ids),
+        selectedTypeIds: parseIds(query.type_ids),
+        selectedTagIds: parseIds(query.tag_ids),
+        inStockOnly: String(query.in_stock_only ?? "false") === "true",
+        minPrice: parseNumber(query.min_price),
+        maxPrice: parseNumber(query.max_price)
+    }
+
+    const searchParams = new URLSearchParams({
+        fields: "+metadata,*collection,*type,*tags,*categories,*variants.calculated_price,+variants.inventory_quantity",
+        region_id: regionId
+    })
+
+    if (categoryId) {
+        searchParams.set("category_id", categoryId)
+    }
+
+    if (countryCode) {
+        searchParams.set("country_code", countryCode)
+    }
+
+    try {
+        const { products } = await fetchAllStoreProducts<ProductWithRelations>(event, searchParams)
+        const filteredProducts = filterProducts(products, filters)
+        const sortedProducts = [...filteredProducts].sort((leftProduct, rightProduct) => compareProducts(leftProduct, rightProduct, order))
+
+        setHeader(event, "Cache-Control", "no-store")
+
+        return {
+            products: sortedProducts.slice(offset, offset + limit),
+            count: filteredProducts.length,
+            facets: buildFacets(products)
+        }
+    } catch (error: unknown) {
+        setHeader(event, "Cache-Control", "no-store")
+        throw toUpstreamError(error, "Failed to fetch category products")
+    }
+})

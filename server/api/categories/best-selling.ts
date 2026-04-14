@@ -5,7 +5,7 @@ import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 export default defineEventHandler(async (event) => {
     const query = getQuery(event)
 
-    const limit = query.limit != null ? String(query.limit) : LIMIT
+    const limit = query.limit != null ? String(query.limit) : String(LIMIT)
     const offset = query.offset != null ? String(query.offset) : "0"
     const regionId = query.region_id ? String(query.region_id) : ""
     const countryCode = query.country_code ? String(query.country_code) : null
@@ -31,8 +31,11 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        return await fetchMedusaJson(event, `/store/products?${searchParams.toString()}`)
+        const payload = await fetchMedusaJson(event, `/store/products?${searchParams.toString()}`)
+        setHeader(event, "Cache-Control", "no-store")
+        return payload
     } catch (error: unknown) {
+        setHeader(event, "Cache-Control", "no-store")
         throw toUpstreamError(error, "Failed to fetch products")
     }
 })
