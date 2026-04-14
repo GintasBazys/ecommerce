@@ -551,7 +551,16 @@ async function handleSubmit(): Promise<void> {
     isLoading.value = true
 
     try {
-        const result = await stripe.confirmPayment({ elements, redirect: "if_required" })
+        let result = await stripe.confirmPayment({ elements, redirect: "if_required" })
+
+        if (result.error?.code === "payment_intent_unexpected_state") {
+            await createOrUpdatePaymentIntent()
+
+            if (elements && clientSecretValue.value) {
+                result = await stripe.confirmPayment({ elements, redirect: "if_required" })
+            }
+        }
+
         if (result.error) {
             errorMessage.value = result.error.message ?? "Payment failed"
             return

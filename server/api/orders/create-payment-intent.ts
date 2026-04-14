@@ -49,7 +49,16 @@ export default defineEventHandler(async (event) => {
         paymentCollectionId = payment_collection.id
     }
 
-    await fetch(`${config.public.MEDUSA_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`, {
+    await fetch(`${config.public.MEDUSA_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions/${STRIPE_PAYMENT_PROVIDER}`, {
+        method: "DELETE",
+        headers: {
+            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+            "Content-Type": "application/json"
+        },
+        credentials: "include"
+    }).catch(() => {})
+
+    const createSessionResponse = await fetch(`${config.public.MEDUSA_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`, {
         method: "POST",
         headers: {
             "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
@@ -58,6 +67,11 @@ export default defineEventHandler(async (event) => {
         credentials: "include",
         body: JSON.stringify({ provider_id: STRIPE_PAYMENT_PROVIDER })
     })
+
+    if (!createSessionResponse.ok) {
+        const errorText = await createSessionResponse.text()
+        throw new Error(`Failed to create Stripe payment session: ${errorText}`)
+    }
 
     cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
         method: "GET",
