@@ -1,0 +1,14 @@
+.git
+.gitignore
+.idea
+.vscode
+.nuxt
+node_modules
+.env
+.env.*
+npm-debug.log*
+pnpm-debug.log*
+docker-compose*.yml
+test
+.data
+dump.rdb
