@@ -1,9 +1,6 @@
 import { fileURLToPath } from "node:url"
 
-const imageDomains = [
-    "medusa-public-images.s3.eu-west-1.amazonaws.com",
-    "api.medusa-commerce.de"
-]
+const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com"]
 
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
@@ -38,6 +35,7 @@ export default defineNuxtConfig({
 
     modules: [
         "@nuxt/eslint",
+        "@nuxtjs/tailwindcss",
         "@pinia/nuxt",
         "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
@@ -46,6 +44,10 @@ export default defineNuxtConfig({
         "@nuxt/content",
         "vuetify-nuxt-module"
     ],
+
+    tailwindcss: {
+        cssPath: "@/assets/css/tailwind.css"
+    },
 
     stripe: {
         server: {
