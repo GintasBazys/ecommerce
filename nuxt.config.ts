@@ -1,5 +1,10 @@
 import { fileURLToPath } from "node:url"
 
+const imageDomains = [
+    "medusa-public-images.s3.eu-west-1.amazonaws.com",
+    "api.medusa-commerce.de"
+]
+
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
 
@@ -28,7 +33,7 @@ export default defineNuxtConfig({
 
     image: {
         inject: true,
-        domains: ["medusa-public-images.s3.eu-west-1.amazonaws.com"]
+        domains: [...new Set(imageDomains)]
     },
 
     modules: [
@@ -44,23 +49,23 @@ export default defineNuxtConfig({
 
     stripe: {
         server: {
-            key: process.env.STRIPE_SECRET_KEY,
+            key: process.env.NUXT_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY,
             options: {}
         },
         client: {
-            key: process.env.STRIPE_PUBLIC_KEY,
+            key: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY,
             options: {}
         }
     },
 
     runtimeConfig: {
-        medusaUrl: process.env.MEDUSA_URL,
+        medusaUrl: process.env.NUXT_MEDUSA_URL || process.env.MEDUSA_URL,
         public: {
-            MEDUSA_URL: process.env.MEDUSA_URL,
-            PUBLISHABLE_KEY: process.env.PUBLISHABLE_KEY,
-            STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
+            MEDUSA_URL: process.env.NUXT_PUBLIC_MEDUSA_URL || process.env.MEDUSA_URL,
+            PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY || process.env.PUBLISHABLE_KEY,
+            STRIPE_PUBLIC_KEY: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY,
             SITE_NAME: process.env.SITE_NAME || "Ecommerce",
-            SITE_URL: process.env.SITE_URL || ""
+            SITE_URL: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || ""
         },
         secret: {
             mailchimpApiKey: process.env.MAILCHIMP_API_KEY,

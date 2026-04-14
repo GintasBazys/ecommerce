@@ -118,16 +118,14 @@ onBeforeUnmount(() => {
                         :class="{ 'banner-swiper__embla-slide--active': idx === selectedSlide }"
                     >
                         <article class="banner-swiper__slide">
-                            <NuxtImg
+                            <img
                                 class="banner-swiper__image"
                                 :src="slide.image"
                                 :alt="slide.alt"
                                 width="1920"
                                 height="1080"
-                                sizes="100vw"
-                                format="webp"
                                 :loading="idx === 0 ? 'eager' : 'lazy'"
-                                :preload="idx === 0"
+                                decoding="async"
                                 :style="{ objectPosition: slide.imagePosition }"
                             />
                             <div class="banner-swiper__veil"></div>
