@@ -86,11 +86,12 @@ const debouncedAddToCart = debounce(addToCart, 300)
             <div class="product-card__top">
                 <div class="product-card__meta">
                     <span class="product-card__stock">{{ stockLabel }}</span>
-                    <div v-if="averageRating" class="product-card__rating" :aria-label="`Rated ${averageRating} out of 5`">
+                    <div v-if="averageRating" class="product-card__rating" aria-hidden="true">
                         <VIcon v-for="i in 5" :key="i" size="16" class="product-card__star">
                             {{ i <= Math.round(averageRating) ? "mdi-star" : "mdi-star-outline" }}
                         </VIcon>
                     </div>
+                    <span v-if="averageRating" class="sr-only">Rated {{ averageRating }} out of 5</span>
                 </div>
 
                 <NuxtLink :to="productHref" class="product-card__title-link">

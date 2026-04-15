@@ -26,13 +26,17 @@ const highlights = [
             <div class="about-cta__panel">
                 <div class="about-cta__media">
                     <div class="about-cta__image-wrap">
-                        <VImg
+                        <NuxtImage
                             src="/images/online_purchase.jpg"
                             alt="online purchase illustration"
-                            aspect-ratio="1.08"
-                            lazy-src="/images/online_purchase.jpg"
+                            width="1200"
+                            height="1120"
+                            sizes="(max-width: 1024px) 100vw, 45vw"
+                            format="webp"
+                            quality="72"
+                            loading="lazy"
+                            decoding="async"
                             class="about-cta__image"
-                            cover
                         />
                         <div class="about-cta__floating">
                             <span class="about-cta__floating-label">Trusted ecommerce</span>
@@ -70,7 +74,7 @@ const highlights = [
                             rounded="pill"
                             tag="NuxtLink"
                         >
-                            Read more
+                            Learn about our approach
                         </VBtn>
                     </div>
                 </div>
@@ -118,6 +122,10 @@ const highlights = [
 }
 
 .about-cta__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.08;
+    object-fit: cover;
     transform: scale(1.01);
 }
 

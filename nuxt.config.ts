@@ -22,6 +22,9 @@ export default defineNuxtConfig({
             charset: "utf-8",
             viewport: "width=device-width, initial-scale=1",
             title: "Ecommerce",
+            htmlAttrs: {
+                lang: "en"
+            },
             meta: [{ name: "description", content: "..." }]
         }
     },

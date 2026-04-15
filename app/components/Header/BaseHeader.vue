@@ -424,7 +424,7 @@ function getProductMeta(product: ProductDTO): string {
                             <span class="sr-only">Search by product name</span>
                             <input
                                 v-model="searchQuery"
-                                class="ui-input rounded-xl"
+                                class="ui-input site-header__search-input rounded-xl"
                                 placeholder="Search by product name (min 3 chars)..."
                             />
                         </label>
@@ -474,6 +474,11 @@ function getProductMeta(product: ProductDTO): string {
 <style scoped>
 .site-header__country-select {
     border: 2px solid #334155;
+    background-color: #ffffff;
+}
+
+.site-header__search-input {
+    border: 2px solid #000000;
     background-color: #ffffff;
 }
 
