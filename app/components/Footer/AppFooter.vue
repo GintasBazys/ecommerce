@@ -25,6 +25,8 @@ const paymentIcons = [
     { src: "/images/visa-blue.svg", alt: "Visa" }
 ]
 
+const currentYear = useState<number>("footer-current-year", () => new Date().getFullYear())
+
 const expandedMobileSections = reactive<Record<string, boolean>>({
     help: true,
     categories: true,
@@ -148,20 +150,14 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                             :key="item.alt"
                             class="flex h-12 w-[94px] items-center justify-center rounded-xl bg-white p-2"
                         >
-                            <NuxtImage
-                                :src="item.src"
-                                :alt="item.alt"
-                                width="84"
-                                height="44"
-                                loading="lazy"
-                            />
+                            <NuxtImage :src="item.src" :alt="item.alt" width="84" height="44" loading="lazy" />
                         </div>
                     </div>
                 </section>
             </div>
 
             <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/15 pt-6">
-                <p class="text-sm text-blue-100/85">Copyright Gintas Bazys {{ new Date().getFullYear() }}. All rights reserved.</p>
+                <p class="text-sm text-blue-100/85">Copyright Gintas Bazys {{ currentYear }}. All rights reserved.</p>
                 <NuxtLink to="/privacy" class="text-sm font-semibold text-blue-100 transition hover:text-white">Privacy Policy</NuxtLink>
             </div>
         </div>

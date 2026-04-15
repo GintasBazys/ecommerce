@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Review } from "@/types/interfaces"
 
+import { formatDate } from "@/utils/formatDate"
+
 defineProps<{
     reviews: Review[]
 }>()
@@ -18,7 +20,7 @@ defineProps<{
                     <div class="product-reviews__top">
                         <div class="product-reviews__author">{{ review.first_name }} {{ review.last_name }}</div>
                         <div class="product-reviews__date">
-                            {{ new Date(review.created_at).toLocaleDateString() }}
+                            {{ formatDate(review.created_at) }}
                         </div>
                     </div>
 

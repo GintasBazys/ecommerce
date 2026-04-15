@@ -2,6 +2,7 @@
 import type { OrderDTO } from "@medusajs/types"
 
 import { ORDER_STATUS } from "@/enumerators/order"
+import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 
 const route = useRoute()
@@ -40,13 +41,7 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
                             <div class="order-invoice-content__detail-card">
                                 <span class="order-invoice-content__label">Placed on</span>
                                 <strong class="order-invoice-content__value">
-                                    {{
-                                        new Date(order.created_at ?? new Date()).toLocaleDateString("en-US", {
-                                            year: "numeric",
-                                            month: "short",
-                                            day: "numeric"
-                                        })
-                                    }}
+                                    {{ formatDate(order.created_at) || "Unavailable" }}
                                 </strong>
                             </div>
                             <div class="order-invoice-content__detail-card">

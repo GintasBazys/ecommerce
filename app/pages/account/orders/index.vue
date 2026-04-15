@@ -2,6 +2,8 @@
 import type { DataTableHeader, DataTableSortItem, OrdersResponse } from "@/types/interfaces"
 
 import { ORDER_STATUS } from "@/enumerators/order"
+import { formatDate } from "@/utils/formatDate"
+import { formatPrice } from "@/utils/formatPrice"
 
 definePageMeta({
     layout: "account",
@@ -68,13 +70,13 @@ const sortBy = ref<DataTableSortItem[]>([{ key: "created_at", order: "desc" }])
                     <VSkeletonLoader type="table" :loading="pending" />
                 </template>
                 <template #[`item.created_at`]="{ item }">
-                    {{ new Date(item.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) }}
+                    {{ formatDate(item.created_at) }}
                 </template>
                 <template #[`item.currency_code`]="{ item }">
                     {{ item.currency_code.toUpperCase() }}
                 </template>
                 <template #[`item.total`]="{ item }">
-                    {{ Number(item.total).toLocaleString(undefined, { style: "currency", currency: item.currency_code }) }}
+                    {{ formatPrice(Number(item.total), item.currency_code) }}
                 </template>
                 <template #[`item.fulfillment_status`]="{ item }">
                     <VChip size="small" class="account-orders-content__status-chip">

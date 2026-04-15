@@ -3,6 +3,11 @@ const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)
+const isClientHydrated = ref(false)
+
+onMounted(() => {
+    isClientHydrated.value = true
+})
 
 const accountNav = [
     { label: "Dashboard", to: "/account", icon: "mdi-view-grid-outline" },
@@ -82,7 +87,7 @@ const breadcrumbItems = computed(() => {
 const accountStatus = computed(() => [
     {
         label: "Signed in",
-        value: customer.value?.email || "Account member"
+        value: isClientHydrated.value ? customer.value?.email || "Account member" : "Account member"
     },
     {
         label: "Current section",
@@ -142,9 +147,12 @@ async function handleLogout(): Promise<void> {
                         </div>
                         <div>
                             <p class="account-shell__profile-name">
-                                {{ customer?.first_name || "Account" }} {{ customer?.last_name || "Member" }}
+                                {{ isClientHydrated ? customer?.first_name || "Account" : "Account" }}
+                                {{ isClientHydrated ? customer?.last_name || "Member" : "Member" }}
                             </p>
-                            <p class="account-shell__profile-email">{{ customer?.email || "Signed in customer" }}</p>
+                            <p class="account-shell__profile-email">
+                                {{ isClientHydrated ? customer?.email || "Signed in customer" : "Signed in customer" }}
+                            </p>
                         </div>
                     </div>
                     <nav class="account-shell__nav">

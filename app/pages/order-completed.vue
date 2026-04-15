@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
 
+import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
@@ -28,7 +29,7 @@ const {
 
 const order = computed<OrderDTO | null>(() => orderRes.value?.order ?? null)
 const currencyCode = computed<string>(() => order.value?.currency_code ?? DEFAULT_CURENCY)
-const orderDate = computed<string>(() => new Date(order.value?.created_at ?? new Date()).toLocaleDateString())
+const orderDate = computed<string>(() => formatDate(order.value?.created_at))
 const shippingMethod = computed(() => order.value?.shipping_methods?.[0] ?? null)
 const statusItems = computed(() => [
     {
@@ -41,7 +42,7 @@ const statusItems = computed(() => [
     },
     {
         label: "Date placed",
-        value: orderDate.value
+        value: orderDate.value || "Unavailable"
     }
 ])
 </script>

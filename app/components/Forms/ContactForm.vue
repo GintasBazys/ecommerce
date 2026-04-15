@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { formatDateTime } from "@/utils/formatDate"
+
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const loading = ref<boolean>(false)
+const formSubject = useState<string>("contact-form-subject", () => "New submission")
 
 function handleSubmit(e: Event): void {
     e.preventDefault()
@@ -40,16 +43,9 @@ function handleSubmit(e: Event): void {
         })
 }
 
-function getFormatedDate(): string {
-    return new Date().toLocaleString("lt-LT", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-    })
-}
+onMounted(() => {
+    formSubject.value = `${formatDateTime(new Date())} - New submission`
+})
 
 const formErrors = ref<{ subject: string; email: string; message: string }>({
     subject: "",
@@ -133,7 +129,7 @@ function validateForm(formData: FormData): boolean {
                 />
             </VCol>
 
-            <input type="hidden" name="_subject" :value="getFormatedDate() + ' - New submission'" />
+            <input type="hidden" name="_subject" :value="formSubject" />
 
             <VCol cols="12" class="mt-2">
                 <VBtn :loading="loading" :disabled="loading" type="submit" color="primary" block size="large"> Send Message </VBtn>
