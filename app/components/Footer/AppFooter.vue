@@ -26,6 +26,14 @@ const paymentIcons = [
 ]
 
 const currentYear = useState<number>("footer-current-year", () => new Date().getFullYear())
+const isClientHydrated = ref(false)
+const supportEmail = "info@ecommerce.com"
+const supportPhone = "+370 600 00000"
+const supportPhoneHref = "tel:+37060000000"
+
+onMounted(() => {
+    isClientHydrated.value = true
+})
 
 const expandedMobileSections = reactive<Record<string, boolean>>({
     help: true,
@@ -58,20 +66,24 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                 <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                     <p class="text-xs font-semibold uppercase tracking-[0.12em] text-blue-100">Need help?</p>
                     <NuxtLink
+                        v-if="isClientHydrated"
                         class="mt-2 block text-base font-semibold text-white hover:text-blue-100"
-                        to="mailto:info@ecommerce.com"
+                        :to="`mailto:${supportEmail}`"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        info@ecommerce.com
+                        {{ supportEmail }}
+                    </NuxtLink>
+                    <NuxtLink v-else class="mt-2 block text-base font-semibold text-white hover:text-blue-100" to="/contact">
+                        Contact support
                     </NuxtLink>
                     <NuxtLink
                         class="mt-1 block text-base font-semibold text-white hover:text-blue-100"
-                        to="tel:+37060000000"
+                        :to="supportPhoneHref"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        +370 600 00000
+                        {{ supportPhone }}
                     </NuxtLink>
                 </div>
             </section>
