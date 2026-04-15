@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import debounce from "lodash/debounce"
+import debounce from "lodash-es/debounce"
 
 import TaxedLinePrice from "../../components/Cart/TaxedLinePrice.vue"
 

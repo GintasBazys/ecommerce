@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import debounce from "lodash/debounce"
+import debounce from "lodash-es/debounce"
 
 import type { SearchResponse } from "@/types/interfaces"
 import type { ProductDTO } from "@medusajs/types"
@@ -305,14 +305,12 @@ function getProductMeta(product: ProductDTO): string {
                                 <circle cx="17" cy="19" r="1.4" />
                             </svg>
                         </span>
-                        <ClientOnly>
-                            <span
-                                v-if="itemCount"
-                                class="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white"
-                            >
-                                {{ itemCount < 99 ? itemCount : "99+" }}
-                            </span>
-                        </ClientOnly>
+                        <span
+                            v-if="isClientHydrated && itemCount"
+                            class="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white"
+                        >
+                            {{ itemCount < 99 ? itemCount : "99+" }}
+                        </span>
                     </NuxtLink>
 
                     <NuxtLink

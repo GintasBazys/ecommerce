@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import debounce from "lodash/debounce"
+import debounce from "lodash-es/debounce"
 
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 

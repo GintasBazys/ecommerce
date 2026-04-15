@@ -2,6 +2,11 @@
 import PoliciesBlock from "@/components/About/PoliciesBlock.vue"
 
 const { cart } = storeToRefs(useCartStore())
+const isClientHydrated = ref<boolean>(false)
+
+onMounted(() => {
+    isClientHydrated.value = true
+})
 </script>
 
 <template>
@@ -11,6 +16,6 @@ const { cart } = storeToRefs(useCartStore())
         </div>
         <NewsletterComponent />
         <PoliciesBlock />
-        <CartDrawer v-if="cart" />
+        <CartDrawer v-if="isClientHydrated && cart" />
     </main>
 </template>

@@ -50,8 +50,8 @@ importers:
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
-      lodash:
-        specifier: ^4.18.1
+      lodash-es:
+        specifier: ^4.17.21
         version: 4.18.1
       nuxt:
         specifier: ^4.4.2
@@ -78,9 +78,6 @@ importers:
       '@nuxtjs/tailwindcss':
         specifier: ^6.14.0
         version: 6.14.0(magicast@0.5.1)(tsx@4.21.0)(yaml@2.8.2)
-      '@types/lodash':
-        specifier: ^4.17.24
-        version: 4.17.24
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -4395,6 +4392,9 @@ packages:
   locate-path@8.0.0:
     resolution: {integrity: sha512-XT9ewWAC43tiAV7xDAPflMkG0qOPn2QjHqlgX8FOqmWa/rxnyYDulF9T0F7tRy1u+TVTmK/M//6VIOye+2zDXg==}
     engines: {node: '>=20'}
+
+  lodash-es@4.18.1:
+    resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
   lodash.defaults@4.2.0:
     resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
@@ -11535,6 +11535,8 @@ snapshots:
   locate-path@8.0.0:
     dependencies:
       p-locate: 6.0.0
+
+  lodash-es@4.18.1: {}
 
   lodash.defaults@4.2.0: {}
 
