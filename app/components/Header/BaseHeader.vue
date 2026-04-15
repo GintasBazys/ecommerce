@@ -15,6 +15,7 @@ const searchResults = ref<ProductDTO[]>([])
 const searchHasSearched = ref<boolean>(false)
 const selectionLoading = ref<boolean>(false)
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
+const isClientHydrated = ref<boolean>(false)
 
 const route = useRoute()
 
@@ -122,6 +123,10 @@ onBeforeUnmount(() => {
     }
 
     document.documentElement.style.removeProperty("--site-header-offset")
+})
+
+onMounted(() => {
+    isClientHydrated.value = true
 })
 
 function openSearchDialog(): void {
@@ -255,6 +260,7 @@ function getProductMeta(product: ProductDTO): string {
                         </span>
                         <span class="sr-only">Choose shipping country</span>
                         <select
+                            v-if="isClientHydrated"
                             v-model="locationValue"
                             class="ui-input site-header__country-select max-w-[170px] pr-8 text-sm xl:max-w-[190px]"
                             :disabled="selectionLoading"
@@ -263,6 +269,12 @@ function getProductMeta(product: ProductDTO): string {
                                 {{ country.title }}
                             </option>
                         </select>
+                        <span
+                            v-else
+                            class="ui-input site-header__country-select inline-flex max-w-[170px] items-center pr-8 text-sm xl:max-w-[190px]"
+                        >
+                            Country
+                        </span>
                     </label>
 
                     <button type="button" class="ui-icon-btn" @click="openSearchDialog">
@@ -304,7 +316,7 @@ function getProductMeta(product: ProductDTO): string {
                     </NuxtLink>
 
                     <NuxtLink
-                        v-if="customer?.id"
+                        v-if="isClientHydrated && customer?.id"
                         class="hidden items-center rounded-full border border-slate-200 px-3 py-2 text-base font-semibold text-slate-700 hover:text-brand-700 xl:inline-flex"
                         to="/account"
                     >
@@ -352,11 +364,17 @@ function getProductMeta(product: ProductDTO): string {
 
             <label class="mt-4 block">
                 <span class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Country</span>
-                <select v-model="locationValue" class="ui-input site-header__country-select rounded-xl" :disabled="selectionLoading">
+                <select
+                    v-if="isClientHydrated"
+                    v-model="locationValue"
+                    class="ui-input site-header__country-select rounded-xl"
+                    :disabled="selectionLoading"
+                >
                     <option v-for="country in locationItems" :key="country.value" :value="country.value">
                         {{ country.title }}
                     </option>
                 </select>
+                <span v-else class="ui-input site-header__country-select inline-flex w-full items-center rounded-xl">Country</span>
             </label>
 
             <nav class="mt-5 grid gap-1" aria-label="Mobile links">
@@ -384,7 +402,7 @@ function getProductMeta(product: ProductDTO): string {
                     {{ cat.name }}
                 </NuxtLink>
                 <NuxtLink
-                    v-if="customer?.id"
+                    v-if="isClientHydrated && customer?.id"
                     class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
                     to="/account"
                     @click="closeDrawer"
