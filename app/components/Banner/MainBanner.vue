@@ -1,175 +1,100 @@
 <script setup lang="ts">
-import EmblaCarousel, { type EmblaCarouselType } from "embla-carousel"
-import Autoplay from "embla-carousel-autoplay"
+import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
-type BannerSlide = {
-    eyebrow: string
-    title: string
-    description: string
-    detail: string
-    caption: string
-    alt: string
-    image: string
-    imagePosition: string
-    ctaTo: string
-}
+const heroContent = {
+    eyebrow: "New Season Edit",
+    title: "A cleaner, more thoughtful online store experience.",
+    description:
+        "Discover curated essentials with reliable delivery and practical support, all designed to make each purchase feel straightforward from first scroll to checkout.",
+    detail: "Designed for fast browsing, simple decisions, and dependable delivery.",
+    ctaLabel: "Shop now",
+    ctaTo: "/special-offers",
+    secondaryLabel: "Browse all products",
+    secondaryTo: ALL_PRODUCTS_URL_HANDLE,
+    image: "/images/hero-main.jpg",
+    alt: "Lifestyle ecommerce hero image with curated home products"
+} as const
 
-const slides: BannerSlide[] = [
-    {
-        eyebrow: "New Season Edit",
-        title: "A softer way to shop your everyday essentials",
-        description:
-            "Layer calm color, tactile comfort, and quick-shipping favorites into a home storefront that feels considered from the first click.",
-        detail: "Curated drops with a premium editorial feel",
-        caption: "Selected for living rooms, bedrooms, and slow Sunday upgrades.",
-        alt: "Warm-toned lifestyle banner for an ecommerce home collection",
-        image: "/slides/1.jpeg",
-        imagePosition: "center center",
-        ctaTo: "/special-offers"
-    },
-    {
-        eyebrow: "Online Favorites",
-        title: "Build a storefront hero that sells the mood, not just the item",
-        description:
-            "Combine lifestyle imagery, clean typography, and a direct shopping path to make the first fold feel more like a campaign than a placeholder.",
-        detail: "High-impact visuals tuned for conversion-first landing pages",
-        caption: "Designed to echo the brand blues already present across the site.",
-        alt: "Online shopping lifestyle image for an ecommerce landing banner",
-        image: "/images/online_purchase.jpg",
-        imagePosition: "center top",
-        ctaTo: "/special-offers"
-    },
-    {
-        eyebrow: "Shop The Refresh",
-        title: "Turn first visits into intent with a hero that moves immediately",
-        description:
-            "Animated copy, layered overlays, and a confident call to action help the banner feel active the moment the page loads.",
-        detail: "Motion-led headline reveal with a clear shop now action",
-        caption: "Built for broad ecommerce storytelling, not a single product niche.",
-        alt: "Editorial ecommerce banner image with premium product storytelling",
-        image: "/slides/1.jpeg",
-        imagePosition: "right center",
-        ctaTo: "/special-offers"
-    }
-]
-
-const bannerViewport = ref<HTMLElement | null>(null)
-const bannerApi = ref<EmblaCarouselType | null>(null)
-const selectedSlide = ref<number>(0)
-const snapPoints = ref<number[]>([])
-
-function syncSelectedSlide(): void {
-    if (!bannerApi.value) {
-        return
-    }
-
-    selectedSlide.value = bannerApi.value.selectedScrollSnap()
-}
-
-function goToSlide(index: number): void {
-    bannerApi.value?.scrollTo(index)
-}
-
-onMounted(() => {
-    if (!bannerViewport.value) {
-        return
-    }
-
-    const embla = EmblaCarousel(
-        bannerViewport.value,
-        {
-            align: "start",
-            loop: true
-        },
-        [
-            Autoplay({
-                delay: 7000,
-                stopOnInteraction: false
-            })
-        ]
-    )
-
-    bannerApi.value = embla
-    snapPoints.value = embla.scrollSnapList()
-    syncSelectedSlide()
-
-    embla.on("select", syncSelectedSlide)
-    embla.on("reInit", () => {
-        snapPoints.value = embla.scrollSnapList()
-        syncSelectedSlide()
-    })
-})
-
-onBeforeUnmount(() => {
-    bannerApi.value?.destroy()
-    bannerApi.value = null
-})
+const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real people"] as const
 </script>
 
 <template>
-    <section class="container-fluid banner-section">
-        <div class="banner-swiper">
-            <div ref="bannerViewport" class="banner-swiper__viewport">
-                <div class="banner-swiper__track">
-                    <div
-                        v-for="(slide, idx) in slides"
-                        :key="slide.title"
-                        class="banner-swiper__embla-slide"
-                        :class="{ 'banner-swiper__embla-slide--active': idx === selectedSlide }"
-                    >
-                        <article class="banner-swiper__slide">
-                            <img
-                                class="banner-swiper__image"
-                                :src="slide.image"
-                                :alt="slide.alt"
-                                width="1920"
-                                height="1080"
-                                :loading="idx === 0 ? 'eager' : 'lazy'"
-                                decoding="async"
-                                :style="{ objectPosition: slide.imagePosition }"
-                            />
-                            <div class="banner-swiper__veil"></div>
-                            <div class="container banner-swiper__inner">
-                                <div class="banner-swiper__content">
-                                    <span class="banner-swiper__eyebrow">{{ slide.eyebrow }}</span>
-                                    <h1 class="banner-swiper__title">
-                                        {{ slide.title }}
-                                    </h1>
-                                    <p class="banner-swiper__description">
-                                        {{ slide.description }}
-                                    </p>
-                                    <div class="banner-swiper__actions">
-                                        <NuxtLink :to="slide.ctaTo" class="banner-swiper__cta">
-                                            <VBtn color="primary" size="x-large" rounded="pill" class="px-8 text-none font-weight-bold">
-                                                Shop now
-                                            </VBtn>
-                                        </NuxtLink>
-                                        <span class="banner-swiper__detail">{{ slide.detail }}</span>
-                                    </div>
-                                </div>
-                                <div class="banner-swiper__card">
-                                    <span class="banner-swiper__card-label">Featured direction</span>
-                                    <p class="banner-swiper__card-text">{{ slide.caption }}</p>
-                                    <div class="banner-swiper__card-accent"></div>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                </div>
-            </div>
+    <section class="site-hero relative isolate overflow-hidden bg-slate-950">
+        <NuxtImg
+            :src="heroContent.image"
+            :alt="heroContent.alt"
+            width="2400"
+            height="1411"
+            sizes="(max-width: 767px) 100vw, (max-width: 1280px) 100vw, (max-width: 1920px) 100vw, 1920px"
+            format="webp"
+            quality="72"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            preload
+            class="absolute inset-0 h-full w-full object-cover object-center"
+        />
 
-            <div class="banner-swiper__pagination" aria-label="Homepage hero pagination">
-                <button
-                    v-for="(_, idx) in snapPoints"
-                    :key="`banner-dot-${idx}`"
-                    type="button"
-                    class="banner-swiper__pagination-dot"
-                    :class="{ 'banner-swiper__pagination-dot--active': idx === selectedSlide }"
-                    :aria-label="`Go to slide ${idx + 1}`"
-                    :aria-current="idx === selectedSlide ? 'true' : undefined"
-                    @click="goToSlide(idx)"
-                ></button>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#051349]/90 via-[#051349]/62 to-[#051349]/15"></div>
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#030d33]/70 via-[#030d33]/25 to-transparent"></div>
+
+        <div
+            class="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-12 pt-24 sm:px-6 sm:pb-14 md:pb-16 md:pt-28 lg:pb-20 lg:pt-32"
+        >
+            <div class="w-full max-w-3xl text-white">
+                <span
+                    class="inline-flex rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-100"
+                >
+                    {{ heroContent.eyebrow }}
+                </span>
+
+                <h1 class="mt-4 max-w-[14ch] text-4xl font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl">
+                    {{ heroContent.title }}
+                </h1>
+
+                <p class="mt-4 max-w-2xl text-base leading-7 text-white/90 sm:text-lg">
+                    {{ heroContent.description }}
+                </p>
+
+                <div class="mt-7 flex flex-wrap items-center gap-3">
+                    <NuxtLink :to="heroContent.ctaTo" class="ui-btn-primary px-7 text-base">
+                        {{ heroContent.ctaLabel }}
+                    </NuxtLink>
+                    <NuxtLink
+                        :to="heroContent.secondaryTo"
+                        class="inline-flex min-h-11 items-center justify-center rounded-full border border-white/25 px-5 text-sm font-semibold text-white transition hover:border-white/50"
+                    >
+                        {{ heroContent.secondaryLabel }}
+                    </NuxtLink>
+                </div>
+
+                <p class="mt-4 text-sm text-white/85">
+                    {{ heroContent.detail }}
+                </p>
+
+                <ul class="mt-5 flex flex-wrap gap-2" aria-label="Hero benefits">
+                    <li
+                        v-for="item in heroHighlights"
+                        :key="item"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-blue-50"
+                    >
+                        <span class="h-1.5 w-1.5 rounded-full bg-cyan-300" aria-hidden="true"></span>
+                        {{ item }}
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
 </template>
+
+<style scoped>
+.site-hero {
+    min-height: calc(100vh - var(--site-header-offset, 98px));
+}
+
+@supports (height: 100svh) {
+    .site-hero {
+        min-height: calc(100svh - var(--site-header-offset, 98px));
+    }
+}
+</style>

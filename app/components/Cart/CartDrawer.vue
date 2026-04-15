@@ -8,18 +8,53 @@ const { cart, openCartDrawer } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem } = useCartStore()
 
 const isHydrated = ref(false)
+const drawerRef = ref<HTMLElement | null>(null)
+const closeButtonRef = ref<HTMLButtonElement | null>(null)
+const previousFocusedElement = ref<HTMLElement | null>(null)
 
 const qtyMap = reactive<Record<string, number | undefined>>({})
 const updating = reactive<Record<string, boolean>>({})
 
+const router = useRouter()
+const unregisterAfterEach = router.afterEach(() => {
+    openCartDrawer.value = false
+})
+
 onMounted(() => {
     isHydrated.value = true
+
+    if (openCartDrawer.value) {
+        previousFocusedElement.value = document.activeElement as HTMLElement
+        document.body.style.overflow = "hidden"
+    }
+})
+
+onBeforeUnmount(() => {
+    unregisterAfterEach()
+    document.body.style.overflow = ""
+})
+
+watch(openCartDrawer, async (opened) => {
+    if (!import.meta.client) {
+        return
+    }
+
+    if (opened) {
+        previousFocusedElement.value = document.activeElement as HTMLElement
+        document.body.style.overflow = "hidden"
+        await nextTick()
+        closeButtonRef.value?.focus()
+        return
+    }
+
+    document.body.style.overflow = ""
+    previousFocusedElement.value?.focus()
 })
 
 watch(
     cart,
     (newCart) => {
-        const newIds = newCart?.items?.map((i) => i.id) || []
+        const newIds = newCart?.items?.map((item) => item.id) || []
 
         Object.keys(qtyMap).forEach((id) => {
             if (!newIds.includes(id)) {
@@ -32,6 +67,7 @@ watch(
             if (qtyMap[item.id] === undefined) {
                 qtyMap[item.id] = Number(item.quantity)
             }
+
             if (updating[item.id] === undefined) {
                 updating[item.id] = false
             }
@@ -42,9 +78,11 @@ watch(
 
 const originalQtys = computed<Record<string, number>>(() => {
     const map: Record<string, number> = {}
+
     cart.value?.items?.forEach((item) => {
         map[item.id] = Number(item.quantity)
     })
+
     return map
 })
 
@@ -52,40 +90,60 @@ const isCartDirty = computed<boolean>(() =>
     Object.entries(qtyMap).some(([id, qty]) => (qty ?? originalQtys.value[id]) !== originalQtys.value[id])
 )
 
+const isAnyUpdating = computed<boolean>(() => Object.values(updating).some(Boolean))
+
+const displayTotal = computed<string>(() => {
+    const sum = (cart.value?.items || []).reduce((acc, item) => {
+        const qty = qtyMap[item.id] ?? Number(item.quantity)
+        return acc + qty * Number(item.unit_price)
+    }, 0)
+
+    return formatPrice(sum, cart.value?.currency_code ?? DEFAULT_CURENCY)
+})
+
+const displayTaxTotal = computed<string>(() =>
+    formatPrice(Number(cart.value?.tax_total || 0), cart.value?.currency_code ?? DEFAULT_CURENCY)
+)
+
 async function removeItem(lineItemId: string): Promise<void> {
     if (!cart.value?.id) {
         throw new Error("No active cart found")
     }
+
     try {
         await removeLineItem(lineItemId)
-    } catch (err) {
-        console.error("Failed to remove item:", err)
+    } catch (error) {
+        console.error("Failed to remove item:", error)
     }
 }
 
 function decrementQty(itemId: string): void {
-    const q = qtyMap[itemId] ?? 1
-    if (q > 1) {
-        qtyMap[itemId] = q - 1
+    const quantity = qtyMap[itemId] ?? 1
+
+    if (quantity > 1) {
+        qtyMap[itemId] = quantity - 1
     }
 }
 
 function incrementQty(item: CartLineItemDTO): void {
-    const q = qtyMap[item.id] ?? Number(item.quantity)
+    const quantity = qtyMap[item.id] ?? Number(item.quantity)
     const max = item.stocked_quantity ?? Infinity
-    if (q < max) {
-        qtyMap[item.id] = q + 1
+
+    if (quantity < max) {
+        qtyMap[item.id] = quantity + 1
     }
 }
 
 async function updateCount(item: CartLineItemDTO): Promise<void> {
     const desiredQty = qtyMap[item.id] ?? Number(item.quantity)
     const currentQty = Number(item.quantity)
+
     if (desiredQty === currentQty || desiredQty < 1 || desiredQty > (item.stocked_quantity ?? Infinity) || !cart.value?.id) {
         return
     }
 
     updating[item.id] = true
+
     try {
         const variant = {
             inventory_quantity: item.stocked_quantity ?? desiredQty,
@@ -95,402 +153,245 @@ async function updateCount(item: CartLineItemDTO): Promise<void> {
         }
 
         await updateLineItem(variant, desiredQty, true)
-    } catch (err) {
-        console.error("Failed to update count:", err)
+    } catch (error) {
+        console.error("Failed to update count:", error)
     } finally {
         updating[item.id] = false
     }
 }
 
 function updateCart(): void {
-    cart.value?.items?.forEach((item) => updateCount(item))
+    cart.value?.items?.forEach((item) => {
+        void updateCount(item)
+    })
 }
 
-const isAnyUpdating = computed<boolean>(() => Object.values(updating).some(Boolean))
-
-const displayTotal = computed<string>(() => {
-    const sum = (cart.value?.items || []).reduce((acc, item) => {
-        const qty = qtyMap[item.id] ?? Number(item.quantity)
-        return acc + qty * Number(item.unit_price)
-    }, 0)
-    return formatPrice(sum, cart.value?.currency_code ?? DEFAULT_CURENCY)
-})
-
-const displayTaxTotal = computed<string>(() =>
-    formatPrice(Number(cart.value?.tax_total || 0), cart.value?.currency_code ?? DEFAULT_CURENCY)
-)
-
-const router = useRouter()
-
-router.afterEach(() => {
+function closeDrawer(): void {
     openCartDrawer.value = false
-})
+}
+
+function onDrawerKeydown(event: KeyboardEvent): void {
+    if (event.key === "Escape") {
+        closeDrawer()
+        return
+    }
+
+    if (event.key !== "Tab") {
+        return
+    }
+
+    const container = drawerRef.value
+    if (!container) {
+        return
+    }
+
+    const focusableElements = container.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+
+    if (!focusableElements.length) {
+        return
+    }
+
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+
+    if (!firstElement || !lastElement) {
+        return
+    }
+    const activeElement = document.activeElement
+
+    if (event.shiftKey && activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+    } else if (!event.shiftKey && activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+    }
+}
 </script>
 
 <template>
-    <VNavigationDrawer v-if="isHydrated" v-model="openCartDrawer" location="right" touchless temporary width="420" class="cart-drawer">
-        <div class="cart-drawer__shell">
-            <div class="cart-drawer__backdrop"></div>
+    <Teleport to="body">
+        <div v-if="isHydrated" class="pointer-events-none fixed inset-0 z-[80]">
+            <transition name="fade">
+                <div v-if="openCartDrawer" class="pointer-events-auto absolute inset-0 bg-slate-950/50" @click="closeDrawer"></div>
+            </transition>
 
-            <VContainer class="cart-drawer__container">
-                <header class="cart-drawer__hero">
+            <aside
+                ref="drawerRef"
+                class="pointer-events-auto absolute right-0 top-0 flex h-full w-full max-w-[420px] flex-col border-l border-slate-200 bg-gradient-to-b from-[#f6f9ff] via-white to-[#f7faff] shadow-2xl transition-transform duration-300"
+                :class="openCartDrawer ? 'translate-x-0' : 'translate-x-full'"
+                aria-label="Shopping cart"
+                role="search"
+                @keydown="onDrawerKeydown"
+            >
+                <div class="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:p-4">
                     <div>
-                        <span class="cart-drawer__eyebrow">Cart overview</span>
-                        <h2 class="cart-drawer__title">Your order is nearly ready.</h2>
-                        <p class="cart-drawer__description">
+                        <p
+                            class="inline-flex rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700"
+                        >
+                            Cart overview
+                        </p>
+                        <h2 class="mt-3 text-xl font-semibold leading-tight text-slate-900 sm:text-2xl">Your order is nearly ready.</h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">
                             Review quantities, make quick changes, and continue to checkout when everything looks right.
                         </p>
                     </div>
 
-                    <VBtn icon variant="text" class="cart-drawer__close-btn" @click="openCartDrawer = false">
-                        <VIcon>mdi-close</VIcon>
-                    </VBtn>
-                </header>
+                    <button ref="closeButtonRef" type="button" class="ui-icon-btn shrink-0" @click="closeDrawer">
+                        <span class="sr-only">Close cart drawer</span>
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                            <path
+                                d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
+                            />
+                        </svg>
+                    </button>
+                </div>
 
-                <div class="cart-drawer__content">
-                    <div v-if="cart?.items?.length" class="cart-drawer__items">
-                        <article v-for="item in cart?.items || []" :key="item.id" class="cart-drawer__item-card">
-                            <VImg :src="item.thumbnail" alt="product image" width="96" height="112" class="cart-drawer__image" cover />
+                <div class="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:p-4">
+                    <div v-if="cart?.items?.length" class="grid gap-3">
+                        <article
+                            v-for="item in cart.items"
+                            :key="item.id"
+                            class="grid grid-cols-[84px_minmax(0,1fr)] gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-panel sm:grid-cols-[96px_minmax(0,1fr)]"
+                        >
+                            <NuxtImage
+                                :src="item.thumbnail || '/images/about_banner.webp'"
+                                :alt="item.product_title || 'Product image'"
+                                width="96"
+                                height="112"
+                                loading="lazy"
+                                class="h-24 w-[84px] rounded-xl bg-slate-100 object-cover sm:h-28 sm:w-24"
+                            />
 
-                            <div class="cart-drawer__item-body">
+                            <div class="flex min-w-0 flex-col justify-between gap-3">
                                 <div>
-                                    <p class="cart-drawer__item-title">{{ item.product_title }}</p>
-                                    <p class="cart-drawer__item-variant">{{ item.variant_title || "Standard option" }}</p>
+                                    <p class="text-sm font-semibold text-slate-900">{{ item.product_title }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">{{ item.variant_title || "Standard option" }}</p>
                                 </div>
 
-                                <div class="cart-drawer__item-footer">
-                                    <div class="cart-drawer__qty-control">
-                                        <VBtn
-                                            icon
-                                            size="x-small"
-                                            variant="text"
+                                <div class="flex items-end justify-between gap-3">
+                                    <div class="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 p-1">
+                                        <button
+                                            type="button"
+                                            class="ui-icon-btn min-h-11 min-w-11 border-0 bg-transparent"
                                             :disabled="(qtyMap[item.id] ?? 1) <= 1"
+                                            :aria-label="`Decrease quantity for ${item.product_title}`"
                                             @click="decrementQty(item.id)"
                                         >
-                                            <VIcon size="18">mdi-minus</VIcon>
-                                        </VBtn>
-
-                                        <span class="cart-drawer__qty-value">{{ qtyMap[item.id] ?? Number(item.quantity) }}</span>
-
-                                        <VBtn
-                                            icon
-                                            size="x-small"
-                                            variant="text"
+                                            -
+                                        </button>
+                                        <span class="min-w-7 text-center text-sm font-semibold text-slate-900">{{
+                                            qtyMap[item.id] ?? Number(item.quantity)
+                                        }}</span>
+                                        <button
+                                            type="button"
+                                            class="ui-icon-btn min-h-11 min-w-11 border-0 bg-transparent"
                                             :disabled="(qtyMap[item.id] ?? Number(item.quantity)) >= (item.stocked_quantity ?? Infinity)"
+                                            :aria-label="`Increase quantity for ${item.product_title}`"
                                             @click="incrementQty(item)"
                                         >
-                                            <VIcon size="18">mdi-plus</VIcon>
-                                        </VBtn>
+                                            +
+                                        </button>
                                     </div>
 
-                                    <div class="cart-drawer__item-actions">
-                                        <span class="cart-drawer__item-price">
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-semibold text-slate-900">
                                             {{
                                                 formatPrice(
                                                     (qtyMap[item.id] ?? Number(item.quantity)) * Number(item.unit_price),
                                                     cart?.currency_code ?? DEFAULT_CURENCY
                                                 )
                                             }}
-                                        </span>
-
-                                        <VBtn icon variant="text" class="cart-drawer__remove-btn" @click="removeItem(item.id)">
-                                            <VIcon size="18">mdi-trash-can-outline</VIcon>
-                                        </VBtn>
+                                        </p>
+                                        <button
+                                            type="button"
+                                            class="ui-icon-btn min-h-11 min-w-11"
+                                            :aria-label="`Remove ${item.product_title}`"
+                                            @click="removeItem(item.id)"
+                                        >
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                class="h-4 w-4"
+                                                stroke="currentColor"
+                                                stroke-width="1.8"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M4 7h16M9 7V5h6v2m-7 3v7m4-7v7m4-7v7M6 7l1 12h10l1-12"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </article>
                     </div>
 
-                    <div v-else class="cart-drawer__empty-state">
-                        <div class="cart-drawer__empty-icon">
-                            <VIcon size="26">mdi-cart-outline</VIcon>
-                        </div>
-                        <h3 class="cart-drawer__empty-title">Your cart is empty</h3>
-                        <p class="cart-drawer__empty-text">Add a few pieces you love and they will appear here for a quick final review.</p>
-                        <VBtn color="primary" rounded="pill" class="text-none px-6" :to="ALL_PRODUCTS_URL_HANDLE">Keep shopping</VBtn>
-                    </div>
+                    <section v-else class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-panel">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-700">🛒</div>
+                        <h3 class="mt-3 text-lg font-semibold text-slate-900">Your cart is empty</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">
+                            Add a few pieces you love and they will appear here for a quick final review.
+                        </p>
+                        <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="ui-btn-primary mt-5">Keep shopping</NuxtLink>
+                    </section>
                 </div>
 
-                <footer class="cart-drawer__summary">
-                    <div class="cart-drawer__summary-row">
-                        <span class="cart-drawer__summary-label">Subtotal</span>
-                        <strong class="cart-drawer__summary-value">{{ displayTotal }}</strong>
+                <footer class="border-t border-slate-200 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+                    <div class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-sm text-slate-600">Subtotal</span>
+                            <strong class="text-sm text-slate-900">{{ displayTotal }}</strong>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-sm text-slate-600">Tax</span>
+                            <strong class="text-sm text-slate-900">{{ displayTaxTotal }}</strong>
+                        </div>
+                        <p class="pt-1 text-xs text-slate-500">Shipping is calculated during checkout.</p>
                     </div>
 
-                    <div class="cart-drawer__summary-row">
-                        <span class="cart-drawer__summary-label">Tax</span>
-                        <strong class="cart-drawer__summary-value">{{ displayTaxTotal }}</strong>
-                    </div>
+                    <div class="mt-4 grid gap-2">
+                        <button
+                            v-if="isCartDirty"
+                            type="button"
+                            class="ui-btn-primary w-full"
+                            :disabled="!isCartDirty || isAnyUpdating"
+                            @click="updateCart"
+                        >
+                            <span
+                                v-if="isAnyUpdating"
+                                class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-white"
+                            ></span>
+                            Update cart
+                        </button>
 
-                    <p class="cart-drawer__summary-note">Shipping is calculated during checkout.</p>
-
-                    <VBtn
-                        v-if="isCartDirty"
-                        color="primary"
-                        block
-                        rounded="pill"
-                        class="text-none"
-                        :loading="isAnyUpdating"
-                        :disabled="!isCartDirty || isAnyUpdating"
-                        @click="updateCart"
-                    >
-                        Update cart
-                    </VBtn>
-
-                    <NuxtLink :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }" to="/cart">
-                        <VBtn color="primary" variant="outlined" rounded="pill" class="cart-drawer__view-cart-btn text-none" block>
+                        <NuxtLink
+                            to="/cart"
+                            class="ui-btn-secondary w-full"
+                            :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }"
+                        >
                             Go to cart
-                        </VBtn>
-                    </NuxtLink>
+                        </NuxtLink>
+                    </div>
                 </footer>
-            </VContainer>
+            </aside>
         </div>
-    </VNavigationDrawer>
+    </Teleport>
 </template>
 
-<style scoped lang="scss">
-.cart-drawer :deep(.v-navigation-drawer__content) {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.1), transparent 26%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 45%, #f7faff 100%);
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
 }
 
-.cart-drawer__shell {
-    position: relative;
-    min-height: 100%;
-}
-
-.cart-drawer__backdrop {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at top right, rgba(0, 128, 255, 0.12), transparent 22%),
-        radial-gradient(circle at bottom left, rgba(1, 12, 128, 0.08), transparent 28%);
-    pointer-events: none;
-}
-
-.cart-drawer__container {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 3rem 1rem 0;
-}
-
-.cart-drawer__hero,
-.cart-drawer__summary,
-.cart-drawer__item-card,
-.cart-drawer__empty-state {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.cart-drawer__hero {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.35rem;
-}
-
-.cart-drawer__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.1rem;
-    padding: 0.45rem 0.85rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.cart-drawer__title {
-    margin: 0.95rem 0 0.65rem;
-    color: #08173f;
-    font-size: clamp(1.8rem, 4vw, 2.4rem);
-    line-height: 0.98;
-    letter-spacing: -0.05rem;
-    text-wrap: balance;
-}
-
-.cart-drawer__description,
-.cart-drawer__item-variant,
-.cart-drawer__summary-note,
-.cart-drawer__empty-text {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.65;
-}
-
-.cart-drawer__close-btn,
-.cart-drawer__remove-btn {
-    color: #08173f;
-}
-
-.cart-drawer__content {
-    flex: 1;
-    min-height: 0;
-    padding: 1rem 0;
-    overflow-y: auto;
-}
-
-.cart-drawer__items {
-    display: grid;
-    gap: 1rem;
-}
-
-.cart-drawer__item-card {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 1rem;
-    padding: 1rem;
-}
-
-.cart-drawer__image {
-    border-radius: 1rem;
-    background: #edf2ff;
-}
-
-.cart-drawer__item-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 1rem;
-    min-width: 0;
-}
-
-.cart-drawer__item-title,
-.cart-drawer__empty-title {
-    margin: 0;
-    color: #08173f;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.cart-drawer__item-title {
-    font-size: 1rem;
-}
-
-.cart-drawer__item-variant {
-    margin-top: 0.35rem;
-    font-size: 0.92rem;
-}
-
-.cart-drawer__item-footer,
-.cart-drawer__item-actions,
-.cart-drawer__summary-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-}
-
-.cart-drawer__qty-control {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.15rem;
-    padding: 0.2rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 999px;
-    background: rgba(247, 250, 255, 0.95);
-}
-
-.cart-drawer__qty-value {
-    min-width: 1.9rem;
-    color: #08173f;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-align: center;
-}
-
-.cart-drawer__item-price,
-.cart-drawer__summary-value {
-    color: #08173f;
-    font-weight: 700;
-}
-
-.cart-drawer__summary {
-    display: grid;
-    gap: 0.95rem;
-    padding: 1.25rem;
-    position: sticky;
-    bottom: 0;
-    margin-top: auto;
-}
-
-.cart-drawer__summary-label {
-    color: #6a7590;
-    font-size: 0.92rem;
-}
-
-.cart-drawer__summary-value {
-    font-size: 1.1rem;
-}
-
-.cart-drawer__view-cart-btn {
-    margin-top: 0.1rem;
-}
-
-.cart-drawer__empty-state {
-    display: grid;
-    justify-items: start;
-    gap: 0.85rem;
-    padding: 1.4rem;
-}
-
-.cart-drawer__empty-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.15rem;
-    height: 3.15rem;
-    border-radius: 1rem;
-    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
-    color: #010c80;
-}
-
-.cart-drawer__empty-title {
-    font-size: 1.2rem;
-}
-
-@media screen and (max-width: 600px) {
-    .cart-drawer__container {
-        min-height: 100%;
-        padding: 1.35rem 1rem 1rem;
-    }
-
-    .cart-drawer__hero,
-    .cart-drawer__summary,
-    .cart-drawer__item-card,
-    .cart-drawer__empty-state {
-        border-radius: 1.2rem;
-    }
-
-    .cart-drawer__item-card {
-        grid-template-columns: 1fr;
-    }
-
-    .cart-drawer__image {
-        width: 100% !important;
-        height: 12rem !important;
-    }
-
-    .cart-drawer__item-footer {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .cart-drawer__item-actions,
-    .cart-drawer__summary-row {
-        width: 100%;
-    }
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

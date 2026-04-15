@@ -6,6 +6,12 @@ const { organizationSchema, websiteSchema } = useSiteIdentity()
 
 useHead({
     link: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
+        {
+            rel: "stylesheet",
+            href: "https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap"
+        },
         { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
         { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
         { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
@@ -54,6 +60,6 @@ body {
 }
 
 main {
-    padding-top: 98px;
+    padding-top: var(--site-header-offset, 98px);
 }
 </style>

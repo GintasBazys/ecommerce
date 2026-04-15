@@ -15,6 +15,7 @@ const searchResults = ref<ProductDTO[]>([])
 const searchHasSearched = ref<boolean>(false)
 const selectionLoading = ref<boolean>(false)
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
+
 const route = useRoute()
 
 const regionStore = useRegionStore()
@@ -24,14 +25,17 @@ const { categories } = storeToRefs(useProductStore())
 const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
 
 const topOffset = computed<number>(() => (bannerHidden.value ? 0 : 32))
+const headerHeight = 64
+const headerOffset = computed<number>(() => (bannerHidden.value ? headerHeight : headerHeight + 32))
 const regionId = computed<string>(() => regionStoreId.value ?? "")
+
 const locationItems = computed(() =>
     availableCountries.value.map((country) => ({
         title: country.display_name || country.iso_2.toUpperCase(),
         value: country.iso_2
     }))
 )
-const locationLabel = computed<string>(() => "Country")
+
 const locationValue = computed<string>({
     get: () => selectedCountryCode.value ?? "",
     set: (value) => {
@@ -40,7 +44,7 @@ const locationValue = computed<string>({
 })
 
 const runSearch = debounce(async (value: string) => {
-    if (value.length < 2) {
+    if (value.length < 3) {
         searchResults.value = []
         searchHasSearched.value = false
         searchLoading.value = false
@@ -48,6 +52,7 @@ const runSearch = debounce(async (value: string) => {
     }
 
     searchLoading.value = true
+
     try {
         const response = await $fetch<SearchResponse>("/api/search", {
             method: "POST",
@@ -63,6 +68,7 @@ const runSearch = debounce(async (value: string) => {
                 q: value
             }
         })
+
         searchResults.value = response.products.slice(0, 8)
     } catch {
         searchResults.value = []
@@ -70,7 +76,7 @@ const runSearch = debounce(async (value: string) => {
         searchHasSearched.value = true
         searchLoading.value = false
     }
-}, 260)
+}, 300)
 
 watch(searchDialog, (opened) => {
     if (!opened) {
@@ -83,11 +89,39 @@ watch(searchDialog, (opened) => {
 })
 
 watch(searchQuery, (value) => {
-    const query = value.trim()
     if (!searchDialog.value) {
         return
     }
-    runSearch(query)
+
+    runSearch(value.trim())
+})
+
+watch(
+    () => route.fullPath,
+    () => {
+        drawer.value = false
+        searchDialog.value = false
+    }
+)
+
+watch(
+    headerOffset,
+    (value) => {
+        if (!import.meta.client) {
+            return
+        }
+
+        document.documentElement.style.setProperty("--site-header-offset", `${value}px`)
+    },
+    { immediate: true }
+)
+
+onBeforeUnmount(() => {
+    if (!import.meta.client) {
+        return
+    }
+
+    document.documentElement.style.removeProperty("--site-header-offset")
 })
 
 function openSearchDialog(): void {
@@ -99,12 +133,7 @@ function closeSearchDialog(): void {
 }
 
 async function updateLocation(value: string): Promise<void> {
-    if (!value) {
-        return
-    }
-
-    const isSameSelection = value === selectedCountryCode.value
-    if (isSameSelection) {
+    if (!value || value === selectedCountryCode.value) {
         return
     }
 
@@ -112,7 +141,6 @@ async function updateLocation(value: string): Promise<void> {
 
     try {
         regionStore.setCountry(value)
-
         drawer.value = false
         searchDialog.value = false
 
@@ -126,447 +154,341 @@ async function updateLocation(value: string): Promise<void> {
         selectionLoading.value = false
     }
 }
+
+function closeDrawer(): void {
+    drawer.value = false
+}
+
+function getProductPath(handle?: string | null): string {
+    return handle ? `${PRODUCT_URL_HANDLE}/${handle}` : ALL_PRODUCTS_URL_HANDLE
+}
+
+function getProductMeta(product: ProductDTO): string {
+    if (product.collection?.title) {
+        return product.collection.title
+    }
+
+    if (product.type?.value) {
+        return product.type.value
+    }
+
+    if (product.subtitle) {
+        return product.subtitle
+    }
+
+    return "View product details"
+}
 </script>
 
 <template>
-    <header class="site-header">
-        <div v-if="!bannerHidden" class="site-header__notice">
-            <div class="site-header__notice-inner">
-                <div class="site-header__notice-content">
-                    <VIcon size="18" class="site-header__notice-icon">mdi-truck-fast</VIcon>
-                    <span>Free shipping on 35 €</span>
-                </div>
-                <VBtn icon size="x-small" variant="text" class="site-header__notice-close" @click="bannerHidden = true">
-                    <VIcon size="18">mdi-close</VIcon>
-                </VBtn>
+    <header class="relative z-50">
+        <div
+            v-if="!bannerHidden"
+            class="fixed inset-x-0 top-0 z-50 h-8 border-b border-blue-100 bg-gradient-to-r from-brand-900 via-brand-700 to-sky-500 text-white"
+        >
+            <div class="mx-auto flex h-full w-full max-w-7xl items-center justify-between px-4">
+                <p class="truncate text-xs font-semibold tracking-wide">Free shipping on 35 EUR</p>
+                <button
+                    type="button"
+                    class="ui-icon-btn min-h-7 min-w-7 border-white/30 text-white hover:text-white"
+                    @click="bannerHidden = true"
+                >
+                    <span class="sr-only">Dismiss shipping notice</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                        <path
+                            d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
+                        />
+                    </svg>
+                </button>
             </div>
         </div>
 
-        <VAppBar app color="white" elevation="0" height="64" class="site-header__app-bar" :style="{ top: `${topOffset}px` }">
-            <VContainer>
-                <VRow align="center" justify="space-between" no-gutters class="w-100 no-wrap">
-                    <VCol class="site-header__logo-col" cols="auto">
-                        <NuxtLink class="site-header__logo-link" to="/">
-                            <NuxtImg src="/images/logo.svg" alt="Ecommerce logo" />
-                        </NuxtLink>
-                    </VCol>
-
-                    <nav class="hidden-md-and-down site-header__nav">
-                        <NuxtLink class="site-header__nav-link" :to="ALL_PRODUCTS_URL_HANDLE">All products</NuxtLink>
-                        <NuxtLink class="site-header__nav-link" to="/special-offers">Special offers</NuxtLink>
-                        <NuxtLink
-                            v-for="cat in categories"
-                            :key="cat.id"
-                            class="site-header__nav-link"
-                            :to="`${CATEGORY_HANDLE}/${cat.handle}`"
-                        >
-                            {{ cat.name }}
-                        </NuxtLink>
-                    </nav>
-
-                    <VCol cols="auto" class="d-flex align-center">
-                        <VToolbarItems class="d-flex align-center">
-                            <VSelect
-                                v-model="locationValue"
-                                :items="locationItems"
-                                :label="locationLabel"
-                                item-title="title"
-                                item-value="value"
-                                density="compact"
-                                variant="outlined"
-                                hide-details
-                                rounded="pill"
-                                class="hidden-sm-and-down site-header__location-select"
-                                :loading="selectionLoading"
-                            />
-
-                            <VBtn icon class="site-header__icon-btn" @click="openSearchDialog">
-                                <VIcon>mdi-magnify</VIcon>
-                            </VBtn>
-
-                            <NuxtLink to="/cart" class="position-relative">
-                                <VBtn icon class="site-header__icon-btn">
-                                    <VIcon>mdi-cart</VIcon>
-                                    <ClientOnly>
-                                        <VBadge
-                                            v-if="itemCount"
-                                            :content="itemCount < 99 ? itemCount : '99+'"
-                                            color="error"
-                                            overlap
-                                            bordered
-                                            class="site-header__cart-counter"
-                                        />
-                                    </ClientOnly>
-                                </VBtn>
-                            </NuxtLink>
-
-                            <NuxtLink v-if="customer?.id" class="hidden-md-and-down" to="/account">
-                                <VBtn variant="text" class="site-header__account-btn">
-                                    <VIcon>mdi-account</VIcon>
-                                    <span class="ms-2 site-header__truncate">{{ customer.first_name ?? "Profile" }}</span>
-                                </VBtn>
-                            </NuxtLink>
-                            <NuxtLink v-else class="hidden-md-and-down" to="/signin">
-                                <VBtn variant="text" class="site-header__account-btn">
-                                    <VIcon>mdi-account</VIcon>
-                                    <span class="ms-2">Sign In</span>
-                                </VBtn>
-                            </NuxtLink>
-                        </VToolbarItems>
-
-                        <VBtn icon class="hidden-lg-and-up site-header__icon-btn" @click="drawer = !drawer">
-                            <VIcon>mdi-menu</VIcon>
-                        </VBtn>
-                    </VCol>
-                </VRow>
-            </VContainer>
-        </VAppBar>
-
-        <VNavigationDrawer v-model="drawer" temporary touchless location="right" width="260" :style="{ paddingTop: `${topOffset}px` }">
-            <VList nav>
-                <VListItem>
-                    <VSelect
-                        v-model="locationValue"
-                        :items="locationItems"
-                        :label="locationLabel"
-                        item-title="title"
-                        item-value="value"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
-                        rounded="pill"
-                        class="site-header__drawer-select"
-                        :loading="selectionLoading"
+        <div class="fixed inset-x-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur" :style="{ top: `${topOffset}px` }">
+            <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
+                <NuxtLink to="/" class="shrink-0">
+                    <NuxtImage
+                        src="/images/logo.svg"
+                        alt="Ecommerce logo"
+                        width="128"
+                        height="28"
+                        loading="eager"
+                        class="h-6 w-auto sm:h-7"
                     />
-                </VListItem>
-                <VListItem>
-                    <NuxtLink class="site-header__drawer-link" :to="ALL_PRODUCTS_URL_HANDLE">All products</NuxtLink>
-                </VListItem>
-                <VListItem>
-                    <NuxtLink class="site-header__drawer-link" to="/special-offers">Special offers</NuxtLink>
-                </VListItem>
-                <VListItem v-for="cat in categories" :key="cat.id">
-                    <NuxtLink class="site-header__drawer-link" :to="`${CATEGORY_HANDLE}/${cat.handle}`">
+                </NuxtLink>
+
+                <nav class="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
+                    <NuxtLink class="text-base font-semibold text-slate-700 hover:text-brand-700" :to="ALL_PRODUCTS_URL_HANDLE"
+                    >All products</NuxtLink
+                    >
+                    <NuxtLink class="text-base font-semibold text-slate-700 hover:text-brand-700" to="/special-offers"
+                    >Special offers</NuxtLink
+                    >
+                    <NuxtLink
+                        v-for="cat in categories"
+                        :key="cat.id"
+                        class="text-base font-semibold text-slate-700 hover:text-brand-700"
+                        :to="`${CATEGORY_HANDLE}/${cat.handle}`"
+                    >
                         {{ cat.name }}
                     </NuxtLink>
-                </VListItem>
-                <VListItem>
-                    <NuxtLink v-if="customer?.id" class="site-header__drawer-link" to="/account">Profile</NuxtLink>
-                    <NuxtLink v-else class="site-header__drawer-link" to="/signin">Sign In</NuxtLink>
-                </VListItem>
-            </VList>
-        </VNavigationDrawer>
+                </nav>
 
-        <VDialog v-model="searchDialog" max-width="760" scrollable>
-            <VCard class="search-window">
-                <div class="search-window__top">
-                    <h2 class="search-window__title">Search products</h2>
-                    <VBtn icon variant="text" @click="closeSearchDialog">
-                        <VIcon>mdi-close</VIcon>
-                    </VBtn>
-                </div>
+                <div class="flex items-center gap-2">
+                    <label class="hidden items-center gap-2 lg:flex">
+                        <span class="hidden items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500 xl:flex">
+                            <svg
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                class="h-4 w-4"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M10 18c3.866-3.588 5.8-6.422 5.8-8.5A5.8 5.8 0 1 0 4.2 9.5C4.2 11.578 6.134 14.412 10 18Z"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <circle cx="10" cy="9" r="2" />
+                            </svg>
+                            Ship to
+                        </span>
+                        <span class="sr-only">Choose shipping country</span>
+                        <select
+                            v-model="locationValue"
+                            class="ui-input site-header__country-select max-w-[170px] pr-8 text-sm xl:max-w-[190px]"
+                            :disabled="selectionLoading"
+                        >
+                            <option v-for="country in locationItems" :key="country.value" :value="country.value">
+                                {{ country.title }}
+                            </option>
+                        </select>
+                    </label>
 
-                <VTextField
-                    v-model="searchQuery"
-                    placeholder="Search by product name..."
-                    density="comfortable"
-                    variant="solo-filled"
-                    hide-details
-                    clearable
-                    prepend-inner-icon="mdi-magnify"
-                    class="search-window__input"
-                />
+                    <button type="button" class="ui-icon-btn" @click="openSearchDialog">
+                        <span class="sr-only">Search products</span>
+                        <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+                        </svg>
+                    </button>
 
-                <div class="search-window__summary">
-                    <span v-if="normalizedSearchQuery.length < 2">Type at least 2 characters</span>
-                    <span v-else-if="searchLoading">Searching...</span>
-                    <span v-else-if="searchHasSearched">{{ searchResults.length }} result{{ searchResults.length === 1 ? "" : "s" }}</span>
-                </div>
-
-                <div class="search-window__results">
-                    <div v-if="searchLoading" class="search-window__state">
-                        <VProgressCircular indeterminate size="28" color="primary" />
-                    </div>
-
-                    <div v-else-if="searchHasSearched && !searchResults.length" class="search-window__state">No products found.</div>
+                    <NuxtLink to="/cart" class="relative inline-flex">
+                        <span class="ui-icon-btn">
+                            <span class="sr-only">Open cart</span>
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                class="h-5 w-5"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M3 4h2l1.2 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.5L20 7H7"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <circle cx="10" cy="19" r="1.4" />
+                                <circle cx="17" cy="19" r="1.4" />
+                            </svg>
+                        </span>
+                        <ClientOnly>
+                            <span
+                                v-if="itemCount"
+                                class="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white"
+                            >
+                                {{ itemCount < 99 ? itemCount : "99+" }}
+                            </span>
+                        </ClientOnly>
+                    </NuxtLink>
 
                     <NuxtLink
-                        v-for="product in searchResults"
-                        :key="product.id"
-                        :to="product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : '#'"
-                        class="search-window__item"
-                        @click="closeSearchDialog"
+                        v-if="customer?.id"
+                        class="hidden items-center rounded-full border border-slate-200 px-3 py-2 text-base font-semibold text-slate-700 hover:text-brand-700 xl:inline-flex"
+                        to="/account"
                     >
-                        <NuxtImg
-                            :src="product.thumbnail || product.images?.[0]?.url || '/images/about_banner.webp'"
-                            :alt="product.title || 'Product image'"
-                            width="80"
-                            height="80"
-                            format="webp"
-                            class="search-window__thumb"
-                        />
-                        <div class="search-window__item-content">
-                            <p class="search-window__item-title">{{ product.title }}</p>
-                            <p class="search-window__item-meta">{{ product.subtitle || product.handle }}</p>
-                        </div>
-                        <VIcon size="18" class="search-window__item-arrow">mdi-chevron-right</VIcon>
+                        {{ customer.first_name ?? "Profile" }}
                     </NuxtLink>
+                    <NuxtLink
+                        v-else
+                        class="hidden items-center rounded-full border border-slate-200 px-3 py-2 text-base font-semibold text-slate-700 hover:text-brand-700 xl:inline-flex"
+                        to="/signin"
+                    >
+                        Sign in
+                    </NuxtLink>
+
+                    <button type="button" class="ui-icon-btn xl:hidden" @click="drawer = true">
+                        <span class="sr-only">Open menu</span>
+                        <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+                        </svg>
+                    </button>
                 </div>
-            </VCard>
-        </VDialog>
+            </div>
+        </div>
+
+        <transition name="fade">
+            <div v-if="drawer" class="fixed inset-0 z-[60] bg-slate-950/40" @click="closeDrawer"></div>
+        </transition>
+
+        <aside
+            class="fixed right-0 z-[65] h-screen w-[300px] border-l border-slate-200 bg-white px-4 pb-6 pt-4 shadow-panel transition-transform duration-300 sm:w-[320px]"
+            :class="drawer ? 'translate-x-0' : 'translate-x-full'"
+            :style="{ top: `${topOffset + headerHeight}px`, height: `calc(100vh - ${topOffset + headerHeight}px)` }"
+            aria-label="Mobile navigation"
+        >
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-semibold text-slate-900">Menu</h2>
+                <button type="button" class="ui-icon-btn" @click="closeDrawer">
+                    <span class="sr-only">Close menu</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                        <path
+                            d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+            <label class="mt-4 block">
+                <span class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Country</span>
+                <select v-model="locationValue" class="ui-input site-header__country-select rounded-xl" :disabled="selectionLoading">
+                    <option v-for="country in locationItems" :key="country.value" :value="country.value">
+                        {{ country.title }}
+                    </option>
+                </select>
+            </label>
+
+            <nav class="mt-5 grid gap-1" aria-label="Mobile links">
+                <NuxtLink
+                    class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    :to="ALL_PRODUCTS_URL_HANDLE"
+                    @click="closeDrawer"
+                >
+                    All products
+                </NuxtLink>
+                <NuxtLink
+                    class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    to="/special-offers"
+                    @click="closeDrawer"
+                >
+                    Special offers
+                </NuxtLink>
+                <NuxtLink
+                    v-for="cat in categories"
+                    :key="cat.id"
+                    class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    :to="`${CATEGORY_HANDLE}/${cat.handle}`"
+                    @click="closeDrawer"
+                >
+                    {{ cat.name }}
+                </NuxtLink>
+                <NuxtLink
+                    v-if="customer?.id"
+                    class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    to="/account"
+                    @click="closeDrawer"
+                >
+                    Profile
+                </NuxtLink>
+                <NuxtLink
+                    v-else
+                    class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    to="/signin"
+                    @click="closeDrawer"
+                >
+                    Sign in
+                </NuxtLink>
+            </nav>
+        </aside>
+
+        <transition name="fade">
+            <div v-if="searchDialog" class="fixed inset-0 z-[70] bg-slate-900/60 p-4 md:p-6" @click.self="closeSearchDialog">
+                <section
+                    class="mx-auto mt-14 max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-panel"
+                >
+                    <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3 md:px-6">
+                        <h2 class="text-lg font-semibold text-slate-900">Search products</h2>
+                        <button type="button" class="ui-icon-btn" @click="closeSearchDialog">
+                            <span class="sr-only">Close search</span>
+                            <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                                <path
+                                    d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="border-b border-slate-200 px-4 py-3 md:px-6">
+                        <label>
+                            <span class="sr-only">Search by product name</span>
+                            <input
+                                v-model="searchQuery"
+                                class="ui-input site-header__search-input rounded-xl"
+                                placeholder="Search by product name (min 3 chars)..."
+                            />
+                        </label>
+                        <p class="mt-2 text-sm text-slate-600">
+                            <span v-if="normalizedSearchQuery.length < 3">Type at least 3 characters</span>
+                            <span v-else-if="searchLoading">Searching...</span>
+                            <span v-else-if="searchHasSearched"
+                            >{{ searchResults.length }} result{{ searchResults.length === 1 ? "" : "s" }}</span
+                            >
+                        </p>
+                    </div>
+
+                    <div class="max-h-[58vh] overflow-y-auto px-4 py-2 md:px-6 md:py-3">
+                        <div v-if="searchLoading" class="flex items-center justify-center py-12" role="status" aria-live="polite">
+                            <span class="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-brand-700"></span>
+                        </div>
+
+                        <p v-else-if="searchHasSearched && !searchResults.length" class="py-8 text-sm text-slate-600">No products found.</p>
+
+                        <NuxtLink
+                            v-for="product in searchResults"
+                            :key="product.id"
+                            class="flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-slate-50"
+                            :to="getProductPath(product.handle)"
+                            @click="closeSearchDialog"
+                        >
+                            <NuxtImage
+                                :src="product.thumbnail || product.images?.[0]?.url || '/images/about_banner.webp'"
+                                :alt="product.title || 'Product image'"
+                                width="80"
+                                height="80"
+                                class="h-20 w-20 rounded-lg bg-slate-100 object-cover"
+                            />
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-semibold text-slate-900">{{ product.title }}</p>
+                                <p class="truncate text-xs font-medium text-slate-600">{{ getProductMeta(product) }}</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400">Open</span>
+                        </NuxtLink>
+                    </div>
+                </section>
+            </div>
+        </transition>
     </header>
 </template>
 
-<style scoped lang="scss">
-.site-header {
-    position: sticky;
-    top: 0;
-    z-index: 1100;
+<style scoped>
+.site-header__country-select {
+    border: 2px solid #334155;
+    background-color: #ffffff;
 }
 
-.site-header__notice {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 32px;
-    background: linear-gradient(90deg, #010c80 0%, #0043c8 100%);
-    color: #ffffff;
-    z-index: 1102;
+.site-header__search-input {
+    border: 2px solid #000000;
+    background-color: #ffffff;
 }
 
-.site-header__notice-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 0.75rem;
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
 }
 
-.site-header__notice-content {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.83rem;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-.site-header__notice-close {
-    color: #ffffff;
-}
-
-.site-header__app-bar {
-    border-bottom: 1px solid rgba(1, 12, 128, 0.08);
-    background: rgba(255, 255, 255, 0.92) !important;
-    backdrop-filter: blur(10px);
-}
-
-.site-header__logo-col {
-    max-width: 200px;
-    flex-grow: 1;
-    flex-shrink: 1;
-}
-
-.site-header__logo-link {
-    display: flex;
-    align-items: center;
-}
-
-.site-header__logo-link img {
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-.site-header__nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    gap: 0.35rem;
-}
-
-.site-header__nav-link {
-    padding: 0.4rem 0.75rem;
-    border-radius: 999px;
-    color: #203255;
-    font-size: 0.92rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition:
-        color 0.22s ease,
-        background-color 0.22s ease;
-}
-
-.site-header__nav-link:hover {
-    background: rgba(1, 12, 128, 0.08);
-    color: #010c80;
-}
-
-.site-header__icon-btn {
-    color: #1d2f53;
-}
-
-.site-header__location-select {
-    width: 180px;
-    margin-right: 0.25rem;
-}
-
-.site-header__account-btn {
-    color: #1d2f53;
-    font-weight: 600;
-    text-transform: none;
-}
-
-.site-header__cart-counter {
-    position: absolute;
-    top: 0;
-    right: 10px;
-}
-
-.site-header__truncate {
-    display: inline-block;
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: bottom;
-}
-
-.site-header__drawer-link {
-    color: #23365b;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.site-header__drawer-select {
-    margin: 0.35rem 0;
-}
-
-.search-window {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.2rem;
-    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-    box-shadow: 0 18px 50px rgba(9, 29, 88, 0.12);
-}
-
-.search-window__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.95rem 1rem 0.7rem;
-    border-bottom: 1px solid rgba(8, 23, 63, 0.06);
-}
-
-.search-window__title {
-    margin: 0;
-    color: #08173f;
-    font-size: 1.15rem;
-    font-weight: 700;
-}
-
-.search-window__input {
-    padding: 0.75rem 1rem 0.35rem;
-}
-
-.search-window__summary {
-    padding: 0 1rem 0.7rem;
-    color: #667694;
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-}
-
-.search-window__results {
-    max-height: 420px;
-    overflow-y: auto;
-    padding: 0 1rem 1rem;
-    display: grid;
-    gap: 0.45rem;
-}
-
-.search-window__state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 120px;
-    color: #53607b;
-    font-size: 0.95rem;
-    text-align: center;
-}
-
-.search-window__item {
-    display: grid;
-    grid-template-columns: 72px 1fr auto;
-    gap: 0.8rem;
-    align-items: center;
-    padding: 0.55rem 0.65rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 0.8rem;
-    background: rgba(255, 255, 255, 0.82);
-    text-decoration: none;
-    transition:
-        background-color 0.22s ease,
-        border-color 0.22s ease,
-        transform 0.22s ease;
-}
-
-.search-window__item:hover {
-    background: rgba(1, 12, 128, 0.04);
-    border-color: rgba(1, 12, 128, 0.18);
-    transform: translateY(-1px);
-}
-
-.search-window__thumb {
-    width: 72px;
-    height: 72px;
-    border-radius: 0.65rem;
-    object-fit: cover;
-}
-
-.search-window__item-content {
-    min-width: 0;
-}
-
-.search-window__item-title {
-    margin: 0 0 0.2rem;
-    color: #08173f;
-    font-size: 0.95rem;
-    font-weight: 700;
-    line-height: 1.35;
-}
-
-.search-window__item-meta {
-    margin: 0;
-    color: #607090;
-    font-size: 0.82rem;
-    line-height: 1.45;
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-.search-window__item-arrow {
-    color: #6c7d9d;
-}
-
-@media screen and (max-width: 1024px) {
-    .site-header__notice-inner {
-        padding: 0 0.55rem;
-    }
-
-    .search-window__item {
-        grid-template-columns: 64px 1fr auto;
-        gap: 0.65rem;
-    }
-
-    .search-window__thumb {
-        width: 64px;
-        height: 64px;
-    }
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
