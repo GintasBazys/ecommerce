@@ -154,7 +154,7 @@ async function updateLocation(value: string): Promise<void> {
             return
         }
 
-        await reloadNuxtApp({ path: route.fullPath })
+        reloadNuxtApp({ path: route.fullPath })
     } finally {
         selectionLoading.value = false
     }
@@ -215,14 +215,14 @@ function getProductMeta(product: ProductDTO): string {
             :style="{ top: `${topOffset}px` }"
         >
             <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
-                <NuxtLink to="/" class="shrink-0">
-                    <NuxtImage
+                <NuxtLink to="/" class="inline-flex shrink-0 items-center">
+                    <img
                         src="/images/logo.svg"
-                        alt="Ecommerce logo"
-                        width="128"
-                        height="28"
-                        loading="eager"
-                        class="h-6 w-auto sm:h-7"
+                        alt="Medusa Commerce"
+                        width="640"
+                        height="144"
+                        fetchpriority="high"
+                        class="site-header__logo"
                     />
                 </NuxtLink>
 
@@ -575,6 +575,18 @@ function getProductMeta(product: ProductDTO): string {
 @media (prefers-reduced-motion: reduce) {
     .site-header__icon-btn {
         transition: none;
+    }
+}
+
+.site-header__logo {
+    display: block;
+    height: 2rem;
+    width: auto;
+}
+
+@media (min-width: 640px) {
+    .site-header__logo {
+        height: 2.25rem;
     }
 }
 </style>
