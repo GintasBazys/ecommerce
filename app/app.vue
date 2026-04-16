@@ -36,7 +36,9 @@ useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global
 <style lang="scss">
 html {
     font-family: "Archivo", sans-serif;
-    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 53, 15, 0.78) rgba(241, 245, 249, 0.96);
 }
 
 html,
@@ -46,5 +48,25 @@ body {
 
 main {
     padding-top: var(--site-header-offset, 98px);
+}
+
+html::-webkit-scrollbar {
+    width: 0.9rem;
+}
+
+html::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 249, 0.98));
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
+}
+
+html::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(255, 255, 255, 0.92);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(180, 132, 48, 0.95), rgba(120, 53, 15, 0.92));
+    box-shadow: 0 4px 12px rgba(120, 53, 15, 0.18);
+}
+
+html::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(202, 138, 4, 0.95), rgba(120, 53, 15, 0.96));
 }
 </style>

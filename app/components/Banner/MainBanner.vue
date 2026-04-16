@@ -28,9 +28,8 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
             format="webp"
             quality="72"
             loading="eager"
-            fetchpriority="high"
+            :preload="{ fetchPriority: 'high' }"
             decoding="async"
-            preload
             class="absolute inset-0 h-full w-full object-cover object-center"
         />
 
@@ -90,7 +89,7 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
     </section>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .site-hero {
     min-height: calc(100vh - var(--site-header-offset, 98px));
 }
