@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode"
 import type { CustomJwtPayload } from "@/types/interfaces"
 import type { CustomerDTO } from "@medusajs/types"
 
-import { SOCIAL_AUTH_REDIRECT_KEY } from "~/composables/useCustomerAuth"
+import { SOCIAL_AUTH_REDIRECT_KEY, SOCIAL_AUTH_PROVIDER_KEY } from "~/composables/useCustomerAuth"
 
 type SocialProvider = "google" | "facebook"
 type SocialStage = "authenticating" | "error" | "success"
@@ -29,14 +29,28 @@ const snackbarText = ref<string>("")
 const snackbarColor = ref<string>("success")
 const isRetrying = ref<boolean>(false)
 
-const provider = computed<SocialProvider | null>(() => {
-    const value = String(route.query.provider || "").toLowerCase()
+function getStoredProvider(): SocialProvider | null {
+    if (import.meta.server) {
+        return null
+    }
+
+    const value = sessionStorage.getItem(SOCIAL_AUTH_PROVIDER_KEY)?.toLowerCase()
 
     if (value === "google" || value === "facebook") {
         return value
     }
 
     return null
+}
+
+const provider = computed<SocialProvider | null>(() => {
+    const queryValue = String(route.query.provider || "").toLowerCase()
+
+    if (queryValue === "google" || queryValue === "facebook") {
+        return queryValue
+    }
+
+    return getStoredProvider()
 })
 
 const providerLabel = computed<string>(() => {

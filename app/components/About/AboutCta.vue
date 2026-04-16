@@ -7,329 +7,133 @@ defineProps<{
 const highlights = [
     {
         title: "Curated since 2012",
-        text: "A sharper product mix built around quality, utility, and easier everyday shopping."
+        text: "Selected for quality, utility, and everyday appeal."
     },
     {
         title: "Global delivery",
-        text: "Fast-moving collections shipped internationally with a cleaner, lower-friction checkout flow."
+        text: "International shipping with a smoother, lower-friction journey."
     },
     {
         title: "Human support",
-        text: "Real help when you need it, from product questions to delivery follow-ups."
+        text: "Direct, practical help before and after purchase."
     }
 ]
 </script>
 
 <template>
-    <section class="about-cta-section" :class="extraSpacerClass">
-        <VContainer class="about-cta">
-            <div class="about-cta__panel">
-                <div class="about-cta__media">
-                    <div class="about-cta__image-wrap">
-                        <NuxtImage
-                            src="/images/online_purchase.jpg"
-                            alt="online purchase illustration"
-                            width="1200"
-                            height="1120"
-                            sizes="100vw lg:45vw"
-                            format="webp"
-                            quality="72"
-                            loading="lazy"
-                            decoding="async"
-                            class="about-cta__image"
-                        />
-                        <div class="about-cta__floating">
-                            <span class="about-cta__floating-label">Trusted ecommerce</span>
-                            <strong class="about-cta__floating-value">12+ years</strong>
-                            <span class="about-cta__floating-text">Building a smoother shopping experience from Vilnius.</span>
+    <section
+        :class="extraSpacerClass"
+        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(212,175,55,0.12),transparent_22%),linear-gradient(180deg,#fcfdff_0%,#f6f8fc_100%)] py-14 sm:py-16 lg:py-20"
+    >
+        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+            <div class="grid items-center gap-8 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] xl:gap-10 pb-8">
+                <div class="xl:pr-4">
+                    <div
+                        class="relative rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.9))] p-3 pb-20 shadow-[0_28px_80px_rgba(8,27,90,0.12)] backdrop-blur sm:rounded-[2.2rem] sm:p-4 sm:pb-24"
+                    >
+                        <div
+                            class="absolute inset-x-6 top-6 h-24 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.22),transparent_72%)] blur-2xl sm:inset-x-10"
+                            aria-hidden="true"
+                        ></div>
+                        <div
+                            class="relative overflow-hidden rounded-[1.35rem] bg-[linear-gradient(160deg,rgba(15,23,42,0.06),rgba(148,163,184,0.08))] sm:rounded-[1.85rem]"
+                        >
+                            <NuxtImage
+                                src="/images/hero-main.jpg"
+                                alt="Editorial lifestyle arrangement of curated home products"
+                                width="1200"
+                                height="1411"
+                                sizes="100vw lg:45vw"
+                                format="webp"
+                                quality="72"
+                                loading="lazy"
+                                decoding="async"
+                                class="block aspect-[1.08] w-full object-cover object-center"
+                            />
+                            <div class="absolute inset-0 bg-gradient-to-tr from-[#020617]/28 via-transparent to-white/10"></div>
+                        </div>
+                        <div
+                            class="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_12px_32px_rgba(8,27,90,0.16)] sm:left-5 sm:top-5"
+                        >
+                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            Trusted since 2012
+                        </div>
+                        <div
+                            class="absolute inset-x-3 bottom-3 rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.92))] p-4 text-white shadow-[0_16px_44px_rgba(2,6,23,0.3)] backdrop-blur-xl sm:inset-x-5 sm:bottom-5 sm:p-5"
+                        >
+                            <div class="flex flex-wrap items-end justify-between gap-3">
+                                <div>
+                                    <span class="text-[0.73rem] font-bold uppercase tracking-[0.14em] text-amber-200"
+                                    >Trusted ecommerce</span
+                                    >
+                                    <div class="mt-2 flex items-end gap-2">
+                                        <strong class="text-3xl leading-none sm:text-[2rem]">12+ years</strong>
+                                        <span class="pb-0.5 text-sm text-slate-200">of curated retail experience</span>
+                                    </div>
+                                </div>
+                                <span
+                                    class="inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold text-slate-100"
+                                >
+                                    Based in Vilnius
+                                </span>
+                            </div>
+                            <p class="mt-3 max-w-[26rem] text-sm leading-6 text-slate-100 sm:text-[0.95rem]">
+                                Building a smoother shopping experience with dependable products, practical service, and faster decisions at
+                                every step.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="about-cta__content">
-                    <span class="about-cta__eyebrow">Who We Are</span>
-                    <h2 class="about-cta__title">A cleaner, more thoughtful online store experience.</h2>
-                    <p class="about-cta__lead">
+                <div
+                    class="rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-6 shadow-[0_28px_80px_rgba(8,27,90,0.08)] backdrop-blur sm:p-8 xl:p-10"
+                >
+                    <span
+                        class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                    >
+                        Who We Are
+                    </span>
+                    <h2
+                        class="mt-4 max-w-[10ch] text-[clamp(1.9rem,8vw,2.6rem)] font-bold leading-[1] tracking-[-0.06rem] text-slate-950 md:text-[clamp(2.25rem,4vw,3.6rem)] md:leading-[0.95]"
+                    >
+                        A cleaner,
+                        <span class="block font-medium italic tracking-[-0.04rem] text-[#8a6a2f]">
+                            more thoughtful
+                        </span>
+                        online store experience.
+                    </h2>
+                    <p class="mt-4 max-w-[34rem] text-[1rem] leading-[1.8] text-slate-700 sm:text-[1.05rem] sm:leading-8">
                         Since 2012, we have focused on combining dependable products, fast fulfillment, and a storefront that feels easy to
                         browse from the first scroll.
                     </p>
 
-                    <div class="about-cta__highlights">
-                        <article v-for="item in highlights" :key="item.title" class="about-cta__highlight">
-                            <h3 class="about-cta__highlight-title">{{ item.title }}</h3>
-                            <p class="about-cta__highlight-text">{{ item.text }}</p>
+                    <div class="mt-8 grid gap-3 xl:grid-cols-3">
+                        <article
+                            v-for="(item, index) in highlights"
+                            :key="item.title"
+                            class="rounded-[1.25rem] border border-slate-200/80 bg-white p-4 shadow-[0_12px_30px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:shadow-[0_18px_42px_rgba(8,27,90,0.1)] motion-reduce:transition-none"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-sm font-bold text-amber-900 ring-1 ring-amber-100"
+                                >
+                                    0{{ index + 1 }}
+                                </div>
+                                <h3 class="text-base font-semibold leading-6 text-slate-950">{{ item.title }}</h3>
+                            </div>
+                            <p class="mt-3 text-[0.95rem] leading-7 text-slate-700">{{ item.text }}</p>
                         </article>
                     </div>
 
-                    <div class="about-cta__footer">
-                        <p class="about-cta__body">
+                    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-slate-200/80 pt-6">
+                        <p class="min-w-0 flex-1 basis-[22rem] text-[1rem] leading-[1.8] text-slate-700 sm:text-base sm:leading-8">
                             We curate a broad range of products and support customers worldwide with a practical, friendly approach. The
                             goal is simple: make shopping feel confident, calm, and efficient.
                         </p>
-                        <VBtn
-                            v-if="linkShown"
-                            to="/about"
-                            class="about-cta__button text-none"
-                            color="primary"
-                            rounded="pill"
-                            tag="NuxtLink"
-                        >
-                            Learn about our approach
-                        </VBtn>
+                        <NuxtLink v-if="linkShown" to="/about" class="ui-btn-primary min-w-[12rem] px-6">Learn about our approach</NuxtLink>
                     </div>
                 </div>
             </div>
-        </VContainer>
+        </div>
     </section>
 </template>
-
-<style scoped lang="scss">
-.about-cta-section {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(4.5rem, 8vw, 7rem) 0;
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 28%), linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
-}
-
-.about-cta {
-    position: relative;
-    z-index: 1;
-}
-
-.about-cta__panel {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    align-items: center;
-    gap: clamp(2rem, 4vw, 4rem);
-}
-
-.about-cta__media,
-.about-cta__content {
-    animation: about-rise 0.8s ease both;
-}
-
-.about-cta__content {
-    animation-delay: 0.12s;
-}
-
-.about-cta__image-wrap {
-    position: relative;
-    overflow: hidden;
-    border-radius: 2rem;
-    background: linear-gradient(160deg, rgba(1, 12, 128, 0.08), rgba(0, 128, 255, 0.12));
-    box-shadow: 0 24px 70px rgba(8, 27, 90, 0.14);
-}
-
-.about-cta__image {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1.08;
-    object-fit: cover;
-    transform: scale(1.01);
-}
-
-.about-cta__floating {
-    position: absolute;
-    right: 1.25rem;
-    bottom: 1.25rem;
-    display: grid;
-    gap: 0.35rem;
-    max-width: 15rem;
-    padding: 1rem 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 1.25rem;
-    background: rgba(8, 24, 73, 0.8);
-    backdrop-filter: blur(12px);
-    color: #ffffff;
-    box-shadow: 0 14px 40px rgba(8, 24, 73, 0.22);
-}
-
-.about-cta__floating-label {
-    color: rgba(220, 231, 255, 0.88);
-    font-size: 0.73rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.about-cta__floating-value {
-    font-size: 1.5rem;
-    line-height: 1.1;
-}
-
-.about-cta__floating-text {
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 0.92rem;
-    line-height: 1.5;
-}
-
-.about-cta__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    margin-bottom: 1rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.about-cta__title {
-    max-width: 11ch;
-    margin-bottom: 1rem;
-    color: #08173f;
-    font-size: clamp(2.25rem, 4vw, 4.1rem);
-    line-height: 0.96;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.about-cta__lead {
-    max-width: 38rem;
-    margin-bottom: 1.75rem;
-    color: #44506d;
-    font-size: 1.05rem;
-    line-height: 1.75;
-}
-
-.about-cta__highlights {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-}
-
-.about-cta__highlight {
-    min-height: 100%;
-    padding: 1.15rem 1rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.25rem;
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 12px 40px rgba(8, 27, 90, 0.06);
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        border-color 0.25s ease;
-}
-
-.about-cta__highlight:hover {
-    transform: translateY(-4px);
-    border-color: rgba(1, 12, 128, 0.14);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.12);
-}
-
-.about-cta__highlight-title {
-    margin-bottom: 0.55rem;
-    color: #08173f;
-    font-size: 1rem;
-    line-height: 1.35;
-}
-
-.about-cta__highlight-text {
-    margin-bottom: 0;
-    color: #5a6480;
-    font-size: 0.95rem;
-    line-height: 1.65;
-}
-
-.about-cta__footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1rem 1.5rem;
-}
-
-.about-cta__body {
-    flex: 1 1 22rem;
-    margin-bottom: 0;
-    color: #44506d;
-    font-size: 1rem;
-    line-height: 1.75;
-}
-
-.about-cta__button {
-    min-width: 9rem;
-    min-height: 3rem;
-    padding-inline: 1.5rem;
-    font-weight: 700;
-}
-
-@keyframes about-rise {
-    from {
-        opacity: 0;
-        transform: translateY(28px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 1260px) {
-    .about-cta__highlights {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media screen and (max-width: 960px) {
-    .about-cta-section {
-        padding: 4rem 0;
-    }
-
-    .about-cta__panel {
-        grid-template-columns: 1fr;
-    }
-
-    .about-cta__title {
-        max-width: 100%;
-    }
-
-    .about-cta__image-wrap {
-        max-width: 44rem;
-        margin: 0 auto;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    .about-cta-section {
-        padding: 3.25rem 0;
-    }
-
-    .about-cta__image-wrap {
-        border-radius: 1.4rem;
-    }
-
-    .about-cta__floating {
-        right: 0.85rem;
-        bottom: 0.85rem;
-        max-width: 13rem;
-        padding: 0.85rem 0.95rem;
-    }
-
-    .about-cta__title {
-        font-size: clamp(1.9rem, 8vw, 2.6rem);
-        line-height: 1;
-    }
-
-    .about-cta__lead,
-    .about-cta__body {
-        font-size: 0.98rem;
-        line-height: 1.65;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .about-cta__media,
-    .about-cta__content,
-    .about-cta__highlight {
-        animation: none;
-        transition: none;
-    }
-}
-</style>

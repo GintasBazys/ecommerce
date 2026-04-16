@@ -5,7 +5,7 @@ import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
-const FALLBACK_IMAGE = "/images/about_banner.webp"
+const FALLBACK_IMAGE = "/images/about-premium.jpg"
 
 const { product } = defineProps<{
     product: ProductDTO
@@ -43,6 +43,8 @@ const averageRating = computed<number | null>(() => {
     return rating > 0 ? rating : null
 })
 
+const roundedRating = computed<number>(() => (averageRating.value ? Math.round(averageRating.value) : 0))
+
 const variantLabel = computed<string>(() => selectedVariant.value?.title || "Selected option")
 
 const stockLabel = computed<string>(() => (selectedVariant.value?.inventory_quantity ? "Ready to ship" : "Currently unavailable"))
@@ -64,9 +66,13 @@ const debouncedAddToCart = debounce(addToCart, 300)
 </script>
 
 <template>
-    <article class="product-card">
-        <NuxtLink :to="productHref" class="product-card__media-link">
-            <div class="product-card__media">
+    <article
+        class="group grid h-full overflow-hidden rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] shadow-[0_14px_34px_rgba(8,27,90,0.06)] transition duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_22px_54px_rgba(8,27,90,0.12)] focus-within:-translate-y-1 focus-within:border-amber-200 focus-within:shadow-[0_22px_54px_rgba(8,27,90,0.12)] motion-reduce:transition-none"
+    >
+        <NuxtLink :to="productHref" class="block text-inherit no-underline focus-visible:outline-none">
+            <div
+                class="relative aspect-[0.96] overflow-hidden bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#edf2f7_100%)]"
+            >
                 <NuxtImg
                     :src="productImage"
                     :alt="product.title || 'Product image'"
@@ -75,279 +81,110 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     height="840"
                     sizes="280px md:33vw xl:22vw"
                     densities="x1 x2"
-                    class="product-card__image"
+                    class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] group-focus-within:scale-[1.03] motion-reduce:transition-none"
                 />
-                <div class="product-card__glow"></div>
-                <VChip v-if="isOnSale" class="product-card__badge" color="error" size="small" label> Sale </VChip>
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-950/18 to-transparent"></div>
+
+                <span
+                    v-if="isOnSale"
+                    class="absolute right-3 top-3 inline-flex min-h-8 items-center rounded-full border border-rose-200 bg-white/92 px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-rose-600 shadow-[0_10px_24px_rgba(8,27,90,0.08)]"
+                >
+                    Sale
+                </span>
             </div>
         </NuxtLink>
 
-        <div class="product-card__body">
-            <div class="product-card__top">
-                <div class="product-card__meta">
-                    <span class="product-card__stock">{{ stockLabel }}</span>
-                    <div v-if="averageRating" class="product-card__rating" aria-hidden="true">
-                        <VIcon v-for="i in 5" :key="i" size="16" class="product-card__star">
-                            {{ i <= Math.round(averageRating) ? "mdi-star" : "mdi-star-outline" }}
-                        </VIcon>
-                    </div>
-                    <span v-if="averageRating" class="sr-only">Rated {{ averageRating }} out of 5</span>
-                </div>
+        <div class="grid flex-1 grid-rows-[auto_1fr_auto] gap-4 p-4 sm:p-[1.05rem]">
+            <div class="flex items-start justify-between gap-3">
+                <span
+                    class="inline-flex min-h-8 items-center rounded-full border px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em]"
+                    :class="
+                        selectedVariant?.inventory_quantity
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                            : 'border-slate-300 bg-slate-100 text-slate-700'
+                    "
+                >
+                    {{ stockLabel }}
+                </span>
 
-                <NuxtLink :to="productHref" class="product-card__title-link">
-                    <h3 class="product-card__title">{{ product.title }}</h3>
+                <div v-if="averageRating" class="flex shrink-0 items-center gap-1 text-amber-500" aria-hidden="true">
+                    <svg
+                        v-for="i in 5"
+                        :key="i"
+                        viewBox="0 0 20 20"
+                        class="h-4 w-4"
+                        :class="i <= roundedRating ? 'fill-current' : 'fill-none stroke-current opacity-45'"
+                    >
+                        <path
+                            d="M10 2.5l2.32 4.7 5.18.76-3.75 3.65.88 5.16L10 14.34l-4.63 2.43.88-5.16L2.5 7.96l5.18-.76L10 2.5Z"
+                            stroke-width="1.4"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                    <span class="ml-1 text-xs font-semibold text-slate-500">{{ averageRating.toFixed(1) }}</span>
+                </div>
+                <span v-if="averageRating" class="sr-only">Rated {{ averageRating }} out of 5</span>
+            </div>
+
+            <div class="min-w-0">
+                <NuxtLink :to="productHref" class="text-inherit no-underline focus-visible:outline-none">
+                    <h3 class="product-card__title text-[1rem] font-semibold leading-6 text-slate-950">
+                        {{ product.title }}
+                    </h3>
                 </NuxtLink>
 
-                <p class="product-card__description">
+                <p class="product-card__description mt-2 text-[0.92rem] leading-7 text-slate-600">
                     {{ productDescription }}
                 </p>
             </div>
 
-            <div class="product-card__bottom">
-                <div class="product-card__price-block">
-                    <div class="product-card__price-row">
-                        <span class="product-card__price">{{ displayPrice }}</span>
-                        <del v-if="isOnSale && originalPrice" class="product-card__original-price">{{ originalPrice }}</del>
+            <div class="grid gap-3 border-t border-slate-200/80 pt-3">
+                <div class="grid gap-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[1.05rem] font-semibold leading-none text-slate-950">{{ displayPrice }}</span>
+                        <del v-if="isOnSale && originalPrice" class="text-[0.9rem] text-rose-500">{{ originalPrice }}</del>
                     </div>
-                    <span class="product-card__tax-meta">{{ taxLabel }}</span>
-                    <span class="product-card__variant">{{ variantLabel }}</span>
+                    <span class="text-[0.78rem] uppercase tracking-[0.08em] text-slate-500">{{ taxLabel }}</span>
+                    <span class="truncate text-[0.82rem] text-slate-600">{{ variantLabel }}</span>
                 </div>
 
-                <VBtn
-                    color="primary"
-                    rounded="pill"
-                    class="product-card__button text-none"
-                    :loading="loading"
-                    :disabled="!selectedVariant?.inventory_quantity"
+                <button
+                    type="button"
+                    class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#cda45e] px-4 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                    :disabled="loading || !selectedVariant?.inventory_quantity"
                     @click="debouncedAddToCart"
                 >
-                    <template #loader>
-                        <VProgressCircular indeterminate color="white" size="18" />
-                    </template>
-                    Add to cart
-                </VBtn>
+                    <span
+                        v-if="loading"
+                        class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-950/35 border-t-slate-950"
+                    ></span>
+                    {{ selectedVariant?.inventory_quantity ? "Add to cart" : "Unavailable" }}
+                </button>
             </div>
         </div>
     </article>
 </template>
 
-<style scoped lang="scss">
-.product-card {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100%;
+<style scoped>
+.product-card__title,
+.product-card__description {
+    display: -webkit-box;
     overflow: hidden;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.1rem;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-    transition:
-        transform 0.28s ease,
-        border-color 0.28s ease;
-}
-
-.product-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(1, 12, 128, 0.16);
-}
-
-.product-card__media-link,
-.product-card__title-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.product-card__media {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 1;
-    background: radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 36%), linear-gradient(180deg, #eef5ff 0%, #dfeafc 100%);
-}
-
-.product-card__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.45s ease;
-}
-
-.product-card:hover .product-card__image {
-    transform: scale(1.04);
-}
-
-.product-card__glow {
-    position: absolute;
-    inset: auto auto 0 0;
-    width: 100%;
-    height: 45%;
-    background: linear-gradient(180deg, transparent 0%, rgba(8, 23, 63, 0.18) 100%);
-    pointer-events: none;
-}
-
-.product-card__badge {
-    position: absolute;
-    top: 0.9rem;
-    right: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-}
-
-.product-card__body {
-    display: grid;
-    grid-template-rows: 1fr auto;
-    gap: 0.85rem;
-    padding: 1rem;
-}
-
-.product-card__top {
-    display: grid;
-    gap: 0.75rem;
-    min-width: 0;
-}
-
-.product-card__meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 0;
-    margin-bottom: 0.1rem;
-}
-
-.product-card__stock {
-    color: #010c80;
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
-.product-card__rating {
-    display: inline-flex;
-    align-items: center;
-    color: #f7ae2b;
-    flex-shrink: 0;
-}
-
-.product-card__star {
-    margin-right: 0.1rem;
+    -webkit-box-orient: vertical;
 }
 
 .product-card__title {
-    display: -webkit-box;
-    overflow: hidden;
-    margin: 0;
-    color: #08173f;
-    font-size: 0.98rem;
-    line-height: 1.3;
-    -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
 
 .product-card__description {
-    display: -webkit-box;
-    overflow: hidden;
-    min-height: 2.55rem;
-    margin: 0;
-    color: #5a6480;
-    font-size: 0.86rem;
-    line-height: 1.48;
-    -webkit-box-orient: vertical;
+    min-height: 3.2rem;
     -webkit-line-clamp: 2;
 }
 
-.product-card__bottom {
-    display: grid;
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    gap: 0.75rem;
-    min-width: 0;
-    padding-top: 0.1rem;
-}
-
-.product-card__price-block {
-    display: grid;
-    gap: 0.3rem;
-    min-width: 0;
-}
-
-.product-card__price-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.55rem;
-}
-
-.product-card__price {
-    color: #08173f;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.product-card__original-price {
-    color: #cc3344;
-    font-size: 0.92rem;
-}
-
-.product-card__variant {
-    display: block;
-    overflow: hidden;
-    color: #6a758f;
-    font-size: 0.83rem;
-    line-height: 1.4;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.product-card__tax-meta {
-    color: #5f6d8a;
-    font-size: 0.8rem;
-    line-height: 1.4;
-}
-
-.product-card__button {
-    min-width: 0;
-    max-width: none;
-    min-height: 2.5rem;
-    padding-inline: 0.9rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-@media screen and (max-width: 1200px) {
-    .product-card__bottom {
-        gap: 0.7rem;
-    }
-
-    .product-card__meta {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 0.35rem;
-    }
-}
-
 @media screen and (max-width: 767px) {
-    .product-card__body {
-        padding: 0.9rem;
-    }
-
-    .product-card__title {
-        font-size: 0.95rem;
-    }
-
     .product-card__description {
         min-height: auto;
-    }
-
-    .product-card__price-row {
-        gap: 0.4rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .product-card,
-    .product-card__image {
-        transition: none;
     }
 }
 </style>

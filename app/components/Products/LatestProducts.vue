@@ -1,226 +1,140 @@
 <script setup lang="ts">
-import EmblaCarousel, { type EmblaCarouselType } from "embla-carousel"
+import { useDragScroll } from "~/composables/useDragScroll"
+import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const productStore = useProductStore()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { products } = storeToRefs(useProductStore())
-const sliderViewport = ref<HTMLElement | null>(null)
-const sliderApi = ref<EmblaCarouselType | null>(null)
 
 await callOnce(async () => {
     await productStore.fetchData(regionStoreId.value ?? "", selectedCountryCode.value ?? "")
 })
 
-onMounted(() => {
-    if (!sliderViewport.value) {
-        return
-    }
+const railRef = ref<HTMLElement | null>(null)
 
-    sliderApi.value = EmblaCarousel(sliderViewport.value, {
-        align: "start",
-        containScroll: "trimSnaps",
-        dragFree: true
-    })
-})
-
-onBeforeUnmount(() => {
-    sliderApi.value?.destroy()
-    sliderApi.value = null
-})
+const { onPointerDown, onPointerMove, endDrag, onClickCapture, onDragStart } = useDragScroll(railRef)
 </script>
 
 <template>
-    <section class="catalog-section catalog-section--latest">
-        <VContainer class="catalog-section__container">
-            <div class="catalog-section__intro">
-                <div class="catalog-section__copy">
-                    <span class="catalog-section__eyebrow">Latest Offers</span>
-                    <h2 class="catalog-section__title">Fresh arrivals with a sharper, more editorial storefront feel.</h2>
-                    <p class="catalog-section__description">
-                        Browse newly added deals and current promotions in a layout designed to feel lighter, cleaner, and easier to scan.
+    <section
+        v-if="products?.length"
+        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(212,175,55,0.12),transparent_22%),linear-gradient(180deg,#fcfdff_0%,#f6f8fc_100%)] py-[4rem] sm:py-18 lg:py-24"
+    >
+        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                <div class="max-w-[46rem]">
+                    <span
+                        class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                    >
+                        Latest Offers
+                    </span>
+                    <h2
+                        class="mt-4 max-w-[13ch] text-[clamp(2rem,6vw,3.75rem)] font-bold leading-[0.97] tracking-[-0.05rem] text-slate-950"
+                    >
+                        Fresh arrivals with a more
+                        <span class="font-medium italic text-[#8a6a2f]">editorial rhythm</span>
+                    </h2>
+                    <p class="mt-4 max-w-[42rem] text-[1rem] leading-8 text-slate-700">
+                        Browse newly added deals and current promotions in a calmer premium rail that feels easier to scan across mobile and
+                        desktop.
                     </p>
                 </div>
+
+                <NuxtLink
+                    :to="ALL_PRODUCTS_URL_HANDLE"
+                    class="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 lg:self-auto"
+                >
+                    Explore catalog
+                </NuxtLink>
             </div>
 
-            <div class="catalog-section__slider">
-                <div ref="sliderViewport" class="catalog-section__viewport">
-                    <div class="catalog-section__track">
-                        <div v-for="product in products" :key="product.id" class="catalog-section__slide">
-                            <ProductCard :product="product" />
-                        </div>
+            <div class="relative mt-9">
+                <div
+                    class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-gradient-to-r from-[#f8fafc] to-transparent lg:block"
+                ></div>
+                <div
+                    class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-gradient-to-l from-[#f6f8fc] to-transparent lg:block"
+                ></div>
+
+                <div
+                    ref="railRef"
+                    class="catalog-rail flex gap-4 overflow-x-auto pb-4 pl-0 pr-6 pt-1 sm:gap-5 sm:pr-8"
+                    aria-label="Latest products"
+                    tabindex="0"
+                    @pointerdown="onPointerDown"
+                    @pointermove="onPointerMove"
+                    @pointerup="endDrag"
+                    @pointercancel="endDrag"
+                    @pointerleave="endDrag"
+                    @click.capture="onClickCapture"
+                    @dragstart="onDragStart"
+                >
+                    <div
+                        v-for="product in products"
+                        :key="product.id"
+                        class="rail-item shrink-0 basis-[82%] sm:basis-[47%] lg:basis-[31%] xl:basis-[24%] 2xl:basis-[20%]"
+                    >
+                        <ProductCard :product="product" />
                     </div>
                 </div>
             </div>
-        </VContainer>
+        </div>
     </section>
 </template>
 
-<style scoped lang="scss">
-.catalog-section {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(4.5rem, 7vw, 6.5rem) 0;
+<style scoped>
+.catalog-rail {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 53, 15, 0.72) rgba(241, 245, 249, 0.92);
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-x;
+    scroll-behavior: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: none;
 }
 
-.catalog-section--latest {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 26%), linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+.catalog-rail.is-pointer-down {
+    cursor: grabbing;
 }
 
-.catalog-section__container {
-    position: relative;
-    z-index: 1;
+.rail-item {
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
 }
 
-.catalog-section__intro {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 2rem;
+@media (hover: none) and (pointer: coarse) {
+    .catalog-rail {
+        scroll-snap-type: x mandatory;
+    }
+
+    .rail-item {
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+    }
 }
 
-.catalog-section__copy,
-.catalog-section__slide {
-    animation: catalog-rise 0.75s ease both;
+.catalog-rail :deep(img) {
+    -webkit-user-drag: none;
+    user-select: none;
 }
 
-.catalog-section__slide {
-    height: auto;
-    padding-bottom: 0.35rem;
+.catalog-rail::-webkit-scrollbar {
+    height: 0.8rem;
 }
 
-.catalog-section__slide:nth-child(2) {
-    animation-delay: 0.08s;
-}
-
-.catalog-section__slide:nth-child(3) {
-    animation-delay: 0.14s;
-}
-
-.catalog-section__slide:nth-child(4) {
-    animation-delay: 0.2s;
-}
-
-.catalog-section__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.3rem;
-    padding: 0.45rem 0.9rem;
-    margin-bottom: 1rem;
+.catalog-rail::-webkit-scrollbar-track {
     border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.88), rgba(241, 245, 249, 0.96));
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
 }
 
-.catalog-section__title {
-    max-width: 20ch;
-    margin-bottom: 0.9rem;
-    margin-inline: auto;
-    color: #08173f;
-    font-size: clamp(2.1rem, 3.8vw, 3.75rem);
-    line-height: 0.98;
-    letter-spacing: -0.05rem;
-    text-wrap: balance;
-}
-
-.catalog-section__description {
-    max-width: 800px;
-    margin-bottom: 0;
-    margin-inline: auto;
-    color: #53607b;
-    font-size: 1.02rem;
-    line-height: 1.75;
-}
-
-.catalog-section__copy {
-    width: 100%;
-    max-width: 800px;
-    margin-inline: auto;
-    text-align: center;
-}
-
-.catalog-section__slider {
-    --catalog-slide-gap: 16px;
-    --catalog-slide-size: 86%;
-}
-
-.catalog-section__viewport {
-    overflow: hidden;
-}
-
-.catalog-section__track {
-    display: flex;
-    gap: var(--catalog-slide-gap);
-}
-
-.catalog-section__slide {
-    flex: 0 0 var(--catalog-slide-size);
-}
-
-@media screen and (min-width: 640px) {
-    .catalog-section__slider {
-        --catalog-slide-gap: 18px;
-        --catalog-slide-size: 47%;
-    }
-}
-
-@media screen and (min-width: 960px) {
-    .catalog-section__slider {
-        --catalog-slide-gap: 20px;
-        --catalog-slide-size: 31%;
-    }
-}
-
-@media screen and (min-width: 1280px) {
-    .catalog-section__slider {
-        --catalog-slide-gap: 22px;
-        --catalog-slide-size: 24%;
-    }
-}
-
-@media screen and (min-width: 1536px) {
-    .catalog-section__slider {
-        --catalog-slide-gap: 24px;
-        --catalog-slide-size: 20%;
-    }
-}
-
-@keyframes catalog-rise {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 960px) {
-    .catalog-section__title {
-        max-width: 100%;
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .catalog-section {
-        padding: 3.75rem 0;
-    }
-
-    .catalog-section__title {
-        font-size: clamp(1.9rem, 7vw, 2.75rem);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .catalog-section__copy,
-    .catalog-section__slide {
-        animation: none;
-    }
+.catalog-rail::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(180, 132, 48, 0.95), rgba(120, 53, 15, 0.9));
+    box-shadow: 0 4px 12px rgba(120, 53, 15, 0.18);
 }
 </style>
