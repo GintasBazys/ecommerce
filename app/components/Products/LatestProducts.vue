@@ -12,7 +12,7 @@ await callOnce(async () => {
 
 const railRef = ref<HTMLElement | null>(null)
 
-const { onPointerDown, onPointerMove, endDrag, onClickCapture, onDragStart } = useDragScroll(railRef)
+const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 </script>
 
 <template>
@@ -62,10 +62,6 @@ const { onPointerDown, onPointerMove, endDrag, onClickCapture, onDragStart } = u
                     aria-label="Latest products"
                     tabindex="0"
                     @pointerdown="onPointerDown"
-                    @pointermove="onPointerMove"
-                    @pointerup="endDrag"
-                    @pointercancel="endDrag"
-                    @pointerleave="endDrag"
                     @click.capture="onClickCapture"
                     @dragstart="onDragStart"
                 >
@@ -84,13 +80,16 @@ const { onPointerDown, onPointerMove, endDrag, onClickCapture, onDragStart } = u
 
 <style scoped>
 .catalog-rail {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     scrollbar-gutter: stable both-edges;
     scrollbar-width: thin;
     scrollbar-color: rgba(120, 53, 15, 0.72) rgba(241, 245, 249, 0.92);
     cursor: grab;
     user-select: none;
-    touch-action: pan-x;
     scroll-behavior: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: none;
@@ -101,18 +100,33 @@ const { onPointerDown, onPointerMove, endDrag, onClickCapture, onDragStart } = u
 }
 
 .rail-item {
+    min-width: 0;
     scroll-snap-align: none;
     scroll-snap-stop: normal;
 }
 
 @media (hover: none) and (pointer: coarse) {
     .catalog-rail {
-        scroll-snap-type: x mandatory;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        overflow-x: visible;
+        overflow-y: visible;
+        cursor: default;
+        user-select: auto;
+        touch-action: auto;
+        overscroll-behavior-x: auto;
+        scrollbar-width: auto;
     }
 
     .rail-item {
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
+        min-width: 0;
+        flex-basis: auto !important;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) and (min-width: 640px) {
+    .catalog-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 

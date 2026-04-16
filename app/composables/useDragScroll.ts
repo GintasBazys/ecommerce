@@ -22,7 +22,7 @@ export function useDragScroll(railRef: Ref<HTMLElement | null>, options: UseDrag
             return
         }
 
-        if (e.pointerType === "mouse" && e.button !== 0) {
+        if (e.pointerType !== "mouse" || e.button !== 0) {
             return
         }
 
@@ -98,7 +98,7 @@ export function useDragScroll(railRef: Ref<HTMLElement | null>, options: UseDrag
         e.preventDefault()
     }
 
-    onBeforeUnmount(function () {
+    onBeforeUnmount(function (): void {
         cleanup()
     })
 
