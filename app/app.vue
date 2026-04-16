@@ -20,12 +20,6 @@ useHead({
 })
 
 useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global-structured-data")
-
-const nuxtApp = useNuxtApp()
-
-nuxtApp.hook("page:finish", () => {
-    window.scrollTo(0, 0)
-})
 </script>
 
 <template>
@@ -40,15 +34,6 @@ nuxtApp.hook("page:finish", () => {
 </template>
 
 <style lang="scss">
-.page-enter-active,
-.page-leave-active {
-    transition: all 0.4s;
-}
-.page-enter-from,
-.page-leave-to {
-    opacity: 0;
-    filter: blur(1rem);
-}
 html {
     font-family: "Archivo", sans-serif;
     scroll-behavior: smooth;
