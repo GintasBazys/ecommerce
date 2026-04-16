@@ -130,6 +130,11 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
     }
 }
 
+.catalog-rail :deep(img) {
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
 .catalog-rail::-webkit-scrollbar {
     height: 0.8rem;
 }
@@ -145,20 +150,5 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
     border-radius: 999px;
     background: linear-gradient(90deg, rgba(180, 132, 48, 0.95), rgba(120, 53, 15, 0.9));
     box-shadow: 0 4px 12px rgba(120, 53, 15, 0.18);
-}
-
-.catalog-rail {
-    cursor: grab;
-    user-select: none;
-    touch-action: pan-y;
-    scroll-behavior: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .catalog-rail {
-        touch-action: pan-x;
-    }
 }
 </style>
