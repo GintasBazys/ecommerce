@@ -323,7 +323,7 @@ function getProductMeta(product: ProductDTO): string {
                         class="hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
                         to="/account"
                     >
-                        {{ customer.first_name ?? "Profile" }}
+                        Profile
                     </NuxtLink>
                     <NuxtLink
                         v-else
