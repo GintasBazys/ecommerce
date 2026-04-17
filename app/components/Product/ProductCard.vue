@@ -106,6 +106,18 @@ const debouncedAddToCart = debounce(addToCart, 300)
                 >
                     {{ stockLabel }}
                 </span>
+            </div>
+
+            <div class="min-w-0">
+                <NuxtLink :to="productHref" class="text-inherit no-underline focus-visible:outline-none">
+                    <h3 class="product-card__title text-[1rem] font-semibold leading-6 text-slate-950">
+                        {{ product.title }}
+                    </h3>
+                </NuxtLink>
+
+                <p class="product-card__description mt-2 text-[0.92rem] leading-7 text-slate-600">
+                    {{ productDescription }}
+                </p>
 
                 <div v-if="averageRating" class="flex shrink-0 items-center gap-1 text-amber-500" aria-hidden="true">
                     <svg
@@ -121,21 +133,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                             stroke-linejoin="round"
                         />
                     </svg>
-                    <span class="ml-1 text-xs font-semibold text-slate-500">{{ averageRating.toFixed(1) }}</span>
                 </div>
-                <span v-if="averageRating" class="sr-only">Rated {{ averageRating }} out of 5</span>
-            </div>
-
-            <div class="min-w-0">
-                <NuxtLink :to="productHref" class="text-inherit no-underline focus-visible:outline-none">
-                    <h3 class="product-card__title text-[1rem] font-semibold leading-6 text-slate-950">
-                        {{ product.title }}
-                    </h3>
-                </NuxtLink>
-
-                <p class="product-card__description mt-2 text-[0.92rem] leading-7 text-slate-600">
-                    {{ productDescription }}
-                </p>
             </div>
 
             <div class="grid gap-3 border-t border-slate-200/80 pt-3">

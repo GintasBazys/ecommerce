@@ -352,89 +352,107 @@ function getProductMeta(product: ProductDTO): string {
         </transition>
 
         <aside
-            class="fixed right-0 z-[65] h-screen w-[300px] border-l border-white/60 bg-[linear-gradient(180deg,#fbfcfe_0%,#f6f8fc_58%,#f2f5fa_100%)] px-4 pb-6 pt-4 shadow-[0_30px_90px_rgba(2,6,23,0.24)] transition-transform duration-300 sm:w-[340px]"
-            :class="drawer ? 'translate-x-0' : 'translate-x-full'"
-            :style="{ top: `${topOffset + headerHeight}px`, height: `calc(100vh - ${topOffset + headerHeight}px)` }"
+            class="site-drawer fixed right-0 bottom-0 z-[65] w-[300px] border-l border-white/60 sm:w-[340px]"
+            :class="drawer ? 'site-drawer--open' : 'site-drawer--closed'"
+            :style="{ top: `${topOffset + headerHeight}px` }"
             aria-label="Mobile navigation"
         >
-            <div class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.45),rgba(148,163,184,0))]"></div>
-            <div class="flex items-center justify-between gap-3">
-                <div>
-                    <p
-                        class="inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-amber-900"
-                    >
-                        Navigation
-                    </p>
-                    <h2 class="mt-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">Menu</h2>
+            <div class="site-drawer__inner">
+                <div class="site-drawer__top px-4 pb-4 pt-4">
+                    <div
+                        class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.45),rgba(148,163,184,0))]"
+                    ></div>
+
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p
+                                class="inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-amber-900"
+                            >
+                                Navigation
+                            </p>
+                            <h2 class="mt-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">Menu</h2>
+                        </div>
+
+                        <button type="button" class="site-header__icon-btn" @click="closeDrawer">
+                            <span class="sr-only">Close menu</span>
+                            <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                                <path
+                                    d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <button type="button" class="site-header__icon-btn" @click="closeDrawer">
-                    <span class="sr-only">Close menu</span>
-                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-                        <path
-                            d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
-                        />
-                    </svg>
-                </button>
+
+                <div class="site-drawer__scroll px-4 pb-6">
+                    <label
+                        class="mt-1 block rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_32px_rgba(8,27,90,0.06)]"
+                    >
+                        <span class="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Country</span>
+
+                        <select
+                            v-if="isClientHydrated"
+                            v-model="locationValue"
+                            class="ui-input site-header__country-select rounded-xl"
+                            :disabled="selectionLoading"
+                        >
+                            <option v-for="country in locationItems" :key="country.value" :value="country.value">
+                                {{ country.title }}
+                            </option>
+                        </select>
+
+                        <span v-else class="ui-input site-header__country-select inline-flex w-full items-center rounded-xl">
+                            Country
+                        </span>
+                    </label>
+
+                    <nav class="mt-5 grid gap-2" aria-label="Mobile links">
+                        <NuxtLink
+                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            :to="ALL_PRODUCTS_URL_HANDLE"
+                            @click="closeDrawer"
+                        >
+                            All products
+                        </NuxtLink>
+
+                        <NuxtLink
+                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            to="/special-offers"
+                            @click="closeDrawer"
+                        >
+                            Special offers
+                        </NuxtLink>
+
+                        <NuxtLink
+                            v-for="cat in categories"
+                            :key="cat.id"
+                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            :to="`${CATEGORY_HANDLE}/${cat.handle}`"
+                            @click="closeDrawer"
+                        >
+                            {{ cat.name }}
+                        </NuxtLink>
+
+                        <NuxtLink
+                            v-if="isClientHydrated && customer?.id"
+                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            to="/account"
+                            @click="closeDrawer"
+                        >
+                            Profile
+                        </NuxtLink>
+
+                        <NuxtLink
+                            v-else
+                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            to="/signin"
+                            @click="closeDrawer"
+                        >
+                            Sign in
+                        </NuxtLink>
+                    </nav>
+                </div>
             </div>
-
-            <label
-                class="mt-5 block rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_32px_rgba(8,27,90,0.06)]"
-            >
-                <span class="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Country</span>
-                <select
-                    v-if="isClientHydrated"
-                    v-model="locationValue"
-                    class="ui-input site-header__country-select rounded-xl"
-                    :disabled="selectionLoading"
-                >
-                    <option v-for="country in locationItems" :key="country.value" :value="country.value">
-                        {{ country.title }}
-                    </option>
-                </select>
-                <span v-else class="ui-input site-header__country-select inline-flex w-full items-center rounded-xl">Country</span>
-            </label>
-
-            <nav class="mt-5 grid gap-2" aria-label="Mobile links">
-                <NuxtLink
-                    class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
-                    :to="ALL_PRODUCTS_URL_HANDLE"
-                    @click="closeDrawer"
-                >
-                    All products
-                </NuxtLink>
-                <NuxtLink
-                    class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
-                    to="/special-offers"
-                    @click="closeDrawer"
-                >
-                    Special offers
-                </NuxtLink>
-                <NuxtLink
-                    v-for="cat in categories"
-                    :key="cat.id"
-                    class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
-                    :to="`${CATEGORY_HANDLE}/${cat.handle}`"
-                    @click="closeDrawer"
-                >
-                    {{ cat.name }}
-                </NuxtLink>
-                <NuxtLink
-                    v-if="isClientHydrated && customer?.id"
-                    class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
-                    to="/account"
-                    @click="closeDrawer"
-                >
-                    Profile
-                </NuxtLink>
-                <NuxtLink
-                    v-else
-                    class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
-                    to="/signin"
-                    @click="closeDrawer"
-                >
-                    Sign in
-                </NuxtLink>
-            </nav>
         </aside>
 
         <transition name="fade">
@@ -588,5 +606,43 @@ function getProductMeta(product: ProductDTO): string {
     .site-header__logo {
         height: 2.25rem;
     }
+}
+
+.site-drawer {
+    background: linear-gradient(180deg, #fbfcfe 0%, #f6f8fc 58%, #f2f5fa 100%);
+    box-shadow: -12px 0 32px rgba(2, 6, 23, 0.14);
+    transform: translate3d(100%, 0, 0);
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+    backface-visibility: hidden;
+    contain: layout paint style;
+    overflow: hidden;
+}
+
+.site-drawer--open {
+    transform: translate3d(0, 0, 0);
+}
+
+.site-drawer--closed {
+    transform: translate3d(100%, 0, 0);
+}
+
+.site-drawer__inner {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+}
+
+.site-drawer__top {
+    flex: 0 0 auto;
+}
+
+.site-drawer__scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 </style>

@@ -95,10 +95,6 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
     scroll-snap-type: none;
 }
 
-.catalog-rail.is-pointer-down {
-    cursor: grabbing;
-}
-
 .rail-item {
     min-width: 0;
     scroll-snap-align: none;
@@ -120,7 +116,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
     .rail-item {
         min-width: 0;
-        flex-basis: auto !important;
+        flex-basis: auto;
     }
 }
 
@@ -133,22 +129,5 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 .catalog-rail :deep(img) {
     -webkit-user-drag: none;
     user-select: none;
-}
-
-.catalog-rail::-webkit-scrollbar {
-    height: 0.8rem;
-}
-
-.catalog-rail::-webkit-scrollbar-track {
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.88), rgba(241, 245, 249, 0.96));
-    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
-}
-
-.catalog-rail::-webkit-scrollbar-thumb {
-    border: 2px solid rgba(255, 255, 255, 0.9);
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(180, 132, 48, 0.95), rgba(120, 53, 15, 0.9));
-    box-shadow: 0 4px 12px rgba(120, 53, 15, 0.18);
 }
 </style>
