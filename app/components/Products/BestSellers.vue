@@ -4,7 +4,7 @@ import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const productStore = useProductStore()
-const { bestSellers } = storeToRefs(useProductStore())
+const { bestSellers } = storeToRefs(productStore)
 
 await callOnce(async () => {
     await productStore.fetchBestSellers(regionStoreId.value ?? "", selectedCountryCode.value ?? "")

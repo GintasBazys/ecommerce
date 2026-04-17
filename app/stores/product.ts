@@ -79,6 +79,10 @@ export const useProductStore = defineStore("product", () => {
         }
     }
     const fetchBestSellers = async (regionId?: string, countryCode?: string) => {
+        if (!regionId) {
+            return
+        }
+
         try {
             const { products } = await $fetch<{ products: ProductDTO[] }>(`/api/categories/best-selling`, {
                 query: {

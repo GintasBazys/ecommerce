@@ -1,156 +1,163 @@
 <script setup lang="ts">
-import type { Policies } from "@/types/interfaces"
+interface PolicyItem {
+    icon: string
+    title: string
+    description: string
+}
 
-const policies = ref<Policies[]>([
+const policies: PolicyItem[] = [
     {
-        icon: "mdi-truck-fast",
+        icon: "/images/policies/shipping.svg",
         title: "Free Shipping",
         description: "Enjoy free shipping on qualifying orders with a clearer delivery experience."
     },
     {
-        icon: "mdi-lock-outline",
+        icon: "/images/policies/secure-payment.svg",
         title: "Secure Payment",
         description: "Protected checkout with trusted payment flows and transparent confirmation."
     },
     {
-        icon: "mdi-headset",
+        icon: "/images/policies/support.svg",
         title: "Human Support",
         description: "Helpful support for product questions, order updates, and returns when needed."
     }
-])
+]
 </script>
 
 <template>
     <section class="policies-strip">
-        <VContainer class="policies-strip__container">
-            <VRow class="policies-strip__grid" align="stretch">
-                <VCol v-for="policy in policies" :key="policy.title" cols="12" md="4" class="policies-strip__col">
-                    <article class="policies-strip__card">
-                        <div class="policies-strip__icon-wrap">
-                            <VIcon size="26" class="policies-strip__icon">
-                                {{ policy.icon }}
-                            </VIcon>
-                        </div>
-                        <div class="policies-strip__content">
-                            <h3 class="policies-strip__title">{{ policy.title }}</h3>
-                            <p class="policies-strip__description">{{ policy.description }}</p>
-                        </div>
-                    </article>
-                </VCol>
-            </VRow>
-        </VContainer>
+        <div class="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
+            <div class="policies-strip__intro">
+                <span class="policies-strip__eyebrow">Shop with confidence</span>
+                <h2 class="policies-strip__title">A smoother purchase experience from product discovery to delivery.</h2>
+                <p class="policies-strip__description">
+                    Clear delivery, safer checkout, and responsive support built into the same premium storefront experience.
+                </p>
+            </div>
+
+            <div class="policies-strip__grid">
+                <article v-for="policy in policies" :key="policy.title" class="policies-strip__card">
+                    <div class="policies-strip__icon-wrap" aria-hidden="true">
+                        <img :src="policy.icon" alt="" class="policies-strip__icon" loading="lazy" width="40" height="40" />
+                    </div>
+                    <div class="policies-strip__content">
+                        <h3 class="policies-strip__card-title">{{ policy.title }}</h3>
+                        <p class="policies-strip__card-description">{{ policy.description }}</p>
+                    </div>
+                </article>
+            </div>
+        </div>
     </section>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .policies-strip {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(3rem, 5vw, 4.5rem) 0;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    background:
+        radial-gradient(circle at top left, rgba(245, 158, 11, 0.08), transparent 24%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
 
-.policies-strip__container {
-    position: relative;
-    z-index: 1;
+.policies-strip__intro {
+    max-width: 42rem;
+}
+
+.policies-strip__eyebrow {
+    display: inline-flex;
+    min-height: 2.25rem;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(253, 230, 138, 0.72);
+    background: rgba(254, 243, 199, 0.72);
+    padding: 0.45rem 0.95rem;
+    color: #78350f;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.policies-strip__title {
+    margin: 1rem 0 0;
+    max-width: 14ch;
+    color: #0f172a;
+    font-size: clamp(1.9rem, 6vw, 3.1rem);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+}
+
+.policies-strip__description {
+    margin: 1rem 0 0;
+    max-width: 38rem;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.8;
 }
 
 .policies-strip__grid {
-    row-gap: 1rem;
-}
-
-.policies-strip__col {
-    animation: policies-rise 0.72s ease both;
-}
-
-.policies-strip__col:nth-child(2) {
-    animation-delay: 0.08s;
-}
-
-.policies-strip__col:nth-child(3) {
-    animation-delay: 0.14s;
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.75rem;
 }
 
 .policies-strip__card {
     display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: start;
     gap: 1rem;
-    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    border-radius: 1.5rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+    box-shadow: 0 12px 28px rgba(8, 27, 90, 0.06);
     padding: 1.2rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.35rem;
-    background: rgba(255, 255, 255, 0.88);
-    transition:
-        transform 0.28s ease,
-        border-color 0.28s ease,
-        background-color 0.28s ease;
-}
-
-.policies-strip__card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(1, 12, 128, 0.16);
-    background: #ffffff;
 }
 
 .policies-strip__icon-wrap {
     display: inline-flex;
-    justify-content: center;
+    height: 3.25rem;
+    width: 3.25rem;
     align-items: center;
-    width: 3rem;
-    height: 3rem;
+    justify-content: center;
     border-radius: 1rem;
-    background: linear-gradient(135deg, rgba(1, 12, 128, 0.08), rgba(0, 128, 255, 0.14));
-    color: #010c80;
-    flex-shrink: 0;
+    border: 1px solid rgba(253, 230, 138, 0.65);
+    background: linear-gradient(180deg, rgba(254, 243, 199, 0.85), rgba(255, 255, 255, 0.98));
+}
+
+.policies-strip__icon {
+    display: block;
+    height: 2.5rem;
+    width: 2.5rem;
 }
 
 .policies-strip__content {
     min-width: 0;
 }
 
-.policies-strip__title {
-    margin-bottom: 0.35rem;
-    color: #08173f;
-    font-size: 1rem;
+.policies-strip__card-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 700;
     line-height: 1.35;
 }
 
-.policies-strip__description {
-    margin-bottom: 0;
-    color: #5a6480;
-    font-size: 0.92rem;
-    line-height: 1.65;
+.policies-strip__card-description {
+    margin: 0.45rem 0 0;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.7;
 }
 
-@keyframes policies-rise {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .policies-strip {
-        padding: 2.5rem 0;
+@media (min-width: 768px) {
+    .policies-strip__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .policies-strip__card {
-        grid-template-columns: 1fr;
-        gap: 0.85rem;
+        min-height: 100%;
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .policies-strip__col,
-    .policies-strip__card {
-        animation: none;
-        transition: none;
+@media (max-width: 767px) {
+    .policies-strip__title {
+        max-width: 100%;
     }
 }
 </style>
