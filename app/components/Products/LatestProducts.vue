@@ -103,26 +103,9 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
 @media (hover: none) and (pointer: coarse) {
     .catalog-rail {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        overflow-x: visible;
-        overflow-y: visible;
-        cursor: default;
-        user-select: auto;
-        touch-action: auto;
+        cursor: auto;
         overscroll-behavior-x: auto;
-        scrollbar-width: auto;
-    }
-
-    .rail-item {
-        min-width: 0;
-        flex-basis: auto;
-    }
-}
-
-@media (hover: none) and (pointer: coarse) and (min-width: 640px) {
-    .catalog-rail {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        user-select: auto;
     }
 }
 
