@@ -1,48 +1,72 @@
 <script setup lang="ts">
-const { data: latestPosts } = await useAsyncData("/", () => queryCollection("content").limit(3).order("date", "DESC").all())
+import type { BlogPostsResponse } from "~/types/blog"
+
+import { BLOG_HANDLE } from "~/utils/consts"
+
+const { data: latestPostsData, error: latestPostsError } = await useAsyncData("latest-blog-posts", () =>
+    $fetch<BlogPostsResponse>("/api/blog/posts", {
+        params: {
+            limit: 3,
+            offset: 0
+        }
+    })
+)
+
+const latestPosts = computed(() => latestPostsData.value?.posts || [])
 </script>
 
 <template>
     <section class="latest-posts-section">
-        <VContainer class="latest-posts-section__container">
+        <div class="latest-posts-section__container">
             <div class="latest-posts-section__intro">
                 <div class="latest-posts-section__copy">
                     <span class="latest-posts-section__eyebrow">Journal</span>
-                    <h2 class="latest-posts-section__title">Fresh reads that keep the storefront feeling alive and useful.</h2>
+                    <h2 class="latest-posts-section__title">Journal posts with the same premium tone as the storefront.</h2>
                     <p class="latest-posts-section__description">
-                        Short, practical articles with a cleaner card layout, brighter visuals, and clearer routes into the full story.
+                        Editorial updates, product context, and commerce guidance surfaced in a calmer, more refined reading layout.
                     </p>
+                </div>
+
+                <NuxtLink :to="BLOG_HANDLE" class="latest-posts-section__link">Browse all posts</NuxtLink>
+            </div>
+
+            <div v-if="latestPosts.length" class="latest-posts-section__grid">
+                <div v-for="article in latestPosts" :key="article.id" class="latest-posts-section__col">
+                    <BlogCard :article="article" />
                 </div>
             </div>
 
-            <VRow class="latest-posts-section__grid" align="stretch">
-                <template v-if="latestPosts">
-                    <VCol v-for="article in latestPosts" :key="article.path" cols="12" md="6" lg="4" class="latest-posts-section__col">
-                        <BlogCard :article="article" />
-                    </VCol>
-                </template>
-            </VRow>
-        </VContainer>
+            <div v-else-if="latestPostsError" class="latest-posts-section__state">
+                Something went wrong while loading the journal. Please try again.
+            </div>
+
+            <div v-else class="latest-posts-section__state">No blog posts published yet.</div>
+        </div>
     </section>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .latest-posts-section {
     position: relative;
     overflow: hidden;
-    padding: clamp(4.5rem, 7vw, 6.5rem) 0;
+    padding: clamp(4.5rem, 7vw, 6.5rem) 1rem;
     background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%), linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+        radial-gradient(circle at top left, rgba(245, 158, 11, 0.08), transparent 24%), linear-gradient(180deg, #fcfdff 0%, #f6f8fc 100%);
 }
 
 .latest-posts-section__container {
     position: relative;
     z-index: 1;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 80rem;
 }
 
 .latest-posts-section__intro {
     display: flex;
-    justify-content: center;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -52,9 +76,7 @@ const { data: latestPosts } = await useAsyncData("/", () => queryCollection("con
 }
 
 .latest-posts-section__copy {
-    width: 100%;
-    max-width: 820px;
-    text-align: center;
+    max-width: 46rem;
 }
 
 .latest-posts-section__col:nth-child(2) {
@@ -72,17 +94,43 @@ const { data: latestPosts } = await useAsyncData("/", () => queryCollection("con
     padding: 0.45rem 0.9rem;
     margin-bottom: 1rem;
     border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
+    border: 1px solid rgba(253, 230, 138, 0.72);
+    background: rgba(254, 243, 199, 0.72);
+    color: #78350f;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
 
+.latest-posts-section__link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 213, 225, 1);
+    background: rgba(255, 255, 255, 0.92);
+    padding: 0.75rem 1.15rem;
+    color: #1e293b;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(8, 27, 90, 0.05);
+    transition:
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.latest-posts-section__link:hover {
+    border-color: rgba(253, 230, 138, 0.95);
+    color: #0f172a;
+}
+
 .latest-posts-section__title {
-    max-width: 18ch;
-    margin: 0 auto 0.9rem;
+    max-width: 14ch;
+    margin: 0 0 0.9rem;
     color: #08173f;
     font-size: clamp(2rem, 3.8vw, 3.5rem);
     line-height: 0.98;
@@ -91,15 +139,27 @@ const { data: latestPosts } = await useAsyncData("/", () => queryCollection("con
 }
 
 .latest-posts-section__description {
-    max-width: 760px;
-    margin: 0 auto;
+    max-width: 42rem;
+    margin: 0;
     color: #53607b;
     font-size: 1rem;
     line-height: 1.75;
 }
 
 .latest-posts-section__grid {
-    row-gap: 1.25rem;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.latest-posts-section__state {
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1.5rem;
+    color: #475569;
+    text-align: center;
+    box-shadow: 0 14px 32px rgba(8, 27, 90, 0.06);
 }
 
 @keyframes latest-post-rise {
@@ -116,12 +176,29 @@ const { data: latestPosts } = await useAsyncData("/", () => queryCollection("con
 
 @media screen and (max-width: 767px) {
     .latest-posts-section {
-        padding: 3.75rem 0;
+        padding: 3.75rem 1rem;
+    }
+
+    .latest-posts-section__intro {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .latest-posts-section__title {
         max-width: 100%;
         font-size: clamp(1.9rem, 7vw, 2.75rem);
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .latest-posts-section__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .latest-posts-section__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 

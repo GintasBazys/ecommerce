@@ -24,13 +24,11 @@ useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global
 
 <template>
     <NuxtLoadingIndicator />
-    <VApp>
-        <BaseHeader />
-        <NuxtLayout>
-            <NuxtPage />
-        </NuxtLayout>
-        <AppFooter />
-    </VApp>
+    <BaseHeader />
+    <NuxtLayout>
+        <NuxtPage />
+    </NuxtLayout>
+    <AppFooter />
 </template>
 
 <style lang="scss">

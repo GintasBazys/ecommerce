@@ -222,14 +222,14 @@ function onDrawerKeydown(event: KeyboardEvent): void {
             <transition name="fade">
                 <div
                     v-if="openCartDrawer"
-                    class="fixed inset-0 z-[80] bg-[linear-gradient(180deg,rgba(2,6,23,0.5),rgba(2,6,23,0.66))] backdrop-blur-[2px]"
+                    class="fixed inset-0 z-80 bg-[linear-gradient(180deg,rgba(2,6,23,0.5),rgba(2,6,23,0.66))] backdrop-blur-[2px]"
                     @click="closeDrawer"
                 ></div>
             </transition>
 
             <aside
                 ref="drawerRef"
-                class="cart-drawer fixed right-0 bottom-0 z-[85] w-full max-w-[440px] border-l border-white/60"
+                class="cart-drawer fixed right-0 bottom-0 z-85 w-full max-w-110 border-l border-white/60"
                 :class="openCartDrawer ? 'cart-drawer--open' : 'cart-drawer--closed'"
                 :aria-labelledby="titleId"
                 role="search"
@@ -253,7 +253,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 >
                                     Your order is nearly ready.
                                 </h2>
-                                <p class="mt-2 max-w-[28rem] text-sm leading-6 text-slate-700">
+                                <p class="mt-2 max-w-md text-sm leading-6 text-slate-700">
                                     Review quantities, make quick changes, and continue to checkout when everything looks right.
                                 </p>
                             </div>
@@ -261,7 +261,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <button
                                 ref="closeButtonRef"
                                 type="button"
-                                class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-[0_10px_30px_rgba(8,27,90,0.08)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-[0_10px_30px_rgba(8,27,90,0.08)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
                                 @click="closeDrawer"
                             >
                                 <span class="sr-only">Close cart drawer</span>
@@ -287,7 +287,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                     width="96"
                                     height="112"
                                     loading="lazy"
-                                    class="h-24 w-[84px] rounded-[1rem] bg-slate-100 object-cover sm:h-28 sm:w-24"
+                                    class="h-24 w-21 rounded-2xl bg-slate-100 object-cover sm:h-28 sm:w-24"
                                 />
 
                                 <div class="flex min-w-0 flex-col justify-between gap-3">
@@ -304,7 +304,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                         >
                                             <button
                                                 type="button"
-                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
                                                 :disabled="(qtyMap[item.id] ?? 1) <= 1"
                                                 :aria-label="`Decrease quantity for ${item.product_title}`"
                                                 @click="decrementQty(item.id)"
@@ -316,7 +316,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                             }}</span>
                                             <button
                                                 type="button"
-                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
                                                 :disabled="
                                                     (qtyMap[item.id] ?? Number(item.quantity)) >= (item.stocked_quantity ?? Infinity)
                                                 "
@@ -338,7 +338,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                             </p>
                                             <button
                                                 type="button"
-                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 transition hover:border-rose-200 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200"
+                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 transition hover:border-rose-200 hover:text-rose-600 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-200"
                                                 :aria-label="`Remove ${item.product_title}`"
                                                 @click="removeItem(item.id)"
                                             >
@@ -378,7 +378,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             </p>
                             <NuxtLink
                                 :to="ALL_PRODUCTS_URL_HANDLE"
-                                class="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
                             >
                                 Keep shopping
                             </NuxtLink>
@@ -389,7 +389,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                         class="cart-drawer__footer border-t border-slate-200/80 bg-white/85 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur sm:px-5"
                     >
                         <div
-                            class="space-y-2 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_36px_rgba(8,27,90,0.06)]"
+                            class="space-y-2 rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_36px_rgba(8,27,90,0.06)]"
                         >
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm text-slate-600">Subtotal</span>
@@ -411,7 +411,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <button
                                 v-if="isCartDirty"
                                 type="button"
-                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
                                 :disabled="!isCartDirty || isAnyUpdating"
                                 @click="updateCart"
                             >
@@ -424,7 +424,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 
                             <NuxtLink
                                 to="/cart"
-                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
                                 :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }"
                             >
                                 Go to cart

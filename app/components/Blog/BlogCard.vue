@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { BLOG_HANDLE } from "~/utils/consts"
+import type { BlogPostSummary } from "~/types/blog"
 
-type BlogCardArticle = {
-    title?: string
-    path?: string
-    description?: string
-    image?: string
-    date?: string
-    author?: string
-}
+import { BLOG_HANDLE } from "~/utils/consts"
+import { formatDate } from "~/utils/formatDate"
 
 const FALLBACK_IMAGE = "/images/blog/about_banner.webp"
 
 const { article, compact = false } = defineProps<{
-    article: BlogCardArticle
+    article: BlogPostSummary
     compact?: boolean
 }>()
 
-const articleHref = computed<string>(() => `${BLOG_HANDLE}${article.path || ""}`)
-const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
+const articleHref = computed<string>(() => `${BLOG_HANDLE}/${article.slug}`)
+const articleImage = computed<string>(() => article.thumbnail || FALLBACK_IMAGE)
+const articleDate = computed<string>(() => formatDate(article.publishedAt))
 </script>
 
 <template>
@@ -27,7 +22,7 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
             <div class="blog-card__media">
                 <NuxtImg
                     :src="articleImage"
-                    :alt="article.title || 'Blog post image'"
+                    :alt="article.title"
                     format="webp"
                     width="960"
                     height="640"
@@ -40,13 +35,14 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
         </NuxtLink>
 
         <div class="blog-card__body">
-            <div v-if="article.date || article.author" class="blog-card__meta">
-                <span v-if="article.date" class="blog-card__meta-item">
-                    <VIcon icon="mdi-calendar-blank-outline" size="16" />
-                    {{ article.date }}
+            <div class="blog-card__meta">
+                <span v-if="article.category" class="blog-card__category">{{ article.category.name }}</span>
+                <span v-if="articleDate" class="blog-card__meta-item">
+                    <span class="blog-card__meta-dot" aria-hidden="true"></span>
+                    {{ articleDate }}
                 </span>
                 <span v-if="article.author" class="blog-card__meta-item">
-                    <VIcon icon="mdi-account-outline" size="16" />
+                    <span class="blog-card__meta-dot" aria-hidden="true"></span>
                     {{ article.author }}
                 </span>
             </div>
@@ -55,39 +51,40 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
                 <h3 class="blog-card__title">{{ article.title }}</h3>
             </NuxtLink>
 
-            <p class="blog-card__description">{{ article.description }}</p>
+            <p class="blog-card__description">{{ article.excerpt || "Read the latest journal entry from the storefront." }}</p>
 
             <NuxtLink :to="articleHref" class="blog-card__cta-link">
                 <span class="blog-card__cta">Read article</span>
-                <VIcon icon="mdi-arrow-right" size="18" />
+                <span aria-hidden="true">→</span>
             </NuxtLink>
         </div>
     </article>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .blog-card {
     display: grid;
     grid-template-rows: auto 1fr;
     height: 100%;
     overflow: hidden;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.35rem;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 1.6rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+    box-shadow: 0 18px 40px rgba(8, 27, 90, 0.06);
     transition:
         transform 0.3s ease,
         border-color 0.3s ease,
-        background-color 0.3s ease;
+        box-shadow 0.3s ease;
 }
 
 .blog-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(1, 12, 128, 0.16);
-    background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+    border-color: rgba(202, 138, 4, 0.2);
+    box-shadow: 0 22px 48px rgba(8, 27, 90, 0.1);
 }
 
 .blog-card--compact .blog-card__media {
-    aspect-ratio: 1.18;
+    aspect-ratio: 1.12;
 }
 
 .blog-card__media-link,
@@ -100,8 +97,9 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
 .blog-card__media {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 1.32;
-    background: radial-gradient(circle at top, rgba(0, 128, 255, 0.14), transparent 38%), linear-gradient(180deg, #ecf4ff 0%, #dde9fb 100%);
+    aspect-ratio: 1.2;
+    background:
+        radial-gradient(circle at top right, rgba(202, 138, 4, 0.16), transparent 30%), linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
 .blog-card__image {
@@ -119,38 +117,61 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
     position: absolute;
     inset: auto 0 0;
     height: 44%;
-    background: linear-gradient(180deg, transparent 0%, rgba(7, 21, 67, 0.2) 100%);
+    background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.18) 100%);
     pointer-events: none;
 }
 
 .blog-card__body {
     display: grid;
-    gap: 0.9rem;
-    padding: 1.15rem;
+    gap: 0.95rem;
+    padding: 1.25rem;
 }
 
 .blog-card__meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.85rem;
+    align-items: center;
+    gap: 0.6rem 0.8rem;
+}
+
+.blog-card__category {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(253, 230, 138, 0.8);
+    background: rgba(254, 243, 199, 0.7);
+    padding: 0.35rem 0.8rem;
+    color: #78350f;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .blog-card__meta-item {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    color: #6a758f;
+    color: #64748b;
     font-size: 0.8rem;
     line-height: 1.4;
+}
+
+.blog-card__meta-dot {
+    height: 0.3rem;
+    width: 0.3rem;
+    border-radius: 999px;
+    background: #cbd5e1;
 }
 
 .blog-card__title {
     display: -webkit-box;
     overflow: hidden;
     margin: 0;
-    color: #08173f;
-    font-size: 1.18rem;
-    line-height: 1.35;
+    color: #0f172a;
+    font-size: 1.22rem;
+    line-height: 1.3;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
@@ -160,9 +181,9 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
     overflow: hidden;
     min-height: 4.2rem;
     margin: 0;
-    color: #53607b;
-    font-size: 0.96rem;
-    line-height: 1.7;
+    color: #475569;
+    font-size: 0.97rem;
+    line-height: 1.75;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
 }
@@ -173,10 +194,15 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
     gap: 0.45rem;
     width: fit-content;
     margin-top: auto;
-    color: #010c80;
+    color: #8a6a2f;
     font-size: 0.92rem;
     font-weight: 700;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.03em;
+    transition: color 0.2s ease;
+}
+
+.blog-card__cta-link:hover {
+    color: #6b4f1d;
 }
 
 @media screen and (max-width: 767px) {
@@ -185,7 +211,7 @@ const articleImage = computed<string>(() => article.image || FALLBACK_IMAGE)
     }
 
     .blog-card__title {
-        font-size: 1.06rem;
+        font-size: 1.08rem;
     }
 
     .blog-card__description {

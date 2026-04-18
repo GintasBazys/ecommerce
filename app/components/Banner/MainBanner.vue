@@ -36,21 +36,21 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
         <div
             class="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-12 pt-24 sm:px-6 sm:pb-14 md:pb-16 md:pt-28 lg:pb-20 lg:pt-32"
         >
-            <div class="site-hero__panel w-full max-w-3xl rounded-[2rem] p-6 text-white sm:p-8 lg:p-10">
+            <div class="site-hero__panel w-full max-w-3xl rounded-4xl p-6 text-white sm:p-8 lg:p-10">
                 <h1 class="mt-5 max-w-[13ch] text-4xl font-bold leading-[0.95] tracking-[-0.05em] text-white sm:text-5xl lg:text-[4.25rem]">
                     A cleaner,
                     <span class="block font-medium italic tracking-[-0.03em] text-[#e8c98d]"> more thoughtful </span>
                     online store experience.
                 </h1>
 
-                <p class="mt-5 max-w-[36rem] text-base leading-7 text-slate-100/92 sm:text-lg sm:leading-8">
+                <p class="mt-5 max-w-xl text-base leading-7 text-slate-100/92 sm:text-lg sm:leading-8">
                     {{ heroContent.description }}
                 </p>
 
                 <div class="mt-7 flex flex-wrap items-center gap-3">
                     <NuxtLink
                         :to="heroContent.ctaTo"
-                        class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-7 text-base font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c98d]"
+                        class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-7 text-base font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e8c98d]"
                     >
                         {{ heroContent.ctaLabel }}
                     </NuxtLink>

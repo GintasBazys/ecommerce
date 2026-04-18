@@ -3,7 +3,7 @@ import debounce from "lodash-es/debounce"
 
 import TaxedLinePrice from "../../components/Cart/TaxedLinePrice.vue"
 
-import type { CartLineItemDTO } from "@medusajs/types"
+import type { CartDTO, CartLineItemDTO } from "@medusajs/types"
 
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
@@ -329,7 +329,7 @@ async function updateCart(): Promise<void> {
                                                         density="compact"
                                                         class="cart-page__qty-input"
                                                         @update:model-value="
-                                                            (val) =>
+                                                            (val: CartDTO) =>
                                                                 debouncedQtyUpdate(item.id, Number(val), item.stocked_quantity ?? Infinity)
                                                         "
                                                     />

@@ -1,5 +1,7 @@
 import { fileURLToPath } from "node:url"
 
+import tailwindcss from "@tailwindcss/vite"
+
 const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com"]
 
 export default defineNuxtConfig({
@@ -29,28 +31,14 @@ export default defineNuxtConfig({
         }
     },
 
-    css: ["@/assets/scss/main.scss"],
+    css: ["@/assets/css/tailwind.css"],
 
     image: {
         inject: true,
         domains: [...new Set(imageDomains)]
     },
 
-    modules: [
-        "@nuxt/eslint",
-        "@nuxtjs/tailwindcss",
-        "@pinia/nuxt",
-        "pinia-plugin-persistedstate/nuxt",
-        "@nuxt/image",
-        "@nuxtjs/sitemap",
-        "@unlok-co/nuxt-stripe",
-        "@nuxt/content",
-        "vuetify-nuxt-module"
-    ],
-
-    tailwindcss: {
-        cssPath: "@/assets/css/tailwind.css"
-    },
+    modules: ["@nuxt/eslint", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "@unlok-co/nuxt-stripe"],
 
     stripe: {
         server: {
@@ -81,6 +69,7 @@ export default defineNuxtConfig({
     plugins: ["~/plugins/init-app"],
 
     vite: {
+        plugins: [tailwindcss()],
         resolve: {
             alias: [
                 {
@@ -92,9 +81,5 @@ export default defineNuxtConfig({
         optimizeDeps: {
             include: ["@stripe/stripe-js"]
         }
-    },
-
-    content: {
-        experimental: { nativeSqlite: true }
     }
 })

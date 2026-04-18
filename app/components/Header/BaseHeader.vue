@@ -197,7 +197,7 @@ function getProductMeta(product: ProductDTO): string {
                 </p>
                 <button
                     type="button"
-                    class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
+                    class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/25"
                     @click="bannerHidden = true"
                 >
                     <span class="sr-only">Dismiss shipping notice</span>
@@ -227,12 +227,12 @@ function getProductMeta(product: ProductDTO): string {
                 </NuxtLink>
 
                 <nav class="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
-                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" :to="ALL_PRODUCTS_URL_HANDLE"
-                    >All products</NuxtLink
-                    >
-                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" to="/special-offers"
-                    >Special offers</NuxtLink
-                    >
+                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" :to="ALL_PRODUCTS_URL_HANDLE">
+                        All products
+                    </NuxtLink>
+                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" to="/special-offers">
+                        Special offers
+                    </NuxtLink>
                     <NuxtLink
                         v-for="cat in categories"
                         :key="cat.id"
@@ -267,7 +267,7 @@ function getProductMeta(product: ProductDTO): string {
                         <select
                             v-if="isClientHydrated"
                             v-model="locationValue"
-                            class="ui-input site-header__country-select max-w-[170px] pr-8 text-sm xl:max-w-[190px]"
+                            class="ui-input site-header__country-select max-w-42.5 pr-8 text-sm xl:max-w-47.5"
                             :disabled="selectionLoading"
                         >
                             <option v-for="country in locationItems" :key="country.value" :value="country.value">
@@ -276,7 +276,7 @@ function getProductMeta(product: ProductDTO): string {
                         </select>
                         <span
                             v-else
-                            class="ui-input site-header__country-select inline-flex max-w-[170px] items-center pr-8 text-sm xl:max-w-[190px]"
+                            class="ui-input site-header__country-select inline-flex max-w-42.5 items-center pr-8 text-sm xl:max-w-47.5"
                         >
                             Country
                         </span>
@@ -346,13 +346,13 @@ function getProductMeta(product: ProductDTO): string {
         <transition name="fade">
             <div
                 v-if="drawer"
-                class="fixed inset-0 z-[60] bg-[linear-gradient(180deg,rgba(2,6,23,0.5),rgba(2,6,23,0.66))] backdrop-blur-[2px]"
+                class="fixed inset-0 z-60 bg-[linear-gradient(180deg,rgba(2,6,23,0.5),rgba(2,6,23,0.66))] backdrop-blur-[2px]"
                 @click="closeDrawer"
             ></div>
         </transition>
 
         <aside
-            class="site-drawer fixed right-0 bottom-0 z-[65] w-[300px] border-l border-white/60 sm:w-[340px]"
+            class="site-drawer fixed right-0 bottom-0 z-65 w-75 border-l border-white/60 sm:w-85"
             :class="drawer ? 'site-drawer--open' : 'site-drawer--closed'"
             :style="{ top: `${topOffset + headerHeight}px` }"
             aria-label="Mobile navigation"
@@ -458,7 +458,7 @@ function getProductMeta(product: ProductDTO): string {
         <transition name="fade">
             <div
                 v-if="searchDialog"
-                class="fixed inset-0 z-[70] bg-[linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.74))] p-4 backdrop-blur-[4px] md:p-6"
+                class="fixed inset-0 z-70 bg-[linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.74))] p-4 backdrop-blur-xs md:p-6"
                 @click.self="closeSearchDialog"
             >
                 <section
@@ -500,9 +500,9 @@ function getProductMeta(product: ProductDTO): string {
                         <p class="mt-2 text-sm text-slate-600">
                             <span v-if="normalizedSearchQuery.length < 3">Type at least 3 characters</span>
                             <span v-else-if="searchLoading">Searching...</span>
-                            <span v-else-if="searchHasSearched"
-                            >{{ searchResults.length }} result{{ searchResults.length === 1 ? "" : "s" }}</span
-                            >
+                            <span v-else-if="searchHasSearched">
+                                {{ searchResults.length }} result{{ searchResults.length === 1 ? "" : "s" }}
+                            </span>
                         </p>
                     </div>
 

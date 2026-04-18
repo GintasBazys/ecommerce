@@ -69,7 +69,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
     <article
         class="group grid h-full overflow-hidden rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] shadow-[0_14px_34px_rgba(8,27,90,0.06)] transition duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_22px_54px_rgba(8,27,90,0.12)] focus-within:-translate-y-1 focus-within:border-amber-200 focus-within:shadow-[0_22px_54px_rgba(8,27,90,0.12)] motion-reduce:transition-none"
     >
-        <NuxtLink :to="productHref" class="block text-inherit no-underline focus-visible:outline-none">
+        <NuxtLink :to="productHref" class="block text-inherit no-underline focus-visible:outline-hidden">
             <div
                 class="relative aspect-[0.96] overflow-hidden bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#edf2f7_100%)]"
             >
@@ -83,7 +83,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     densities="x1 x2"
                     class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] group-focus-within:scale-[1.03] motion-reduce:transition-none"
                 />
-                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-950/18 to-transparent"></div>
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-slate-950/18 to-transparent"></div>
 
                 <span
                     v-if="isOnSale"
@@ -109,7 +109,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
             </div>
 
             <div class="min-w-0">
-                <NuxtLink :to="productHref" class="text-inherit no-underline focus-visible:outline-none">
+                <NuxtLink :to="productHref" class="text-inherit no-underline focus-visible:outline-hidden">
                     <h3 class="product-card__title text-[1rem] font-semibold leading-6 text-slate-950">
                         {{ product.title }}
                     </h3>
@@ -148,7 +148,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
 
                 <button
                     type="button"
-                    class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#cda45e] px-4 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                    class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#cda45e] px-4 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
                     :disabled="loading || !selectedVariant?.inventory_quantity"
                     @click="debouncedAddToCart"
                 >

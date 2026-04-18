@@ -1,39 +1,85 @@
 <script setup lang="ts">
 import type { SchemaNode } from "~/composables/useStructuredData"
+import type { BlogPost, BlogPostResponse, BlogPostsResponse } from "~/types/blog"
 
-type BlogPost = {
-    title?: string
-    path?: string
-    description?: string
-    image?: string
-    author?: string
-    date?: string
-}
+import { BLOG_HANDLE } from "~/utils/consts"
+import { formatDate } from "~/utils/formatDate"
 
 const route = useRoute()
 const { organizationId, absoluteUrl } = useSiteIdentity()
-const slug = computed<string[] | string>(() => {
-    if (route.params.slug) {
-        return route.params.slug
+
+const slug = computed<string>(() => {
+    const routeSlug = route.params.slug
+
+    if (Array.isArray(routeSlug)) {
+        return routeSlug[routeSlug.length - 1] || ""
     }
-    const parts = route.path.split("/")
+
+    if (typeof routeSlug === "string") {
+        return routeSlug
+    }
+
+    const parts = route.path.split("/").filter(Boolean)
     return parts[parts.length - 1] || ""
 })
 
-const { data: currentPost } = await useAsyncData<BlogPost | null>(`post-${slug.value}`, () =>
-    queryCollection("content").path(`/${slug.value}`).first()
+const { data: postResponse } = await useAsyncData(`blog-post-${slug.value}`, () =>
+    $fetch<BlogPostResponse>(`/api/blog/posts/${slug.value}`)
 )
 
-const relatedQuery = queryCollection("content")
-    .order("date", "DESC")
-    .limit(3)
-    .where("path", "NOT LIKE", currentPost.value?.path || "")
+const currentPost = computed<BlogPost | null>(() => postResponse.value?.post || null)
 
-const { data: relatedPosts } = await useAsyncData(`related-${slug.value}`, () => relatedQuery.all())
+if (!currentPost.value) {
+    throw createError({ statusCode: 404, statusMessage: "Blog post not found" })
+}
 
-useHead({
-    title: `${currentPost.value?.title ?? "Shop"} | Ecommerce`
+const publishedDate = computed<string>(() => formatDate(currentPost.value?.publishedAt))
+
+const { data: relatedPostsData } = await useAsyncData(`related-${slug.value}`, async () => {
+    const primaryResponse = await $fetch<BlogPostsResponse>("/api/blog/posts", {
+        params: {
+            limit: 6,
+            offset: 0,
+            category: currentPost.value?.category?.slug || undefined
+        }
+    })
+
+    const primaryPosts = primaryResponse.posts.filter((post) => post.slug !== slug.value)
+    if (primaryPosts.length >= 3 || !currentPost.value?.category?.slug) {
+        return primaryPosts.slice(0, 3)
+    }
+
+    const fallbackResponse = await $fetch<BlogPostsResponse>("/api/blog/posts", {
+        params: {
+            limit: 6,
+            offset: 0
+        }
+    })
+
+    const combinedPosts = [...primaryPosts]
+
+    for (const post of fallbackResponse.posts) {
+        if (post.slug === slug.value || combinedPosts.some((item) => item.id === post.id)) {
+            continue
+        }
+
+        combinedPosts.push(post)
+    }
+
+    return combinedPosts.slice(0, 3)
 })
+
+const relatedPosts = computed(() => relatedPostsData.value || [])
+
+useHead(() => ({
+    title: `${currentPost.value?.title ?? "Shop"} | Ecommerce`,
+    meta: [
+        {
+            name: "description",
+            content: currentPost.value?.excerpt || "Read the latest journal post from the storefront."
+        }
+    ]
+}))
 
 const articleUrl = computed<string>(() => absoluteUrl(route.path))
 const breadcrumbItems = computed(() => [
@@ -47,21 +93,21 @@ const articleSchema = computed<SchemaNode | null>(() => {
         return null
     }
 
-    const image = currentPost.value.image ? absoluteUrl(currentPost.value.image) : undefined
+    const image = currentPost.value.thumbnail ? absoluteUrl(currentPost.value.thumbnail) : undefined
 
     return {
         "@type": "BlogPosting",
         "@id": `${articleUrl.value}#article`,
         headline: currentPost.value.title,
-        description: currentPost.value.description || undefined,
+        description: currentPost.value.excerpt || undefined,
         url: articleUrl.value,
         mainEntityOfPage: articleUrl.value,
         image: image ? [image] : undefined,
-        datePublished: normalizeSchemaDate(currentPost.value.date),
-        dateModified: normalizeSchemaDate(currentPost.value.date),
+        datePublished: normalizeSchemaDate(currentPost.value.publishedAt),
+        dateModified: normalizeSchemaDate(currentPost.value.updatedAt || currentPost.value.publishedAt),
         author: {
             "@type": "Person",
-            name: currentPost.value.author || "Admin"
+            name: currentPost.value.author || "Editorial team"
         },
         publisher: {
             "@id": organizationId.value
@@ -89,28 +135,24 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 
 <template>
     <main class="blog-post">
-        <VContainer class="blog-post__container">
+        <div class="blog-post__container">
             <section class="blog-post__hero">
                 <div class="blog-post__hero-copy">
                     <AppBreadcrumbs :items="breadcrumbItems" class="blog-post__breadcrumbs" />
                     <span class="blog-post__eyebrow">Journal</span>
+                    <span v-if="currentPost?.category" class="blog-post__category">{{ currentPost.category.name }}</span>
                     <h1 class="blog-post__title">{{ currentPost?.title }}</h1>
                     <div class="blog-post__meta">
-                        <span v-if="currentPost?.date" class="blog-post__meta-item">
-                            <VIcon icon="mdi-calendar-blank-outline" size="18" />
-                            {{ currentPost.date }}
-                        </span>
-                        <span v-if="currentPost?.author" class="blog-post__meta-item">
-                            <VIcon icon="mdi-account-outline" size="18" />
-                            {{ currentPost.author }}
-                        </span>
+                        <span v-if="publishedDate" class="blog-post__meta-item">{{ publishedDate }}</span>
+                        <span v-if="currentPost?.author" class="blog-post__meta-item">{{ currentPost.author }}</span>
                     </div>
+                    <p v-if="currentPost?.excerpt" class="blog-post__excerpt">{{ currentPost.excerpt }}</p>
                 </div>
             </section>
             <section class="blog-post__article">
                 <NuxtImg
-                    v-if="currentPost?.image"
-                    :src="currentPost.image"
+                    v-if="currentPost?.thumbnail"
+                    :src="currentPost.thumbnail"
                     :alt="currentPost.title"
                     format="webp"
                     width="1600"
@@ -119,42 +161,53 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
                     densities="x1 x2"
                     class="blog-post__image"
                 />
-                <div class="blog-post__content">
-                    <ContentRenderer v-if="currentPost" :value="currentPost" />
-                </div>
+                <!-- eslint-disable vue/no-v-html -->
+                <!-- The Medusa blog API returns sanitized HTML for post bodies. -->
+                <div class="blog-post__content" v-html="currentPost?.html"></div>
+                <!-- eslint-enable vue/no-v-html -->
+                <div v-if="!currentPost?.html" class="blog-post__empty-copy">This article does not have content yet.</div>
             </section>
-            <section class="blog-post__related">
+            <section v-if="relatedPosts.length" class="blog-post__related">
                 <div class="blog-post__related-intro">
+                    <span class="blog-post__related-kicker">More to read</span>
                     <h2 class="blog-post__related-title">Related posts</h2>
                 </div>
-                <VRow v-if="relatedPosts && relatedPosts.length > 0" class="blog-post__related-grid" align="stretch">
-                    <VCol v-for="article in relatedPosts" :key="article.path" cols="12" md="6" lg="4" class="blog-post__related-col">
+                <div class="blog-post__related-grid">
+                    <article v-for="article in relatedPosts" :key="article.id" class="blog-post__related-col">
                         <BlogCard :article="article" compact />
-                    </VCol>
-                </VRow>
-                <div v-else class="blog-post__empty">No related posts found.</div>
+                    </article>
+                </div>
             </section>
-        </VContainer>
+
+            <div v-else class="blog-post__empty">No related posts found.</div>
+
+            <div class="blog-post__footer-link-wrap">
+                <NuxtLink :to="BLOG_HANDLE" class="blog-post__footer-link">Back to all posts</NuxtLink>
+            </div>
+        </div>
     </main>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .blog-post {
     min-height: 100vh;
-    padding: 6rem 0;
+    padding: clamp(3.5rem, 6vw, 6rem) 1rem;
     background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%), linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+        radial-gradient(circle at top left, rgba(202, 138, 4, 0.08), transparent 24%), linear-gradient(180deg, #fcfdff 0%, #f6f8fc 100%);
 }
 
 .blog-post__container {
     position: relative;
     z-index: 1;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 80rem;
 }
 
 .blog-post__hero {
     display: flex;
     justify-content: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .blog-post__hero-copy,
@@ -165,7 +218,7 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 
 .blog-post__hero-copy {
     width: 100%;
-    max-width: 880px;
+    max-width: 56rem;
     text-align: center;
 }
 
@@ -188,13 +241,29 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
     text-transform: uppercase;
 }
 
+.blog-post__category {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(253, 230, 138, 0.8);
+    background: rgba(254, 243, 199, 0.72);
+    padding: 0.35rem 0.8rem;
+    margin: 0 auto 1rem;
+    color: #78350f;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
 .blog-post__title {
-    max-width: 800px;
+    max-width: 14ch;
     margin: 0 auto 1rem;
     color: #08173f;
-    font-size: 4.3rem;
-    line-height: 0.96;
-    letter-spacing: -0.06rem;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.07rem;
     text-wrap: balance;
 }
 
@@ -208,10 +277,17 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 .blog-post__meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
     color: #6a758f;
     font-size: 0.92rem;
     line-height: 1.4;
+}
+
+.blog-post__excerpt {
+    max-width: 46rem;
+    margin: 1rem auto 0;
+    color: #475569;
+    font-size: 1.04rem;
+    line-height: 1.8;
 }
 
 .blog-post__article {
@@ -223,17 +299,23 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
     width: 100%;
     height: auto;
     margin-bottom: 1.5rem;
-    border-radius: 1.5rem;
+    border-radius: 1.75rem;
 }
 
 .blog-post__content {
     padding: 2rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    border-radius: 1.75rem;
+    background: rgba(255, 255, 255, 0.9);
     color: #2f3c59;
     line-height: 1.8;
-    box-shadow: 0 16px 48px rgba(10, 28, 86, 0.06);
+    box-shadow: 0 18px 44px rgba(8, 27, 90, 0.08);
+}
+
+.blog-post__empty-copy {
+    margin-top: 1rem;
+    color: #53607b;
+    text-align: center;
 }
 
 .blog-post__related {
@@ -241,9 +323,18 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 }
 
 .blog-post__related-intro {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    gap: 0.45rem;
     margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.blog-post__related-kicker {
+    color: #8a6a2f;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
 .blog-post__related-title {
@@ -254,7 +345,8 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 }
 
 .blog-post__related-grid {
-    row-gap: 1.25rem;
+    display: grid;
+    gap: 1.25rem;
 }
 
 .blog-post__related-col:nth-child(2) {
@@ -272,6 +364,27 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
     line-height: 1.6;
 }
 
+.blog-post__footer-link-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.blog-post__footer-link {
+    display: inline-flex;
+    min-height: 2.9rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 213, 225, 1);
+    background: rgba(255, 255, 255, 0.92);
+    padding: 0.8rem 1.2rem;
+    color: #1e293b;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
 :deep(.blog-post__content h2),
 :deep(.blog-post__content h3),
 :deep(.blog-post__content h4) {
@@ -281,8 +394,12 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 }
 
 :deep(.blog-post__content a) {
-    color: #010c80;
+    color: #8a6a2f;
     text-decoration: none;
+}
+
+:deep(.blog-post__content a:hover) {
+    text-decoration: underline;
 }
 
 :deep(.blog-post__content p),
@@ -293,7 +410,22 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 }
 
 :deep(.blog-post__content img) {
+    margin: 1.25rem 0;
     border-radius: 1rem;
+}
+
+:deep(.blog-post__content ul),
+:deep(.blog-post__content ol) {
+    margin: 1rem 0;
+    padding-left: 1.2rem;
+}
+
+:deep(.blog-post__content ul) {
+    list-style: disc;
+}
+
+:deep(.blog-post__content ol) {
+    list-style: decimal;
 }
 
 @keyframes blog-post-rise {
@@ -309,25 +441,24 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 }
 
 @media screen and (max-width: 767px) {
-    .blog-post {
-        padding: 3.5rem 0;
-    }
-
     .blog-post__title {
         max-width: 100%;
-        font-size: 3rem;
     }
 
     .blog-post__content {
-        padding: 1.15rem;
+        padding: 1.25rem;
     }
+}
 
-    .blog-post__image {
-        border-radius: 1rem;
+@media screen and (min-width: 768px) {
+    .blog-post__related-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
 
-    .blog-post__related-title {
-        font-size: 2rem;
+@media screen and (min-width: 1200px) {
+    .blog-post__related-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 

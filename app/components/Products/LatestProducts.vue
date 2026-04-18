@@ -42,7 +42,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
                 <NuxtLink
                     :to="ALL_PRODUCTS_URL_HANDLE"
-                    class="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 lg:self-auto"
+                    class="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 lg:self-auto"
                 >
                     Explore catalog
                 </NuxtLink>
