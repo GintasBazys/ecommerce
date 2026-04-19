@@ -4,7 +4,7 @@ import type { BlogPostSummary } from "~/types/blog"
 import { BLOG_HANDLE } from "~/utils/consts"
 import { formatDate } from "~/utils/formatDate"
 
-const FALLBACK_IMAGE = "/images/blog/about_banner.webp"
+const FALLBACK_IMAGE = "/images/about-premium.jpg"
 
 const { article, compact = false } = defineProps<{
     article: BlogPostSummary

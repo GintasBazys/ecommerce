@@ -37,7 +37,7 @@ const publishedDate = computed<string>(() => formatDate(currentPost.value?.publi
 
 const { data: relatedPostsData } = await useAsyncData(`related-${slug.value}`, async () => {
     const primaryResponse = await $fetch<BlogPostsResponse>("/api/blog/posts", {
-        params: {
+        query: {
             limit: 6,
             offset: 0,
             category: currentPost.value?.category?.slug || undefined
@@ -50,7 +50,7 @@ const { data: relatedPostsData } = await useAsyncData(`related-${slug.value}`, a
     }
 
     const fallbackResponse = await $fetch<BlogPostsResponse>("/api/blog/posts", {
-        params: {
+        query: {
             limit: 6,
             offset: 0
         }
@@ -139,8 +139,6 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
             <section class="blog-post__hero">
                 <div class="blog-post__hero-copy">
                     <AppBreadcrumbs :items="breadcrumbItems" class="blog-post__breadcrumbs" />
-                    <span class="blog-post__eyebrow">Journal</span>
-                    <span v-if="currentPost?.category" class="blog-post__category">{{ currentPost.category.name }}</span>
                     <h1 class="blog-post__title">{{ currentPost?.title }}</h1>
                     <div class="blog-post__meta">
                         <span v-if="publishedDate" class="blog-post__meta-item">{{ publishedDate }}</span>
@@ -224,37 +222,6 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 
 .blog-post__breadcrumbs {
     margin: 0 auto 1rem;
-}
-
-.blog-post__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.3rem;
-    padding: 0.45rem 0.9rem;
-    margin-bottom: 1rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.blog-post__category {
-    display: inline-flex;
-    min-height: 2rem;
-    align-items: center;
-    border-radius: 999px;
-    border: 1px solid rgba(253, 230, 138, 0.8);
-    background: rgba(254, 243, 199, 0.72);
-    padding: 0.35rem 0.8rem;
-    margin: 0 auto 1rem;
-    color: #78350f;
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
 }
 
 .blog-post__title {

@@ -107,23 +107,4 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
         min-height: calc(100svh - var(--site-header-offset, 98px));
     }
 }
-
-@media (hover: none), (pointer: coarse), (max-width: 1024px) {
-    .site-hero::before {
-        background: linear-gradient(180deg, rgba(2, 6, 23, 0.76) 0%, rgba(2, 6, 23, 0.56) 100%);
-    }
-
-    .site-hero__panel {
-        background: rgba(2, 6, 23, 0.54);
-        box-shadow: 0 8px 24px rgba(2, 6, 23, 0.14);
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .site-hero__panel {
-        animation: none;
-    }
-}
 </style>

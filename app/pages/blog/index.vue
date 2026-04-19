@@ -120,7 +120,6 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
             <section class="blog-index__hero">
                 <div class="blog-index__hero-copy">
                     <AppBreadcrumbs :items="breadcrumbItems" class="blog-index__breadcrumbs" />
-                    <span class="blog-index__eyebrow">Journal</span>
                     <h1 class="blog-index__title">Product stories, store notes, and cleaner editorial reading.</h1>
                     <p class="blog-index__description">
                         Explore published articles, product context, and editorial notes in a calmer layout with cleaner hierarchy and
@@ -201,13 +200,6 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
     margin-bottom: 1.5rem;
 }
 
-.blog-index__hero-copy,
-.blog-index__col,
-.blog-index__pagination,
-.featured-post {
-    animation: blog-index-rise 0.75s ease both;
-}
-
 .blog-index__hero-copy {
     width: 100%;
     max-width: 60rem;
@@ -274,21 +266,6 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
     border-color: rgba(202, 138, 4, 0.24);
     background: rgba(255, 251, 235, 0.9);
     color: #78350f;
-}
-
-.blog-index__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.3rem;
-    padding: 0.45rem 0.9rem;
-    margin-bottom: 1rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
 }
 
 .blog-index__title {
@@ -526,15 +503,6 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
     .blog-index__grid,
     .blog-index__state-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .blog-index__hero-copy,
-    .blog-index__col,
-    .blog-index__pagination,
-    .featured-post {
-        animation: none;
     }
 }
 </style>

@@ -282,7 +282,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 class="grid grid-cols-[84px_minmax(0,1fr)] gap-3 rounded-[1.35rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-3 shadow-[0_14px_36px_rgba(8,27,90,0.07)] sm:grid-cols-[96px_minmax(0,1fr)]"
                             >
                                 <NuxtImage
-                                    :src="item.thumbnail || '/images/about_banner.webp'"
+                                    :src="item.thumbnail || '/images/about-premium.jpg'"
                                     :alt="item.product_title || 'Product image'"
                                     width="96"
                                     height="112"
