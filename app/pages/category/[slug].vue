@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { ProductCategoryDTO, ProductDTO } from "@medusajs/types"
+import type { ComponentPublicInstance } from "vue"
+import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from "vue-router"
 import type { SchemaNode } from "~/composables/useStructuredData"
 
 import { formatPrice } from "@/utils/formatPrice"
+import CategoryFiltersPanel from "~/components/Category/CategoryFiltersPanel.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 definePageMeta({ layout: "default" })
@@ -51,7 +54,9 @@ const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { absoluteUrl } = useSiteIdentity()
 
 const route = useRoute()
+const router = useRouter()
 const disablePanelTransitions = ref(false)
+const isMobileFilterDrawerOpen = ref(false)
 const category = ref<ProductCategoryDTO | null>(null)
 const products = ref<CategoryProduct[]>([])
 const offset = ref(0)
@@ -60,6 +65,7 @@ const totalCount = ref(0)
 const loadingRef = ref(false)
 const sortLoading = ref(false)
 const filterLoading = ref(false)
+const lastProductTrigger = ref<HTMLElement | null>(null)
 const facets = ref<CategoryProductsResponse["facets"]>({
     categories: [],
     collections: [],
@@ -91,6 +97,9 @@ const priceRange = ref<PriceRange>([0, 0])
 const appliedPriceRange = ref<PriceRange>([0, 0])
 const initialPriceRangeApplied = ref(false)
 const isChangingCategoryPage = ref(false)
+const isSyncingQuery = ref(false)
+const isApplyingQueryState = ref(false)
+const pendingQueryPrice = ref<{ min?: number; max?: number } | null>(null)
 const isAllProductsPage = computed(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
 
 const hasMore = computed(() => products.value.length < totalCount.value)
@@ -135,6 +144,9 @@ const categoryThumbnail = computed(() => {
     return images.find((image) => image.type === "thumbnail")?.url || null
 })
 
+const heroFallbackImage = computed(() => (isAllProductsPage.value ? "/images/hero-premium.jpg" : "/images/hero-main.jpg"))
+const heroImage = computed(() => categoryThumbnail.value || heroFallbackImage.value)
+
 const categoryPath = computed<string>(() =>
     isAllProductsPage.value ? ALL_PRODUCTS_URL_HANDLE : `${CATEGORY_HANDLE}/${String(route.params.slug || "")}`
 )
@@ -149,6 +161,12 @@ const emptyStateText = computed<string>(() =>
 const footerEndText = computed<string>(() =>
     isAllProductsPage.value ? "You have reached the end of all products." : "You have reached the end of this category."
 )
+const heroEyebrow = computed<string>(() => (isAllProductsPage.value ? "Store catalog" : "Category"))
+const browsingNotes = computed<string[]>(() => [
+    isAllProductsPage.value ? "Full catalog with live Medusa filters" : "Focused category view with live inventory and pricing",
+    "Two products per row on mobile for faster scanning",
+    activeFilterCount.value ? `${activeFilterCount.value} active filters applied` : "Sort and filters stay available in this pass"
+])
 
 const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: pageTitle.value }])
 
@@ -211,9 +229,108 @@ const priceStep = computed(() => {
 })
 
 const gridIsInitialLoading = computed(() => loadingRef.value && products.value.length === 0)
+let lastProductObserver: IntersectionObserver | null = null
 
 function createPriceRange(min: number, max: number): PriceRange {
     return [min, max]
+}
+
+function parseQueryList(value: LocationQueryValue | LocationQueryValue[] | undefined): string[] {
+    if (Array.isArray(value)) {
+        return value.flatMap((item) => parseQueryList(item)).filter(Boolean)
+    }
+
+    if (typeof value !== "string") {
+        return []
+    }
+
+    return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+}
+
+function parseQueryNumber(value: LocationQueryValue | LocationQueryValue[] | undefined): number | undefined {
+    const source = Array.isArray(value) ? value[0] : value
+
+    if (typeof source !== "string" || source.trim() === "") {
+        return undefined
+    }
+
+    const parsed = Number(source)
+    return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function clampPriceValue(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max)
+}
+
+function buildQueryState(): LocationQueryRaw {
+    const query: LocationQueryRaw = {}
+
+    if (sortOption.value !== sortOptions[0]!.value) {
+        query.sort = sortOption.value
+    }
+
+    if (selectedChildCategoryIds.value.length) {
+        query.subcategories = selectedChildCategoryIds.value.join(",")
+    }
+
+    if (selectedCollectionIds.value.length) {
+        query.collections = selectedCollectionIds.value.join(",")
+    }
+
+    if (selectedTypeIds.value.length) {
+        query.types = selectedTypeIds.value.join(",")
+    }
+
+    if (selectedTagIds.value.length) {
+        query.tags = selectedTagIds.value.join(",")
+    }
+
+    if (inStockOnly.value) {
+        query.stock = "1"
+    }
+
+    if (appliedPriceRange.value[0] > facets.value.price.min) {
+        query.minPrice = String(appliedPriceRange.value[0])
+    }
+
+    if (appliedPriceRange.value[1] < facets.value.price.max) {
+        query.maxPrice = String(appliedPriceRange.value[1])
+    }
+
+    return query
+}
+
+function applyQueryStateFromRoute(query: LocationQuery): void {
+    isApplyingQueryState.value = true
+
+    const parsedSort = Array.isArray(query.sort) ? query.sort[0] : query.sort
+    const sortExists = sortOptions.some((option) => option.value === parsedSort)
+    sortOption.value = sortExists && typeof parsedSort === "string" ? parsedSort : sortOptions[0]!.value
+
+    selectedChildCategoryIds.value = parseQueryList(query.subcategories)
+    selectedCollectionIds.value = parseQueryList(query.collections)
+    selectedTypeIds.value = parseQueryList(query.types)
+    selectedTagIds.value = parseQueryList(query.tags)
+    inStockOnly.value = query.stock === "1"
+
+    const queryMinPrice = parseQueryNumber(query.minPrice)
+    const queryMaxPrice = parseQueryNumber(query.maxPrice)
+    pendingQueryPrice.value = queryMinPrice !== undefined || queryMaxPrice !== undefined ? { min: queryMinPrice, max: queryMaxPrice } : null
+
+    isApplyingQueryState.value = false
+}
+
+async function syncRouteQuery(): Promise<void> {
+    isSyncingQuery.value = true
+
+    try {
+        await router.replace({ query: buildQueryState() })
+    } finally {
+        isSyncingQuery.value = false
+    }
 }
 
 function createEmptyFacets(): CategoryProductsResponse["facets"] {
@@ -251,13 +368,29 @@ function syncPriceRange(force = false) {
     const nextMax = facets.value.price.max
 
     if (!initialPriceRangeApplied.value || force) {
-        priceRange.value = createPriceRange(nextMin, nextMax)
-        appliedPriceRange.value = createPriceRange(nextMin, nextMax)
+        const nextRange = createPriceRange(nextMin, nextMax)
+        const queryPrice = pendingQueryPrice.value
+
+        if (queryPrice) {
+            const clampedMin = clampPriceValue(queryPrice.min ?? nextMin, nextMin, nextMax)
+            const clampedMax = clampPriceValue(queryPrice.max ?? nextMax, clampedMin, nextMax)
+
+            priceRange.value = createPriceRange(clampedMin, clampedMax)
+            appliedPriceRange.value = createPriceRange(clampedMin, clampedMax)
+            pendingQueryPrice.value = null
+        } else {
+            priceRange.value = nextRange
+            appliedPriceRange.value = nextRange
+        }
+
         initialPriceRangeApplied.value = true
     }
 }
 
 function buildProductQuery() {
+    const initialMinPrice = !initialPriceRangeApplied.value ? pendingQueryPrice.value?.min : undefined
+    const initialMaxPrice = !initialPriceRangeApplied.value ? pendingQueryPrice.value?.max : undefined
+
     return {
         category_id: isAllProductsPage.value ? undefined : category.value?.id,
         region_id: regionStoreId.value,
@@ -270,8 +403,8 @@ function buildProductQuery() {
         type_ids: selectedTypeIds.value.join(",") || undefined,
         tag_ids: selectedTagIds.value.join(",") || undefined,
         in_stock_only: inStockOnly.value ? "true" : undefined,
-        min_price: appliedPriceRange.value[0] > facets.value.price.min ? appliedPriceRange.value[0] : undefined,
-        max_price: appliedPriceRange.value[1] < facets.value.price.max ? appliedPriceRange.value[1] : undefined
+        min_price: initialMinPrice ?? (appliedPriceRange.value[0] > facets.value.price.min ? appliedPriceRange.value[0] : undefined),
+        max_price: initialMaxPrice ?? (appliedPriceRange.value[1] < facets.value.price.max ? appliedPriceRange.value[1] : undefined)
     }
 }
 
@@ -309,12 +442,6 @@ async function fetchProducts(source: "initial" | "sort" | "filters" | "paginatio
     }
 }
 
-function scrollToResults() {
-    if (import.meta.client) {
-        window.scrollTo({ top: 0, behavior: "smooth" })
-    }
-}
-
 function clearAllFilters() {
     selectedChildCategoryIds.value = []
     selectedCollectionIds.value = []
@@ -337,6 +464,7 @@ async function applyPriceRange() {
 async function loadCategoryPage() {
     isChangingCategoryPage.value = true
     resetCategoryPageState()
+    applyQueryStateFromRoute(route.query)
 
     if (!isAllProductsPage.value) {
         const { data } = await useFetch<ProductCategoryDTO | null>(() => `/api/categories/${String(route.params.slug || "")}`)
@@ -361,14 +489,12 @@ await loadCategoryPage()
 
 useHead(() => ({ title: `${pageTitle.value} | Ecommerce` }))
 
-const onIntersectLast = async (isIntersecting: boolean, entries: IntersectionObserverEntry[]) => {
-    if (!isIntersecting || loadingRef.value || !hasMore.value) {
-        return
-    }
+function setLastProductTrigger(element: Element | ComponentPublicInstance | null): void {
+    lastProductTrigger.value = element instanceof HTMLElement ? element : null
+}
 
-    const entry = entries?.[0]
-    const target = entry?.target as HTMLElement | undefined
-    if (!target || !target.classList.contains("js-last-item")) {
+async function loadMoreProducts(): Promise<void> {
+    if (loadingRef.value || !hasMore.value) {
         return
     }
 
@@ -377,9 +503,13 @@ const onIntersectLast = async (isIntersecting: boolean, entries: IntersectionObs
 }
 
 watch(sortOption, async () => {
+    if (isApplyingQueryState.value || isChangingCategoryPage.value) {
+        return
+    }
+
     offset.value = 0
+    await syncRouteQuery()
     await fetchProducts("sort")
-    scrollToResults()
 })
 
 watch(regionStoreId, async (value, previousValue) => {
@@ -402,13 +532,26 @@ watch(
             price: appliedPriceRange.value
         }),
     async () => {
-        if (isChangingCategoryPage.value) {
+        if (isChangingCategoryPage.value || isApplyingQueryState.value) {
             return
         }
 
         offset.value = 0
+        await syncRouteQuery()
         await fetchProducts("filters")
-        scrollToResults()
+    }
+)
+
+watch(
+    () => route.query,
+    async (query, previousQuery) => {
+        if (isSyncingQuery.value || JSON.stringify(query) === JSON.stringify(previousQuery)) {
+            return
+        }
+
+        applyQueryStateFromRoute(query)
+        offset.value = 0
+        await fetchProducts("filters")
     }
 )
 
@@ -430,512 +573,325 @@ onMounted(() => {
 
     const userAgent = window.navigator.userAgent || ""
     disablePanelTransitions.value = /Android/i.test(userAgent)
+
+    lastProductObserver = new IntersectionObserver(
+        (entries) => {
+            const entry = entries[0]
+
+            if (!entry?.isIntersecting) {
+                return
+            }
+
+            void loadMoreProducts()
+        },
+        {
+            rootMargin: "240px 0px"
+        }
+    )
+})
+
+watch(lastProductTrigger, (element, previousElement) => {
+    if (!import.meta.client || !lastProductObserver) {
+        return
+    }
+
+    if (previousElement) {
+        lastProductObserver.unobserve(previousElement)
+    }
+
+    if (element) {
+        lastProductObserver.observe(element)
+    }
+})
+
+watch(isMobileFilterDrawerOpen, (isOpen) => {
+    if (!import.meta.client) {
+        return
+    }
+
+    document.body.style.overflow = isOpen ? "hidden" : ""
+})
+
+onUnmounted(() => {
+    if (!import.meta.client) {
+        return
+    }
+
+    document.body.style.overflow = ""
+
+    if (lastProductObserver) {
+        lastProductObserver.disconnect()
+        lastProductObserver = null
+    }
 })
 
 useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "category-structured-data")
 </script>
 
 <template>
-    <section class="category-page">
-        <div
-            class="category-page__hero"
-            :style="
-                categoryThumbnail
-                    ? `background-image: linear-gradient(180deg, rgba(8, 24, 73, 0.6), rgba(8, 24, 73, 0.72)), url(${categoryThumbnail});`
-                    : ''
-            "
-        >
-            <VContainer class="category-page__hero-container">
-                <AppBreadcrumbs :items="breadcrumbItems" tone="inverse" class="category-page__breadcrumbs" />
-                <span class="category-page__eyebrow">{{ isAllProductsPage ? "Store Catalog" : "Category Edit" }}</span>
-                <h1 class="category-page__title">{{ pageTitle }}</h1>
-                <p class="category-page__description">{{ pageDescription }}</p>
-            </VContainer>
-        </div>
-        <VContainer class="category-page__container">
-            <div class="category-page__layout">
-                <aside class="category-page__sidebar">
-                    <div class="category-page__sidebar-card">
-                        <div class="category-page__sidebar-header">
-                            <div>
-                                <span class="category-page__sidebar-eyebrow">Filters</span>
-                                <h2 class="category-page__sidebar-title">{{ sidebarTitle }}</h2>
-                            </div>
-                            <VBtn v-if="activeFilterCount" variant="text" color="primary" class="text-none px-0" @click="clearAllFilters">
-                                Clear all
-                            </VBtn>
+    <section
+        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
+    >
+        <div class="px-0 pb-8 pt-15 sm:pt-18 xl:pt-23">
+            <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+                <div class="grid items-end gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.02fr)] xl:gap-10">
+                    <div class="max-w-160 xl:pb-6">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        >
+                            {{ heroEyebrow }}
+                        </span>
+                        <h1
+                            class="mt-4 text-[2.1rem] font-bold leading-none tracking-[-0.06rem] text-slate-950 sm:text-[2.9rem] sm:leading-[0.98] xl:max-w-[11ch] xl:text-[4.1rem] xl:leading-[0.96]"
+                        >
+                            {{ pageTitle }}
+                        </h1>
+                        <p class="mt-4 max-w-152 text-base leading-7 text-slate-600 sm:text-[1.05rem] sm:leading-8">
+                            {{ pageDescription }}
+                        </p>
+                    </div>
+
+                    <div
+                        class="relative rounded-[1.75rem] border border-white/80 bg-white/90 p-3 shadow-[0_14px_34px_rgba(8,27,90,0.08)] sm:rounded-4xl sm:p-4"
+                    >
+                        <div class="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem]">
+                            <NuxtImg
+                                :src="heroImage"
+                                :alt="`${pageTitle} category image`"
+                                width="1200"
+                                height="1411"
+                                sizes="100vw lg:45vw"
+                                format="webp"
+                                quality="68"
+                                loading="lazy"
+                                decoding="async"
+                                class="block aspect-[1.08] w-full object-cover object-center"
+                            />
+                            <div
+                                class="absolute inset-0 bg-[linear-gradient(135deg,rgba(2,6,23,0.24),transparent_45%,rgba(255,255,255,0.08))]"
+                            ></div>
                         </div>
 
-                        <VExpansionPanels
-                            multiple
-                            class="category-page__filter-panels"
-                            :class="{ 'category-page__filter-panels--reduced-motion': disablePanelTransitions }"
+                        <div
+                            class="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.1)] sm:left-5 sm:top-5"
                         >
-                            <VExpansionPanel v-if="childCategoryFacets.length" elevation="0" rounded="xl">
-                                <VExpansionPanelTitle>Subcategories</VExpansionPanelTitle>
-                                <VExpansionPanelText>
-                                    <div class="category-page__filter-list">
-                                        <VCheckbox
-                                            v-for="item in childCategoryFacets"
-                                            :key="item.id"
-                                            v-model="selectedChildCategoryIds"
-                                            :label="`${item.label} (${item.count})`"
-                                            :value="item.id"
-                                            hide-details
-                                            density="comfortable"
-                                            color="primary"
-                                        />
-                                    </div>
-                                </VExpansionPanelText>
-                            </VExpansionPanel>
-                            <VExpansionPanel v-if="facets.types.length" elevation="0" rounded="xl">
-                                <VExpansionPanelTitle>Product types</VExpansionPanelTitle>
-                                <VExpansionPanelText>
-                                    <div class="category-page__filter-list">
-                                        <VCheckbox
-                                            v-for="item in facets.types"
-                                            :key="item.id"
-                                            v-model="selectedTypeIds"
-                                            :label="`${item.label} (${item.count})`"
-                                            :value="item.id"
-                                            hide-details
-                                            density="comfortable"
-                                            color="primary"
-                                        />
-                                    </div>
-                                </VExpansionPanelText>
-                            </VExpansionPanel>
-                            <VExpansionPanel v-if="facets.collections.length" elevation="0" rounded="xl">
-                                <VExpansionPanelTitle>Collections</VExpansionPanelTitle>
-                                <VExpansionPanelText>
-                                    <div class="category-page__filter-list">
-                                        <VCheckbox
-                                            v-for="item in facets.collections"
-                                            :key="item.id"
-                                            v-model="selectedCollectionIds"
-                                            :label="`${item.label} (${item.count})`"
-                                            :value="item.id"
-                                            hide-details
-                                            density="comfortable"
-                                            color="primary"
-                                        />
-                                    </div>
-                                </VExpansionPanelText>
-                            </VExpansionPanel>
-                            <VExpansionPanel v-if="facets.tags.length" elevation="0" rounded="xl">
-                                <VExpansionPanelTitle>Tags</VExpansionPanelTitle>
-                                <VExpansionPanelText>
-                                    <div class="category-page__filter-list">
-                                        <VCheckbox
-                                            v-for="item in facets.tags"
-                                            :key="item.id"
-                                            v-model="selectedTagIds"
-                                            :label="`${item.label} (${item.count})`"
-                                            :value="item.id"
-                                            hide-details
-                                            density="comfortable"
-                                            color="primary"
-                                        />
-                                    </div>
-                                </VExpansionPanelText>
-                            </VExpansionPanel>
-                            <VExpansionPanel elevation="0" rounded="xl">
-                                <VExpansionPanelTitle>Availability</VExpansionPanelTitle>
-                                <VExpansionPanelText>
-                                    <VCheckbox
-                                        v-model="inStockOnly"
-                                        label="Only show products in stock"
-                                        hide-details
-                                        density="comfortable"
-                                        color="primary"
-                                    />
-                                </VExpansionPanelText>
-                            </VExpansionPanel>
-                            <VExpansionPanel v-if="facets.price.max > facets.price.min" elevation="0" rounded="xl">
-                                <VExpansionPanelTitle>Price</VExpansionPanelTitle>
-                                <VExpansionPanelText>
-                                    <div class="category-page__price-box">
-                                        <div class="category-page__price-summary">{{ priceSummary }}</div>
-                                        <VRangeSlider
-                                            v-model="priceRange"
-                                            :min="facets.price.min"
-                                            :max="facets.price.max"
-                                            :step="priceStep"
-                                            color="primary"
-                                            thumb-label="always"
-                                            hide-details
-                                        />
-                                        <div class="category-page__price-actions">
-                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="resetPriceRange">Reset</VBtn>
-                                            <VBtn color="primary" rounded="pill" class="text-none" @click="applyPriceRange">Apply</VBtn>
-                                        </div>
-                                    </div>
-                                </VExpansionPanelText>
-                            </VExpansionPanel>
-                        </VExpansionPanels>
-                    </div>
-                </aside>
-                <div class="category-page__content">
-                    <div class="category-page__toolbar">
-                        <div class="category-page__toolbar-copy">
-                            <span class="category-page__results">{{ totalCount }} products</span>
-                            <p class="category-page__results-meta">
-                                <template v-if="sortLoading">Updating sort order...</template>
-                                <template v-else-if="filterLoading">Refreshing filtered results...</template>
-                                <template v-else-if="activeFilterCount">{{ activeFilterCount }} active filters</template>
-                                <template v-else>
-                                    Medusa-backed filters for categories, collections, types, tags, stock, and price.
-                                </template>
-                            </p>
+                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            {{ isAllProductsPage ? "All products" : "Curated category view" }}
                         </div>
-                        <VSelect
-                            v-model="sortOption"
-                            :items="sortOptions"
-                            item-title="text"
-                            item-value="value"
-                            label="Sort by"
-                            variant="outlined"
-                            density="comfortable"
-                            class="category-page__sort-select"
-                            :loading="sortLoading"
-                            :disabled="loadingRef"
-                        />
+
+                        <div
+                            class="absolute inset-x-3 bottom-3 rounded-[1.25rem] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))] p-4 text-white shadow-[0_10px_26px_rgba(2,6,23,0.18)] sm:inset-x-5 sm:bottom-5 sm:p-5"
+                        >
+                            <span class="text-[0.73rem] font-bold uppercase tracking-[0.14em] text-amber-200">Browse smarter</span>
+                            <ul class="mt-4 grid gap-3">
+                                <li
+                                    v-for="note in browsingNotes"
+                                    :key="note"
+                                    class="flex items-start gap-3 text-sm leading-6 text-slate-100"
+                                >
+                                    <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-amber-300"></span>
+                                    <span>{{ note }}</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <VProgressLinear v-if="loadingRef" indeterminate color="primary" class="category-page__progress" />
-                    <div v-if="gridIsInitialLoading" class="category-page__grid category-page__grid--skeleton">
-                        <VSkeletonLoader v-for="n in 6" :key="n" type="image, article, actions" class="category-page__skeleton" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">
+            <Teleport to="body">
+                <Transition
+                    enter-active-class="transition duration-300 ease-out"
+                    enter-from-class="opacity-0"
+                    enter-to-class="opacity-100"
+                    leave-active-class="transition duration-200 ease-in"
+                    leave-from-class="opacity-100"
+                    leave-to-class="opacity-0"
+                >
+                    <div v-if="isMobileFilterDrawerOpen" class="fixed inset-0 z-50 xl:hidden">
+                        <button
+                            type="button"
+                            class="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+                            @click="isMobileFilterDrawerOpen = false"
+                        ></button>
+                        <Transition
+                            enter-active-class="transition duration-300 ease-out"
+                            enter-from-class="translate-y-full"
+                            enter-to-class="translate-y-0"
+                            leave-active-class="transition duration-200 ease-in"
+                            leave-from-class="translate-y-0"
+                            leave-to-class="translate-y-full"
+                        >
+                            <div
+                                v-if="isMobileFilterDrawerOpen"
+                                class="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[1.8rem] bg-white p-4 shadow-[0_-18px_40px_rgba(8,27,90,0.14)] will-change-transform sm:p-5"
+                            >
+                                <CategoryFiltersPanel
+                                    v-model:selected-child-category-ids="selectedChildCategoryIds"
+                                    v-model:selected-collection-ids="selectedCollectionIds"
+                                    v-model:selected-type-ids="selectedTypeIds"
+                                    v-model:selected-tag-ids="selectedTagIds"
+                                    v-model:in-stock-only="inStockOnly"
+                                    v-model:price-range="priceRange"
+                                    :sidebar-title="sidebarTitle"
+                                    :active-filter-count="activeFilterCount"
+                                    :disable-panel-transitions="disablePanelTransitions"
+                                    :child-category-facets="childCategoryFacets"
+                                    :facets="facets"
+                                    :price-summary="priceSummary"
+                                    :price-step="priceStep"
+                                    :show-mobile-close="true"
+                                    @clear-all="clearAllFilters"
+                                    @reset-price-range="resetPriceRange"
+                                    @apply-price-range="applyPriceRange"
+                                    @close="isMobileFilterDrawerOpen = false"
+                                />
+                            </div>
+                        </Transition>
                     </div>
-                    <div v-else-if="products.length" class="category-page__grid">
+                </Transition>
+            </Teleport>
+
+            <div class="grid gap-6 xl:grid-cols-[minmax(17rem,19rem)_minmax(0,1fr)] xl:gap-8">
+                <aside class="hidden xl:grid xl:gap-4 xl:sticky xl:top-6 xl:self-start">
+                    <CategoryFiltersPanel
+                        v-model:selected-child-category-ids="selectedChildCategoryIds"
+                        v-model:selected-collection-ids="selectedCollectionIds"
+                        v-model:selected-type-ids="selectedTypeIds"
+                        v-model:selected-tag-ids="selectedTagIds"
+                        v-model:in-stock-only="inStockOnly"
+                        v-model:price-range="priceRange"
+                        :sidebar-title="sidebarTitle"
+                        :active-filter-count="activeFilterCount"
+                        :disable-panel-transitions="disablePanelTransitions"
+                        :child-category-facets="childCategoryFacets"
+                        :facets="facets"
+                        :price-summary="priceSummary"
+                        :price-step="priceStep"
+                        @clear-all="clearAllFilters"
+                        @reset-price-range="resetPriceRange"
+                        @apply-price-range="applyPriceRange"
+                    />
+                </aside>
+
+                <div class="min-w-0">
+                    <div
+                        class="mb-4 rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-4 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-5"
+                    >
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="min-w-0">
+                                <span class="block text-[1.05rem] font-bold text-slate-950">{{ totalCount }} products</span>
+                                <p class="mt-1 text-sm leading-6 text-slate-600">
+                                    <template v-if="sortLoading">Updating sort order...</template>
+                                    <template v-else-if="filterLoading">Refreshing filtered results...</template>
+                                    <template v-else-if="activeFilterCount">{{ activeFilterCount }} active filters</template>
+                                    <template v-else
+                                    >Medusa-backed filters for categories, collections, types, tags, stock, and price.</template
+                                    >
+                                </p>
+                            </div>
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center lg:justify-end">
+                                <button
+                                    type="button"
+                                    class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] xl:hidden"
+                                    @click="isMobileFilterDrawerOpen = true"
+                                >
+                                    <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M3 5H17" stroke-linecap="round" />
+                                        <path d="M6 10H14" stroke-linecap="round" />
+                                        <path d="M8 15H12" stroke-linecap="round" />
+                                    </svg>
+                                    <span>{{ activeFilterCount ? `Filters (${activeFilterCount})` : "Filters" }}</span>
+                                </button>
+                                <label class="grid gap-1 text-sm font-semibold text-slate-700">
+                                    <span>Sort by</span>
+                                    <div class="relative w-full sm:min-w-60 lg:max-w-68">
+                                        <select
+                                            v-model="sortOption"
+                                            class="min-h-11 w-full appearance-none rounded-2xl border border-slate-300 bg-white px-4 pr-10 text-sm font-medium text-slate-900 outline-hidden transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                            :disabled="loadingRef"
+                                        >
+                                            <option v-for="option in sortOptions" :key="option.value" :value="option.value">
+                                                {{ option.text }}
+                                            </option>
+                                        </select>
+                                        <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
+                                            <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M5 7.5L10 12.5L15 7.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="loadingRef" class="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                        <div class="h-full w-1/3 animate-[category-progress_1.2s_ease-in-out_infinite] rounded-full bg-brand-700"></div>
+                    </div>
+
+                    <div v-if="gridIsInitialLoading" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+                        <div
+                            v-for="n in 6"
+                            :key="n"
+                            class="overflow-hidden rounded-[1.2rem] border border-slate-200 bg-white p-3 shadow-[0_8px_20px_rgba(8,27,90,0.04)]"
+                        >
+                            <div class="aspect-[0.82] w-full animate-pulse rounded-[0.9rem] bg-slate-200"></div>
+                            <div class="mt-3 h-4 w-2/3 animate-pulse rounded bg-slate-200"></div>
+                            <div class="mt-2 h-3 w-5/6 animate-pulse rounded bg-slate-200"></div>
+                            <div class="mt-4 h-9 w-full animate-pulse rounded-full bg-slate-200"></div>
+                        </div>
+                    </div>
+
+                    <div v-else-if="products.length" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                         <div
                             v-for="(product, index) in products"
                             :key="product.id"
-                            v-intersect="{
-                                handler: onIntersectLast,
-                                options: {}
-                            }"
-                            class="category-page__grid-item"
-                            :class="{ 'js-last-item': index === products.length - 1 }"
+                            :ref="index === products.length - 1 ? setLastProductTrigger : undefined"
+                            class="min-w-0"
                         >
-                            <ProductCard :product="product" />
+                            <ProductCard :product="product" compact />
                         </div>
                     </div>
-                    <div v-else class="category-page__empty-state">
-                        <h2 class="category-page__empty-title">No products match these filters.</h2>
-                        <p class="category-page__empty-text">{{ emptyStateText }}</p>
-                        <VBtn color="primary" rounded="pill" class="text-none" @click="clearAllFilters">Reset filters</VBtn>
+
+                    <div
+                        v-else
+                        class="grid justify-items-center gap-3 rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] px-6 py-8 text-center shadow-[0_14px_36px_rgba(8,27,90,0.06)]"
+                    >
+                        <h2 class="text-[1.4rem] font-semibold leading-[1.15] text-slate-950">No products match these filters.</h2>
+                        <p class="max-w-120 text-sm leading-6 text-slate-600">{{ emptyStateText }}</p>
+                        <button
+                            type="button"
+                            class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a]"
+                            @click="clearAllFilters"
+                        >
+                            Reset filters
+                        </button>
                     </div>
-                    <div v-if="products.length" class="category-page__footer">
-                        <VProgressCircular v-if="loadingRef && hasMore" indeterminate color="primary" />
+
+                    <div v-if="products.length" class="flex justify-center pt-6 text-sm text-slate-600">
+                        <span
+                            v-if="loadingRef && hasMore"
+                            class="inline-flex h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-700"
+                        ></span>
                         <span v-else-if="!hasMore">{{ footerEndText }}</span>
                     </div>
                 </div>
             </div>
-        </VContainer>
+        </div>
     </section>
 </template>
 
-<style scoped lang="scss">
-.category-page {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f7faff 0%, #ffffff 36%, #f6f9ff 100%);
-}
-
-.category-page__hero {
-    background: linear-gradient(180deg, rgba(8, 24, 73, 0.74), rgba(8, 24, 73, 0.8)), linear-gradient(130deg, #102a77 0%, #08173f 100%);
-    background-position: center;
-    background-size: cover;
-}
-
-.category-page__hero-container {
-    padding: 6.75rem 1rem;
-    text-align: center;
-}
-
-.category-page__breadcrumbs {
-    margin: 0 auto 1rem;
-}
-
-.category-page__eyebrow,
-.category-page__sidebar-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    margin-bottom: 1rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.12);
-    color: #ffffff;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.category-page__sidebar-eyebrow {
-    margin-bottom: 0.55rem;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-}
-
-.category-page__title {
-    max-width: 13ch;
-    margin: 0 auto 1rem;
-    color: #ffffff;
-    font-size: 4.45rem;
-    line-height: 0.96;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.category-page__description {
-    max-width: 44rem;
-    margin: 0 auto;
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 1rem;
-    line-height: 1.8;
-}
-
-.category-page__container {
-    padding-top: 2rem;
-    padding-bottom: 6rem;
-}
-
-.category-page__layout {
-    display: grid;
-    grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
-    gap: 1.5rem;
-    align-items: start;
-}
-
-.category-page__sidebar {
-    position: sticky;
-    top: 1.5rem;
-}
-
-.category-page__sidebar-card,
-.category-page__toolbar,
-.category-page__empty-state {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.category-page__sidebar-card {
-    padding: 1.15rem;
-}
-
-.category-page__sidebar-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.category-page__sidebar-title {
-    color: #08173f;
-    font-size: 1.3rem;
-    line-height: 1.15;
-}
-
-.category-page__filter-panels {
-    gap: 0.8rem;
-    background: transparent;
-}
-
-.category-page__filter-panels :deep(.v-expansion-panel) {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    background: #ffffff;
-    box-shadow: none;
-}
-
-.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-text__wrapper),
-.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-title),
-.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-title__icon) {
-    transition: none !important;
-}
-
-.category-page__filter-panels--reduced-motion :deep(.v-expansion-panel-text__wrapper) {
-    will-change: auto;
-}
-
-.category-page__filter-list {
-    display: grid;
-    gap: 0.35rem;
-}
-
-.category-page__price-box {
-    display: grid;
-    gap: 1rem;
-}
-
-.category-page__price-summary,
-.category-page__results,
-.category-page__sidebar-title,
-.category-page__empty-title {
-    color: #08173f;
-}
-
-.category-page__price-summary {
-    font-weight: 700;
-}
-
-.category-page__price-actions {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.category-page__content {
-    min-width: 0;
-}
-
-.category-page__toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.category-page__toolbar-copy {
-    min-width: 0;
-}
-
-.category-page__results {
-    display: block;
-    font-size: 1.05rem;
-    font-weight: 700;
-}
-
-.category-page__results-meta,
-.category-page__empty-text {
-    margin: 0.25rem 0 0;
-    color: #5a6580;
-    font-size: 0.95rem;
-    line-height: 1.65;
-}
-
-.category-page__sort-select {
-    flex: 0 0 17rem;
-    max-width: 17rem;
-}
-
-.category-page__progress {
-    margin-bottom: 1rem;
-    border-radius: 999px;
-}
-
-.category-page__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem;
-}
-
-.category-page__grid-item {
-    min-width: 0;
-}
-
-.category-page__grid--skeleton {
-    align-items: stretch;
-}
-
-.category-page__skeleton {
-    border-radius: 1.2rem;
-}
-
-.category-page__footer {
-    display: flex;
-    justify-content: center;
-    padding-top: 1.5rem;
-    color: #5a6580;
-    font-size: 0.95rem;
-}
-
-.category-page__empty-state {
-    display: grid;
-    justify-items: center;
-    gap: 0.75rem;
-    padding: 2rem 1.5rem;
-    text-align: center;
-}
-
-.category-page__empty-title {
-    font-size: 1.4rem;
-    line-height: 1.15;
-}
-
-.category-page :deep(.product-card) {
-    box-shadow: 0 16px 44px rgba(8, 27, 90, 0.08);
-}
-
-@media screen and (max-width: 1280px) {
-    .category-page__grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .category-page__hero-container {
-        padding: 5rem 1rem;
+<style scoped>
+@keyframes category-progress {
+    0% {
+        transform: translateX(-120%);
     }
 
-    .category-page__title {
-        font-size: 3.5rem;
-    }
-
-    .category-page__container {
-        padding-bottom: 4.5rem;
-    }
-
-    .category-page__layout {
-        grid-template-columns: 1fr;
-    }
-
-    .category-page__sidebar {
-        position: static;
-    }
-
-    .category-page__sidebar-card,
-    .category-page__toolbar,
-    .category-page__empty-state {
-        backdrop-filter: none;
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .category-page__hero-container {
-        padding: 3.75rem 1rem;
-    }
-
-    .category-page__title {
-        font-size: 2.9rem;
-        line-height: 1;
-    }
-
-    .category-page__container {
-        padding-bottom: 4rem;
-    }
-
-    .category-page__toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .category-page__sort-select {
-        flex-basis: auto;
-        max-width: 100%;
-    }
-
-    .category-page__grid {
-        grid-template-columns: 1fr;
-    }
-
-    .category-page__price-actions {
-        flex-direction: column;
+    100% {
+        transform: translateX(420%);
     }
 }
 </style>

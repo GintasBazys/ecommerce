@@ -14,6 +14,8 @@ const saleHighlights = [
     "Quick add-to-cart from the listing view"
 ]
 
+const browsingNotes = ["Newer offers appear first", "Live sale pricing updates automatically", "Two-up mobile browsing for faster scanning"]
+
 const { data, pending, error } = await useFetch<ProductListResponse>("/api/products/products", {
     params: {
         ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
@@ -35,336 +37,172 @@ const saleProducts = computed<ProductDTO[]>(() =>
 useHead({
     title: "Special Offers | Ecommerce"
 })
+
+useSeoMeta({
+    description: "Browse current discounted products in a premium mobile-first special offers layout with live sale pricing."
+})
 </script>
 
 <template>
-    <section class="special-offers-page">
-        <div class="special-offers-page__hero">
-            <VContainer class="special-offers-page__container">
-                <div class="special-offers-page__hero-grid">
-                    <div class="special-offers-page__hero-copy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="special-offers-page__breadcrumbs" />
-                        <span class="special-offers-page__eyebrow">Special offers</span>
-                        <h1 class="special-offers-page__title">All current sale products, gathered into one calmer place to browse.</h1>
-                        <p class="special-offers-page__description">
+    <section
+        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
+    >
+        <div class="px-0 pb-8 pt-[3.75rem] sm:pt-[4.5rem] xl:pt-[5.75rem]">
+            <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+                <div class="grid items-end gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.02fr)] xl:gap-10">
+                    <div class="max-w-[40rem] xl:pb-6">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        >
+                            Special offers
+                        </span>
+                        <h1
+                            class="mt-4 text-[2.1rem] font-bold leading-[1] tracking-[-0.06rem] text-slate-950 sm:text-[2.9rem] sm:leading-[0.98] xl:max-w-[11ch] xl:text-[4.1rem] xl:leading-[0.96]"
+                        >
+                            All current sale products, gathered into one premium place to browse.
+                        </h1>
+                        <p class="mt-4 max-w-[38rem] text-base leading-7 text-slate-600 sm:text-[1.05rem] sm:leading-8">
                             Explore every discounted product in the catalog without jumping through categories. The page keeps the same
-                            polished feel as the newer shop experience.
+                            polished feel as the newer storefront experience while making mobile browsing denser and faster.
                         </p>
+                        <div class="mt-7 flex flex-wrap items-center gap-3">
+                            <NuxtLink to="/contact" class="ui-btn-primary px-7">Ask about an offer</NuxtLink>
+                            <NuxtLink to="/products" class="ui-btn-secondary px-6">Browse full catalog</NuxtLink>
+                        </div>
                     </div>
 
-                    <div class="special-offers-page__hero-panel">
-                        <span class="special-offers-page__panel-label">What to expect</span>
-                        <h2 class="special-offers-page__panel-title">Designed like a campaign page, powered by live sale pricing.</h2>
-                        <ul class="special-offers-page__promise-list">
-                            <li v-for="highlight in saleHighlights" :key="highlight" class="special-offers-page__promise-item">
-                                <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
-                                <span>{{ highlight }}</span>
-                            </li>
-                        </ul>
+                    <div
+                        class="relative rounded-[1.75rem] border border-white/80 bg-white/90 p-3 shadow-[0_14px_34px_rgba(8,27,90,0.08)] sm:rounded-[2rem] sm:p-4"
+                    >
+                        <div class="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem]">
+                            <NuxtImg
+                                src="/images/hero-premium.jpg"
+                                alt="Premium special offers editorial visual"
+                                width="1200"
+                                height="1411"
+                                sizes="100vw lg:45vw"
+                                format="webp"
+                                quality="68"
+                                loading="lazy"
+                                decoding="async"
+                                class="block aspect-[1.08] w-full object-cover object-center"
+                            />
+                            <div
+                                class="absolute inset-0 bg-[linear-gradient(135deg,rgba(2,6,23,0.2),transparent_45%,rgba(255,255,255,0.08))]"
+                            ></div>
+                        </div>
+
+                        <div
+                            class="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.1)] sm:left-5 sm:top-5"
+                        >
+                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            Sale campaign view
+                        </div>
+
+                        <div
+                            class="absolute inset-x-3 bottom-3 rounded-[1.25rem] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))] p-4 text-white shadow-[0_10px_26px_rgba(2,6,23,0.18)] sm:inset-x-5 sm:bottom-5 sm:p-5"
+                        >
+                            <span class="text-[0.73rem] font-bold uppercase tracking-[0.14em] text-amber-200">What to expect</span>
+                            <ul class="mt-4 grid gap-3">
+                                <li
+                                    v-for="highlight in saleHighlights"
+                                    :key="highlight"
+                                    class="flex items-start gap-3 text-sm leading-6 text-slate-100"
+                                >
+                                    <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-amber-300"></span>
+                                    <span>{{ highlight }}</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="special-offers-page__stat-row">
-                    <div class="special-offers-page__stat-card">
-                        <span class="special-offers-page__stat-label">Sale products</span>
-                        <strong class="special-offers-page__stat-value">{{ saleProducts.length }}</strong>
+        <div class="mx-auto w-full max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8">
+            <div class="grid gap-4 sm:grid-cols-3">
+                <article
+                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                >
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Sale products</p>
+                    <p class="mt-2 text-2xl font-semibold leading-none text-slate-950">{{ saleProducts.length }}</p>
+                </article>
+                <article
+                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                >
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Sorted by</p>
+                    <p class="mt-2 text-base font-semibold leading-6 text-slate-950">Newest offers first</p>
+                </article>
+                <article
+                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                >
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Mobile UX</p>
+                    <p class="mt-2 text-base font-semibold leading-6 text-slate-950">Two products per row where space allows</p>
+                </article>
+            </div>
+        </div>
+
+        <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">
+            <div
+                v-if="pending"
+                class="grid place-items-center rounded-[1.8rem] border border-slate-200 bg-white/90 px-6 py-16 text-center shadow-[0_12px_28px_rgba(8,27,90,0.05)]"
+            >
+                <div class="h-10 w-10 animate-spin rounded-full border-2 border-brand-200 border-t-brand-700"></div>
+                <p class="mt-4 text-sm leading-6 text-slate-600">Loading sale products...</p>
+            </div>
+
+            <div
+                v-else-if="error"
+                class="rounded-[1.8rem] border border-red-200 bg-red-50 px-6 py-8 text-red-700 shadow-[0_12px_28px_rgba(8,27,90,0.04)]"
+            >
+                Could not load special offers right now.
+            </div>
+
+            <div v-else-if="saleProducts.length" class="grid gap-6">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div class="max-w-[34rem]">
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                        >
+                            On sale now
+                        </span>
+                        <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.35rem]">
+                            Every discounted product currently available.
+                        </h2>
                     </div>
-                    <div class="special-offers-page__stat-card">
-                        <span class="special-offers-page__stat-label">Sorted by</span>
-                        <strong class="special-offers-page__stat-value">Newest offers first</strong>
-                    </div>
+                    <ul class="grid gap-2 text-sm text-slate-600 sm:text-right">
+                        <li v-for="note in browsingNotes" :key="note">{{ note }}</li>
+                    </ul>
                 </div>
 
-                <div v-if="pending" class="special-offers-page__loading-state">
-                    <VProgressCircular indeterminate color="primary" size="40" />
-                    <p class="special-offers-page__loading-text">Loading sale products...</p>
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+                    <ProductCard v-for="product in saleProducts" :key="product.id" :product="product" compact />
                 </div>
+            </div>
 
-                <VAlert v-else-if="error" type="error" variant="tonal"> Could not load special offers right now. </VAlert>
-
-                <div v-else-if="saleProducts.length" class="special-offers-page__results">
-                    <div class="special-offers-page__section-intro">
-                        <span class="special-offers-page__section-eyebrow">On sale now</span>
-                        <h2 class="special-offers-page__section-title">Every discounted product currently available.</h2>
-                    </div>
-
-                    <VRow align="stretch" class="special-offers-page__grid">
-                        <VCol v-for="product in saleProducts" :key="product.id" cols="12" sm="6" lg="4" xl="3">
-                            <ProductCard :product="product" />
-                        </VCol>
-                    </VRow>
+            <div
+                v-else
+                class="grid justify-items-start gap-4 rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-6 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-8"
+            >
+                <div
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-amber-200/70 bg-amber-50 text-amber-900"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" stroke="currentColor" stroke-width="1.8">
+                        <path d="M7 7h10l3 3-8 8-6-6 1-5Z" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="15" cy="9" r="1" fill="currentColor" stroke="none" />
+                    </svg>
                 </div>
-
-                <div v-else class="special-offers-page__empty-state">
-                    <div class="special-offers-page__empty-icon">
-                        <VIcon size="26">mdi-tag-outline</VIcon>
-                    </div>
-                    <h2 class="special-offers-page__empty-title">No sale products live right now</h2>
-                    <p class="special-offers-page__empty-text">
+                <div>
+                    <h2 class="text-[1.7rem] font-bold leading-[1.05] tracking-[-0.04rem] text-slate-950">
+                        No sale products live right now
+                    </h2>
+                    <p class="mt-3 max-w-[34rem] text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
                         The next offer drop will appear here automatically once discounted products are available.
                     </p>
-                    <VBtn color="primary" rounded="pill" class="text-none px-6" to="/">Browse the full shop</VBtn>
                 </div>
-            </VContainer>
+                <NuxtLink to="/" class="ui-btn-primary px-6">Browse the full shop</NuxtLink>
+            </div>
         </div>
     </section>
 </template>
-
-<style scoped lang="scss">
-.special-offers-page {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
-}
-
-.special-offers-page__hero {
-    padding: 5.5rem 0 5rem;
-}
-
-.special-offers-page__container {
-    position: relative;
-    z-index: 1;
-}
-
-.special-offers-page__hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
-    gap: 2rem;
-    align-items: end;
-}
-
-.special-offers-page__hero-copy,
-.special-offers-page__hero-panel,
-.special-offers-page__results,
-.special-offers-page__empty-state {
-    animation: offers-rise 0.8s ease both;
-}
-
-.special-offers-page__hero-panel,
-.special-offers-page__results,
-.special-offers-page__empty-state {
-    animation-delay: 0.12s;
-}
-
-.special-offers-page__breadcrumbs {
-    margin-bottom: 1rem;
-}
-
-.special-offers-page__eyebrow,
-.special-offers-page__panel-label,
-.special-offers-page__section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.special-offers-page__title,
-.special-offers-page__panel-title,
-.special-offers-page__section-title,
-.special-offers-page__empty-title {
-    color: #08173f;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.special-offers-page__title {
-    max-width: 11ch;
-    margin: 1rem 0;
-    font-size: 4.5rem;
-    line-height: 0.95;
-}
-
-.special-offers-page__description,
-.special-offers-page__empty-text,
-.special-offers-page__loading-text {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.75;
-}
-
-.special-offers-page__hero-panel,
-.special-offers-page__stat-card,
-.special-offers-page__empty-state {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.special-offers-page__hero-panel {
-    padding: 1.9rem;
-}
-
-.special-offers-page__panel-label {
-    margin-bottom: 1rem;
-}
-
-.special-offers-page__panel-title,
-.special-offers-page__section-title,
-.special-offers-page__empty-title {
-    margin-bottom: 0.85rem;
-    font-size: 2.2rem;
-    line-height: 1.08;
-}
-
-.special-offers-page__promise-list {
-    display: grid;
-    gap: 0.85rem;
-    margin: 1.2rem 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.special-offers-page__promise-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-    color: #33415f;
-    line-height: 1.6;
-}
-
-.special-offers-page__stat-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin: 2rem 0 3rem;
-}
-
-.special-offers-page__stat-card {
-    display: grid;
-    gap: 0.2rem;
-    padding: 0.95rem 1.1rem;
-}
-
-.special-offers-page__stat-label {
-    color: #6a7590;
-    font-size: 0.88rem;
-}
-
-.special-offers-page__stat-value {
-    color: #08173f;
-    font-size: 1rem;
-    line-height: 1.45;
-}
-
-.special-offers-page__section-intro {
-    margin-bottom: 1.35rem;
-}
-
-.special-offers-page__grid {
-    margin-top: 0;
-}
-
-.special-offers-page__empty-state {
-    display: grid;
-    justify-items: start;
-    gap: 0.85rem;
-    padding: 1.9rem;
-}
-
-.special-offers-page__empty-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.15rem;
-    height: 3.15rem;
-    border-radius: 1rem;
-    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
-    color: #010c80;
-}
-
-.special-offers-page__loading-state {
-    display: grid;
-    justify-items: center;
-    gap: 0.9rem;
-    padding: 4rem 0;
-}
-
-@keyframes offers-rise {
-    from {
-        opacity: 0;
-        transform: translateY(26px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .special-offers-page__hero-grid,
-    .special-offers-page__stat-row {
-        grid-template-columns: 1fr;
-    }
-
-    .special-offers-page__hero {
-        padding: 5rem 0 4.5rem;
-    }
-
-    .special-offers-page__hero-grid {
-        gap: 1.5rem;
-    }
-
-    .special-offers-page__title {
-        max-width: 100%;
-        font-size: 3.2rem;
-    }
-
-    .special-offers-page__panel-title,
-    .special-offers-page__section-title,
-    .special-offers-page__empty-title {
-        font-size: 1.9rem;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .special-offers-page__hero {
-        padding: 3.75rem 0 3.5rem;
-    }
-
-    .special-offers-page__title {
-        font-size: 2.4rem;
-        line-height: 1;
-    }
-
-    .special-offers-page__hero-panel,
-    .special-offers-page__stat-card,
-    .special-offers-page__empty-state {
-        border-radius: 1.2rem;
-    }
-
-    .special-offers-page__hero-panel,
-    .special-offers-page__empty-state {
-        padding: 1.4rem;
-    }
-
-    .special-offers-page__stat-row {
-        margin: 1.5rem 0 2rem;
-    }
-
-    .special-offers-page__panel-title,
-    .special-offers-page__section-title,
-    .special-offers-page__empty-title {
-        font-size: 1.6rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .special-offers-page__hero-copy,
-    .special-offers-page__hero-panel,
-    .special-offers-page__results,
-    .special-offers-page__empty-state {
-        animation: none;
-    }
-}
-</style>
