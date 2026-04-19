@@ -3,12 +3,11 @@ import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogCategoriesResponse, BlogCategory, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 
 import { BLOG_HANDLE } from "~/utils/consts"
-import { formatDate } from "~/utils/formatDate"
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
 
-const limit = 7
+const limit = 6
 
 function parsePage(value: unknown) {
     const parsedValue = Number.parseInt(String(value || "1"), 10)
@@ -43,7 +42,7 @@ const {
     "blog-posts",
     () =>
         $fetch<BlogPostsResponse>("/api/blog/posts", {
-            params: {
+            query: {
                 limit,
                 offset: offset.value,
                 category: currentCategory.value || undefined
@@ -56,8 +55,6 @@ const {
 
 const categories = computed<BlogCategory[]>(() => categoriesData.value?.categories || [])
 const articles = computed<BlogPostSummary[]>(() => blogData.value?.posts || [])
-const featuredArticle = computed<BlogPostSummary | null>(() => articles.value[0] || null)
-const remainingArticles = computed<BlogPostSummary[]>(() => articles.value.slice(1))
 const total = computed<number>(() => blogData.value?.count || 0)
 const totalPages = computed<number>(() => Math.max(1, Math.ceil(total.value / limit)))
 const activeCategory = computed<BlogCategory | null>(() => {
@@ -68,7 +65,6 @@ const activeCategory = computed<BlogCategory | null>(() => {
     return categories.value.find((category) => category.slug === currentCategory.value) || null
 })
 const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Blog" }])
-const articleDate = computed<string>(() => (featuredArticle.value ? formatDate(featuredArticle.value.publishedAt) : ""))
 const pageTitle = computed<string>(() => (activeCategory.value ? `${activeCategory.value.name} Blog | Ecommerce` : "Blog | Ecommerce"))
 const pageDescription = computed<string>(() =>
     activeCategory.value
@@ -152,41 +148,8 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
                 </NuxtLink>
             </section>
 
-            <section v-if="featuredArticle" class="blog-index__featured">
-                <article class="featured-post">
-                    <NuxtLink :to="`${BLOG_HANDLE}/${featuredArticle.slug}`" class="featured-post__media-link">
-                        <NuxtImg
-                            :src="featuredArticle.thumbnail || '/images/blog/about_banner.webp'"
-                            :alt="featuredArticle.title"
-                            width="1200"
-                            height="780"
-                            sizes="(max-width: 1023px) 100vw, 50vw"
-                            format="webp"
-                            class="featured-post__image"
-                        />
-                    </NuxtLink>
-
-                    <div class="featured-post__content">
-                        <div class="featured-post__meta">
-                            <span v-if="featuredArticle.category" class="featured-post__category">{{ featuredArticle.category.name }}</span>
-                            <span v-if="articleDate" class="featured-post__meta-item">{{ articleDate }}</span>
-                        </div>
-
-                        <NuxtLink :to="`${BLOG_HANDLE}/${featuredArticle.slug}`" class="featured-post__title-link">
-                            <h2 class="featured-post__title">{{ featuredArticle.title }}</h2>
-                        </NuxtLink>
-
-                        <p class="featured-post__excerpt">
-                            {{ featuredArticle.excerpt || "Open the article for the full story, context, and storefront perspective." }}
-                        </p>
-
-                        <NuxtLink :to="`${BLOG_HANDLE}/${featuredArticle.slug}`" class="featured-post__cta">Read the story</NuxtLink>
-                    </div>
-                </article>
-            </section>
-
-            <section v-if="remainingArticles.length" class="blog-index__grid">
-                <article v-for="article in remainingArticles" :key="article.id" class="blog-index__col">
+            <section v-if="articles.length" class="blog-index__grid">
+                <article v-for="article in articles" :key="article.id" class="blog-index__col">
                     <BlogCard :article="article" />
                 </article>
             </section>
@@ -197,9 +160,9 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
 
             <div v-else-if="error" class="blog-index__state">Something went wrong while loading blog posts. Please try again.</div>
 
-            <div v-else-if="!featuredArticle" class="blog-index__state">No blog posts found. Try removing a filter or check back soon.</div>
+            <div v-else-if="!articles" class="blog-index__state">No blog posts found. Try removing a filter or check back soon.</div>
 
-            <nav v-if="featuredArticle && totalPages > 1" class="blog-index__pagination" aria-label="Blog pagination">
+            <nav v-if="articles && totalPages > 1" class="blog-index__pagination" aria-label="Blog pagination">
                 <NuxtLink v-if="currentPage > 1" :to="{ query: buildQuery(currentPage - 1) }" class="blog-index__pagination-btn">
                     Previous
                 </NuxtLink>
