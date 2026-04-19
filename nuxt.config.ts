@@ -53,10 +53,12 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         medusaUrl: process.env.NUXT_MEDUSA_URL || process.env.MEDUSA_URL,
+        turnstileSecretKey: process.env.NUXT_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY,
         public: {
             MEDUSA_URL: process.env.NUXT_PUBLIC_MEDUSA_URL || process.env.MEDUSA_URL,
             PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY || process.env.PUBLISHABLE_KEY,
             STRIPE_PUBLIC_KEY: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY,
+            TURNSTILE_SITE_KEY: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY || process.env.TURNSTILE_SITE_KEY,
             SITE_NAME: process.env.SITE_NAME || "Ecommerce",
             SITE_URL: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || ""
         },

@@ -1,501 +1,271 @@
 <script setup lang="ts">
 import ContactForm from "~/components/Forms/ContactForm.vue"
 
+type ContactChannel = {
+    icon: string
+    title: string
+    detail: string
+    meta: string
+    cta: string
+    href?: string
+    to?: string
+}
+
 const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Contact" }])
 
-const contactChannels = [
+const contactChannels: ContactChannel[] = [
     {
-        icon: "mdi-facebook-messenger",
-        title: "Messenger support",
-        detail: "Talk to us during business hours for quick shopping or delivery questions.",
-        meta: "Mon-Fri | 09:00 - 17:00"
+        icon: "/images/contact/email-support.svg",
+        title: "Email support",
+        detail: "Best for order updates, return requests, and product questions that need a detailed reply.",
+        meta: "info@medusa-commerce.de",
+        cta: "Send an email",
+        href: "mailto:info@medusa-commerce.de"
     },
     {
-        icon: "mdi-email-outline",
-        title: "Email us",
-        detail: "Best for order updates, return requests, or detailed product questions.",
-        meta: "info@ecommerce.com"
-    },
-    {
-        icon: "mdi-phone-outline",
+        icon: "/images/contact/phone-support.svg",
         title: "Call the team",
-        detail: "Speak directly with support when you need a fast answer before checkout.",
-        meta: "+370 600 00000"
+        detail: "Useful when you need a quick answer before checkout or want to confirm the next support step.",
+        meta: "+370 600 00000",
+        cta: "Call support",
+        href: "tel:+37060000000"
+    },
+    {
+        icon: "/images/contact/help-center.svg",
+        title: "Help center",
+        detail: "Start with delivery, returns, and order guidance before sending a message to the team.",
+        meta: "Shipping, returns, and common support answers",
+        cta: "Browse FAQ",
+        to: "/faq"
     }
 ]
 
 const supportPromises = [
-    "Order questions handled by a real person",
-    "Guidance before and after checkout",
-    "Clear follow-up for shipping and returns"
+    "Typical reply time within one business day",
+    "Clear follow-up for products, shipping, and returns",
+    "Support handled by a real person from start to finish"
+]
+
+const contactChecklist = [
+    "Add your order number if you already have one",
+    "Mention the product name or selected variant when relevant",
+    "Explain the issue or question in a few direct sentences"
 ]
 
 useHead({
     title: "Contact us | Ecommerce"
 })
+
+useSeoMeta({
+    description:
+        "Contact Ecommerce for product questions, order updates, delivery support, and returns guidance through a calmer premium support experience."
+})
 </script>
 
 <template>
-    <section class="contact-page">
-        <div class="contact-page__hero">
-            <VContainer class="contact-page__container">
-                <div class="contact-page__hero-grid">
-                    <div class="contact-page__hero-copy">
-                        <AppBreadcrumbs :items="breadcrumbItems" class="contact-page__breadcrumbs" />
-                        <span class="contact-page__eyebrow">Customer Care</span>
-                        <h1 class="contact-page__title">Talk to a team that keeps shopping support calm, clear, and fast.</h1>
-                        <p class="contact-page__description">
-                            If you want a quick answer first, browse our
-                            <NuxtLink to="/faq" class="contact-page__inline-link">FAQ</NuxtLink>. If you still need us, send a message and
-                            we will help with products, delivery, returns, or order updates.
+    <section
+        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
+    >
+        <div class="px-0 pb-8 pt-[3.75rem] sm:pt-[4.5rem] xl:pt-[5.75rem]">
+            <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+                <div class="grid items-end gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.02fr)] xl:gap-10">
+                    <div class="max-w-[40rem] xl:pb-6">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        >
+                            Customer care
+                        </span>
+                        <h1
+                            class="mt-4 text-[2.1rem] font-bold leading-[1] tracking-[-0.06rem] text-slate-950 sm:text-[2.9rem] sm:leading-[0.98] xl:max-w-[11ch] xl:text-[4.25rem] xl:leading-[0.96]"
+                        >
+                            Support designed to feel as calm and considered as the storefront.
+                        </h1>
+                        <p class="mt-4 max-w-[38rem] text-base leading-7 text-slate-600 sm:text-[1.05rem] sm:leading-8">
+                            Reach out for product guidance, delivery questions, returns, or order updates. The support flow stays clear,
+                            practical, and easy to use on mobile.
                         </p>
-                        <div class="contact-page__hero-actions">
-                            <VBtn color="primary" rounded="pill" size="large" class="text-none px-7" to="/faq">Browse FAQ</VBtn>
-                            <div class="contact-page__response-card">
-                                <span class="contact-page__response-label">Average response</span>
-                                <strong class="contact-page__response-value">Within one business day</strong>
-                            </div>
+                        <div class="mt-7 flex flex-wrap items-center gap-3">
+                            <NuxtLink to="/faq" class="ui-btn-primary px-7">Browse FAQ</NuxtLink>
+                            <a href="mailto:info@medusa-commerce.de" class="ui-btn-secondary px-6">Email support</a>
                         </div>
-                    </div>
-                    <div class="contact-page__hero-panel">
-                        <span class="contact-page__panel-label">Support desk</span>
-                        <h2 class="contact-page__panel-title">Built to feel as considered as the new homepage.</h2>
-                        <p class="contact-page__panel-text">
-                            Reach out for delivery updates, product advice, or help with a recent order. We keep replies direct and
-                            practical.
-                        </p>
-                        <ul class="contact-page__promise-list">
-                            <li v-for="promise in supportPromises" :key="promise" class="contact-page__promise-item">
-                                <VIcon size="18" color="primary">mdi-check-circle-outline</VIcon>
-                                <span>{{ promise }}</span>
+                        <ul class="mt-6 flex flex-wrap gap-2.5" aria-label="Contact support highlights">
+                            <li
+                                v-for="item in supportPromises"
+                                :key="item"
+                                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-semibold tracking-[0.08em] text-slate-700"
+                            >
+                                <span class="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                                {{ item }}
                             </li>
                         </ul>
                     </div>
+
+                    <div
+                        class="relative rounded-[1.75rem] border border-white/80 bg-white/90 p-3 shadow-[0_14px_34px_rgba(8,27,90,0.08)] sm:rounded-[2rem] sm:p-4"
+                    >
+                        <div class="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem]">
+                            <NuxtImg
+                                src="/images/hero-main.jpg"
+                                alt="Premium support and product consultation atmosphere"
+                                width="1200"
+                                height="1411"
+                                sizes="100vw lg:45vw"
+                                format="webp"
+                                quality="68"
+                                loading="lazy"
+                                decoding="async"
+                                class="block aspect-[1.08] w-full object-cover object-center"
+                            />
+                            <div
+                                class="absolute inset-0 bg-[linear-gradient(135deg,rgba(2,6,23,0.2),transparent_45%,rgba(255,255,255,0.08))]"
+                            ></div>
+                        </div>
+
+                        <div
+                            class="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.1)] sm:left-5 sm:top-5"
+                        >
+                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            Real support from Vilnius
+                        </div>
+
+                        <div
+                            class="absolute inset-x-3 bottom-3 rounded-[1.25rem] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))] p-4 text-white shadow-[0_10px_26px_rgba(2,6,23,0.18)] sm:inset-x-5 sm:bottom-5 sm:p-5"
+                        >
+                            <div class="flex flex-wrap items-end justify-between gap-3">
+                                <div>
+                                    <span class="text-[0.73rem] font-bold uppercase tracking-[0.14em] text-amber-200"
+                                    >Average response</span
+                                    >
+                                    <div class="mt-2 flex items-end gap-2">
+                                        <strong class="text-3xl leading-none sm:text-[2rem]">1 business day</strong>
+                                        <span class="pb-0.5 text-sm text-slate-200">for most requests</span>
+                                    </div>
+                                </div>
+                                <span
+                                    class="inline-flex rounded-full border border-white/12 bg-white/8 px-3 py-1 text-xs font-semibold text-slate-100"
+                                >
+                                    Mon-Fri, 09:00-17:00
+                                </span>
+                            </div>
+                            <p class="mt-3 max-w-[26rem] text-sm leading-6 text-slate-100 sm:text-[0.95rem]">
+                                Practical help for product questions, order updates, and post-purchase follow-up without a complicated
+                                support flow.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </VContainer>
+            </div>
         </div>
-        <VContainer class="contact-page__container">
-            <div class="contact-page__channel-grid">
-                <article v-for="channel in contactChannels" :key="channel.title" class="contact-page__channel-card">
-                    <div class="contact-page__channel-icon">
-                        <VIcon size="22">{{ channel.icon }}</VIcon>
+
+        <div class="mx-auto w-full max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8">
+            <div class="grid gap-4 md:grid-cols-3">
+                <article
+                    v-for="channel in contactChannels"
+                    :key="channel.title"
+                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                >
+                    <div
+                        class="inline-flex h-14 w-14 items-center justify-center rounded-[1rem] border border-amber-200/70 bg-[linear-gradient(180deg,rgba(254,243,199,0.85),rgba(255,255,255,0.98))]"
+                    >
+                        <img :src="channel.icon" alt="" class="h-10 w-10" loading="lazy" width="40" height="40" />
                     </div>
-                    <div>
-                        <h2 class="contact-page__channel-title">{{ channel.title }}</h2>
-                        <p class="contact-page__channel-detail">{{ channel.detail }}</p>
-                        <p class="contact-page__channel-meta">{{ channel.meta }}</p>
-                    </div>
+                    <h2 class="mt-4 text-xl font-semibold leading-7 text-slate-950">{{ channel.title }}</h2>
+                    <p class="mt-2 text-sm leading-7 text-slate-600">{{ channel.detail }}</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-800">{{ channel.meta }}</p>
+                    <NuxtLink
+                        v-if="channel.to"
+                        :to="channel.to"
+                        class="mt-4 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-900"
+                    >
+                        {{ channel.cta }}
+                    </NuxtLink>
+                    <a v-else :href="channel.href" class="mt-4 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-900">
+                        {{ channel.cta }}
+                    </a>
                 </article>
             </div>
-            <div class="contact-page__content-grid">
-                <div class="contact-page__form-panel">
-                    <div class="contact-page__section-intro">
-                        <span class="contact-page__section-eyebrow">Send a message</span>
-                        <h2 class="contact-page__section-title">Share the details and we will take it from there.</h2>
-                        <p class="contact-page__section-text">
-                            Add your order number if you have one. That helps us respond faster and keeps follow-up straightforward.
+        </div>
+
+        <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] xl:gap-8">
+                <div>
+                    <div class="max-w-[38rem]">
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                        >
+                            Send a message
+                        </span>
+                        <h2 class="mt-4 text-[1.95rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.5rem]">
+                            Share the details and the team will take it from there.
+                        </h2>
+                        <p class="mt-4 text-base leading-7 text-slate-600 sm:text-[1.02rem] sm:leading-8">
+                            Add the basics once and keep the follow-up simple. The form is designed to be quick on mobile and detailed
+                            enough for order-related support.
                         </p>
                     </div>
-                    <div class="contact-page__form-card">
+
+                    <div
+                        class="mt-6 rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-7 lg:p-8"
+                    >
                         <ContactForm />
                     </div>
                 </div>
-                <aside class="contact-page__sidebar">
-                    <div class="contact-page__sidebar-card">
-                        <span class="contact-page__sidebar-label">Visit us</span>
-                        <h2 class="contact-page__sidebar-title">Vilnius support base</h2>
-                        <p class="contact-page__sidebar-text">
-                            Our team works from Vilnius and supports customers across product questions, order issues, and post-purchase
-                            help.
+
+                <aside class="grid gap-5 xl:sticky xl:top-6 xl:self-start">
+                    <div
+                        class="rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-6 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-8"
+                    >
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        >
+                            Support desk
+                        </span>
+                        <h2 class="mt-4 text-[1.6rem] font-bold leading-[1.05] tracking-[-0.04rem] text-slate-950">
+                            Built for practical support before and after checkout.
+                        </h2>
+                        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
+                            The team works from Vilnius and handles product questions, delivery concerns, returns, and follow-up for recent
+                            orders.
                         </p>
-                        <div class="contact-page__sidebar-meta">Open on weekdays | Closed on public holidays</div>
+                        <div class="mt-6 grid gap-4 border-t border-slate-200 pt-6 text-sm text-slate-700">
+                            <div>
+                                <p class="font-semibold text-slate-950">Location</p>
+                                <p class="mt-1">Vilnius, Lithuania</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-950">Business hours</p>
+                                <p class="mt-1">Mon-Fri, 09:00-17:00</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-950">Best for</p>
+                                <p class="mt-1">Delivery updates, product guidance, returns, and order support</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="contact-page__map-card">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d203269.51871892938!2d25.088231590205528!3d54.700572672503455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46dd93fb5c6408f5%3A0x400d18c70e9dc40!2sVilnius%2C%20Vilniaus%20m.%20sav.!5e1!3m2!1slt!2slt!4v1727009719782!5m2!1slt!2slt"
-                            width="100%"
-                            height="100%"
-                            class="contact-page__map"
-                            style="border: 0"
-                            allowfullscreen
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                        ></iframe>
+
+                    <div class="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-[0_12px_28px_rgba(8,27,90,0.05)] sm:p-8">
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full bg-slate-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-slate-700"
+                        >
+                            Before you send
+                        </span>
+                        <h2 class="mt-4 text-[1.45rem] font-bold leading-[1.08] tracking-[-0.04rem] text-slate-950">
+                            A few direct details help us reply faster.
+                        </h2>
+                        <ul class="mt-5 grid gap-4">
+                            <li
+                                v-for="item in contactChecklist"
+                                :key="item"
+                                class="flex items-start gap-3 rounded-[1.15rem] border border-slate-200 bg-slate-50/80 p-4"
+                            >
+                                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500"></span>
+                                <span class="text-sm leading-6 text-slate-700">{{ item }}</span>
+                            </li>
+                        </ul>
                     </div>
                 </aside>
             </div>
-        </VContainer>
+        </div>
     </section>
 </template>
-
-<style scoped lang="scss">
-.contact-page {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
-}
-
-.contact-page__hero {
-    padding: 5.5rem 0 2.5rem;
-}
-
-.contact-page__container {
-    position: relative;
-    z-index: 1;
-}
-
-.contact-page__hero-grid,
-.contact-page__content-grid {
-    display: grid;
-    gap: 2rem;
-}
-
-.contact-page__hero-grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.8fr);
-    align-items: end;
-}
-
-.contact-page__hero-copy,
-.contact-page__hero-panel,
-.contact-page__channel-card,
-.contact-page__form-panel,
-.contact-page__sidebar {
-    animation: contact-rise 0.8s ease both;
-}
-
-.contact-page__hero-panel,
-.contact-page__sidebar {
-    animation-delay: 0.12s;
-}
-
-.contact-page__breadcrumbs {
-    margin-bottom: 1rem;
-}
-
-.contact-page__eyebrow,
-.contact-page__section-eyebrow,
-.contact-page__panel-label,
-.contact-page__sidebar-label {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.contact-page__eyebrow,
-.contact-page__section-eyebrow {
-    margin-bottom: 1rem;
-}
-
-.contact-page__title,
-.contact-page__section-title {
-    color: #08173f;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.contact-page__title {
-    max-width: 12ch;
-    margin-bottom: 1rem;
-    font-size: 4rem;
-    line-height: 0.95;
-}
-
-.contact-page__description,
-.contact-page__panel-text,
-.contact-page__section-text,
-.contact-page__sidebar-text,
-.contact-page__channel-detail {
-    color: #4b5874;
-    font-size: 1rem;
-    line-height: 1.75;
-}
-
-.contact-page__description {
-    max-width: 40rem;
-    margin-bottom: 0;
-}
-
-.contact-page__inline-link {
-    color: #010c80;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.contact-page__inline-link:hover {
-    text-decoration: underline;
-}
-
-.contact-page__hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1rem 1.25rem;
-    margin-top: 1.75rem;
-}
-
-.contact-page__response-card,
-.contact-page__hero-panel,
-.contact-page__channel-card,
-.contact-page__form-card,
-.contact-page__sidebar-card,
-.contact-page__map-card {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.contact-page__response-card {
-    display: grid;
-    gap: 0.2rem;
-    padding: 0.9rem 1.05rem;
-}
-
-.contact-page__response-label,
-.contact-page__channel-meta,
-.contact-page__sidebar-meta {
-    color: #6a7590;
-    font-size: 0.88rem;
-}
-
-.contact-page__response-value,
-.contact-page__panel-title,
-.contact-page__section-title,
-.contact-page__sidebar-title,
-.contact-page__channel-title {
-    color: #08173f;
-}
-
-.contact-page__response-value {
-    font-size: 1rem;
-    line-height: 1.4;
-}
-
-.contact-page__hero-panel,
-.contact-page__sidebar-card {
-    padding: 1.75rem;
-}
-
-.contact-page__panel-label,
-.contact-page__sidebar-label {
-    margin-bottom: 1rem;
-}
-
-.contact-page__panel-title,
-.contact-page__section-title {
-    margin-bottom: 0.85rem;
-    font-size: 2rem;
-    line-height: 1.08;
-}
-
-.contact-page__panel-text,
-.contact-page__section-text,
-.contact-page__sidebar-text {
-    margin-bottom: 0;
-}
-
-.contact-page__promise-list {
-    display: grid;
-    gap: 0.85rem;
-    margin: 1.4rem 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.contact-page__promise-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-    color: #33415f;
-    line-height: 1.6;
-}
-
-.contact-page__channel-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 2.75rem;
-}
-
-.contact-page__channel-card {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 1rem;
-    min-height: 100%;
-    padding: 1.35rem;
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        border-color 0.25s ease;
-}
-
-.contact-page__channel-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(1, 12, 128, 0.14);
-    box-shadow: 0 22px 54px rgba(8, 27, 90, 0.12);
-}
-
-.contact-page__channel-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 1rem;
-    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
-    color: #010c80;
-}
-
-.contact-page__channel-title {
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-}
-
-.contact-page__channel-detail {
-    margin-bottom: 0.75rem;
-}
-
-.contact-page__channel-meta {
-    margin-bottom: 0;
-    font-weight: 700;
-}
-
-.contact-page__content-grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
-    align-items: start;
-    padding-bottom: 5rem;
-}
-
-.contact-page__form-panel {
-    min-width: 0;
-}
-
-.contact-page__form-card {
-    padding: 1.5rem;
-}
-
-.contact-page__section-intro {
-    margin-bottom: 1.25rem;
-}
-
-.contact-page__sidebar {
-    display: grid;
-    gap: 1rem;
-    position: sticky;
-    top: 1.5rem;
-}
-
-.contact-page__sidebar-title {
-    margin-bottom: 0.75rem;
-    font-size: 1.5rem;
-    line-height: 1.1;
-}
-
-.contact-page__sidebar-meta {
-    margin-top: 1.1rem;
-    font-weight: 700;
-}
-
-.contact-page__map-card {
-    overflow: hidden;
-    min-height: 22rem;
-}
-
-.contact-page__map {
-    display: block;
-    min-height: 22rem;
-}
-
-@keyframes contact-rise {
-    from {
-        opacity: 0;
-        transform: translateY(26px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .contact-page__hero-grid,
-    .contact-page__content-grid,
-    .contact-page__channel-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .contact-page__title {
-        max-width: 100%;
-    }
-
-    .contact-page__sidebar {
-        position: static;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    .contact-page__hero {
-        padding: 3.75rem 0 2rem;
-    }
-
-    .contact-page__title {
-        font-size: 2.5rem;
-        line-height: 1;
-    }
-
-    .contact-page__hero-panel,
-    .contact-page__channel-card,
-    .contact-page__form-card,
-    .contact-page__sidebar-card {
-        border-radius: 1.2rem;
-    }
-
-    .contact-page__hero-grid,
-    .contact-page__content-grid {
-        gap: 1.5rem;
-    }
-
-    .contact-page__hero-panel,
-    .contact-page__sidebar-card,
-    .contact-page__form-card {
-        padding: 1.4rem;
-    }
-
-    .contact-page__panel-title,
-    .contact-page__section-title {
-        font-size: 1.7rem;
-    }
-
-    .contact-page__channel-grid {
-        margin-bottom: 2.25rem;
-    }
-
-    .contact-page__content-grid {
-        padding-bottom: 4rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .contact-page__hero-copy,
-    .contact-page__hero-panel,
-    .contact-page__channel-card,
-    .contact-page__form-panel,
-    .contact-page__sidebar {
-        animation: none;
-    }
-
-    .contact-page__channel-card {
-        transition: none;
-    }
-}
-</style>

@@ -27,7 +27,7 @@ const paymentIcons = [
 
 const currentYear = useState<number>("footer-current-year", () => new Date().getFullYear())
 const isClientHydrated = ref(false)
-const supportEmail = "info@ecommerce.com"
+const supportEmail = "info@medusa-commerce.de"
 const supportPhone = "+370 600 00000"
 const supportPhoneHref = "tel:+37060000000"
 
