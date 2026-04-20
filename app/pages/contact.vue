@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ContactForm from "~/components/Forms/ContactForm.vue"
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 
 type ContactChannel = {
     icon: string

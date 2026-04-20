@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { SchemaNode } from "~/composables/useStructuredData"
 
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+
 const route = useRoute()
 const { absoluteUrl } = useSiteIdentity()
 

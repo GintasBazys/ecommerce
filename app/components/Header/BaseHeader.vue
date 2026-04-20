@@ -4,6 +4,8 @@ import debounce from "lodash-es/debounce"
 import type { SearchResponse } from "@/types/interfaces"
 import type { ProductDTO } from "@medusajs/types"
 
+import BaseSelect from "~/components/Shared/BaseSelect.vue"
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const bannerHidden = ref<boolean>(false)
@@ -264,16 +266,14 @@ function getProductMeta(product: ProductDTO): string {
                             Ship to
                         </span>
                         <span class="sr-only">Choose shipping country</span>
-                        <select
+                        <BaseSelect
                             v-if="isClientHydrated"
                             v-model="locationValue"
-                            class="ui-input site-header__country-select max-w-42.5 pr-8 text-sm xl:max-w-47.5"
+                            class="site-header__country-select max-w-42.5 xl:max-w-47.5"
+                            :options="locationItems"
+                            option-label-key="title"
                             :disabled="selectionLoading"
-                        >
-                            <option v-for="country in locationItems" :key="country.value" :value="country.value">
-                                {{ country.title }}
-                            </option>
-                        </select>
+                        />
                         <span
                             v-else
                             class="ui-input site-header__country-select inline-flex max-w-42.5 items-center pr-8 text-sm xl:max-w-47.5"
@@ -390,16 +390,14 @@ function getProductMeta(product: ProductDTO): string {
                     >
                         <span class="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Country</span>
 
-                        <select
+                        <BaseSelect
                             v-if="isClientHydrated"
                             v-model="locationValue"
-                            class="ui-input site-header__country-select rounded-xl"
+                            class="site-header__country-select rounded-xl"
+                            :options="locationItems"
+                            option-label-key="title"
                             :disabled="selectionLoading"
-                        >
-                            <option v-for="country in locationItems" :key="country.value" :value="country.value">
-                                {{ country.title }}
-                            </option>
-                        </select>
+                        />
 
                         <span v-else class="ui-input site-header__country-select inline-flex w-full items-center rounded-xl">
                             Country

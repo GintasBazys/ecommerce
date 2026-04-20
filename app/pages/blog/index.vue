@@ -2,6 +2,7 @@
 import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogCategoriesResponse, BlogCategory, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 
 const route = useRoute()

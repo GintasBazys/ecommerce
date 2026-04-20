@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { CartLineItemDTO } from "@medusajs/types"
 
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { usePostHog } from "~/composables/usePostHog"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
 
 const { cart, openCartDrawer } = storeToRefs(useCartStore())
 const { removeLineItem, updateLineItem } = useCartStore()
+const posthog = usePostHog()
 
 const isHydrated = ref(false)
 const drawerRef = ref<HTMLElement | null>(null)
@@ -115,8 +118,17 @@ async function removeItem(lineItemId: string): Promise<void> {
         throw new Error("No active cart found")
     }
 
+    const item = cart.value?.items?.find((i) => i.id === lineItemId)
+
     try {
         await removeLineItem(lineItemId)
+        posthog?.capture("cart_item_removed", {
+            product_id: item?.product_id,
+            product_name: item?.product_title,
+            variant_id: item?.variant_id,
+            variant_name: item?.variant_title,
+            quantity: item?.quantity
+        })
     } catch (error) {
         console.error("Failed to remove item:", error)
     }

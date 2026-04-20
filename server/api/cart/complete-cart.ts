@@ -1,3 +1,5 @@
+import { useServerPostHog } from "../../utils/posthog"
+
 function getSetCookies(res: Response): string[] {
     if (typeof res.headers.getSetCookie === "function") return res.headers.getSetCookie()
     const single = res.headers.get("set-cookie")
@@ -28,5 +30,23 @@ export default defineEventHandler(async (event) => {
 
     deleteCookie(event, "cart_id", { path: "/" })
 
-    return await medusaRes.json()
+    const result = await medusaRes.json()
+
+    const sessionId = getHeader(event, "x-posthog-session-id")
+    const distinctId = getHeader(event, "x-posthog-distinct-id")
+
+    if (distinctId) {
+        const posthog = useServerPostHog()
+        posthog.capture({
+            distinctId,
+            event: "server_cart_completed",
+            properties: {
+                $session_id: sessionId,
+                cart_id: cartId,
+                order_id: result?.order?.id
+            }
+        })
+    }
+
+    return result
 })

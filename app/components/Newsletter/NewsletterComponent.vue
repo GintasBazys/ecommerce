@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { FetchError } from "ofetch"
 
+import { usePostHog } from "~/composables/usePostHog"
+
+const posthog = usePostHog()
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const loading = ref<boolean>(false)
@@ -62,6 +65,7 @@ async function handleSubscribe(e: Event): Promise<void> {
 
         if (response.success) {
             successMessage.value = response.message
+            posthog?.capture("newsletter_subscribed")
             form.reset()
         }
     } catch (error: unknown) {

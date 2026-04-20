@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ProductDTO } from "@medusajs/types"
 
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+
 interface ProductListResponse {
     products?: ProductDTO[]
 }

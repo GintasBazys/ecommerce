@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { SchemaNode } from "~/composables/useStructuredData"
 
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+
 type FaqItem = {
     question: string
     answer: string

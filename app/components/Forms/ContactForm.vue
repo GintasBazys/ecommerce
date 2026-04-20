@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatDateTime } from "@/utils/formatDate"
+import { usePostHog } from "~/composables/usePostHog"
 
 type ContactFormState = {
     subject: string
@@ -20,6 +21,7 @@ type ContactResponse = {
     message: string
 }
 
+const posthog = usePostHog()
 const runtimeConfig = useRuntimeConfig()
 const turnstileSiteKey = computed(() => String(runtimeConfig.public.TURNSTILE_SITE_KEY || ""))
 const widgetContainer = ref<HTMLElement | null>(null)
@@ -182,6 +184,7 @@ async function handleSubmit(): Promise<void> {
 
         successMessage.value = response.message
         errorMessage.value = null
+        posthog?.capture("contact_form_submitted", { subject: form.subject, has_order_number: !!form.orderNumber })
         resetForm()
         resetTurnstile()
     } catch (error: unknown) {

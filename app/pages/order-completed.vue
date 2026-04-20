@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
 
+
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
+import { usePostHog } from "~/composables/usePostHog"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
 definePageMeta({ layout: "checkout" })
@@ -11,6 +13,7 @@ useHead({ title: "Order Completed | Ecommerce" })
 
 const route = useRoute()
 const orderId = route.query.orderId
+const posthog = usePostHog()
 
 const { customer } = storeToRefs(useCustomerStore())
 
@@ -28,6 +31,23 @@ const {
 })
 
 const order = computed<OrderDTO | null>(() => orderRes.value?.order ?? null)
+
+watch(
+    order,
+    (o) => {
+        if (o) {
+            posthog?.capture("order_completed", {
+                order_id: o.id,
+                display_id: o.display_id,
+                total: o.total,
+                subtotal: o.subtotal,
+                currency_code: o.currency_code,
+                item_count: o.items?.length
+            })
+        }
+    },
+    { immediate: true }
+)
 const currencyCode = computed<string>(() => order.value?.currency_code ?? DEFAULT_CURENCY)
 const orderDate = computed<string>(() => formatDate(order.value?.created_at))
 const shippingMethod = computed(() => order.value?.shipping_methods?.[0] ?? null)

@@ -6,6 +6,8 @@ import type { SchemaNode } from "~/composables/useStructuredData"
 
 import { formatPrice } from "@/utils/formatPrice"
 import CategoryFiltersPanel from "~/components/Category/CategoryFiltersPanel.vue"
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 definePageMeta({ layout: "default" })
@@ -807,21 +809,13 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                 </button>
                                 <label class="grid gap-1 text-sm font-semibold text-slate-700">
                                     <span>Sort by</span>
-                                    <div class="relative w-full sm:min-w-60 lg:max-w-68">
-                                        <select
+                                    <div class="w-full sm:min-w-60 lg:max-w-68">
+                                        <BaseSelect
                                             v-model="sortOption"
-                                            class="min-h-11 w-full appearance-none rounded-2xl border border-slate-300 bg-white px-4 pr-10 text-sm font-medium text-slate-900 outline-hidden transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                            :options="sortOptions"
+                                            option-label-key="text"
                                             :disabled="loadingRef"
-                                        >
-                                            <option v-for="option in sortOptions" :key="option.value" :value="option.value">
-                                                {{ option.text }}
-                                            </option>
-                                        </select>
-                                        <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
-                                            <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">
-                                                <path d="M5 7.5L10 12.5L15 7.5" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                        </span>
+                                        />
                                     </div>
                                 </label>
                             </div>

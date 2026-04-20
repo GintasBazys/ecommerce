@@ -10,6 +10,7 @@ import {
     mergeCookieHeader,
     toUpstreamError
 } from "#server/utils/medusa-proxy"
+import { useServerPostHog } from "../../utils/posthog"
 
 type RegisterBody = {
     email?: string
@@ -72,6 +73,21 @@ export default defineEventHandler(async (event) => {
             method: "GET",
             cookie: mergeCookieHeader(incomingCookie, setCookieHeaders)
         })
+
+        const sessionId = getHeader(event, "x-posthog-session-id")
+        const distinctId = getHeader(event, "x-posthog-distinct-id")
+
+        if (distinctId) {
+            const posthog = useServerPostHog()
+            posthog.capture({
+                distinctId,
+                event: "server_user_registered",
+                properties: {
+                    $session_id: sessionId,
+                    email: body.email
+                }
+            })
+        }
 
         return {
             success: true,

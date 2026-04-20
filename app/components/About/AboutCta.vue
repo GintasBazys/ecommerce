@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
+
 defineProps<{
     linkShown?: boolean
     extraSpacerClass?: string

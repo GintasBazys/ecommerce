@@ -38,7 +38,15 @@ export default defineNuxtConfig({
         domains: [...new Set(imageDomains)]
     },
 
-    modules: ["@nuxt/eslint", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "@unlok-co/nuxt-stripe"],
+    modules: [
+        "@nuxt/eslint",
+        "@pinia/nuxt",
+        "pinia-plugin-persistedstate/nuxt",
+        "@nuxt/image",
+        "@nuxtjs/sitemap",
+        "@unlok-co/nuxt-stripe",
+        "nuxt-posthog"
+    ],
 
     stripe: {
         server: {
@@ -51,10 +59,22 @@ export default defineNuxtConfig({
         }
     },
 
+    posthog: {
+        publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || "",
+        host: process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com",
+        clientOptions: {
+            capture_exceptions: true
+        }
+    },
+
     runtimeConfig: {
         medusaUrl: process.env.NUXT_MEDUSA_URL || process.env.MEDUSA_URL,
         turnstileSecretKey: process.env.NUXT_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY,
         public: {
+            posthog: {
+                publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || "",
+                host: process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com"
+            },
             MEDUSA_URL: process.env.NUXT_PUBLIC_MEDUSA_URL || process.env.MEDUSA_URL,
             PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY || process.env.PUBLISHABLE_KEY,
             STRIPE_PUBLIC_KEY: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY,

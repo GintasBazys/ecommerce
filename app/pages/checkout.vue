@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { loadStripe } from "@stripe/stripe-js/pure"
 
+
 import TaxedLinePrice from "../components/Cart/TaxedLinePrice.vue"
 
 import type { Address, ShippingOption, VForm } from "@/types/interfaces"
@@ -8,6 +9,7 @@ import type { CartDTO, CartLineItemDTO } from "@medusajs/types"
 import type { Stripe, StripeElements, StripeLinkAuthenticationElement, StripePaymentElement } from "@stripe/stripe-js"
 
 import { formatPrice } from "@/utils/formatPrice"
+import { usePostHog } from "~/composables/usePostHog"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
 definePageMeta({ layout: "checkout" })
@@ -40,6 +42,7 @@ const { regionCountries } = storeToRefs(regionStore)
 const auth = useCustomerAuth()
 const config = useRuntimeConfig()
 const router = useRouter()
+const posthog = usePostHog()
 
 const currentStep = ref<CheckoutStep>("account")
 const authTab = ref<AuthTab>("login")
@@ -612,6 +615,11 @@ onMounted(async () => {
     currentStep.value = deriveInitialStep()
     stripe = await loadStripe(String(config.public.STRIPE_PUBLIC_KEY))
     isBooting.value = false
+    posthog?.capture("checkout_started", {
+        cart_id: checkoutCart.value?.id,
+        item_count: checkoutCart.value?.items?.length,
+        cart_total: checkoutCart.value?.total
+    })
 })
 
 onBeforeRouteLeave(() => cleanup())

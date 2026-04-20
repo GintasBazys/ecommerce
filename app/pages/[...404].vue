@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+
 const route = useRoute()
 const event = useRequestEvent()
 

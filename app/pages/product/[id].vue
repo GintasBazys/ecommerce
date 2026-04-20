@@ -3,6 +3,8 @@ import type { Review, ReviewApiResponse } from "@/types/interfaces"
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 import type { SchemaNode } from "~/composables/useStructuredData"
 
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import { usePostHog } from "~/composables/usePostHog"
 import { useProductPrice } from "~/composables/useProductPrice"
 import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
@@ -20,6 +22,7 @@ const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { openCartDrawer } = storeToRefs(useCartStore())
 const { customer } = storeToRefs(useCustomerStore())
+const posthog = usePostHog()
 
 const handle = computed<string>(() => String(route.params.id || ""))
 
@@ -267,6 +270,14 @@ async function addToCart(): Promise<void> {
 
     try {
         await useCartStore().updateLineItem(selectedVariant.value, quantity.value)
+        posthog?.capture("product_added_to_cart", {
+            product_id: product.value?.id,
+            product_name: product.value?.title,
+            variant_id: selectedVariant.value.id,
+            variant_name: selectedVariant.value.title,
+            quantity: quantity.value,
+            price: selectedVariant.value.calculated_price?.calculated_amount
+        })
     } finally {
         adding.value = false
         openCartDrawer.value = true
@@ -296,6 +307,10 @@ async function handleReviewSubmit(review: {
 
         reviewsData.value = await $fetch("/api/reviews/list-reviews", {
             params: { product_id: review.productId, limit: 10, offset: 0 }
+        })
+        posthog?.capture("product_review_submitted", {
+            product_id: review.productId,
+            rating: review.rating
         })
         showReviewForm.value = false
     } catch (error) {

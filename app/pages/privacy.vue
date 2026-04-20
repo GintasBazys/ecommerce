@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+
 const breadcrumbItems = [{ label: "Home", to: "/" }, { label: "Privacy Policy" }]
 
 useHead({

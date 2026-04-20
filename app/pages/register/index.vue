@@ -2,6 +2,8 @@
 import type { CustomerResponseInterface } from "@/types/interfaces"
 import type { VForm } from "~/types/interfaces"
 
+import { usePostHog } from "~/composables/usePostHog"
+
 useHead({
     title: "Register | Ecommerce"
 })
@@ -12,6 +14,7 @@ definePageMeta({
 
 const router = useRouter()
 const config = useRuntimeConfig()
+const posthog = usePostHog()
 
 const registerFormRef = ref<VForm | null>(null)
 const snackbar = ref<boolean>(false)
@@ -52,6 +55,12 @@ async function handleRegister(): Promise<void> {
             })
         })
         useCustomerStore().customer = response.customer
+        posthog?.identify(email.value, {
+            email: email.value,
+            first_name: firstName.value,
+            last_name: lastName.value
+        })
+        posthog?.capture("user_registered", { email: email.value })
         await router.push("/")
     } catch (error) {
         console.error("Register failed:", error)

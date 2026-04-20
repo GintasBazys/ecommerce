@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NavLink } from "@/types/interfaces"
 
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE, BLOG_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
 
 const { categories } = useProductStore()
@@ -115,7 +116,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
             </section>
 
             <div class="grid gap-4 py-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_20rem] lg:gap-6">
-                <section class="site-footer__panel rounded-[1.5rem] p-4 md:p-5">
+                <section class="site-footer__panel rounded-3xl p-4 md:p-5">
                     <button
                         type="button"
                         class="flex w-full items-center justify-between text-left text-base font-semibold text-white md:pointer-events-none"
@@ -131,7 +132,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </ul>
                 </section>
 
-                <section class="site-footer__panel rounded-[1.5rem] p-4 md:p-5">
+                <section class="site-footer__panel rounded-3xl p-4 md:p-5">
                     <button
                         type="button"
                         class="flex w-full items-center justify-between text-left text-base font-semibold text-white md:pointer-events-none"
@@ -152,7 +153,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </ul>
                 </section>
 
-                <section class="site-footer__panel rounded-[1.5rem] p-4 md:p-5">
+                <section class="site-footer__panel rounded-3xl p-4 md:p-5">
                     <button
                         type="button"
                         class="flex w-full items-center justify-between text-left text-base font-semibold text-white md:pointer-events-none"
@@ -175,7 +176,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </ul>
                 </section>
 
-                <section class="site-footer__payments rounded-[1.5rem] p-4 md:p-5">
+                <section class="site-footer__payments rounded-3xl p-4 md:p-5">
                     <p class="text-[0.74rem] font-bold uppercase tracking-[0.14em] text-amber-100">Accepted payments</p>
                     <p class="mt-3 text-sm leading-7 text-slate-200/82">
                         Secure payment methods with a clear checkout flow and transparent order confirmation.
@@ -184,7 +185,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                         <div
                             v-for="item in paymentIcons"
                             :key="item.alt"
-                            class="site-footer__payment-item flex h-12 w-[94px] items-center justify-center rounded-xl p-2"
+                            class="site-footer__payment-item flex h-12 w-23.5 items-center justify-center rounded-xl p-2"
                         >
                             <NuxtImage :src="item.src" :alt="item.alt" width="84" height="44" loading="lazy" />
                         </div>

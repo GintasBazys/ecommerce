@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { VForm } from "~/types/interfaces"
 
+import { usePostHog } from "~/composables/usePostHog"
+
 useHead({ title: "Signin | Ecommerce" })
 definePageMeta({ layout: "default" })
 
@@ -29,6 +31,7 @@ const emailRules: ((_: string) => boolean | string)[] = [
 const passwordRules: ((__: string) => boolean | string)[] = [(v: string) => !!v || "Password is required"]
 
 const auth = useCustomerAuth()
+const posthog = usePostHog()
 
 async function handleLogin(e: Event) {
     e.preventDefault()
@@ -46,10 +49,14 @@ async function handleLogin(e: Event) {
         return
     }
 
+    posthog?.identify(loginEmail.value, { email: loginEmail.value })
+    posthog?.capture("user_signed_in", { method: "email" })
+
     await router.push("/")
 }
 
 async function handleSocialLogin(provider: "google" | "facebook") {
+    posthog?.capture("user_signed_in", { method: provider })
     await auth.startSocialLogin(provider, "/")
 }
 
