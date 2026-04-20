@@ -268,46 +268,6 @@ async function fetchIdentity(token: string, authIdentityId: string): Promise<Rec
     return identityPayload.authIdentity?.user_metadata || {}
 }
 
-async function establishSession(token: string): Promise<void> {
-    const response = await fetch(getMedusaUrl("/auth/session"), {
-        credentials: "include",
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        }
-    })
-
-    if (!response.ok) {
-        const payload = await parseResponsePayload(response)
-        throw new Error(readPayloadMessage(payload) || "Could not establish authenticated session.")
-    }
-}
-
-async function fetchCustomer(token: string): Promise<CustomerDTO> {
-    const response = await fetch(getMedusaUrl("/store/customers/me"), {
-        credentials: "include",
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-        }
-    })
-    const payload = await parseResponsePayload(response)
-
-    if (!response.ok) {
-        throw new Error(readPayloadMessage(payload) || "Could not fetch your customer profile.")
-    }
-
-    const customerData = (payload as { customer?: CustomerDTO }).customer
-    if (!customerData) {
-        throw new Error("Authentication finished, but customer details were not returned.")
-    }
-
-    return customerData
-}
-
 async function validateAndAuthenticate(): Promise<void> {
     if (!provider.value) {
         failAuth("The callback provider is missing or invalid. Please start sign-in again.")
@@ -347,10 +307,17 @@ async function validateAndAuthenticate(): Promise<void> {
         }
 
         loadingMessage.value = "Establishing secure session..."
-        await establishSession(token)
+        const sessionPayload = await $fetch<{ success: boolean; customer: CustomerDTO | null }>("/api/social/session", {
+            method: "POST",
+            credentials: "include",
+            body: { token }
+        })
 
-        loadingMessage.value = "Fetching account details..."
-        const customer = await fetchCustomer(token)
+        const customer = sessionPayload.customer
+        if (!customer) {
+            throw new Error("Authentication finished, but customer details were not returned.")
+        }
+
         customerStore.customer = customer
 
         try {

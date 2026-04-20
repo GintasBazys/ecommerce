@@ -7,10 +7,6 @@ const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.me
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
 
-    nitro: {
-        preset: process.env.VERCEL ? "vercel" : undefined
-    },
-
     app: {
         layoutTransition: {
             name: "page",

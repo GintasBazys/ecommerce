@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { VForm } from "~/types/interfaces"
-
 import { usePostHog } from "~/composables/usePostHog"
 
 useHead({ title: "Signin | Ecommerce" })
@@ -11,41 +9,60 @@ const router = useRouter()
 const showResetDialog = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
+const loginErrors = ref<{ email: string; password: string }>({ email: "", password: "" })
+const resetEmailError = ref<string>("")
 
 const snackbar = ref<boolean>(false)
 const snackbarText = ref<string>("")
-const snackbarColor = ref<string>("success")
-
-const loginFormRef = ref<VForm | null>(null)
-const resetFormRef = ref<VForm | null>(null)
+const snackbarTone = ref<"success" | "error">("success")
+const snackbarTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
 
 const resetEmail = ref<string>("")
-const emailRules: ((_: string) => boolean | string)[] = [
-    (v: string) => !!v || "E-mail is required",
-    (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "E-mail must be valid"
-]
-
-const passwordRules: ((__: string) => boolean | string)[] = [(v: string) => !!v || "Password is required"]
 
 const auth = useCustomerAuth()
 const posthog = usePostHog()
 
-async function handleLogin(e: Event) {
-    e.preventDefault()
+function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
 
-    const { valid } = (await loginFormRef.value?.validate()) ?? { valid: false }
-    if (!valid) {
+function showSnackbar(message: string, tone: "success" | "error"): void {
+    snackbarText.value = message
+    snackbarTone.value = tone
+    snackbar.value = true
+
+    if (snackbarTimer.value) {
+        clearTimeout(snackbarTimer.value)
+    }
+
+    snackbarTimer.value = setTimeout(() => {
+        snackbar.value = false
+    }, 4000)
+}
+
+async function handleLogin(): Promise<void> {
+    loginErrors.value = { email: "", password: "" }
+
+    if (!loginEmail.value) {
+        loginErrors.value.email = "E-mail is required"
+    } else if (!isValidEmail(loginEmail.value)) {
+        loginErrors.value.email = "E-mail must be valid"
+    }
+
+    if (!loginPassword.value) {
+        loginErrors.value.password = "Password is required"
+    }
+
+    if (loginErrors.value.email || loginErrors.value.password) {
         return
     }
 
     const customer = await auth.login(loginEmail.value, loginPassword.value, { loadCart: true })
     if (!customer) {
-        snackbarText.value = "Login failed"
-        snackbarColor.value = "error"
-        snackbar.value = true
+        showSnackbar("Login failed", "error")
         return
     }
 
@@ -61,7 +78,15 @@ async function handleSocialLogin(provider: "google" | "facebook") {
 }
 
 async function handleReset(): Promise<void> {
+    resetEmailError.value = ""
+
     if (!resetEmail.value) {
+        resetEmailError.value = "E-mail is required"
+        return
+    }
+
+    if (!isValidEmail(resetEmail.value)) {
+        resetEmailError.value = "E-mail must be valid"
         return
     }
 
@@ -78,385 +103,222 @@ async function handleReset(): Promise<void> {
         })
 
         successMessage.value = "Password reset email sent"
-        snackbarText.value = successMessage.value
-        snackbarColor.value = "success"
-        snackbar.value = true
+        showSnackbar(successMessage.value, "success")
 
         showResetDialog.value = false
         resetEmail.value = ""
     } catch {
         errorMessage.value = "An unexpected error occurred. Please try again."
-        snackbarText.value = errorMessage.value
-        snackbarColor.value = "error"
-        snackbar.value = true
+        showSnackbar(errorMessage.value, "error")
     }
 }
+
+onBeforeUnmount(() => {
+    if (snackbarTimer.value) {
+        clearTimeout(snackbarTimer.value)
+    }
+})
 </script>
 
 <template>
-    <main class="auth-page auth-page--signin">
-        <div class="auth-page__hero">
-            <VContainer class="auth-page__container">
-                <div class="auth-page__grid">
-                    <div class="auth-page__copy">
-                        <span class="auth-page__eyebrow">Welcome back</span>
-                        <h1 class="auth-page__title">Sign in to pick up your order exactly where you left it.</h1>
-                        <p class="auth-page__description">
-                            Access your saved details, revisit recent orders, and move from cart to checkout with less friction.
-                        </p>
-                        <div class="auth-page__stat-card">
-                            <span class="auth-page__stat-label">Member access</span>
-                            <strong class="auth-page__stat-value">Faster checkout, order history, and saved profile details</strong>
-                        </div>
-                    </div>
-                    <div class="auth-page__panel auth-page__panel--form">
-                        <div class="auth-page__panel-intro">
-                            <span class="auth-page__section-eyebrow">Account login</span>
-                            <h2 class="auth-page__section-title">Enter your details and continue.</h2>
-                            <p class="auth-page__section-text">
-                                Use social sign-in or your email and password. You can reset access anytime.
-                            </p>
-                        </div>
-                        <div class="auth-page__social-buttons">
-                            <VBtn class="auth-page__social-btn text-none" color="white" block @click="handleSocialLogin('google')">
-                                <VImg src="/images/google_login_icon.svg" width="24" height="24" class="me-3" />
-                                Log in with Google
-                            </VBtn>
-                            <VBtn class="auth-page__social-btn text-none" block color="white" @click="handleSocialLogin('facebook')">
-                                <VImg src="/images/facebook_login_icon.svg" width="24" height="24" class="me-3" />
-                                Log in with Facebook
-                            </VBtn>
-                        </div>
-                        <div class="auth-page__divider"><span>Or continue with email</span></div>
-                        <VForm ref="loginFormRef" class="auth-page__form" @submit.prevent="handleLogin">
-                            <VTextField
-                                v-model.trim="loginEmail"
-                                :rules="emailRules"
-                                name="email"
-                                label="E-mail"
-                                type="email"
-                                variant="outlined"
-                                autocomplete="email"
-                                required
-                            />
-                            <VTextField
-                                v-model="loginPassword"
-                                :rules="passwordRules"
-                                name="password"
-                                label="Password"
-                                type="password"
-                                variant="outlined"
-                                autocomplete="current-password"
-                                required
-                            />
-                            <div class="auth-page__form-actions">
-                                <VBtn variant="text" class="px-0 text-none auth-page__text-btn" @click="showResetDialog = true">
-                                    Forgot password?
-                                </VBtn>
-                            </div>
-                            <VBtn type="submit" color="primary" rounded="pill" class="text-none" block>Log in</VBtn>
-                        </VForm>
-                        <p class="auth-page__footer-text">
-                            Don't have an account?
-                            <NuxtLink to="/register" class="auth-page__link">Register here</NuxtLink>
+    <main
+        class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900"
+    >
+        <section class="mx-auto w-full max-w-6xl px-4 pb-14 pt-6 sm:px-6 lg:px-8 lg:pt-10">
+            <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-8">
+                <div class="space-y-6">
+                    <span
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold uppercase tracking-[0.13em] text-slate-700"
+                    >
+                        Welcome back
+                    </span>
+                    <h1 class="max-w-[13ch] text-4xl font-semibold leading-[0.95] tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                        Sign in to pick up your order exactly where you left it.
+                    </h1>
+                    <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
+                        Access your saved details, revisit recent orders, and move from cart to checkout with less friction.
+                    </p>
+                    <div class="rounded-3xl border border-slate-200 bg-white/85 p-4 sm:p-5">
+                        <p class="text-xs font-medium uppercase tracking-[0.1em] text-slate-500">Member access</p>
+                        <p class="mt-1 text-sm font-semibold leading-6 text-slate-900 sm:text-base">
+                            Faster checkout, order history, and saved profile details
                         </p>
                     </div>
                 </div>
-            </VContainer>
-        </div>
-        <VDialog v-model="showResetDialog" persistent max-width="560">
-            <VCard class="auth-modal">
-                <VCardTitle class="auth-modal__header">
+
+                <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <div>
-                        <span class="auth-modal__eyebrow">Password reset</span>
-                        <h2 class="auth-modal__title">Forgot your password?</h2>
+                        <span
+                            class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700"
+                        >
+                            Account login
+                        </span>
+                        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                            Enter your details and continue.
+                        </h2>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">Use social sign-in or your email and password. You can reset access anytime.</p>
                     </div>
-                    <VBtn icon variant="text" @click="showResetDialog = false">
-                        <VIcon>mdi-close</VIcon>
-                    </VBtn>
-                </VCardTitle>
-                <VCardText class="auth-modal__body">
-                    <p class="auth-modal__text">Enter your email and we will send a reset link so you can get back into your account.</p>
-                    <VForm ref="resetFormRef" class="auth-modal__form" @submit.prevent="handleReset">
-                        <VTextField
-                            v-model="resetEmail"
-                            :rules="emailRules"
-                            label="E-mail address"
-                            type="email"
-                            variant="outlined"
-                            required
-                        />
-                        <VBtn type="submit" color="primary" rounded="pill" class="text-none" block>Send reset link</VBtn>
-                    </VForm>
-                </VCardText>
-            </VCard>
-        </VDialog>
-        <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4000">
-            {{ snackbarText }}
-        </VSnackbar>
+
+                    <div class="mt-6 grid gap-3">
+                        <button
+                            type="button"
+                            class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            @click="handleSocialLogin('google')"
+                        >
+                            <img src="/images/google_login_icon.svg" width="24" height="24" alt="" aria-hidden="true" />
+                            Log in with Google
+                        </button>
+                        <button
+                            type="button"
+                            class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            @click="handleSocialLogin('facebook')"
+                        >
+                            <img src="/images/facebook_login_icon.svg" width="24" height="24" alt="" aria-hidden="true" />
+                            Log in with Facebook
+                        </button>
+                    </div>
+
+                    <div class="relative my-6 text-center text-xs font-medium uppercase tracking-[0.08em] text-slate-500">
+                        <span class="absolute inset-x-0 top-1/2 -z-0 border-t border-slate-200" aria-hidden="true"></span>
+                        <span class="relative z-10 bg-white px-3">Or continue with email</span>
+                    </div>
+
+                    <form class="grid gap-4" @submit.prevent="handleLogin">
+                        <div>
+                            <label for="signin-email" class="mb-1.5 block text-sm font-medium text-slate-700">E-mail</label>
+                            <input
+                                id="signin-email"
+                                v-model.trim="loginEmail"
+                                name="email"
+                                type="email"
+                                autocomplete="email"
+                                class="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                                :class="loginErrors.email ? 'border-rose-400 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                required
+                            />
+                            <p v-if="loginErrors.email" class="mt-1 text-sm text-rose-600">{{ loginErrors.email }}</p>
+                        </div>
+
+                        <div>
+                            <label for="signin-password" class="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
+                            <input
+                                id="signin-password"
+                                v-model="loginPassword"
+                                name="password"
+                                type="password"
+                                autocomplete="current-password"
+                                class="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                                :class="loginErrors.password ? 'border-rose-400 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                required
+                            />
+                            <p v-if="loginErrors.password" class="mt-1 text-sm text-rose-600">{{ loginErrors.password }}</p>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button
+                                type="button"
+                                class="text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-200"
+                                @click="showResetDialog = true"
+                            >
+                                Forgot password?
+                            </button>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                        >
+                            Log in
+                        </button>
+                    </form>
+
+                    <p class="mt-5 text-center text-sm text-slate-600">
+                        Don't have an account?
+                        <NuxtLink to="/register" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
+                            Register here
+                        </NuxtLink>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <Teleport to="body">
+            <div
+                v-if="showResetDialog"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4"
+                role="presentation"
+                @click.self="showResetDialog = false"
+            >
+                <section
+                    class="w-full max-w-xl rounded-[1.6rem] border border-slate-200 bg-white p-5 sm:p-7"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="reset-password-title"
+                >
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span
+                                class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold uppercase tracking-[0.11em] text-slate-700"
+                            >
+                                Password reset
+                            </span>
+                            <h2 id="reset-password-title" class="mt-3 text-2xl font-semibold tracking-[-0.02em] text-slate-950">
+                                Forgot your password?
+                            </h2>
+                        </div>
+                        <button
+                            type="button"
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:text-slate-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            @click="showResetDialog = false"
+                        >
+                            <span aria-hidden="true">×</span>
+                            <span class="sr-only">Close password reset dialog</span>
+                        </button>
+                    </div>
+
+                    <p class="mt-4 text-sm leading-7 text-slate-600">
+                        Enter your email and we will send a reset link so you can get back into your account.
+                    </p>
+
+                    <form class="mt-5 grid gap-4" @submit.prevent="handleReset">
+                        <div>
+                            <label for="reset-email" class="mb-1.5 block text-sm font-medium text-slate-700">E-mail address</label>
+                            <input
+                                id="reset-email"
+                                v-model.trim="resetEmail"
+                                type="email"
+                                autocomplete="email"
+                                class="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                                :class="resetEmailError ? 'border-rose-400 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                required
+                            />
+                            <p v-if="resetEmailError" class="mt-1 text-sm text-rose-600">{{ resetEmailError }}</p>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                        >
+                            Send reset link
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </Teleport>
+
+        <div v-if="snackbar" class="pointer-events-none fixed inset-x-0 top-5 z-50 flex justify-center px-4">
+            <p
+                class="pointer-events-auto rounded-full border px-5 py-2 text-sm font-medium"
+                :class="
+                    snackbarTone === 'success'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                        : 'border-rose-200 bg-rose-50 text-rose-700'
+                "
+                role="status"
+                aria-live="polite"
+            >
+                {{ snackbarText }}
+            </p>
+        </div>
     </main>
 </template>
-
-<style scoped lang="scss">
-.auth-page {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
-}
-
-.auth-page__hero {
-    padding: 0 0 4rem;
-}
-
-.auth-page__container {
-    position: relative;
-    z-index: 1;
-}
-
-.auth-page__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(19rem, 0.9fr);
-    gap: 1.5rem;
-    align-items: center;
-}
-
-.auth-page__copy,
-.auth-page__panel {
-    animation: auth-rise 0.8s ease both;
-}
-
-.auth-page__panel {
-    animation-delay: 0.12s;
-}
-
-.auth-page__eyebrow,
-.auth-page__section-eyebrow,
-.auth-modal__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.auth-page__title,
-.auth-page__section-title,
-.auth-modal__title {
-    color: #08173f;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.auth-page__title {
-    max-width: 11ch;
-    margin: 1rem 0;
-    font-size: 2.75rem;
-    line-height: 0.95;
-}
-
-.auth-page__description,
-.auth-page__section-text,
-.auth-page__footer-text,
-.auth-modal__text {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.75;
-}
-
-.auth-page__stat-card,
-.auth-page__panel,
-.auth-modal {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.auth-page__stat-card {
-    display: grid;
-    gap: 0.2rem;
-    max-width: 27rem;
-    margin-top: 1.75rem;
-    padding: 0.9rem 1.05rem;
-}
-
-.auth-page__stat-label {
-    color: #6a7590;
-    font-size: 0.88rem;
-}
-
-.auth-page__stat-value {
-    color: #08173f;
-    font-size: 1rem;
-    line-height: 1.45;
-}
-
-.auth-page__panel {
-    padding: 1.4rem;
-}
-
-.auth-page__section-eyebrow {
-    margin-bottom: 1rem;
-}
-
-.auth-page__section-title,
-.auth-modal__title {
-    margin: 0 0 0.75rem;
-    font-size: 1.75rem;
-    line-height: 1.08;
-}
-
-.auth-page__social-buttons,
-.auth-page__form,
-.auth-modal__form {
-    display: grid;
-    gap: 0.9rem;
-}
-
-.auth-page__social-buttons {
-    margin-top: 1.35rem;
-}
-
-.auth-page__social-btn {
-    justify-content: flex-start;
-    min-height: 3.2rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 999px;
-    box-shadow: none;
-}
-
-.auth-page__divider {
-    position: relative;
-    margin: 1.35rem 0;
-    color: #6a7590;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-.auth-page__divider::before {
-    content: "";
-    position: absolute;
-    inset: 50% 0 auto;
-    border-top: 1px solid rgba(8, 23, 63, 0.08);
-}
-
-.auth-page__divider span {
-    position: relative;
-    display: inline-block;
-    padding: 0 0.9rem;
-    background: rgba(255, 255, 255, 0.96);
-}
-
-.auth-page__form-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: -0.3rem;
-}
-
-.auth-page__text-btn,
-.auth-page__link {
-    color: #010c80;
-    font-weight: 700;
-}
-
-.auth-page__footer-text {
-    margin-top: 1.25rem;
-    text-align: center;
-}
-
-.auth-modal {
-    overflow: hidden;
-}
-
-.auth-modal__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.4rem 1.4rem 0.5rem;
-}
-
-.auth-modal__body {
-    padding: 0 1.4rem 1.4rem;
-}
-
-.auth-modal__text {
-    margin-bottom: 1rem;
-}
-
-@keyframes auth-rise {
-    from {
-        opacity: 0;
-        transform: translateY(26px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .auth-page__grid {
-        grid-template-columns: 1fr;
-    }
-
-    .auth-page__title {
-        max-width: 100%;
-    }
-}
-
-@media screen and (min-width: 701px) {
-    .auth-page__hero {
-        padding-bottom: 5rem;
-    }
-
-    .auth-page__grid {
-        gap: 2rem;
-    }
-
-    .auth-page__panel {
-        padding: 1.75rem;
-    }
-
-    .auth-page__title {
-        font-size: 3.5rem;
-    }
-
-    .auth-page__section-title,
-    .auth-modal__title {
-        font-size: 2rem;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .auth-page__hero {
-        padding: 0 0 3.5rem;
-    }
-
-    .auth-page__title {
-        font-size: 2.4rem;
-        line-height: 1;
-    }
-
-    .auth-page__panel,
-    .auth-page__stat-card,
-    .auth-modal {
-        border-radius: 1.2rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .auth-page__copy,
-    .auth-page__panel {
-        animation: none;
-    }
-}
-</style>
