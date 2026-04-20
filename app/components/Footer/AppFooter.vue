@@ -31,6 +31,7 @@ const isClientHydrated = ref(false)
 const supportEmail = "info@medusa-commerce.de"
 const supportPhone = "+370 600 00000"
 const supportPhoneHref = "tel:+37060000000"
+const { openBanner } = useCookieConsent()
 
 onMounted(() => {
     isClientHydrated.value = true
@@ -195,7 +196,10 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
 
             <div class="site-footer__bottom flex flex-wrap items-center justify-between gap-3 px-1 pt-6">
                 <p class="text-sm text-slate-300/90">Copyright Gintas Bazys {{ currentYear }}. All rights reserved.</p>
-                <NuxtLink to="/privacy" class="site-footer__bottom-link text-sm font-semibold">Privacy Policy</NuxtLink>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button type="button" class="site-footer__bottom-link text-sm font-semibold" @click="openBanner">Cookie Settings</button>
+                    <NuxtLink to="/privacy" class="site-footer__bottom-link text-sm font-semibold">Privacy Policy</NuxtLink>
+                </div>
             </div>
         </div>
     </footer>

@@ -26,7 +26,8 @@ const errorMessage = ref<string>("")
 const stage = ref<SocialStage>("authenticating")
 const snackbar = ref<boolean>(false)
 const snackbarText = ref<string>("")
-const snackbarColor = ref<string>("success")
+const snackbarTone = ref<"success" | "error">("success")
+const snackbarTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const isRetrying = ref<boolean>(false)
 
 function getStoredProvider(): SocialProvider | null {
@@ -92,8 +93,16 @@ function getMedusaUrl(path: string): string {
 
 function showNotification(message: string, color: "success" | "error"): void {
     snackbarText.value = message
-    snackbarColor.value = color
+    snackbarTone.value = color
     snackbar.value = true
+
+    if (snackbarTimer.value) {
+        clearTimeout(snackbarTimer.value)
+    }
+
+    snackbarTimer.value = setTimeout(() => {
+        snackbar.value = false
+    }, 4500)
 }
 
 function toText(value: unknown): string | null {
@@ -361,259 +370,81 @@ useHead({
 onMounted(() => {
     void validateAndAuthenticate()
 })
+
+onBeforeUnmount(() => {
+    if (snackbarTimer.value) {
+        clearTimeout(snackbarTimer.value)
+    }
+})
 </script>
 
 <template>
-    <section class="social-auth-page">
-        <div class="social-auth-page__hero">
-            <VContainer class="social-auth-page__container">
-                <div class="social-auth-page__grid">
-                    <div class="social-auth-page__copy">
-                        <span class="social-auth-page__eyebrow">Social sign-in</span>
-                        <h1 class="social-auth-page__title">We are finishing your {{ providerLabel }} authentication.</h1>
-                        <p class="social-auth-page__description">
-                            This step confirms the callback, starts your secure session, and returns you to the storefront.
-                        </p>
+    <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_42%,#fff7ed_100%)] text-slate-900">
+        <section class="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-6xl items-center px-4 pb-14 pt-8 sm:px-6 lg:px-8">
+            <div class="grid w-full items-start gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-8">
+                <div class="space-y-6">
+                    <span
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold uppercase tracking-[0.13em] text-slate-700"
+                    >
+                        Social sign-in
+                    </span>
+                    <h1 class="max-w-[13ch] text-4xl font-semibold leading-[0.95] tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                        We are finishing your {{ providerLabel }} authentication.
+                    </h1>
+                    <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
+                        This step confirms the callback, starts your secure session, and returns you to the storefront.
+                    </p>
+                </div>
+
+                <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
+                    <span
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700"
+                    >
+                        Authentication status
+                    </span>
+                    <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">{{ statusTitle }}</h2>
+                    <p class="mt-3 text-sm leading-7 text-slate-600">{{ statusText }}</p>
+
+                    <div v-if="isLoading" class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5" aria-live="polite">
+                        <div class="h-2.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuetext="Authenticating">
+                            <div class="h-full w-3/5 rounded-full bg-slate-900/85 animate-pulse"></div>
+                        </div>
+                        <p class="mt-3 text-sm text-slate-600">{{ loadingMessage }}</p>
                     </div>
 
-                    <div class="social-auth-page__panel">
-                        <span class="social-auth-page__section-eyebrow">Authentication status</span>
-                        <h2 class="social-auth-page__section-title">{{ statusTitle }}</h2>
-                        <p class="social-auth-page__section-text">{{ statusText }}</p>
-
-                        <div v-if="isLoading" class="social-auth-page__loading-card" aria-live="polite">
-                            <div class="social-auth-page__progress-bar" role="progressbar" aria-valuetext="Authenticating">
-                                <div class="social-auth-page__progress"></div>
-                            </div>
-                            <p class="social-auth-page__loading-message">{{ loadingMessage }}</p>
-                        </div>
-
-                        <div v-else-if="stage === 'error'" class="social-auth-page__error-actions">
-                            <VBtn
-                                color="primary"
-                                rounded="pill"
-                                size="large"
-                                class="text-none"
-                                :loading="isRetrying"
-                                @click="retrySocialLogin"
-                            >
-                                Retry {{ providerLabel }} sign-in
-                            </VBtn>
-                            <VBtn color="primary" variant="outlined" rounded="pill" size="large" class="text-none" to="/signin">
-                                Back to sign in
-                            </VBtn>
-                        </div>
+                    <div v-else-if="stage === 'error'" class="mt-6 grid gap-3">
+                        <button
+                            type="button"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300 disabled:cursor-not-allowed disabled:opacity-70"
+                            :disabled="isRetrying"
+                            @click="retrySocialLogin"
+                        >
+                            {{ isRetrying ? "Retrying..." : `Retry ${providerLabel} sign-in` }}
+                        </button>
+                        <NuxtLink
+                            to="/signin"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                        >
+                            Back to sign in
+                        </NuxtLink>
                     </div>
                 </div>
-            </VContainer>
+            </div>
+        </section>
+
+        <div v-if="snackbar" class="pointer-events-none fixed inset-x-0 top-5 z-50 flex justify-center px-4">
+            <p
+                class="pointer-events-auto rounded-full border px-5 py-2 text-sm font-medium"
+                :class="
+                    snackbarTone === 'success'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                        : 'border-rose-200 bg-rose-50 text-rose-700'
+                "
+                role="status"
+                aria-live="polite"
+            >
+                {{ snackbarText }}
+            </p>
         </div>
-
-        <VSnackbar v-model="snackbar" :color="snackbarColor" location="top" timeout="4500">
-            {{ snackbarText }}
-        </VSnackbar>
-    </section>
+    </main>
 </template>
-
-<style scoped lang="scss">
-.social-auth-page {
-    min-height: calc(100vh - 98px);
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
-}
-
-.social-auth-page__hero {
-    min-height: calc(100vh - 98px);
-    padding: 4.8rem 0 4rem;
-    display: flex;
-    align-items: center;
-}
-
-.social-auth-page__container {
-    position: relative;
-    z-index: 1;
-}
-
-.social-auth-page__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
-    gap: 1.5rem;
-    align-items: center;
-}
-
-.social-auth-page__copy,
-.social-auth-page__panel {
-    animation: social-rise 0.8s ease both;
-}
-
-.social-auth-page__panel {
-    animation-delay: 0.12s;
-}
-
-.social-auth-page__eyebrow,
-.social-auth-page__section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.social-auth-page__title,
-.social-auth-page__section-title {
-    color: #08173f;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.social-auth-page__title {
-    max-width: 12ch;
-    margin: 1rem 0;
-    font-size: 2.85rem;
-    line-height: 0.95;
-}
-
-.social-auth-page__description,
-.social-auth-page__section-text,
-.social-auth-page__loading-message {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.75;
-}
-
-.social-auth-page__panel,
-.social-auth-page__loading-card {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.social-auth-page__panel {
-    padding: 1.4rem;
-}
-
-.social-auth-page__section-eyebrow {
-    margin-bottom: 1rem;
-}
-
-.social-auth-page__section-title {
-    margin: 0 0 0.75rem;
-    font-size: 1.8rem;
-    line-height: 1.08;
-}
-
-.social-auth-page__loading-card {
-    margin-top: 1.35rem;
-    padding: 1.2rem;
-}
-
-.social-auth-page__progress-bar {
-    width: 100%;
-    height: 0.75rem;
-    border-radius: 999px;
-    overflow: hidden;
-    background: rgba(8, 23, 63, 0.08);
-}
-
-.social-auth-page__progress {
-    width: 0;
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #010c80 0%, #2f79ff 100%);
-    animation: social-progress 2s infinite;
-}
-
-.social-auth-page__loading-message {
-    margin-top: 1rem;
-    font-size: 0.98rem;
-}
-
-.social-auth-page__error-actions {
-    display: grid;
-    gap: 0.75rem;
-    margin-top: 1.2rem;
-}
-
-@keyframes social-progress {
-    0% {
-        width: 0;
-    }
-
-    50% {
-        width: 100%;
-    }
-
-    100% {
-        width: 0;
-    }
-}
-
-@keyframes social-rise {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .social-auth-page__hero {
-        min-height: auto;
-        padding-top: 4.2rem;
-    }
-
-    .social-auth-page__grid {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-
-    .social-auth-page__title {
-        max-width: 100%;
-        font-size: 2.45rem;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .social-auth-page {
-        min-height: auto;
-    }
-
-    .social-auth-page__hero {
-        padding: 3.75rem 0 3rem;
-    }
-
-    .social-auth-page__title {
-        font-size: 2rem;
-        line-height: 1;
-    }
-
-    .social-auth-page__panel,
-    .social-auth-page__loading-card {
-        border-radius: 1.2rem;
-    }
-
-    .social-auth-page__section-title {
-        font-size: 1.45rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .social-auth-page__copy,
-    .social-auth-page__panel,
-    .social-auth-page__progress {
-        animation: none;
-    }
-}
-</style>

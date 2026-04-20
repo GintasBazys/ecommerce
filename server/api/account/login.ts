@@ -10,7 +10,7 @@ import {
     mergeCookieHeader,
     toUpstreamError
 } from "#server/utils/medusa-proxy"
-import { useServerPostHog } from "../../utils/posthog"
+import { canTrackServerAnalytics, useServerPostHog } from "../../utils/posthog"
 
 type LoginBody = {
     email?: string
@@ -65,9 +65,9 @@ export default defineEventHandler(async (event) => {
         const sessionId = getHeader(event, "x-posthog-session-id")
         const distinctId = getHeader(event, "x-posthog-distinct-id")
 
-        if (distinctId) {
+        if (distinctId && canTrackServerAnalytics(event)) {
             const posthog = useServerPostHog()
-            posthog.capture({
+            posthog?.capture({
                 distinctId,
                 event: "server_user_signed_in",
                 properties: {

@@ -42,8 +42,7 @@ export default defineNuxtConfig({
         "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
         "@nuxtjs/sitemap",
-        "@unlok-co/nuxt-stripe",
-        "nuxt-posthog"
+        "@unlok-co/nuxt-stripe"
     ],
 
     stripe: {
@@ -57,21 +56,14 @@ export default defineNuxtConfig({
         }
     },
 
-    posthog: {
-        publicKey: posthogPublicKey,
-        host: posthogHost,
-        clientOptions: {
-            capture_exceptions: true
-        }
-    },
-
     runtimeConfig: {
         medusaUrl: process.env.NUXT_MEDUSA_URL || process.env.MEDUSA_URL,
         turnstileSecretKey: process.env.NUXT_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY,
         public: {
             posthog: {
                 publicKey: posthogPublicKey,
-                host: posthogHost
+                host: posthogHost,
+                captureExceptions: true
             },
             MEDUSA_URL: process.env.NUXT_PUBLIC_MEDUSA_URL || process.env.MEDUSA_URL,
             PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY || process.env.PUBLISHABLE_KEY,

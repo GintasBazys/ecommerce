@@ -19,6 +19,7 @@ declare global {
     interface Window {
         turnstile?: TurnstileApi
         onTurnstileContactLoad?: () => void
+        onTurnstileRegisterLoad?: () => void
     }
 }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppFooter from "@/components/Footer/AppFooter.vue"
 import BaseHeader from "@/components/Header/BaseHeader.vue"
+import CookieBanner from "@/components/Shared/CookieBanner.vue"
 
 const { organizationSchema, websiteSchema } = useSiteIdentity()
 
@@ -28,6 +29,7 @@ useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global
     <NuxtLayout>
         <NuxtPage />
     </NuxtLayout>
+    <CookieBanner />
     <AppFooter />
 </template>
 
