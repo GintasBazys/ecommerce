@@ -66,7 +66,7 @@ const { data: relatedData } = await useAsyncData<ProductListResponse>(`related-p
     }
 
     return $fetch("/api/products/products", {
-        params: {
+        query: {
             category_id: primaryCategory.value.id,
             ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
             ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {}),
@@ -391,7 +391,7 @@ async function handleReviewSubmit(review: {
         })
 
         reviewsData.value = await $fetch("/api/reviews/list-reviews", {
-            params: { product_id: review.productId, limit: 10, offset: 0 }
+            query: { product_id: review.productId, limit: 10, offset: 0 }
         })
         posthog?.capture("product_review_submitted", {
             product_id: review.productId,
@@ -412,7 +412,7 @@ watch(
         if (id) {
             try {
                 reviewsData.value = await $fetch("/api/reviews/list-reviews", {
-                    params: { product_id: id, limit: 10, offset: 0 }
+                    query: { product_id: id, limit: 10, offset: 0 }
                 })
             } catch (error) {
                 console.error("Review fetch error", error)
@@ -428,7 +428,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
 
 <template>
     <section v-if="product" class="product-page">
-        <div class="px-0 pb-10 pt-[3.75rem] sm:pb-12 sm:pt-[4.5rem] xl:pb-16 xl:pt-[5.75rem]">
+        <div class="px-0 pb-10 pt-15 sm:pb-12 sm:pt-18 xl:pb-16 xl:pt-23">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 <div class="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(21rem,0.98fr)] xl:gap-8">
                     <div>
@@ -478,7 +478,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                                         v-for="(image, index) in productImages"
                                         :key="image.id"
                                         type="button"
-                                        class="overflow-hidden rounded-[1rem] border bg-slate-50/95 p-1.5 text-left transition motion-reduce:transition-none"
+                                        class="overflow-hidden rounded-2xl border bg-slate-50/95 p-1.5 text-left transition motion-reduce:transition-none"
                                         :class="index === activeImageIndex ? 'border-amber-300 shadow-[0_10px_24px_rgba(8,27,90,0.08)]' : 'border-slate-200/80 hover:border-amber-200'"
                                         :aria-pressed="index === activeImageIndex"
                                         :aria-label="`Show image ${index + 1}`"
@@ -513,7 +513,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                     </div>
 
                     <div class="grid gap-4 xl:gap-5">
-                        <div class="rounded-[1.75rem] border border-white/80 bg-white/94 p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] backdrop-blur sm:rounded-[2rem] sm:p-7 xl:p-8">
+                        <div class="rounded-[1.75rem] border border-white/80 bg-white/94 p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] backdrop-blur sm:rounded-4xl sm:p-7 xl:p-8">
                             <div class="flex flex-col gap-4 sm:gap-5">
                                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
@@ -538,10 +538,10 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                                     <h1 class="max-w-[12ch] text-[2.2rem] font-bold leading-[0.96] tracking-[-0.06rem] text-slate-950 sm:text-[3.1rem] xl:text-[4.25rem]">
                                         {{ product.title }}
                                     </h1>
-                                    <p v-if="product.subtitle" class="mt-3 text-sm font-semibold uppercase tracking-[0.1em] text-slate-700">
+                                    <p v-if="product.subtitle" class="mt-3 text-sm font-semibold uppercase tracking-widest text-slate-700">
                                         {{ product.subtitle }}
                                     </p>
-                                    <p class="mt-4 max-w-[42rem] text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                                    <p class="mt-4 max-w-2xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
                                         {{
                                             product.description ||
                                                 'A refined product pick designed to feel premium, practical, and easy to wear every day.'
@@ -575,7 +575,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             </div>
                         </div>
 
-                        <div class="rounded-[1.75rem] border border-white/80 bg-white/94 p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] backdrop-blur sm:rounded-[2rem] sm:p-7 xl:p-8">
+                        <div class="rounded-[1.75rem] border border-white/80 bg-white/94 p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] backdrop-blur sm:rounded-4xl sm:p-7 xl:p-8">
                             <div v-if="product.variants.length" class="grid gap-4">
                                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <span class="text-sm font-medium text-slate-500">Select option</span>
@@ -685,7 +685,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                 </div>
 
                 <div class="mt-8">
-                    <div class="rounded-[1.75rem] border border-white/80 bg-white/94 p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] backdrop-blur sm:rounded-[2rem] sm:p-7 xl:p-8">
+                    <div class="rounded-[1.75rem] border border-white/80 bg-white/94 p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] backdrop-blur sm:rounded-4xl sm:p-7 xl:p-8">
                         <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
                             Product details
                         </span>
@@ -737,7 +737,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                         <div>
                             <span class="product-page__section-eyebrow">Customer feedback</span>
                             <h2 class="product-page__section-title">What shoppers are saying.</h2>
-                            <p class="product-page__section-text mt-3 max-w-[36rem]">
+                            <p class="product-page__section-text mt-3 max-w-xl">
                                 Read recent feedback from verified shoppers before making a decision.
                             </p>
                         </div>
@@ -754,10 +754,10 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                 </div>
                 <section
                     v-if="relatedProducts.length"
-                    class="product-page__related overflow-hidden rounded-[1.75rem] bg-[radial-gradient(circle_at_top_right,rgba(202,138,4,0.12),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(15,23,42,0.08),transparent_24%),linear-gradient(180deg,#f7f8fb_0%,#ffffff_100%)] px-5 py-6 sm:rounded-[2rem] sm:px-7 sm:py-8 xl:px-8"
+                    class="product-page__related overflow-hidden rounded-[1.75rem] bg-[radial-gradient(circle_at_top_right,rgba(202,138,4,0.12),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(15,23,42,0.08),transparent_24%),linear-gradient(180deg,#f7f8fb_0%,#ffffff_100%)] px-5 py-6 sm:rounded-4xl sm:px-7 sm:py-8 xl:px-8"
                 >
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-                        <div class="max-w-[46rem]">
+                        <div class="max-w-184">
                             <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
                                 Related products
                             </span>
@@ -765,7 +765,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                                 More from the same
                                 <span class="font-medium italic text-[#8a6a2f]">shopping lane</span>
                             </h2>
-                            <p class="mt-4 max-w-[42rem] text-[1rem] leading-8 text-slate-700">
+                            <p class="mt-4 max-w-2xl text-[1rem] leading-8 text-slate-700">
                                 Picked from the same category so the next suggestion still feels aligned with what you are viewing now.
                             </p>
                         </div>
@@ -779,8 +779,8 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                     </div>
 
                     <div class="relative mt-9">
-                        <div class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-gradient-to-r from-[#fbfbfc] to-transparent lg:block"></div>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-gradient-to-l from-[#ffffff] to-transparent lg:block"></div>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-linear-to-r from-[#fbfbfc] to-transparent lg:block"></div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-linear-to-l from-[#ffffff] to-transparent lg:block"></div>
 
                         <div
                             ref="relatedRailRef"
@@ -807,7 +807,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
         <Teleport to="body">
             <div
                 v-if="customer && showReviewForm"
-                class="fixed inset-0 z-[90] flex items-end bg-slate-950/55 p-4 backdrop-blur-[2px] sm:items-center sm:justify-center"
+                class="fixed inset-0 z-90 flex items-end bg-slate-950/55 p-4 backdrop-blur-[2px] sm:items-center sm:justify-center"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="product-review-dialog-title"

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
+
 const approachSteps = [
     {
         title: "Select with intent",
@@ -39,7 +41,7 @@ const approachSteps = [
 
             <div class="grid items-stretch gap-5 lg:grid-cols-2 xl:gap-10">
                 <div>
-                    <NuxtImg
+                    <NuxtImage
                         src="/images/about-premium.jpg"
                         alt="Elegant modern living room with premium furniture and styling"
                         width="1800"

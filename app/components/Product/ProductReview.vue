@@ -48,7 +48,7 @@ function handleCancel(): void {
 </script>
 
 <template>
-    <div class="relative w-full max-w-2xl rounded-[1.75rem] border border-white/80 bg-white p-5 shadow-[0_24px_64px_rgba(2,6,23,0.2)] sm:rounded-[2rem] sm:p-7">
+    <div class="relative w-full max-w-2xl rounded-[1.75rem] border border-white/80 bg-white p-5 shadow-[0_24px_64px_rgba(2,6,23,0.2)] sm:rounded-4xl sm:p-7">
         <button
             type="button"
             class="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
@@ -65,7 +65,7 @@ function handleCancel(): void {
             <h2 id="product-review-dialog-title" class="mt-4 text-[1.85rem] font-bold leading-[1.02] tracking-[-0.04rem] text-slate-950">
                 Write a review
             </h2>
-            <p class="mt-3 max-w-[34rem] text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
+            <p class="mt-3 max-w-136 text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
                 Let other shoppers know how the product feels, fits into daily use, and whether it met expectations.
             </p>
         </div>
@@ -78,7 +78,7 @@ function handleCancel(): void {
                     v-model="form.title"
                     type="text"
                     placeholder="Summarize your experience"
-                    class="min-h-12 rounded-[1rem] border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
                     required
                 />
             </div>
@@ -108,7 +108,7 @@ function handleCancel(): void {
                     v-model="form.content"
                     rows="5"
                     placeholder="Share your thoughts"
-                    class="rounded-[1rem] border border-slate-300 bg-white px-4 py-3 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                    class="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
                     required
                 ></textarea>
             </div>
@@ -121,7 +121,7 @@ function handleCancel(): void {
                         v-model="form.firstName"
                         type="text"
                         placeholder="Your first name"
-                        class="min-h-12 rounded-[1rem] border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
                     />
                 </div>
                 <div class="grid gap-2">
@@ -131,7 +131,7 @@ function handleCancel(): void {
                         v-model="form.lastName"
                         type="text"
                         placeholder="Your last name"
-                        class="min-h-12 rounded-[1rem] border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
                     />
                 </div>
             </div>
@@ -156,7 +156,7 @@ function handleCancel(): void {
 
         <div
             v-if="snackbar"
-            class="mt-4 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+            class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
             role="alert"
         >
             {{ snackbarText }}

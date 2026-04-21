@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const heroContent = {
@@ -19,7 +20,7 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
 
 <template>
     <section class="site-hero relative isolate overflow-hidden bg-slate-950">
-        <NuxtImg
+        <NuxtImage
             :src="heroContent.image"
             :alt="heroContent.alt"
             width="2400"

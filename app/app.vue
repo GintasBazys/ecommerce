@@ -50,6 +50,18 @@ main {
     padding-top: var(--site-header-offset, 98px);
 }
 
+button {
+    cursor: pointer;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    select,
+    textarea,
+    input {
+        font-size: 16px;
+    }
+}
+
 html::-webkit-scrollbar {
     width: 0.9rem;
 }

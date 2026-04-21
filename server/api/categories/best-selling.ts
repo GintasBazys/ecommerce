@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
     const limit = query.limit != null ? String(query.limit) : String(LIMIT)
     const offset = query.offset != null ? String(query.offset) : "0"
     const regionId = query.region_id ? String(query.region_id) : ""
+    const countryCode = query.country_code ? String(query.country_code) : ""
 
     if (!regionId) {
         throw createError({ statusCode: 400, statusMessage: "region_id is required" })
@@ -18,6 +19,10 @@ export default defineEventHandler(async (event) => {
         limit,
         offset
     })
+
+    if (countryCode) {
+        searchParams.set("country_code", countryCode)
+    }
 
     try {
         const payload = await fetchMedusaJson(event, `/store/products/bestselling?${searchParams.toString()}`)

@@ -4,6 +4,7 @@ import type { OrderDTO } from "@medusajs/types"
 import { ORDER_STATUS } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 const route = useRoute()
 const orderId = route.params.id
@@ -56,7 +57,7 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
                         <h2 class="order-invoice-content__title">Items in this order</h2>
                         <div class="order-invoice-content__items-list">
                             <article v-for="item in order.items" :key="item.id" class="order-invoice-content__item-card">
-                                <NuxtImg
+                                <NuxtImage
                                     :src="item.thumbnail || '/images/placeholder.png'"
                                     width="72"
                                     class="order-invoice-content__item-image"

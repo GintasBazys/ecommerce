@@ -2,6 +2,7 @@
 import type { SchemaNode } from "~/composables/useStructuredData"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 type FaqItem = {
     question: string
@@ -167,7 +168,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                         class="relative rounded-[1.75rem] border border-white/80 bg-white/90 p-3 shadow-[0_14px_34px_rgba(8,27,90,0.08)] sm:rounded-[2rem] sm:p-4"
                     >
                         <div class="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem]">
-                            <NuxtImg
+                            <NuxtImage
                                 src="/images/hero-main.jpg"
                                 alt="Support and delivery guidance visual"
                                 width="1200"

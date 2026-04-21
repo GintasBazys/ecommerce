@@ -3,6 +3,7 @@ import debounce from "lodash-es/debounce"
 
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const FALLBACK_IMAGE = "/images/about-premium.jpg"
@@ -80,7 +81,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                 class="relative aspect-[0.96] overflow-hidden bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#edf2f7_100%)]"
                 :class="compact ? 'aspect-[0.82]' : ''"
             >
-                <NuxtImg
+                <NuxtImage
                     :src="productImage"
                     :alt="product.title || 'Product image'"
                     format="webp"

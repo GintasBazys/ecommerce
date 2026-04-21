@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BlogPostSummary } from "~/types/blog"
 
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 import { formatDate } from "~/utils/formatDate"
 
@@ -20,7 +21,7 @@ const articleDate = computed<string>(() => formatDate(article.publishedAt))
     <article class="blog-card" :class="{ 'blog-card--compact': compact }">
         <NuxtLink :to="articleHref" class="blog-card__media-link">
             <div class="blog-card__media">
-                <NuxtImg
+                <NuxtImage
                     :src="articleImage"
                     :alt="article.title"
                     format="webp"

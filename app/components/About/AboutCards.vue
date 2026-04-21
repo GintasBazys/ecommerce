@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
+
 const storePillars = [
     {
         image: "/images/about_store-curated.svg",
@@ -49,7 +51,7 @@ const storePillars = [
                     <div
                         class="flex h-[5.7rem] w-[5.7rem] items-center justify-center rounded-[1.25rem] bg-[linear-gradient(145deg,rgba(1,12,128,0.08),rgba(0,128,255,0.16))]"
                     >
-                        <NuxtImg
+                        <NuxtImage
                             :src="item.image"
                             :alt="item.title"
                             width="140"

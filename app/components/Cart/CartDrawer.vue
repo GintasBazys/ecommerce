@@ -100,6 +100,11 @@ const isCartDirty = computed<boolean>(() =>
 
 const isAnyUpdating = computed<boolean>(() => Object.values(updating).some(Boolean))
 
+type PricedCartLineItem = CartLineItemDTO & {
+    total?: number | null
+    unit_price?: number | null
+}
+
 const displayTotal = computed<string>(() => {
     const sum = (cart.value?.items || []).reduce((acc, item) => {
         const qty = qtyMap[item.id] ?? Number(item.quantity)
@@ -112,6 +117,15 @@ const displayTotal = computed<string>(() => {
 const displayTaxTotal = computed<string>(() =>
     formatPrice(Number(cart.value?.tax_total || 0), cart.value?.currency_code ?? DEFAULT_CURENCY)
 )
+
+function getItemDisplayTotal(item: CartLineItemDTO): string {
+    const pricedItem = item as PricedCartLineItem
+    const savedQuantity = Math.max(Number(item.quantity) || 1, 1)
+    const desiredQuantity = Math.max(Number(qtyMap[item.id] ?? item.quantity) || 1, 1)
+    const unitAmountWithTax = pricedItem.total != null ? Number(pricedItem.total) / savedQuantity : Number(pricedItem.unit_price ?? 0)
+
+    return formatPrice(unitAmountWithTax * desiredQuantity, cart.value?.currency_code ?? DEFAULT_CURENCY)
+}
 
 async function removeItem(lineItemId: string): Promise<void> {
     if (!cart.value?.id) {
@@ -341,12 +355,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 
                                         <div class="flex items-center gap-2">
                                             <p class="text-sm font-semibold text-slate-950">
-                                                {{
-                                                    formatPrice(
-                                                        (qtyMap[item.id] ?? Number(item.quantity)) * Number(item.unit_price),
-                                                        cart?.currency_code ?? DEFAULT_CURENCY
-                                                    )
-                                                }}
+                                                {{ getItemDisplayTotal(item) }}
                                             </p>
                                             <button
                                                 type="button"

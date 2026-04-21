@@ -2,6 +2,7 @@
 import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogPost, BlogPostResponse, BlogPostsResponse } from "~/types/blog"
 
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 import { formatDate } from "~/utils/formatDate"
 
@@ -148,7 +149,7 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
                 </div>
             </section>
             <section class="blog-post__article">
-                <NuxtImg
+                <NuxtImage
                     v-if="currentPost?.thumbnail"
                     :src="currentPost.thumbnail"
                     :alt="currentPost.title"

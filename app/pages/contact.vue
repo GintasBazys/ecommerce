@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ContactForm from "~/components/Forms/ContactForm.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 type ContactChannel = {
     icon: string
@@ -106,7 +107,7 @@ useSeoMeta({
                         class="relative rounded-[1.75rem] border border-white/80 bg-white/90 p-3 shadow-[0_14px_34px_rgba(8,27,90,0.08)] sm:rounded-[2rem] sm:p-4"
                     >
                         <div class="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem]">
-                            <NuxtImg
+                            <NuxtImage
                                 src="/images/hero-main.jpg"
                                 alt="Premium support and product consultation atmosphere"
                                 width="1200"
