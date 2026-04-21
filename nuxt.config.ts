@@ -45,6 +45,10 @@ export default defineNuxtConfig({
         "@unlok-co/nuxt-stripe"
     ],
 
+    sitemap: {
+        sources: ["/api/__sitemap__/urls"]
+    },
+
     stripe: {
         server: {
             key: process.env.NUXT_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY,

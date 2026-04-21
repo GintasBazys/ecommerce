@@ -3,107 +3,76 @@ import type { Review } from "@/types/interfaces"
 
 import { formatDate } from "@/utils/formatDate"
 
-defineProps<{
+const props = defineProps<{
     reviews: Review[]
+    averageRating?: number | null
+    reviewCount?: number | null
 }>()
+
+type SafeReview = {
+    id: string
+    rating: number
+    title: string
+    author: string
+    content: string
+    createdAt: string
+}
+
+const safeReviews = computed<SafeReview[]>(() =>
+    (Array.isArray(props.reviews) ? props.reviews : []).map((review, index) => {
+        const rating = Number(review?.rating || 0)
+        const firstName = typeof review?.first_name === "string" ? review.first_name.trim() : ""
+        const lastName = typeof review?.last_name === "string" ? review.last_name.trim() : ""
+
+        return {
+            id: typeof review?.id === "string" && review.id ? review.id : `review-${index}`,
+            rating: Math.min(Math.max(Number.isFinite(rating) ? rating : 0, 0), 5),
+            title: typeof review?.title === "string" && review.title.trim() ? review.title.trim() : "Customer review",
+            author: `${firstName} ${lastName}`.trim() || "Verified shopper",
+            content: typeof review?.content === "string" && review.content.trim() ? review.content.trim() : "No review details provided.",
+            createdAt: typeof review?.created_at === "string" ? review.created_at : ""
+        }
+    })
+)
 </script>
 
 <template>
-    <div class="product-reviews">
-        <div v-if="reviews.length === 0" class="product-reviews__empty">
-            <p>No reviews yet. Be the first to write one!</p>
+    <div class="mt-5">
+        <div
+            v-if="safeReviews.length === 0"
+            class="rounded-[1.3rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+        >
+            <template v-if="props.averageRating && props.averageRating > 0">
+                Rated {{ props.averageRating.toFixed(1) }} out of 5
+                <template v-if="props.reviewCount && props.reviewCount > 0"> across {{ props.reviewCount }} shopper responses </template>
+                . Written reviews are not available to show for this product yet.
+            </template>
+            <template v-else>
+                No reviews yet. Be the first to write one.
+            </template>
         </div>
 
-        <VRow v-else dense class="product-reviews__grid">
-            <VCol v-for="review in reviews" :key="review.id" cols="12" md="6">
-                <article class="product-reviews__card">
-                    <div class="product-reviews__top">
-                        <div class="product-reviews__author">{{ review.first_name }} {{ review.last_name }}</div>
-                        <div class="product-reviews__date">
-                            {{ formatDate(review.created_at) }}
+        <div v-else class="grid gap-3 md:grid-cols-2">
+            <article
+                v-for="review in safeReviews"
+                :key="review.id"
+                class="h-full rounded-[1.3rem] border border-slate-200/80 bg-slate-50/80 p-5"
+            >
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <div class="text-base font-semibold text-slate-950">{{ review.author }}</div>
+                        <div class="mt-1 flex items-center gap-1 text-base text-amber-500" :aria-label="`${review.rating} out of 5 stars`">
+                            <span v-for="star in 5" :key="star" aria-hidden="true">{{ star <= review.rating ? "★" : "☆" }}</span>
                         </div>
                     </div>
+                    <div class="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
+                        {{ formatDate(review.createdAt) }}
+                    </div>
+                </div>
 
-                    <VRating
-                        :model-value="review.rating"
-                        readonly
-                        density="compact"
-                        color="amber"
-                        size="small"
-                        class="product-reviews__rating"
-                    />
-
-                    <div class="product-reviews__title">{{ review.title }}</div>
-                    <div class="product-reviews__content">{{ review.content }}</div>
-                </article>
-            </VCol>
-        </VRow>
+                <h3 class="mt-4 text-base font-semibold text-slate-950">{{ review.title }}</h3>
+                <p class="mt-2 text-sm leading-7 text-slate-600 sm:text-[0.95rem]">{{ review.content }}</p>
+            </article>
+        </div>
     </div>
 </template>
-
-<style scoped lang="scss">
-.product-reviews {
-    margin-top: 1.25rem;
-}
-
-.product-reviews__empty {
-    padding: 1.1rem 0 0;
-    color: #6a7590;
-}
-
-.product-reviews__card {
-    height: 100%;
-    padding: 1.2rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.2rem;
-    background: rgba(247, 250, 255, 0.92);
-}
-
-.product-reviews__top {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.45rem;
-}
-
-.product-reviews__author,
-.product-reviews__title {
-    color: #08173f;
-}
-
-.product-reviews__author {
-    font-weight: 700;
-}
-
-.product-reviews__date,
-.product-reviews__content {
-    color: #5a6480;
-}
-
-.product-reviews__date {
-    font-size: 0.82rem;
-}
-
-.product-reviews__rating {
-    margin-bottom: 0.45rem;
-}
-
-.product-reviews__title {
-    margin-bottom: 0.35rem;
-    font-weight: 700;
-}
-
-.product-reviews__content {
-    line-height: 1.65;
-}
-
-@media screen and (max-width: 700px) {
-    .product-reviews__card {
-        border-radius: 1rem;
-    }
-
-    .product-reviews__top {
-        flex-direction: column;
-    }
-}
-</style>
