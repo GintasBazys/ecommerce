@@ -10,11 +10,11 @@ onMounted(() => {
 })
 
 const accountNav = [
-    { label: "Dashboard", to: "/account", icon: "mdi-view-grid-outline" },
-    { label: "Profile", to: "/account/profile", icon: "mdi-account-circle-outline" },
-    { label: "Addresses", to: "/account/address", icon: "mdi-map-marker-outline" },
-    { label: "Orders", to: "/account/orders", icon: "mdi-bag-personal-outline" }
-]
+    { label: "Dashboard", to: "/account", icon: "dashboard" },
+    { label: "Profile", to: "/account/profile", icon: "profile" },
+    { label: "Addresses", to: "/account/address", icon: "addresses" },
+    { label: "Orders", to: "/account/orders", icon: "orders" }
+] as const
 
 const pageContent = computed(() => {
     if (route.path === "/account") {
@@ -95,6 +95,33 @@ const accountStatus = computed(() => [
     }
 ])
 
+const customerLabel = computed(() => {
+    const firstName = isClientHydrated.value ? customer.value?.first_name || "Account" : "Account"
+    const lastName = isClientHydrated.value ? customer.value?.last_name || "Member" : "Member"
+
+    return `${firstName} ${lastName}`.trim()
+})
+
+function isActivePath(path: string): boolean {
+    return route.path === path || route.path.startsWith(`${path}/`)
+}
+
+function iconPaths(icon: (typeof accountNav)[number]["icon"]): string[] {
+    if (icon === "dashboard") {
+        return ["M4 4h7v7H4z", "M13 4h7v5h-7z", "M13 11h7v9h-7z", "M4 13h7v7H4z"]
+    }
+
+    if (icon === "profile") {
+        return ["M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z", "M4.5 19.5a7.5 7.5 0 0 1 15 0"]
+    }
+
+    if (icon === "addresses") {
+        return ["M12 21s-5.5-5.7-5.5-10a5.5 5.5 0 1 1 11 0c0 4.3-5.5 10-5.5 10Z", "M12 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"]
+    }
+
+    return ["M6 7h12", "M8 4h8v4H8z", "M5 7h14v11H5z", "M9 11h6", "M9 15h4"]
+}
+
 async function handleLogout(): Promise<void> {
     try {
         const response = await $fetch<{ success: boolean }>("/api/account/logout", { method: "POST" })
@@ -110,316 +137,98 @@ async function handleLogout(): Promise<void> {
 </script>
 
 <template>
-    <main class="account-shell">
-        <div class="account-shell__backdrop"></div>
-        <VContainer class="account-shell__container">
-            <header class="account-shell__hero">
-                <div class="account-shell__meta-row">
-                    <nav class="account-shell__breadcrumb" aria-label="Breadcrumb">
+    <main class="min-h-screen bg-slate-50">
+        <div class="mx-auto w-full max-w-7xl px-4 pb-10 pt-12 sm:px-6 sm:pb-12 sm:pt-16 xl:pb-16">
+            <header class="max-w-4xl">
+                <div class="grid gap-4">
+                    <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
                         <template v-for="(item, index) in breadcrumbItems" :key="item.to">
-                            <NuxtLink v-if="index < breadcrumbItems.length - 1" :to="item.to" class="account-shell__breadcrumb-link">
+                            <NuxtLink
+                                v-if="index < breadcrumbItems.length - 1"
+                                :to="item.to"
+                                class="rounded-full border border-slate-200 bg-white px-3 py-1.5 transition hover:border-amber-200 hover:text-slate-900"
+                            >
                                 {{ item.label }}
                             </NuxtLink>
-                            <span v-else class="account-shell__breadcrumb-current">{{ item.label }}</span>
-                            <VIcon v-if="index < breadcrumbItems.length - 1" size="16" class="account-shell__breadcrumb-icon">
-                                mdi-chevron-right
-                            </VIcon>
+                            <span v-else class="rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 font-semibold text-slate-900">
+                                {{ item.label }}
+                            </span>
+                            <span v-if="index < breadcrumbItems.length - 1" aria-hidden="true" class="text-slate-400">/</span>
                         </template>
                     </nav>
-                    <div class="account-shell__status-strip">
-                        <div v-for="item in accountStatus" :key="item.label" class="account-shell__status-item">
-                            <span class="account-shell__status-label">{{ item.label }}</span>
-                            <strong class="account-shell__status-value">{{ item.value }}</strong>
+
+                    <div class="flex flex-wrap gap-3">
+                        <div v-for="item in accountStatus" :key="item.label" class="min-w-[10rem] rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                            <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">{{ item.label }}</span>
+                            <strong class="mt-1 block text-sm font-semibold text-slate-950">{{ item.value }}</strong>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <span class="account-shell__eyebrow">{{ pageContent.eyebrow }}</span>
-                    <h1 class="account-shell__title">{{ pageContent.title }}</h1>
-                    <p class="account-shell__description">{{ pageContent.description }}</p>
+
+                <div class="mt-5">
+                    <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                        {{ pageContent.eyebrow }}
+                    </span>
+                    <h1 class="mt-4 max-w-[14ch] text-[2.4rem] font-bold leading-[0.96] tracking-[-0.06rem] text-slate-950 sm:text-[3rem] xl:text-[3.6rem]">
+                        {{ pageContent.title }}
+                    </h1>
+                    <p class="mt-4 max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                        {{ pageContent.description }}
+                    </p>
                 </div>
             </header>
-            <div class="account-shell__grid">
-                <aside class="account-shell__sidebar">
-                    <div class="account-shell__profile-card">
-                        <div class="account-shell__avatar">
-                            <VIcon size="24">mdi-account-outline</VIcon>
+
+            <div class="mt-8 grid gap-5 xl:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)] xl:items-start">
+                <aside class="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 xl:sticky xl:top-6">
+                    <div class="flex items-center gap-4 rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4">
+                        <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-sm font-bold uppercase tracking-[0.08em] text-amber-900 ring-1 ring-amber-100">
+                            {{ customerLabel.slice(0, 2) }}
                         </div>
-                        <div>
-                            <p class="account-shell__profile-name">
-                                {{ isClientHydrated ? customer?.first_name || "Account" : "Account" }}
-                                {{ isClientHydrated ? customer?.last_name || "Member" : "Member" }}
-                            </p>
-                            <p class="account-shell__profile-email">
-                                {{ isClientHydrated ? customer?.email || "Signed in customer" : "Signed in customer" }}
+                        <div class="min-w-0">
+                            <p class="truncate text-base font-semibold text-slate-950">{{ customerLabel }}</p>
+                            <p class="truncate text-sm leading-6 text-slate-600">
+                                {{ isClientHydrated ? customer?.email || 'Signed in customer' : 'Signed in customer' }}
                             </p>
                         </div>
                     </div>
-                    <nav class="account-shell__nav">
+
+                    <nav class="mt-4 grid gap-2" aria-label="Account navigation">
                         <NuxtLink
                             v-for="item in accountNav"
                             :key="item.to"
                             :to="item.to"
-                            class="account-shell__nav-link"
-                            :class="{ 'account-shell__nav-link--active': route.path === item.to || route.path.startsWith(`${item.to}/`) }"
+                            class="flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold transition motion-reduce:transition-none"
+                            :class="
+                                isActivePath(item.to)
+                                    ? 'bg-amber-50 text-slate-950 ring-1 ring-amber-100'
+                                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
+                            "
                         >
-                            <VIcon size="18">{{ item.icon }}</VIcon>
+                            <span
+                                class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border"
+                                :class="isActivePath(item.to) ? 'border-amber-200 bg-white text-amber-900' : 'border-slate-200 bg-white text-slate-500'"
+                            >
+                                <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                    <path v-for="path in iconPaths(item.icon)" :key="path" :d="path" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
                             <span>{{ item.label }}</span>
                         </NuxtLink>
                     </nav>
-                    <VBtn color="primary" rounded="pill" class="account-shell__logout-btn text-none" block @click="handleLogout">
+
+                    <button
+                        type="button"
+                        class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                        @click="handleLogout"
+                    >
                         Log out
-                    </VBtn>
+                    </button>
                 </aside>
-                <main class="account-shell__content">
+
+                <section class="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
                     <slot></slot>
-                </main>
+                </section>
             </div>
-        </VContainer>
+        </div>
     </main>
 </template>
-
-<style scoped lang="scss">
-.account-shell {
-    position: relative;
-    min-height: 100vh;
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
-}
-
-.account-shell__backdrop {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at top right, rgba(0, 128, 255, 0.1), transparent 24%),
-        radial-gradient(circle at bottom left, rgba(1, 12, 128, 0.06), transparent 28%);
-    pointer-events: none;
-}
-
-.account-shell__container {
-    position: relative;
-    z-index: 1;
-    padding-top: 4.5rem;
-    padding-bottom: 4rem;
-}
-
-.account-shell__hero {
-    max-width: 48rem;
-    margin-bottom: 1.8rem;
-}
-
-.account-shell__meta-row {
-    display: grid;
-    gap: 1rem;
-    margin-bottom: 1.1rem;
-}
-
-.account-shell__breadcrumb,
-.account-shell__status-strip {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-}
-
-.account-shell__breadcrumb {
-    color: #6a7590;
-    font-size: 0.92rem;
-}
-
-.account-shell__breadcrumb-link,
-.account-shell__breadcrumb-current {
-    text-decoration: none;
-}
-
-.account-shell__breadcrumb-link {
-    color: #4b5874;
-}
-
-.account-shell__breadcrumb-current,
-.account-shell__status-value {
-    color: #08173f;
-    font-weight: 700;
-}
-
-.account-shell__breadcrumb-icon {
-    color: #9aa4bd;
-}
-
-.account-shell__status-strip {
-    gap: 0.75rem;
-}
-
-.account-shell__status-item {
-    display: grid;
-    gap: 0.1rem;
-    min-width: 10rem;
-    padding: 0.65rem 0.85rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.72);
-}
-
-.account-shell__status-label {
-    color: #6a7590;
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.account-shell__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.account-shell__title {
-    margin: 1rem 0 0.75rem;
-    color: #08173f;
-    font-size: 3.4rem;
-    line-height: 0.96;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.account-shell__description,
-.account-shell__profile-email {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.75;
-}
-
-.account-shell__grid {
-    display: grid;
-    grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr);
-    gap: 1.5rem;
-    align-items: start;
-}
-
-.account-shell__sidebar,
-.account-shell__content {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.account-shell__sidebar {
-    position: sticky;
-    top: 1.5rem;
-    display: grid;
-    gap: 1.25rem;
-    padding: 1.2rem;
-}
-
-.account-shell__profile-card {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 0.9rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.2rem;
-    background: rgba(247, 250, 255, 0.92);
-}
-
-.account-shell__avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 1rem;
-    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
-    color: #010c80;
-}
-
-.account-shell__profile-name {
-    margin: 0 0 0.2rem;
-    color: #08173f;
-    font-weight: 700;
-}
-
-.account-shell__nav {
-    display: grid;
-    gap: 0.5rem;
-}
-
-.account-shell__nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.85rem 0.95rem;
-    border-radius: 999px;
-    color: #33415f;
-    font-weight: 700;
-    text-decoration: none;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.account-shell__nav-link:hover,
-.account-shell__nav-link--active {
-    background: rgba(1, 12, 128, 0.08);
-    color: #08173f;
-    transform: translateX(2px);
-}
-
-.account-shell__content {
-    padding: 1.35rem;
-}
-
-.account-shell__logout-btn {
-    margin-top: auto;
-}
-
-@media screen and (max-width: 1100px) {
-    .account-shell__grid {
-        grid-template-columns: 1fr;
-    }
-
-    .account-shell__sidebar {
-        position: static;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .account-shell__container {
-        padding-top: 3rem;
-        padding-bottom: 2.5rem;
-    }
-
-    .account-shell__title {
-        font-size: 2.5rem;
-        line-height: 1;
-    }
-
-    .account-shell__sidebar,
-    .account-shell__content {
-        border-radius: 1.2rem;
-    }
-
-    .account-shell__status-item {
-        width: 100%;
-        min-width: 0;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .account-shell__nav-link {
-        transition: none;
-    }
-}
-</style>

@@ -1,8 +1,18 @@
 import type { OrderAddressDTO, OrderDTO, OrderLineItemDTO } from "@medusajs/types"
-
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 
 import { fetchStoreOrder } from "#server/utils/orders"
+
+type InvoiceOrderDTO = OrderDTO & {
+    payment_status?: string | null
+    fulfillment_status?: string | null
+}
+
+type InvoiceOrderAddressDTO = OrderAddressDTO & {
+    country?: {
+        display_name?: string | null
+    } | null
+}
 
 type FontSet = {
     regular: Awaited<ReturnType<PDFDocument["embedFont"]>>
@@ -18,6 +28,14 @@ type DrawContext = {
     margin: number
     y: number
 }
+
+const INK = rgb(0.1, 0.12, 0.18)
+const MUTED = rgb(0.41, 0.45, 0.54)
+const BORDER = rgb(0.88, 0.9, 0.94)
+const PANEL = rgb(0.97, 0.98, 0.99)
+const PANEL_STRONG = rgb(0.95, 0.96, 0.98)
+const BRAND = rgb(0.13, 0.22, 0.48)
+const BRAND_SOFT = rgb(0.91, 0.94, 0.99)
 
 function formatCurrency(amount: number, currencyCode?: string | null): string {
     const normalizedCurrency = currencyCode?.toUpperCase() ?? "EUR"
@@ -59,7 +77,7 @@ function compactLine(parts: Array<string | undefined | null>): string | null {
     return line || null
 }
 
-function addressLines(address?: OrderAddressDTO | null, email?: string | null): string[] {
+function addressLines(address?: InvoiceOrderAddressDTO | null, email?: string | null): string[] {
     if (!address) {
         return ["Not provided"]
     }
@@ -156,7 +174,7 @@ function drawTextLine(
     const x = options.x ?? context.margin
     const font = options.font ?? context.fonts.regular
     const size = options.size ?? 10
-    const color = options.color ?? rgb(0.09, 0.13, 0.2)
+    const color = options.color ?? INK
 
     context.page.drawText(text, {
         x,
@@ -183,7 +201,7 @@ function drawParagraph(
     const width = options.width ?? context.pageWidth - context.margin * 2
     const font = options.font ?? context.fonts.regular
     const size = options.size ?? 10
-    const color = options.color ?? rgb(0.09, 0.13, 0.2)
+    const color = options.color ?? INK
     const lineHeight = options.lineHeight ?? size + 4
     const lines = wrapText(text, width, font, size)
 
@@ -203,71 +221,99 @@ function drawKeyValueRows(
     width: number
 ): void {
     for (const row of rows) {
-        ensureSpace(context, 18)
-        drawTextLine(context, row.label, {
+        ensureSpace(context, 28)
+        context.page.drawRectangle({
             x,
-            size: 10,
-            color: rgb(0.39, 0.44, 0.52)
+            y: context.y - 12,
+            width: width + (valueX - x),
+            height: 24,
+            color: PANEL,
+            borderColor: BORDER,
+            borderWidth: 0.75
+        })
+        drawTextLine(context, row.label, {
+            x: x + 10,
+            size: 9,
+            color: MUTED
         })
 
         const lines = wrapText(row.value, width, context.fonts.bold, 10)
-        let currentY = context.y
+        let currentY = context.y + 1
         for (const line of lines) {
             context.page.drawText(line, {
                 x: valueX,
                 y: currentY,
                 size: 10,
                 font: context.fonts.bold,
-                color: rgb(0.09, 0.13, 0.2)
+                color: INK
             })
             currentY -= 14
         }
 
-        context.y = currentY - 4
+        context.y = currentY - 10
     }
 }
 
 function drawSectionHeading(context: DrawContext, text: string): void {
-    ensureSpace(context, 26)
-    drawTextLine(context, text.toUpperCase(), {
-        font: context.fonts.bold,
-        size: 10,
-        color: rgb(0.15, 0.28, 0.6)
+    ensureSpace(context, 30)
+    context.page.drawRectangle({
+        x: context.margin,
+        y: context.y - 8,
+        width: context.pageWidth - context.margin * 2,
+        height: 20,
+        color: BRAND_SOFT
     })
-    context.y -= 20
+    drawTextLine(context, text.toUpperCase(), {
+        x: context.margin + 10,
+        font: context.fonts.bold,
+        size: 9,
+        color: BRAND
+    })
+    context.y -= 24
 }
 
 function drawAddressBlock(context: DrawContext, title: string, lines: string[], x: number, width: number): number {
     const startY = context.y
+    const blockHeight = Math.max(90, 26 + lines.reduce((total, line) => total + wrapText(line, width - 20, context.fonts.regular, 10).length * 14, 0))
 
-    context.page.drawText(title, {
+    context.page.drawRectangle({
         x,
-        y: startY,
-        size: 10,
-        font: context.fonts.bold,
-        color: rgb(0.39, 0.44, 0.52)
+        y: startY - blockHeight + 8,
+        width,
+        height: blockHeight,
+        color: PANEL,
+        borderColor: BORDER,
+        borderWidth: 0.75
     })
 
-    let currentY = startY - 18
+    context.page.drawText(title, {
+        x: x + 10,
+        y: startY - 2,
+        size: 9,
+        font: context.fonts.bold,
+        color: MUTED
+    })
+
+    let currentY = startY - 22
     for (const line of lines) {
-        const wrappedLines = wrapText(line, width, context.fonts.regular, 10)
+        const wrappedLines = wrapText(line, width - 20, context.fonts.regular, 10)
         for (const wrappedLine of wrappedLines) {
             context.page.drawText(wrappedLine, {
-                x,
+                x: x + 10,
                 y: currentY,
                 size: 10,
                 font: context.fonts.regular,
-                color: rgb(0.09, 0.13, 0.2)
+                color: INK
             })
             currentY -= 14
         }
     }
 
-    return currentY
+    return startY - blockHeight
 }
 
 function drawTableHeader(context: DrawContext): void {
-    ensureSpace(context, 28)
+    ensureSpace(context, 30)
     const topY = context.y
     const columns = [
         { label: "Item", x: 50 },
@@ -277,13 +323,21 @@ function drawTableHeader(context: DrawContext): void {
         { label: "Line total", x: 495 }
     ]
 
+    context.page.drawRectangle({
+        x: context.margin,
+        y: topY - 6,
+        width: context.pageWidth - context.margin * 2,
+        height: 20,
+        color: PANEL_STRONG
+    })
+
     for (const column of columns) {
         context.page.drawText(column.label, {
             x: column.x,
             y: topY,
             size: 9,
             font: context.fonts.bold,
-            color: rgb(0.39, 0.44, 0.52)
+            color: MUTED
         })
     }
 
@@ -291,7 +345,7 @@ function drawTableHeader(context: DrawContext): void {
         start: { x: context.margin, y: topY - 8 },
         end: { x: context.pageWidth - context.margin, y: topY - 8 },
         thickness: 1,
-        color: rgb(0.88, 0.9, 0.94)
+        color: BORDER
     })
 
     context.y -= 22
@@ -303,7 +357,7 @@ function drawItemRow(context: DrawContext, item: OrderLineItemDTO, currencyCode?
     const optionLines = optionText ? wrapText(optionText, 220, context.fonts.regular, 9) : []
     const skuLines = wrapText(item.variant_sku ?? "-", 70, context.fonts.regular, 9)
     const rowLineCount = Math.max(descriptionLines.length + optionLines.length, skuLines.length, 1)
-    const rowHeight = Math.max(30, rowLineCount * 13 + 8)
+    const rowHeight = Math.max(34, rowLineCount * 13 + 12)
 
     ensureSpace(context, rowHeight + 8)
 
@@ -311,14 +365,24 @@ function drawItemRow(context: DrawContext, item: OrderLineItemDTO, currencyCode?
         drawTableHeader(context)
     }
 
-    let textY = context.y
+    context.page.drawRectangle({
+        x: context.margin,
+        y: context.y - rowHeight + 10,
+        width: context.pageWidth - context.margin * 2,
+        height: rowHeight,
+        color: PANEL,
+        borderColor: BORDER,
+        borderWidth: 0.5
+    })
+
+    let textY = context.y - 2
     for (const line of descriptionLines) {
         context.page.drawText(line, {
             x: 50,
             y: textY,
             size: 10,
             font: context.fonts.bold,
-            color: rgb(0.09, 0.13, 0.2)
+            color: INK
         })
         textY -= 13
     }
@@ -329,58 +393,54 @@ function drawItemRow(context: DrawContext, item: OrderLineItemDTO, currencyCode?
             y: textY,
             size: 9,
             font: context.fonts.regular,
-            color: rgb(0.39, 0.44, 0.52)
+            color: MUTED
         })
         textY -= 12
     }
 
-    let skuY = context.y
+    let skuY = context.y - 2
     for (const line of skuLines) {
         context.page.drawText(line, {
             x: 285,
             y: skuY,
             size: 9,
             font: context.fonts.regular,
-            color: rgb(0.09, 0.13, 0.2)
+            color: INK
         })
         skuY -= 12
     }
 
     context.page.drawText(String(item.quantity ?? 0), {
         x: 370,
-        y: context.y,
+        y: context.y - 2,
         size: 10,
         font: context.fonts.regular,
-        color: rgb(0.09, 0.13, 0.2)
+        color: INK
     })
 
-    context.page.drawText(formatCurrency(Number(item.unit_price ?? 0), currencyCode), {
+    const unitPrice = formatCurrency(Number(item.unit_price ?? 0), currencyCode)
+    const lineTotal = formatCurrency(Number(item.total ?? 0), currencyCode)
+
+    context.page.drawText(unitPrice, {
         x: 425,
-        y: context.y,
+        y: context.y - 2,
         size: 10,
         font: context.fonts.regular,
-        color: rgb(0.09, 0.13, 0.2)
+        color: INK
     })
 
-    context.page.drawText(formatCurrency(Number(item.total ?? 0), currencyCode), {
+    context.page.drawText(lineTotal, {
         x: 495,
-        y: context.y,
+        y: context.y - 2,
         size: 10,
         font: context.fonts.bold,
-        color: rgb(0.09, 0.13, 0.2)
-    })
-
-    context.page.drawLine({
-        start: { x: context.margin, y: context.y - rowHeight + 8 },
-        end: { x: context.pageWidth - context.margin, y: context.y - rowHeight + 8 },
-        thickness: 1,
-        color: rgb(0.94, 0.95, 0.97)
+        color: INK
     })
 
     context.y -= rowHeight
 }
 
-function drawTotals(context: DrawContext, order: OrderDTO): void {
+function drawTotals(context: DrawContext, order: InvoiceOrderDTO): void {
     const totalXLabel = 390
     const totalXValue = 495
 
@@ -391,7 +451,16 @@ function drawTotals(context: DrawContext, order: OrderDTO): void {
         { label: "Total", value: formatCurrency(Number(order.total ?? 0), order.currency_code), bold: true }
     ]
 
-    ensureSpace(context, 90)
+    ensureSpace(context, 118)
+    context.page.drawRectangle({
+        x: 360,
+        y: context.y - 82,
+        width: context.pageWidth - 360 - context.margin,
+        height: 96,
+        color: PANEL,
+        borderColor: BORDER,
+        borderWidth: 0.75
+    })
 
     for (const row of rows) {
         context.page.drawText(row.label, {
@@ -399,14 +468,15 @@ function drawTotals(context: DrawContext, order: OrderDTO): void {
             y: context.y,
             size: 10,
             font: row.bold ? context.fonts.bold : context.fonts.regular,
-            color: rgb(0.09, 0.13, 0.2)
+            color: row.bold ? INK : MUTED
         })
+        const valueWidth = (row.bold ? context.fonts.bold : context.fonts.regular).widthOfTextAtSize(row.value, 10)
         context.page.drawText(row.value, {
-            x: totalXValue,
+            x: totalXValue + 40 - valueWidth,
             y: context.y,
             size: 10,
             font: row.bold ? context.fonts.bold : context.fonts.regular,
-            color: rgb(0.09, 0.13, 0.2)
+            color: INK
         })
         context.y -= 18
 
@@ -415,18 +485,18 @@ function drawTotals(context: DrawContext, order: OrderDTO): void {
                 start: { x: totalXLabel, y: context.y + 8 },
                 end: { x: context.pageWidth - context.margin, y: context.y + 8 },
                 thickness: 1,
-                color: rgb(0.88, 0.9, 0.94)
+                color: BORDER
             })
             context.y -= 8
         }
     }
 }
 
-function buildInvoiceNumber(order: OrderDTO): string {
+function buildInvoiceNumber(order: InvoiceOrderDTO): string {
     return `INV-${order.display_id ?? order.id.slice(0, 8)}`
 }
 
-function buildFileName(order: OrderDTO): string {
+function buildFileName(order: InvoiceOrderDTO): string {
     const dateStamp = new Date(order.created_at ?? Date.now()).toISOString().slice(0, 10)
     return `Invoice-${order.display_id ?? order.id}-${dateStamp}.pdf`
 }
@@ -438,7 +508,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "Order id is required" })
     }
 
-    const order = await fetchStoreOrder(event, id)
+    const order = (await fetchStoreOrder(event, id)) as InvoiceOrderDTO
     const doc = await PDFDocument.create()
     const regular = await doc.embedFont(StandardFonts.Helvetica)
     const bold = await doc.embedFont(StandardFonts.HelveticaBold)
@@ -461,19 +531,50 @@ export default defineEventHandler(async (event) => {
     const billingLines = addressLines(order.billing_address, order.email)
     const shippingLines = addressLines(order.shipping_address, order.email)
 
-    drawTextLine(context, "Ecommerce", {
-        font: bold,
-        size: 24,
-        color: rgb(0.11, 0.2, 0.46)
+    context.page.drawRectangle({
+        x: margin,
+        y: context.y - 72,
+        width: pageWidth - margin * 2,
+        height: 82,
+        color: BRAND
     })
-    context.y -= 18
+    context.page.drawRectangle({
+        x: margin,
+        y: context.y - 72,
+        width: 148,
+        height: 82,
+        color: rgb(0.16, 0.27, 0.56)
+    })
 
-    drawTextLine(context, "Invoice", {
+    context.page.drawText("Ecommerce", {
+        x: margin + 18,
+        y: context.y - 18,
+        size: 22,
         font: bold,
-        size: 16,
-        color: rgb(0.09, 0.13, 0.2)
+        color: rgb(1, 1, 1)
     })
-    context.y -= 24
+    context.page.drawText("Premium order invoice", {
+        x: margin + 18,
+        y: context.y - 38,
+        size: 10,
+        font: regular,
+        color: rgb(0.9, 0.93, 0.98)
+    })
+    context.page.drawText("INVOICE", {
+        x: pageWidth - margin - 82,
+        y: context.y - 22,
+        size: 11,
+        font: bold,
+        color: rgb(0.87, 0.91, 0.99)
+    })
+    context.page.drawText(invoiceNumber, {
+        x: pageWidth - margin - 92,
+        y: context.y - 42,
+        size: 16,
+        font: bold,
+        color: rgb(1, 1, 1)
+    })
+    context.y -= 92
 
     drawKeyValueRows(
         context,
@@ -486,25 +587,17 @@ export default defineEventHandler(async (event) => {
             { label: "Fulfillment status", value: formatStatus(order.fulfillment_status) }
         ],
         margin,
-        170,
-        pageWidth - 170 - margin
+        188,
+        pageWidth - 188 - margin - 10
     )
 
-    context.y -= 8
+    context.y -= 4
     drawSectionHeading(context, "Bill to / Ship to")
-    ensureSpace(context, 120)
+    ensureSpace(context, 132)
 
-    const addressTopY = context.y
-    const billEndY = drawAddressBlock(context, "Billing address", billingLines, margin, 220)
-    const shipEndY = drawAddressBlock(context, "Shipping address", shippingLines, 310, 220)
-    context.y = Math.min(billEndY, shipEndY) - 12
-
-    context.page.drawLine({
-        start: { x: margin, y: addressTopY + 18 },
-        end: { x: pageWidth - margin, y: addressTopY + 18 },
-        thickness: 1,
-        color: rgb(0.88, 0.9, 0.94)
-    })
+    const billEndY = drawAddressBlock(context, "Billing address", billingLines, margin, 232)
+    const shipEndY = drawAddressBlock(context, "Shipping address", shippingLines, 312, 232)
+    context.y = Math.min(billEndY, shipEndY) - 16
 
     drawSectionHeading(context, "Line items")
     drawTableHeader(context)
@@ -541,21 +634,21 @@ export default defineEventHandler(async (event) => {
             start: { x: margin, y: 34 },
             end: { x: pageWidth - margin, y: 34 },
             thickness: 1,
-            color: rgb(0.88, 0.9, 0.94)
+            color: BORDER
         })
         page.drawText(`Invoice ${invoiceNumber}`, {
             x: margin,
             y: 20,
             size: 9,
             font: regular,
-            color: rgb(0.39, 0.44, 0.52)
+            color: MUTED
         })
         page.drawText(`Page ${index + 1} of ${pageCount}`, {
             x: pageWidth - margin - 54,
             y: 20,
             size: 9,
             font: regular,
-            color: rgb(0.39, 0.44, 0.52)
+            color: MUTED
         })
     }
 

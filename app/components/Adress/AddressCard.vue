@@ -9,6 +9,15 @@ const emit = defineEmits<{
     (_: "delete", __: string): void
 }>()
 
+const addressLines = computed<string[]>(() => {
+    const cityLine = [props.address.city, props.address.province].filter(Boolean).join(", ")
+    const postalLine = [props.address.postal_code, props.address.country_code?.toUpperCase()].filter(Boolean).join(" • ")
+
+    return [props.address.address_1, props.address.address_2, cityLine, postalLine, props.address.phone, props.address.company].filter(
+        (line): line is string => Boolean(line)
+    )
+})
+
 function onEdit(): void {
     emit("edit", props.address)
 }
@@ -21,83 +30,50 @@ function onDelete(): void {
 </script>
 
 <template>
-    <article class="address-card">
+    <article class="flex h-full flex-col justify-between rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5">
         <div>
-            <div class="address-card__top">
+            <div class="flex items-start justify-between gap-3">
                 <div>
-                    <span class="address-card__label">{{ props.address.address_name?.toUpperCase() || "UNNAMED ADDRESS" }}</span>
-                    <h3 class="address-card__name">{{ props.address.first_name }} {{ props.address.last_name }}</h3>
+                    <span class="text-[0.74rem] font-bold uppercase tracking-[0.12em] text-brand-700">
+                        {{ props.address.address_name?.toUpperCase() || "UNNAMED ADDRESS" }}
+                    </span>
+                    <h3 class="mt-2 text-[1.05rem] font-semibold text-slate-950">
+                        {{ props.address.first_name }} {{ props.address.last_name }}
+                    </h3>
                 </div>
 
-                <div class="address-card__actions">
-                    <VBtn icon size="small" variant="text" @click="onEdit">
-                        <VIcon>mdi-pencil</VIcon>
-                    </VBtn>
-                    <VBtn icon size="small" variant="text" color="error" @click="onDelete">
-                        <VIcon>mdi-delete-outline</VIcon>
-                    </VBtn>
+                <div class="inline-flex gap-2">
+                    <button
+                        type="button"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                        aria-label="Edit address"
+                        @click="onEdit"
+                    >
+                        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path d="M4 20h4l10-10-4-4L4 16v4Z" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="m13.5 6.5 4 4" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-200 motion-reduce:transition-none"
+                        aria-label="Delete address"
+                        @click="onDelete"
+                    >
+                        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path d="M4 7h16" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10 11v5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M14 11v5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M6 7l1 12h10l1-12" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="address-card__body">
-                <p class="address-card__line">{{ props.address.address_1 }}</p>
-                <p v-if="props.address.address_2" class="address-card__line">{{ props.address.address_2 }}</p>
-                <p class="address-card__line">{{ props.address.city }}, {{ props.address.province }}</p>
-                <p class="address-card__line">{{ props.address.postal_code }} - {{ props.address.country_code?.toUpperCase() }}</p>
-                <p v-if="props.address.phone" class="address-card__line">{{ props.address.phone }}</p>
-                <p v-if="props.address.company" class="address-card__line">{{ props.address.company }}</p>
+            <div class="mt-4 grid gap-1.5 text-sm leading-6 text-slate-600">
+                <p v-for="line in addressLines" :key="line" class="m-0">{{ line }}</p>
             </div>
         </div>
     </article>
 </template>
-
-<style scoped lang="scss">
-.address-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    padding: 1.2rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.25rem;
-    background: rgba(247, 250, 255, 0.92);
-}
-
-.address-card__top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.9rem;
-}
-
-.address-card__label {
-    color: #010c80;
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
-.address-card__name {
-    margin: 0.45rem 0 0;
-    color: #08173f;
-    font-size: 1rem;
-}
-
-.address-card__actions {
-    display: inline-flex;
-    gap: 0.1rem;
-}
-
-.address-card__body {
-    display: grid;
-    gap: 0.3rem;
-}
-
-.address-card__line {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.6;
-}
-</style>

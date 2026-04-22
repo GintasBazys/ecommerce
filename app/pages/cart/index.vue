@@ -243,7 +243,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
     <main
         class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#f6f9ff_100%)] pb-14 pt-[calc(var(--site-header-offset,98px)+1.25rem)] sm:pb-18 sm:pt-[calc(var(--site-header-offset,98px)+1.75rem)]"
     >
-        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 pt-8">
             <section class="grid gap-5 lg:gap-7 xl:grid-cols-[minmax(0,1.15fr)_minmax(21rem,0.85fr)]">
                 <div class="space-y-5 sm:space-y-6">
                     <CartHero :total="displayTotal" :item-count="cartItemCount" :continue-shopping-url="ALL_PRODUCTS_URL_HANDLE" />

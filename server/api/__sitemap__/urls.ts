@@ -7,9 +7,18 @@ import { fetchAllStoreProducts } from "#server/utils/products"
 
 type SitemapProduct = Pick<HttpTypes.StoreProduct, "handle" | "updated_at">
 type SitemapCategory = Pick<ProductCategoryDTO, "handle" | "updated_at">
+
 type SitemapEntry = {
     loc: string
     lastmod?: string
+}
+
+function toLastmod(value: string | Date | null | undefined): string | undefined {
+    if (!value) {
+        return undefined
+    }
+
+    return value instanceof Date ? value.toISOString() : value
 }
 
 async function fetchBlogPosts(event: H3Event) {
@@ -53,30 +62,36 @@ export default defineSitemapEventHandler(async (event) => {
         fetchBlogPosts(event)
     ])
 
-    const productEntries = products
-        .filter((product): product is SitemapProduct & { handle: string } => typeof product.handle === "string" && product.handle.length > 0)
+    const productEntries: SitemapEntry[] = products
+        .filter(
+            (product): product is SitemapProduct & { handle: string } => typeof product.handle === "string" && product.handle.length > 0
+        )
         .map((product) => ({
             loc: `/product/${product.handle}`,
-            lastmod: product.updated_at || undefined
+            lastmod: toLastmod(product.updated_at)
         }))
 
-    const categoryEntries = (product_categories || [])
-        .filter((category): category is SitemapCategory & { handle: string } => typeof category.handle === "string" && category.handle.length > 0)
+    const categoryEntries: SitemapEntry[] = (product_categories || [])
+        .filter(
+            (category): category is SitemapCategory & { handle: string } =>
+                typeof category.handle === "string" && category.handle.length > 0
+        )
         .map((category) => ({
             loc: `/category/${category.handle}`,
-            lastmod: category.updated_at || undefined
+            lastmod: toLastmod(category.updated_at)
         }))
 
-    const blogEntries = blogPosts
+    const blogEntries: SitemapEntry[] = blogPosts
         .filter((post): post is { slug: string; updated_at?: string | null; published_at?: string | null; created_at?: string | null } => {
             return typeof post?.slug === "string" && post.slug.length > 0
         })
         .map((post) => ({
             loc: `/blog/${post.slug}`,
-            lastmod: post.updated_at || post.published_at || post.created_at || undefined
+            lastmod: toLastmod(post.updated_at ?? post.published_at ?? post.created_at)
         }))
 
-    const entries = [{ loc: "/category/all-products" }, ...categoryEntries, ...productEntries, ...blogEntries]
+    const entries: SitemapEntry[] = [{ loc: "/category/all-products" }, ...categoryEntries, ...productEntries, ...blogEntries]
+
     const dedupedEntries = new Map<string, SitemapEntry>()
 
     for (const entry of entries) {

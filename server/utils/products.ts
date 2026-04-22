@@ -18,13 +18,9 @@ type ProductPrice = {
     currency_code?: string | null
 }
 
-type ProductVariant = {
+type ProductVariantPricing = {
     calculated_price?: ProductPrice | null
     inventory_quantity?: number | null
-}
-
-type ProductWithVariants = {
-    variants?: ProductVariant[] | null
 }
 
 type ProductFetchOptions = {
@@ -33,6 +29,9 @@ type ProductFetchOptions = {
 }
 
 type ProductPriceField = keyof Pick<ProductPrice, "calculated_amount" | "original_amount">
+type ProductWithUnknownVariants = {
+    variants?: unknown[] | null
+}
 
 export async function fetchAllStoreProducts<Product>(event: H3Event, searchParams: URLSearchParams, options: ProductFetchOptions = {}) {
     const pageSize = options.pageSize ?? DEFAULT_PAGE_SIZE
@@ -114,17 +113,13 @@ async function fetchStoreProductsPage<Product>(event: H3Event, searchParams: URL
     }
 }
 
-export function getProductPrices(product: ProductWithVariants, field: ProductPriceField = "calculated_amount") {
+export function getProductPrices(product: ProductWithUnknownVariants, field: ProductPriceField = "calculated_amount") {
     return (product.variants ?? [])
-        .map((variant) => variant.calculated_price?.[field])
+        .map((variant) => (variant as ProductVariantPricing).calculated_price?.[field])
         .filter((value): value is number => typeof value === "number")
 }
 
-export function getAggregatedProductPrice(
-    product: ProductWithVariants,
-    mode: "min" | "max" = "min",
-    field: ProductPriceField = "calculated_amount"
-) {
+export function getAggregatedProductPrice(product: ProductWithUnknownVariants, mode: "min" | "max" = "min", field: ProductPriceField = "calculated_amount") {
     const prices = getProductPrices(product, field)
 
     if (!prices.length) {
@@ -134,10 +129,14 @@ export function getAggregatedProductPrice(
     return mode === "max" ? Math.max(...prices) : Math.min(...prices)
 }
 
-export function getProductCurrencyCode(product: ProductWithVariants) {
-    return product.variants?.find((variant) => variant.calculated_price?.currency_code)?.calculated_price?.currency_code ?? null
+export function getProductCurrencyCode(product: ProductWithUnknownVariants) {
+    const variantWithCurrency = product.variants?.find(
+        (variant) => (variant as ProductVariantPricing).calculated_price?.currency_code
+    ) as ProductVariantPricing | undefined
+
+    return variantWithCurrency?.calculated_price?.currency_code ?? null
 }
 
-export function isProductInStock(product: ProductWithVariants) {
-    return (product.variants ?? []).some((variant) => Number(variant.inventory_quantity ?? 0) > 0)
+export function isProductInStock(product: ProductWithUnknownVariants) {
+    return (product.variants ?? []).some((variant) => Number((variant as ProductVariantPricing).inventory_quantity ?? 0) > 0)
 }

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { APIError, Customer } from "@/types/interfaces"
-import type { VForm } from "~/types/interfaces"
 
 definePageMeta({
     layout: "account",
@@ -19,20 +18,47 @@ const customerData = reactive<Customer>({
     company_name: customer.value?.company_name ?? ""
 })
 
-const formRef = ref<VForm | null>(null)
-const snackbar = ref(false)
-const snackbarText = ref("")
-const snackbarColor = ref("success")
+const isSubmitting = ref(false)
+const feedback = reactive({
+    visible: false,
+    text: "",
+    tone: "success" as "success" | "error"
+})
+const fieldErrors = reactive<Record<string, string>>({
+    first_name: "",
+    last_name: ""
+})
 
-const rules = {
-    required: (value: unknown) => !!value || "This field is required"
+const customerFullName = computed<string>(() => {
+    const firstName = customerData.first_name.trim()
+    const lastName = customerData.last_name.trim()
+    return `${firstName} ${lastName}`.trim() || "Saved to your account"
+})
+
+function validateForm(): boolean {
+    fieldErrors.first_name = customerData.first_name.trim() ? "" : "First name is required"
+    fieldErrors.last_name = customerData.last_name.trim() ? "" : "Last name is required"
+
+    return !fieldErrors.first_name && !fieldErrors.last_name
+}
+
+function clearFieldError(field: "first_name" | "last_name"): void {
+    if (fieldErrors[field]) {
+        fieldErrors[field] = ""
+    }
 }
 
 async function onSubmit(): Promise<void> {
-    const validation = await formRef.value?.validate()
-    if (!validation?.valid) {
+    feedback.visible = false
+
+    if (!validateForm()) {
+        feedback.text = "Please complete the required fields before saving."
+        feedback.tone = "error"
+        feedback.visible = true
         return
     }
+
+    isSubmitting.value = true
 
     try {
         await $fetch("/api/account/update-customer", {
@@ -52,134 +78,143 @@ async function onSubmit(): Promise<void> {
             state.customer.company_name = customerData.company_name
         })
 
-        snackbarText.value = "Profile updated!"
-        snackbarColor.value = "success"
-        snackbar.value = true
+        feedback.text = "Profile updated!"
+        feedback.tone = "success"
+        feedback.visible = true
     } catch (error: unknown) {
         const apiError = error as APIError
-        snackbarText.value = apiError.data?.message || "Update failed"
-        snackbarColor.value = "error"
-        snackbar.value = true
+        feedback.text = apiError.data?.message || "Update failed"
+        feedback.tone = "error"
+        feedback.visible = true
+    } finally {
+        isSubmitting.value = false
     }
 }
 </script>
 
 <template>
-    <div class="profile-content">
-        <section class="profile-content__stats">
-            <div class="profile-content__stat-card">
-                <span class="profile-content__stat-label">Account email</span>
-                <strong class="profile-content__stat-value">{{ customer?.email || "Saved to your account" }}</strong>
-            </div>
-            <div class="profile-content__stat-card">
-                <span class="profile-content__stat-label">Customer name</span>
-                <strong class="profile-content__stat-value">
-                    {{ customerData.first_name || "First" }} {{ customerData.last_name || "Last" }}
+    <div class="grid gap-5">
+        <section class="grid gap-4 lg:grid-cols-2">
+            <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <span class="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Account email</span>
+                <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
+                    {{ customer?.email || "Saved to your account" }}
                 </strong>
+                <p class="mt-2 text-sm leading-6 text-slate-600">Used for order updates, account access, and checkout communication.</p>
+            </article>
+
+            <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <span class="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Customer name</span>
+                <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
+                    {{ customerFullName }}
+                </strong>
+                <p class="mt-2 text-sm leading-6 text-slate-600">Keep your personal details current so delivery and support stay accurate.</p>
+            </article>
+        </section>
+
+        <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <div class="max-w-3xl">
+                <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                    Profile details
+                </span>
+                <h2 class="mt-4 text-[1.85rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
+                    Keep your account details up to date.
+                </h2>
+                <p class="mt-3 text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                    Update the core information attached to your account so orders, support, and saved details stay consistent.
+                </p>
             </div>
-        </section>
-        <section class="profile-content__panel">
-            <h2 class="profile-content__title">Profile details</h2>
-            <p class="profile-content__text">Update the core information attached to your account.</p>
-            <VForm ref="formRef" class="profile-content__form" @submit.prevent="onSubmit">
-                <div class="profile-content__grid">
-                    <VTextField
-                        v-model="customerData.first_name"
-                        label="First name"
-                        :rules="[rules.required]"
-                        prepend-inner-icon="mdi-account"
-                        variant="outlined"
-                    />
-                    <VTextField
-                        v-model="customerData.last_name"
-                        label="Last name"
-                        :rules="[rules.required]"
-                        prepend-inner-icon="mdi-account-outline"
-                        variant="outlined"
-                    />
+
+            <div
+                v-if="feedback.visible"
+                class="mt-6 rounded-2xl border px-4 py-3 text-sm font-medium"
+                :class="
+                    feedback.tone === 'success'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                        : 'border-rose-200 bg-rose-50 text-rose-700'
+                "
+                role="status"
+                :aria-live="feedback.tone === 'error' ? 'assertive' : 'polite'"
+            >
+                {{ feedback.text }}
+            </div>
+
+            <form class="mt-6 grid gap-5" @submit.prevent="onSubmit">
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid gap-2">
+                        <label for="profile-first-name" class="text-sm font-medium text-slate-700">First name</label>
+                        <input
+                            id="profile-first-name"
+                            v-model="customerData.first_name"
+                            type="text"
+                            autocomplete="given-name"
+                            class="min-h-12 rounded-2xl border bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:outline-hidden focus:ring-2"
+                            :class="
+                                fieldErrors.first_name
+                                    ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-100'
+                                    : 'border-slate-300 focus:border-amber-300 focus:ring-amber-200'
+                            "
+                            placeholder="Enter your first name"
+                            @input="clearFieldError('first_name')"
+                        />
+                        <p v-if="fieldErrors.first_name" class="text-sm text-rose-600">{{ fieldErrors.first_name }}</p>
+                    </div>
+
+                    <div class="grid gap-2">
+                        <label for="profile-last-name" class="text-sm font-medium text-slate-700">Last name</label>
+                        <input
+                            id="profile-last-name"
+                            v-model="customerData.last_name"
+                            type="text"
+                            autocomplete="family-name"
+                            class="min-h-12 rounded-2xl border bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:outline-hidden focus:ring-2"
+                            :class="
+                                fieldErrors.last_name
+                                    ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-100'
+                                    : 'border-slate-300 focus:border-amber-300 focus:ring-amber-200'
+                            "
+                            placeholder="Enter your last name"
+                            @input="clearFieldError('last_name')"
+                        />
+                        <p v-if="fieldErrors.last_name" class="text-sm text-rose-600">{{ fieldErrors.last_name }}</p>
+                    </div>
+
+                    <div class="grid gap-2">
+                        <label for="profile-phone" class="text-sm font-medium text-slate-700">Phone</label>
+                        <input
+                            id="profile-phone"
+                            v-model="customerData.phone"
+                            type="tel"
+                            autocomplete="tel"
+                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                            placeholder="Add a phone number"
+                        />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <label for="profile-company" class="text-sm font-medium text-slate-700">Company name</label>
+                        <input
+                            id="profile-company"
+                            v-model="customerData.company_name"
+                            type="text"
+                            autocomplete="organization"
+                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                            placeholder="Add a company name"
+                        />
+                    </div>
                 </div>
-                <div class="profile-content__grid">
-                    <VTextField v-model="customerData.phone" label="Phone" prepend-inner-icon="mdi-phone-outline" variant="outlined" />
-                    <VTextField
-                        v-model="customerData.company_name"
-                        label="Company name"
-                        prepend-inner-icon="mdi-domain"
-                        variant="outlined"
-                    />
+
+                <div class="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm leading-6 text-slate-500">Changes are saved to your account immediately after a successful update.</p>
+                    <button
+                        type="submit"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
+                        :disabled="isSubmitting"
+                    >
+                        {{ isSubmitting ? 'Saving...' : 'Save changes' }}
+                    </button>
                 </div>
-                <VBtn type="submit" color="primary" rounded="pill" class="text-none px-7">Save changes</VBtn>
-            </VForm>
+            </form>
         </section>
-        <VSnackbar v-model="snackbar" timeout="3000" :color="snackbarColor" location="top">
-            {{ snackbarText }}
-        </VSnackbar>
     </div>
 </template>
-
-<style scoped lang="scss">
-.profile-content {
-    display: grid;
-    gap: 1.25rem;
-}
-
-.profile-content__stats,
-.profile-content__grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.profile-content__stat-card,
-.profile-content__panel {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.4rem;
-    background: rgba(247, 250, 255, 0.92);
-}
-
-.profile-content__stat-card {
-    display: grid;
-    gap: 0.2rem;
-    padding: 1rem 1.1rem;
-}
-
-.profile-content__stat-label,
-.profile-content__text {
-    color: #4b5874;
-}
-
-.profile-content__stat-label {
-    font-size: 0.88rem;
-}
-
-.profile-content__stat-value,
-.profile-content__title {
-    color: #08173f;
-}
-
-.profile-content__panel {
-    padding: 1.35rem;
-}
-
-.profile-content__title {
-    margin: 0 0 0.5rem;
-    font-size: 1.45rem;
-}
-
-.profile-content__text {
-    margin: 0;
-    line-height: 1.7;
-}
-
-.profile-content__form {
-    display: grid;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-@media screen and (max-width: 900px) {
-    .profile-content__stats,
-    .profile-content__grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>

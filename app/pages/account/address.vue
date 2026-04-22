@@ -15,6 +15,8 @@ const LIMIT = 3
 const page = ref(1)
 const limit = ref(LIMIT)
 const offset = computed(() => (page.value - 1) * limit.value)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / limit.value)))
+const skeletonCards = Array.from({ length: LIMIT }, (_, index) => index)
 
 const loading = ref(false)
 const addresses = ref<CustomerAddressDTO[]>([])
@@ -74,6 +76,12 @@ async function updateAddress(payload: CustomerAddressDTO): Promise<void> {
 async function deleteAddress(id: string): Promise<void> {
     try {
         await $fetch(`/api/account/delete-address/${id}`, { method: "DELETE", credentials: "include" })
+
+        if (addresses.value.length === 1 && page.value > 1) {
+            page.value -= 1
+            return
+        }
+
         await fetchPage()
     } catch {
         error.value = "Could not delete address."
@@ -84,124 +92,120 @@ function onEdit(address: CustomerAddressDTO): void {
     editAddr.value = { ...address }
     showEdit.value = true
 }
+
+function changePage(nextPage: number): void {
+    if (nextPage < 1 || nextPage > totalPages.value || nextPage === page.value) {
+        return
+    }
+
+    page.value = nextPage
+}
 </script>
 
 <template>
-    <div class="account-addresses-content">
-        <div class="account-addresses-content__toolbar">
-            <div class="account-addresses-content__stat-card">
-                <span class="account-addresses-content__stat-label">Saved entries</span>
-                <strong class="account-addresses-content__stat-value">{{ totalCount }}</strong>
+    <div class="grid gap-5">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 shadow-sm">
+                <span class="block text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Saved entries</span>
+                <strong class="mt-1 block text-2xl font-semibold text-slate-950">{{ totalCount }}</strong>
             </div>
 
-            <VBtn color="primary" rounded="pill" class="text-none px-7" @click="showAdd = true">Add new address</VBtn>
+            <button
+                type="button"
+                class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                @click="showAdd = true"
+            >
+                Add new address
+            </button>
         </div>
-        <section class="account-addresses-content__panel">
-            <VRow v-if="loading" justify="center" class="my-6">
-                <VProgressCircular indeterminate color="primary" size="48" />
-            </VRow>
-            <template v-else>
-                <VRow v-if="addresses.length" align="stretch">
-                    <VCol v-for="address in addresses" :key="address.id" cols="12" sm="6" xl="4">
-                        <AddressCard :address="address" @edit="onEdit" @delete="deleteAddress" />
-                    </VCol>
-                </VRow>
-                <div v-else class="account-addresses-content__empty-state">
-                    <div class="account-addresses-content__empty-icon">
-                        <VIcon size="26">mdi-map-marker-outline</VIcon>
+
+        <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-7">
+            <div v-if="loading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+                <div v-for="item in skeletonCards" :key="item" class="rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5">
+                    <div class="animate-pulse space-y-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="space-y-3">
+                                <div class="h-3 w-24 rounded-full bg-slate-200"></div>
+                                <div class="h-5 w-36 rounded-full bg-slate-200"></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="h-9 w-9 rounded-full bg-slate-200"></div>
+                                <div class="h-9 w-9 rounded-full bg-slate-200"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="h-4 w-full rounded-full bg-slate-200"></div>
+                            <div class="h-4 w-5/6 rounded-full bg-slate-200"></div>
+                            <div class="h-4 w-2/3 rounded-full bg-slate-200"></div>
+                            <div class="h-4 w-1/2 rounded-full bg-slate-200"></div>
+                        </div>
                     </div>
-                    <h2 class="account-addresses-content__empty-title">No addresses saved yet</h2>
-                    <p class="account-addresses-content__empty-text">Add your first address to make future checkout steps faster.</p>
                 </div>
-            </template>
-            <VRow v-if="totalCount > limit" class="mt-6" justify="center">
-                <VPagination v-model="page" :length="Math.ceil(totalCount / limit)" circle rounded />
-            </VRow>
-            <VAlert v-if="error" type="error" variant="tonal" class="mt-4">
+            </div>
+
+            <div v-else-if="addresses.length" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <AddressCard v-for="address in addresses" :key="address.id" :address="address" @edit="onEdit" @delete="deleteAddress" />
+            </div>
+
+            <div v-else class="grid gap-4 rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M12 21s-5.5-5.7-5.5-10a5.5 5.5 0 1 1 11 0c0 4.3-5.5 10-5.5 10Z" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-[1.35rem] font-semibold text-slate-950">No addresses saved yet</h2>
+                    <p class="mt-2 max-w-xl text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
+                        Add your first address to make future checkout steps faster.
+                    </p>
+                </div>
+            </div>
+
+            <div v-if="totalCount > limit" class="mt-6 flex flex-wrap items-center justify-center gap-2">
+                <button
+                    type="button"
+                    class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
+                    :disabled="page <= 1"
+                    aria-label="Go to previous address page"
+                    @click="changePage(page - 1)"
+                >
+                    ‹
+                </button>
+
+                <button
+                    v-for="pageNumber in totalPages"
+                    :key="pageNumber"
+                    type="button"
+                    class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border px-3 text-sm font-semibold transition motion-reduce:transition-none"
+                    :class="
+                        pageNumber === page
+                            ? 'border-amber-300 bg-amber-50 text-slate-950 ring-1 ring-amber-100'
+                            : 'border-slate-300 bg-white text-slate-700 hover:border-amber-200 hover:text-slate-950'
+                    "
+                    :aria-current="pageNumber === page ? 'page' : undefined"
+                    @click="changePage(pageNumber)"
+                >
+                    {{ pageNumber }}
+                </button>
+
+                <button
+                    type="button"
+                    class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
+                    :disabled="page >= totalPages"
+                    aria-label="Go to next address page"
+                    @click="changePage(page + 1)"
+                >
+                    ›
+                </button>
+            </div>
+
+            <div v-if="error" class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700" role="alert">
                 {{ error }}
-            </VAlert>
+            </div>
         </section>
+
         <AddressForm v-model="showAdd" title="Add address" :address="{}" @save="createAddress" />
         <AddressForm v-model="showEdit" title="Edit address" :address="editAddr" @save="updateAddress" />
     </div>
 </template>
-
-<style scoped lang="scss">
-.account-addresses-content {
-    display: grid;
-    gap: 1.25rem;
-}
-
-.account-addresses-content__toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.account-addresses-content__stat-card,
-.account-addresses-content__panel,
-.account-addresses-content__empty-state {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.4rem;
-    background: rgba(247, 250, 255, 0.92);
-}
-
-.account-addresses-content__stat-card {
-    display: grid;
-    gap: 0.2rem;
-    padding: 1rem 1.1rem;
-}
-
-.account-addresses-content__stat-label,
-.account-addresses-content__empty-text {
-    color: #4b5874;
-}
-
-.account-addresses-content__stat-label {
-    font-size: 0.88rem;
-}
-
-.account-addresses-content__stat-value,
-.account-addresses-content__empty-title {
-    color: #08173f;
-}
-
-.account-addresses-content__panel,
-.account-addresses-content__empty-state {
-    padding: 1.35rem;
-}
-
-.account-addresses-content__empty-state {
-    display: grid;
-    justify-items: start;
-    gap: 0.85rem;
-}
-
-.account-addresses-content__empty-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.15rem;
-    height: 3.15rem;
-    border-radius: 1rem;
-    background: linear-gradient(145deg, rgba(1, 12, 128, 0.1), rgba(0, 128, 255, 0.08));
-    color: #010c80;
-}
-
-.account-addresses-content__empty-title {
-    margin: 0;
-}
-
-.account-addresses-content__empty-text {
-    margin: 0;
-    line-height: 1.7;
-}
-
-@media screen and (max-width: 700px) {
-    .account-addresses-content__toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-</style>
