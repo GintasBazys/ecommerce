@@ -11,29 +11,9 @@ export interface CustomerAuthResponseInterface {
     success: boolean
 }
 
-export interface CustomerLoginResponseInterface {
-    customer: CustomerDTO
-    success: boolean
-    message: string
-}
-
 export interface CustomJwtPayload extends JwtPayload {
     auth_identity_id: string
     actor_id?: string
-}
-
-export interface SimpleProductVariant {
-    id: string
-    title: string
-    calculated_price: {
-        calculated_amount: number
-        original_amount: number
-        currency_code: string
-        calculated_price: {
-            price_list_type: string
-        }
-    }
-    inventory_quantity: number
 }
 
 export interface Price {
@@ -67,12 +47,6 @@ export type ReviewApiResponse = {
     reviews: Review[]
 }
 
-export interface Policies {
-    icon: string
-    title: string
-    description: string
-}
-
 export interface NavLink {
     label: string
     to: string
@@ -100,20 +74,4 @@ export interface APIError {
 export interface Address extends AddressDTO {
     first_name: string
     last_name: string
-}
-
-export interface VForm {
-    validate: () => Promise<{ valid: boolean }>
-}
-
-export interface DataTableHeader {
-    title: string
-    align?: "start" | "center" | "end"
-    sortable?: boolean
-    value?: string
-}
-
-export interface DataTableSortItem {
-    key: string
-    order?: "asc" | "desc"
 }

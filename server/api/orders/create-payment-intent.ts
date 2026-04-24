@@ -1,5 +1,11 @@
 import { STRIPE_PAYMENT_PROVIDER } from "@/utils/consts"
 
+type StripeSessionData = {
+    client_secret?: string
+    publishable_key?: string
+    stripe_account?: string
+}
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const { cartId } = await readBody(event)
@@ -8,88 +14,80 @@ export default defineEventHandler(async (event) => {
         throw new Error("Cart ID is required.")
     }
 
-    let cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
-        method: "GET",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    })
-
-    let { cart } = await cartResponse.json()
-
-    const providersResponse = await fetch(`${config.public.MEDUSA_URL}/store/payment-providers?region_id=${cart.region_id}`, {
-        method: "GET",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    })
-
-    const { payment_providers } = await providersResponse.json()
-    if (!payment_providers || payment_providers.length === 0) {
-        throw new Error("No payment providers available for this region.")
+    const headers = {
+        "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
+        "Content-Type": "application/json"
     }
 
+    async function fetchCart() {
+        const res = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
+            method: "GET",
+            headers,
+            credentials: "include"
+        })
+
+        if (!res.ok) {
+            throw new Error(`Failed to fetch cart: ${await res.text()}`)
+        }
+
+        const data = await res.json()
+        return data.cart
+    }
+
+    let cart = await fetchCart()
+
     let paymentCollectionId = cart.payment_collection?.id
+
     if (!paymentCollectionId) {
         const collectionResponse = await fetch(`${config.public.MEDUSA_URL}/store/payment-collections`, {
             method: "POST",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
-            },
+            headers,
             credentials: "include",
             body: JSON.stringify({ cart_id: cart.id })
         })
+
+        if (!collectionResponse.ok) {
+            throw new Error(`Failed to create payment collection: ${await collectionResponse.text()}`)
+        }
 
         const { payment_collection } = await collectionResponse.json()
         paymentCollectionId = payment_collection.id
     }
 
-    await fetch(`${config.public.MEDUSA_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions/${STRIPE_PAYMENT_PROVIDER}`, {
-        method: "DELETE",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    }).catch(() => {})
+    cart = await fetchCart()
 
-    const createSessionResponse = await fetch(`${config.public.MEDUSA_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`, {
-        method: "POST",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ provider_id: STRIPE_PAYMENT_PROVIDER })
-    })
+    let stripeSession = cart.payment_collection?.payment_sessions?.find(
+        (session: { provider_id: string; data?: StripeSessionData }) => session.provider_id === STRIPE_PAYMENT_PROVIDER
+    )
 
-    if (!createSessionResponse.ok) {
-        const errorText = await createSessionResponse.text()
-        throw new Error(`Failed to create Stripe payment session: ${errorText}`)
+    if (!stripeSession?.data?.client_secret) {
+        const createSessionResponse = await fetch(
+            `${config.public.MEDUSA_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`,
+            {
+                method: "POST",
+                headers,
+                credentials: "include",
+                body: JSON.stringify({ provider_id: STRIPE_PAYMENT_PROVIDER })
+            }
+        )
+
+        if (!createSessionResponse.ok) {
+            throw new Error(`Failed to create Stripe payment session: ${await createSessionResponse.text()}`)
+        }
+
+        cart = await fetchCart()
+
+        stripeSession = cart.payment_collection?.payment_sessions?.find(
+            (session: { provider_id: string; data?: StripeSessionData }) => session.provider_id === STRIPE_PAYMENT_PROVIDER
+        )
     }
 
-    cartResponse = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
-        method: "GET",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    })
-
-    cart = (await cartResponse.json()).cart
-
-    const paymentSessions = cart.payment_collection.payment_sessions
-    const stripeSession = paymentSessions.find((session: { provider_id: string }) => session.provider_id === STRIPE_PAYMENT_PROVIDER)
-
-    if (!stripeSession || !stripeSession.data.client_secret) {
+    if (!stripeSession?.data?.client_secret) {
         throw new Error("Client secret not available for Stripe payment session.")
     }
 
-    return { clientSecret: stripeSession.data.client_secret }
+    return {
+        clientSecret: stripeSession.data.client_secret,
+        publishableKey: config.public.STRIPE_PUBLIC_KEY
+    }
 })

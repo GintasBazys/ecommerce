@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
 
-
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 import { usePostHog } from "~/composables/usePostHog"
@@ -10,6 +9,8 @@ import { DEFAULT_CURENCY } from "~/utils/consts"
 definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Order Completed | Ecommerce" })
+
+type OrderAddress = OrderDTO["shipping_address"] | OrderDTO["billing_address"]
 
 const route = useRoute()
 const orderId = route.query.orderId
@@ -31,27 +32,12 @@ const {
 })
 
 const order = computed<OrderDTO | null>(() => orderRes.value?.order ?? null)
-
-watch(
-    order,
-    (o) => {
-        if (o) {
-            posthog?.capture("order_completed", {
-                order_id: o.id,
-                display_id: o.display_id,
-                total: o.total,
-                subtotal: o.subtotal,
-                currency_code: o.currency_code,
-                item_count: o.items?.length
-            })
-        }
-    },
-    { immediate: true }
-)
 const currencyCode = computed<string>(() => order.value?.currency_code ?? DEFAULT_CURENCY)
 const orderDate = computed<string>(() => formatDate(order.value?.created_at))
 const shippingMethod = computed(() => order.value?.shipping_methods?.[0] ?? null)
-const statusItems = computed(() => [
+const orderItems = computed(() => order.value?.items ?? [])
+const orderEmail = computed(() => order.value?.email || customer.value?.email || "your email")
+const supportFacts = computed(() => [
     {
         label: "Order status",
         value: order.value?.status ?? "Pending"
@@ -65,471 +51,240 @@ const statusItems = computed(() => [
         value: orderDate.value || "Unavailable"
     }
 ])
+
+watch(
+    order,
+    (currentOrder) => {
+        if (currentOrder) {
+            posthog?.capture("order_completed", {
+                order_id: currentOrder.id,
+                display_id: currentOrder.display_id,
+                total: currentOrder.total,
+                subtotal: currentOrder.subtotal,
+                currency_code: currentOrder.currency_code,
+                item_count: currentOrder.items?.length
+            })
+        }
+    },
+    { immediate: true }
+)
+
+function formatAddressLines(address: OrderAddress): string[] {
+    if (!address) {
+        return ["Details unavailable"]
+    }
+
+    const cityLine = [address.city, address.province].filter(Boolean).join(", ")
+
+    return [
+        [address.first_name, address.last_name].filter(Boolean).join(" "),
+        address.address_1,
+        address.address_2,
+        cityLine,
+        address.postal_code,
+        address.country?.display_name
+    ].filter((value): value is string => Boolean(value))
+}
 </script>
 
 <template>
-    <section class="order-complete-page">
-        <div class="order-complete-page__hero">
-            <VContainer class="order-complete-page__container">
-                <div v-if="pending" class="order-complete-page__loading-state">
-                    <VProgressCircular indeterminate color="primary" size="40" />
-                    <p class="order-complete-page__loading-text">Loading your order details...</p>
+    <main class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#f6f9ff_100%)] pb-14 pt-[calc(var(--site-header-offset,98px)+1rem)] sm:pb-18 sm:pt-[calc(var(--site-header-offset,98px)+1.5rem)]">
+        <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+            <section class="rounded-[1.9rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_18px_48px_rgba(8,27,90,0.08)] sm:p-7 lg:p-8">
+                <div v-if="pending" class="grid justify-items-center gap-4 px-4 py-14 text-center">
+                    <span class="inline-flex h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-700"></span>
+                    <p class="text-sm leading-6 text-slate-600">Loading your order details...</p>
                 </div>
-                <VAlert v-else-if="error" type="error" variant="tonal"> Error loading order: {{ error.message }} </VAlert>
+
+                <div v-else-if="error" class="rounded-[1.4rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700">
+                    Error loading order: {{ error.message }}
+                </div>
+
                 <template v-else-if="order">
-                    <div class="order-complete-page__hero-grid">
-                        <div class="order-complete-page__copy">
-                            <span class="order-complete-page__eyebrow">Order confirmed</span>
-                            <h1 class="order-complete-page__title">Thank you. Your order is in and the next steps are already underway.</h1>
-                            <p class="order-complete-page__description">
-                                We have received your order and sent the details to {{ order.email || customer?.email || "your email" }}.
-                                You can review everything below.
+                    <div class="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-end">
+                        <div>
+                            <span class="inline-flex min-h-9 items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-emerald-700">
+                                Order confirmed
+                            </span>
+                            <h1 class="mt-4 max-w-[12ch] text-[2.3rem] font-semibold leading-[0.95] tracking-[-0.04rem] text-slate-950 sm:text-[3.4rem]">
+                                Thank you. Your order is in and already moving forward.
+                            </h1>
+                            <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                                We have sent the order details to {{ orderEmail }}. Review the order, delivery information, and totals below.
                             </p>
-                            <div class="order-complete-page__hero-actions">
-                                <VBtn color="primary" rounded="pill" class="text-none px-7" to="/">Continue shopping</VBtn>
-                                <div class="order-complete-page__order-chip">Order #{{ order.display_id }}</div>
+
+                            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                                <NuxtLink
+                                    to="/"
+                                    class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                >
+                                    Continue shopping
+                                </NuxtLink>
+                                <NuxtLink
+                                    to="/account/orders"
+                                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-200"
+                                >
+                                    View your orders
+                                </NuxtLink>
+                                <div class="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-900">
+                                    Order #{{ order.display_id }}
+                                </div>
                             </div>
                         </div>
-                        <div class="order-complete-page__progress-card">
-                            <div v-for="item in statusItems" :key="item.label" class="order-complete-page__status-item">
-                                <span class="order-complete-page__status-label">{{ item.label }}</span>
-                                <strong class="order-complete-page__status-value">{{ item.value }}</strong>
+
+                        <div class="grid gap-3 rounded-[1.6rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]">
+                            <div
+                                v-for="item in supportFacts"
+                                :key="item.label"
+                                class="rounded-[1.15rem] border border-slate-200 bg-slate-50/80 px-4 py-3"
+                            >
+                                <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-500">{{ item.label }}</p>
+                                <p class="mt-2 text-sm font-semibold text-slate-950">{{ item.value }}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="order-complete-page__content-grid">
-                        <div class="order-complete-page__main">
-                            <section class="order-complete-page__section-card">
-                                <div class="order-complete-page__section-intro">
-                                    <span class="order-complete-page__section-eyebrow">Customer details</span>
-                                    <h2 class="order-complete-page__section-title">Who and where this order is going.</h2>
-                                </div>
-                                <div class="order-complete-page__details-grid">
-                                    <article class="order-complete-page__detail-panel">
-                                        <h3 class="order-complete-page__panel-title">Shipping address</h3>
-                                        <p class="order-complete-page__address-text">
-                                            {{ order.shipping_address?.first_name }} {{ order.shipping_address?.last_name }}<br />
-                                            {{ order.shipping_address?.address_1 }}<br />
-                                            {{ order.shipping_address?.city }}, {{ order.shipping_address?.province }}<br />
-                                            {{ order.shipping_address?.postal_code }}<br />
-                                            {{ order.shipping_address?.country?.display_name }}
-                                        </p>
+
+                    <div class="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(21rem,0.88fr)] xl:items-start">
+                        <div class="space-y-5">
+                            <section class="rounded-[1.6rem] border border-slate-200 bg-white/95 p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)] sm:p-6">
+                                <span class="inline-flex min-h-8 items-center rounded-full border border-slate-200 bg-slate-50 px-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-600">
+                                    Customer details
+                                </span>
+                                <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                                    Who and where this order is going.
+                                </h2>
+
+                                <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                                    <article class="rounded-[1.3rem] border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                                        <h3 class="text-base font-semibold text-slate-950">Shipping address</h3>
+                                        <div class="mt-3 space-y-1 text-sm leading-6 text-slate-600">
+                                            <p v-for="line in formatAddressLines(order.shipping_address)" :key="`shipping-${line}`">{{ line }}</p>
+                                        </div>
                                     </article>
-                                    <article class="order-complete-page__detail-panel">
-                                        <h3 class="order-complete-page__panel-title">Billing address</h3>
-                                        <p class="order-complete-page__address-text">
-                                            {{ order.billing_address?.first_name }} {{ order.billing_address?.last_name }}<br />
-                                            {{ order.billing_address?.address_1 }}<br />
-                                            {{ order.billing_address?.city }}, {{ order.billing_address?.province }}<br />
-                                            {{ order.billing_address?.postal_code }}<br />
-                                            {{ order.billing_address?.country?.display_name }}
-                                        </p>
+
+                                    <article class="rounded-[1.3rem] border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                                        <h3 class="text-base font-semibold text-slate-950">Billing address</h3>
+                                        <div class="mt-3 space-y-1 text-sm leading-6 text-slate-600">
+                                            <p v-for="line in formatAddressLines(order.billing_address)" :key="`billing-${line}`">{{ line }}</p>
+                                        </div>
                                     </article>
                                 </div>
-                                <div class="order-complete-page__meta-row">
-                                    <div class="order-complete-page__meta-item">
-                                        <span class="order-complete-page__meta-label">Contact email</span>
-                                        <strong class="order-complete-page__meta-value">{{
-                                            order.email || customer?.email || "Not provided"
-                                        }}</strong>
+
+                                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                                    <div class="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-3">
+                                        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-500">Contact email</p>
+                                        <p class="mt-2 text-sm font-semibold text-slate-950">{{ orderEmail }}</p>
                                     </div>
-                                    <div class="order-complete-page__meta-item">
-                                        <span class="order-complete-page__meta-label">Shipping method</span>
-                                        <strong class="order-complete-page__meta-value">{{
-                                            shippingMethod?.name || "Shipping method unavailable"
-                                        }}</strong>
+                                    <div class="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-3">
+                                        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-500">Shipping method</p>
+                                        <p class="mt-2 text-sm font-semibold text-slate-950">{{ shippingMethod?.name || "Shipping method unavailable" }}</p>
                                     </div>
                                 </div>
                             </section>
-                            <section class="order-complete-page__section-card">
-                                <div class="order-complete-page__section-intro">
-                                    <span class="order-complete-page__section-eyebrow">Order items</span>
-                                    <h2 class="order-complete-page__section-title">Everything included in this order.</h2>
-                                </div>
-                                <div class="order-complete-page__items-list">
-                                    <article v-for="item in order.items" :key="item.id" class="order-complete-page__item-card">
-                                        <VImg
+
+                            <section class="rounded-[1.6rem] border border-slate-200 bg-white/95 p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)] sm:p-6">
+                                <span class="inline-flex min-h-8 items-center rounded-full border border-slate-200 bg-slate-50 px-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-600">
+                                    Order items
+                                </span>
+                                <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                                    Everything included in this order.
+                                </h2>
+
+                                <div class="mt-5 grid gap-4">
+                                    <article
+                                        v-for="item in orderItems"
+                                        :key="item.id"
+                                        class="flex flex-col gap-4 rounded-[1.3rem] border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-start sm:p-5"
+                                    >
+                                        <img
                                             :src="item.thumbnail || '/images/placeholder.png'"
                                             :alt="item.product_title || 'Product image'"
                                             width="88"
                                             height="108"
-                                            class="order-complete-page__item-image"
-                                            cover
+                                            class="h-[108px] w-[88px] rounded-[1rem] bg-white object-cover"
                                         />
-                                        <div class="order-complete-page__item-body">
-                                            <strong class="order-complete-page__item-title">{{ item.product_title }}</strong>
-                                            <p class="order-complete-page__item-meta">
-                                                Variant: {{ item.variant_title || "Standard option" }}
-                                            </p>
-                                            <p class="order-complete-page__item-meta">Quantity: {{ item.quantity }}</p>
-                                            <p class="order-complete-page__item-meta">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-semibold text-slate-950">{{ item.product_title }}</p>
+                                            <p class="mt-2 text-sm leading-6 text-slate-600">Variant: {{ item.variant_title || "Standard option" }}</p>
+                                            <p class="text-sm leading-6 text-slate-600">Quantity: {{ item.quantity }}</p>
+                                            <p class="text-sm leading-6 text-slate-600">
                                                 Unit price: {{ formatPrice(Number(item.unit_price || 0), currencyCode) }}
                                             </p>
                                         </div>
-                                        <strong class="order-complete-page__item-price">
+                                        <strong class="text-sm font-semibold text-slate-950 sm:text-right">
                                             {{ formatPrice(Number(item.total ?? item.unit_price ?? 0), currencyCode) }}
                                         </strong>
                                     </article>
                                 </div>
                             </section>
                         </div>
-                        <aside class="order-complete-page__summary-column">
-                            <div class="order-complete-page__summary-card">
-                                <span class="order-complete-page__section-eyebrow">Order summary</span>
-                                <h2 class="order-complete-page__summary-title">A clear breakdown of what was charged.</h2>
-                                <div class="order-complete-page__totals">
-                                    <div class="order-complete-page__total-row">
+
+                        <aside class="xl:sticky xl:top-6 xl:self-start">
+                            <div class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_18px_48px_rgba(8,27,90,0.08)] sm:p-6">
+                                <span class="inline-flex min-h-9 items-center rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                                    Order summary
+                                </span>
+                                <h2 class="mt-4 text-[1.8rem] font-semibold leading-[1.05] tracking-[-0.04rem] text-slate-950 sm:text-[2.2rem]">
+                                    A clear breakdown of what was charged.
+                                </h2>
+
+                                <div class="mt-5 rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4 shadow-[0_10px_26px_rgba(8,27,90,0.05)]">
+                                    <p class="text-[0.74rem] font-bold uppercase tracking-[0.14em] text-slate-500">Payment snapshot</p>
+                                    <p class="mt-2 text-sm font-semibold text-slate-950">
+                                        {{ orderItems.length }} line item{{ orderItems.length === 1 ? "" : "s" }} in this order
+                                    </p>
+                                </div>
+
+                                <div class="my-5 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.38),rgba(148,163,184,0))]"></div>
+
+                                <div class="grid gap-3">
+                                    <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                                         <span>Subtotal</span>
-                                        <span>{{ formatPrice(Number(order.subtotal || 0), currencyCode) }}</span>
+                                        <span class="font-semibold text-slate-950">{{ formatPrice(Number(order.subtotal || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="order-complete-page__total-row">
+                                    <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                                         <span>Shipping</span>
-                                        <span>{{ formatPrice(Number(order.shipping_total || 0), currencyCode) }}</span>
+                                        <span class="font-semibold text-slate-950">{{ formatPrice(Number(order.shipping_total || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="order-complete-page__total-row">
+                                    <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                                         <span>Tax</span>
-                                        <span>{{ formatPrice(Number(order.tax_total || 0), currencyCode) }}</span>
+                                        <span class="font-semibold text-slate-950">{{ formatPrice(Number(order.tax_total || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="order-complete-page__total-row">
+                                    <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                                         <span>Discount</span>
-                                        <span>-{{ formatPrice(Number(order.discount_total || 0), currencyCode) }}</span>
+                                        <span class="font-semibold text-slate-950">-{{ formatPrice(Number(order.discount_total || 0), currencyCode) }}</span>
                                     </div>
-                                    <div class="order-complete-page__total-row order-complete-page__total-row--grand">
-                                        <span>Total</span>
-                                        <strong>{{ formatPrice(Number(order.total || 0), currencyCode) }}</strong>
+                                    <div class="flex items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+                                        <span class="text-sm font-semibold text-slate-900">Total</span>
+                                        <strong class="text-lg font-semibold tracking-[-0.02em] text-slate-950">
+                                            {{ formatPrice(Number(order.total || 0), currencyCode) }}
+                                        </strong>
                                     </div>
-                                    <div class="order-complete-page__total-row">
+                                    <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                                         <span>Paid</span>
-                                        <strong>{{ formatPrice(Number(order.summary?.paid_total || 0), currencyCode) }}</strong>
+                                        <strong class="font-semibold text-slate-950">{{ formatPrice(Number(order.summary?.paid_total || 0), currencyCode) }}</strong>
                                     </div>
                                 </div>
-                                <div class="order-complete-page__cta-block">
-                                    <VBtn color="primary" rounded="pill" class="text-none" block to="/">Back to home</VBtn>
-                                    <VBtn variant="outlined" rounded="pill" class="text-none" block to="/account/orders">
+
+                                <div class="mt-5 grid gap-3">
+                                    <NuxtLink
+                                        to="/"
+                                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                                    >
+                                        Back to home
+                                    </NuxtLink>
+                                    <NuxtLink
+                                        to="/account/orders"
+                                        class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-200"
+                                    >
                                         View your orders
-                                    </VBtn>
+                                    </NuxtLink>
                                 </div>
                             </div>
                         </aside>
                     </div>
                 </template>
-            </VContainer>
+            </section>
         </div>
-    </section>
+    </main>
 </template>
-
-<style scoped lang="scss">
-.order-complete-page {
-    background:
-        radial-gradient(circle at top left, rgba(1, 12, 128, 0.08), transparent 24%),
-        linear-gradient(180deg, #f6f9ff 0%, #ffffff 40%, #f7faff 100%);
-}
-
-.order-complete-page__hero {
-    padding: 5.5rem 0 5rem;
-}
-
-.order-complete-page__container {
-    position: relative;
-    z-index: 1;
-}
-
-.order-complete-page__hero-grid,
-.order-complete-page__content-grid,
-.order-complete-page__details-grid {
-    display: grid;
-    gap: 2rem;
-}
-
-.order-complete-page__hero-grid {
-    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
-    align-items: end;
-    margin-bottom: 3rem;
-}
-
-.order-complete-page__content-grid {
-    grid-template-columns: minmax(0, 1.12fr) minmax(19rem, 0.88fr);
-    align-items: start;
-}
-
-.order-complete-page__copy,
-.order-complete-page__progress-card,
-.order-complete-page__main,
-.order-complete-page__summary-column {
-    animation: order-rise 0.8s ease both;
-}
-
-.order-complete-page__progress-card,
-.order-complete-page__summary-column {
-    animation-delay: 0.12s;
-}
-
-.order-complete-page__eyebrow,
-.order-complete-page__section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(1, 12, 128, 0.07);
-    color: #010c80;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.order-complete-page__title,
-.order-complete-page__section-title,
-.order-complete-page__summary-title {
-    color: #08173f;
-    letter-spacing: -0.06rem;
-    text-wrap: balance;
-}
-
-.order-complete-page__title {
-    max-width: 12ch;
-    margin: 1rem 0;
-    font-size: 4.5rem;
-    line-height: 0.95;
-}
-
-.order-complete-page__description,
-.order-complete-page__loading-text,
-.order-complete-page__address-text,
-.order-complete-page__item-meta,
-.order-complete-page__status-label,
-.order-complete-page__meta-label {
-    margin: 0;
-    color: #4b5874;
-    line-height: 1.75;
-}
-
-.order-complete-page__hero-actions,
-.order-complete-page__meta-row,
-.order-complete-page__item-card,
-.order-complete-page__total-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.order-complete-page__hero-actions,
-.order-complete-page__total-row {
-    align-items: center;
-}
-
-.order-complete-page__progress-card,
-.order-complete-page__section-card,
-.order-complete-page__summary-card,
-.order-complete-page__detail-panel {
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 18px 48px rgba(8, 27, 90, 0.08);
-    backdrop-filter: blur(14px);
-}
-
-.order-complete-page__progress-card,
-.order-complete-page__section-card,
-.order-complete-page__summary-card,
-.order-complete-page__detail-panel {
-    padding: 1.8rem;
-}
-
-.order-complete-page__order-chip {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.95rem;
-    border-radius: 999px;
-    background: rgba(247, 250, 255, 0.95);
-    color: #08173f;
-    font-weight: 700;
-}
-
-.order-complete-page__status-item + .order-complete-page__status-item {
-    margin-top: 0.95rem;
-}
-
-.order-complete-page__status-value,
-.order-complete-page__panel-title,
-.order-complete-page__meta-value,
-.order-complete-page__item-title,
-.order-complete-page__item-price {
-    color: #08173f;
-}
-
-.order-complete-page__section-title,
-.order-complete-page__summary-title {
-    margin: 1rem 0 0.75rem;
-    font-size: 2.15rem;
-    line-height: 1.08;
-}
-
-.order-complete-page__main {
-    display: grid;
-    gap: 1.25rem;
-}
-
-.order-complete-page__details-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 1rem;
-}
-
-.order-complete-page__meta-row {
-    margin-top: 1rem;
-}
-
-.order-complete-page__meta-item {
-    display: grid;
-    gap: 0.25rem;
-}
-
-.order-complete-page__items-list,
-.order-complete-page__totals,
-.order-complete-page__cta-block {
-    display: grid;
-    gap: 0.9rem;
-}
-
-.order-complete-page__items-list {
-    margin-top: 1rem;
-}
-
-.order-complete-page__item-card {
-    align-items: flex-start;
-    padding: 1rem;
-    border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 1.2rem;
-    background: rgba(247, 250, 255, 0.92);
-}
-
-.order-complete-page__item-image {
-    border-radius: 1rem;
-    background: #edf2ff;
-}
-
-.order-complete-page__item-body {
-    display: grid;
-    flex: 1;
-    gap: 0.2rem;
-}
-
-.order-complete-page__summary-column {
-    position: sticky;
-    top: 1.5rem;
-}
-
-.order-complete-page__total-row {
-    color: #4b5874;
-}
-
-.order-complete-page__total-row--grand {
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(8, 23, 63, 0.08);
-}
-
-.order-complete-page__total-row strong {
-    color: #08173f;
-}
-
-.order-complete-page__loading-state {
-    display: grid;
-    justify-items: center;
-    gap: 0.9rem;
-    padding: 4rem 0;
-}
-
-@keyframes order-rise {
-    from {
-        opacity: 0;
-        transform: translateY(26px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .order-complete-page__hero-grid,
-    .order-complete-page__content-grid,
-    .order-complete-page__details-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .order-complete-page__title {
-        max-width: 100%;
-        font-size: 3.2rem;
-    }
-
-    .order-complete-page__hero-grid,
-    .order-complete-page__content-grid,
-    .order-complete-page__details-grid {
-        gap: 1.5rem;
-    }
-
-    .order-complete-page__hero-grid {
-        margin-bottom: 2rem;
-    }
-
-    .order-complete-page__progress-card,
-    .order-complete-page__section-card,
-    .order-complete-page__summary-card,
-    .order-complete-page__detail-panel {
-        padding: 1.4rem;
-    }
-
-    .order-complete-page__section-title,
-    .order-complete-page__summary-title {
-        font-size: 1.8rem;
-    }
-
-    .order-complete-page__summary-column {
-        position: static;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .order-complete-page__hero {
-        padding: 3.75rem 0 3.5rem;
-    }
-
-    .order-complete-page__title {
-        font-size: 2.4rem;
-        line-height: 1;
-    }
-
-    .order-complete-page__progress-card,
-    .order-complete-page__section-card,
-    .order-complete-page__summary-card,
-    .order-complete-page__detail-panel,
-    .order-complete-page__item-card {
-        border-radius: 1.2rem;
-    }
-
-    .order-complete-page__section-title,
-    .order-complete-page__summary-title {
-        font-size: 1.6rem;
-    }
-
-    .order-complete-page__hero-actions,
-    .order-complete-page__meta-row,
-    .order-complete-page__item-card,
-    .order-complete-page__total-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .order-complete-page__copy,
-    .order-complete-page__progress-card,
-    .order-complete-page__main,
-    .order-complete-page__summary-column {
-        animation: none;
-    }
-}
-</style>

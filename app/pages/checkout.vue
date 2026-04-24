@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { loadStripe } from "@stripe/stripe-js/pure"
 
-
 import TaxedLinePrice from "../components/Cart/TaxedLinePrice.vue"
 
-import type { Address, ShippingOption, VForm } from "@/types/interfaces"
+import type { Address, ShippingOption } from "@/types/interfaces"
 import type { CartDTO, CartLineItemDTO } from "@medusajs/types"
 import type { Stripe, StripeElements, StripeLinkAuthenticationElement, StripePaymentElement } from "@stripe/stripe-js"
 
@@ -54,9 +53,6 @@ const isShippingLoading = ref<boolean>(true)
 const isPaymentInitializing = ref<boolean>(false)
 const isCheckoutActive = ref<boolean>(true)
 
-const loginFormRef = ref<VForm | null>(null)
-const addressFormRef = ref<VForm | null>(null)
-
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
 
@@ -95,6 +91,71 @@ const shippingAddress = reactive<Address>({
 
 const useSeparateShipping = ref<boolean>(false)
 
+type LoginErrors = {
+    email: string
+    password: string
+}
+
+type RegisterErrors = {
+    first_name: string
+    last_name: string
+    email: string
+    password: string
+}
+
+type GuestErrors = {
+    email: string
+}
+
+type AddressErrors = {
+    first_name: string
+    last_name: string
+    address_1: string
+    city: string
+    province: string
+    postal_code: string
+    country_code: string
+    phone: string
+}
+
+const loginErrors = reactive<LoginErrors>({
+    email: "",
+    password: ""
+})
+
+const registerErrors = reactive<RegisterErrors>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: ""
+})
+
+const guestErrors = reactive<GuestErrors>({
+    email: ""
+})
+
+const billingErrors = reactive<AddressErrors>({
+    first_name: "",
+    last_name: "",
+    address_1: "",
+    city: "",
+    province: "",
+    postal_code: "",
+    country_code: "",
+    phone: ""
+})
+
+const shippingErrors = reactive<AddressErrors>({
+    first_name: "",
+    last_name: "",
+    address_1: "",
+    city: "",
+    province: "",
+    postal_code: "",
+    country_code: "",
+    phone: ""
+})
+
 let stripe: Stripe | null = null
 let elements: StripeElements | null = null
 let paymentElement: StripePaymentElement | null = null
@@ -112,6 +173,7 @@ const emailRules = [
     (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || "E-mail must be valid"
 ]
 const passwordRules = [(value: string) => !!value || "Password is required"]
+const addressFields = ["first_name", "last_name", "address_1", "city", "province", "postal_code", "country_code", "phone"] as const
 const addressRules = {
     required: (value: unknown): boolean | string => (value !== null && value !== undefined && value !== "") || "This field is required",
     phone: (value: string): boolean | string => /^[+]?[\d\s-]{7,}$/.test(value) || "Enter a valid phone number"
@@ -194,6 +256,74 @@ function getShippingOptionLabel(option: ShippingOption): string {
           : null
 
     return `${option.name} - ${amount != null ? formatPrice(amount, currencyCode.value) : "Free"}`
+}
+
+function clearValidationErrors<T extends Record<string, string>>(errors: T): void {
+    for (const key of Object.keys(errors) as Array<keyof T>) {
+        errors[key] = "" as T[keyof T]
+    }
+}
+
+function runValidationRules(value: unknown, rules: Array<(_value: string) => boolean | string>): string {
+    const normalizedValue = typeof value === "string" ? value : String(value ?? "")
+
+    for (const rule of rules) {
+        const result = rule(normalizedValue)
+
+        if (result !== true) {
+            return typeof result === "string" ? result : "Invalid value"
+        }
+    }
+
+    return ""
+}
+
+function validateLoginForm(): boolean {
+    clearValidationErrors(loginErrors)
+    loginErrors.email = runValidationRules(loginEmail.value, emailRules)
+    loginErrors.password = runValidationRules(loginPassword.value, passwordRules)
+
+    return !loginErrors.email && !loginErrors.password
+}
+
+function validateRegisterForm(): boolean {
+    clearValidationErrors(registerErrors)
+    registerErrors.first_name = runValidationRules(regFirstName.value, [(_value) => addressRules.required(regFirstName.value)])
+    registerErrors.last_name = runValidationRules(regLastName.value, [(_value) => addressRules.required(regLastName.value)])
+    registerErrors.email = runValidationRules(regEmail.value, emailRules)
+    registerErrors.password = runValidationRules(regPassword.value, passwordRules)
+
+    return !registerErrors.first_name && !registerErrors.last_name && !registerErrors.email && !registerErrors.password
+}
+
+function validateGuestForm(): boolean {
+    clearValidationErrors(guestErrors)
+    guestErrors.email = runValidationRules(guestEmail.value, emailRules)
+
+    return !guestErrors.email
+}
+
+function validateAddressFields(address: Address, errors: AddressErrors): boolean {
+    clearValidationErrors(errors)
+
+    for (const field of addressFields) {
+        errors[field] = runValidationRules(address[field], [addressRules.required])
+    }
+
+    errors.phone = runValidationRules(address.phone, [addressRules.required, addressRules.phone])
+
+    return !Object.values(errors).some(Boolean)
+}
+
+function validateAddressForm(): boolean {
+    const billingValid = validateAddressFields(billingAddress, billingErrors)
+    const shippingValid = useSeparateShipping.value ? validateAddressFields(shippingAddress, shippingErrors) : true
+
+    if (!useSeparateShipping.value) {
+        clearValidationErrors(shippingErrors)
+    }
+
+    return billingValid && shippingValid
 }
 
 function resetAddress(address: Address): void {
@@ -283,18 +413,21 @@ async function loadShippingOptions(): Promise<void> {
     isShippingLoading.value = true
 
     try {
-        const response = await fetch("/api/orders/shipping-options", {
+        const data = await $fetch<ShippingOptionsPayload>("/api/orders/shipping-options", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ cart_id: checkoutCart.value.id })
+            body: {
+                cart_id: checkoutCart.value.id
+            }
         })
 
-        const data = (await response.json()) as ShippingOptionsPayload
         const options = Array.isArray(data) ? data : (data.shipping_options ?? [])
 
         shippingOptions.value = options
         selectedShippingOptionId.value ||= options[0]?.id ?? null
+    } catch (error) {
+        console.error("Failed to load shipping options:", error)
+        errorMessage.value = "Could not load shipping options"
     } finally {
         isShippingLoading.value = false
     }
@@ -310,14 +443,13 @@ async function updateShippingOption(): Promise<void> {
         return
     }
 
-    await fetch("/api/orders/shipping-methods", {
+    await $fetch("/api/orders/shipping-methods", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
+        body: {
             cart_id: checkoutCart.value.id,
             option_id: selectedShippingOptionId.value
-        })
+        }
     })
 
     lastAppliedShippingContext.value = context
@@ -365,16 +497,15 @@ async function createOrUpdatePaymentIntent(): Promise<void> {
         return
     }
 
-    const response = await fetch("/api/orders/create-payment-intent", {
+    const payload = await $fetch<CreatePaymentIntentPayload>("/api/orders/create-payment-intent", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        credentials: "include",
+        body: {
             cartId: checkoutCart.value.id,
             shippingOptionId: selectedShippingOptionId.value
-        })
+        }
     })
 
-    const payload = (await response.json()) as CreatePaymentIntentPayload
     const secret = payload.clientSecret ?? payload.client_secret
 
     if (!secret) {
@@ -437,11 +568,8 @@ async function attachCustomerToCheckoutCart(): Promise<void> {
     await cartStore.loadCart()
 }
 
-async function handleCheckoutLogin(event: Event): Promise<void> {
-    event.preventDefault()
-
-    const { valid } = (await loginFormRef.value?.validate()) ?? { valid: false }
-    if (!valid) {
+async function handleCheckoutLogin(): Promise<void> {
+    if (!validateLoginForm()) {
         return
     }
 
@@ -467,6 +595,10 @@ async function handleCheckoutSocialLogin(provider: "google" | "facebook"): Promi
 }
 
 async function submitRegister(): Promise<void> {
+    if (!validateRegisterForm()) {
+        return
+    }
+
     errorMessage.value = null
     isSubmitting.value = true
 
@@ -494,6 +626,10 @@ async function submitRegister(): Promise<void> {
 }
 
 async function submitGuest(): Promise<void> {
+    if (!validateGuestForm()) {
+        return
+    }
+
     errorMessage.value = null
     isSubmitting.value = true
 
@@ -514,8 +650,7 @@ async function submitGuest(): Promise<void> {
 }
 
 async function submitAddresses(): Promise<void> {
-    const { valid } = (await addressFormRef.value?.validate()) ?? { valid: false }
-    if (!valid || !checkoutCart.value?.id) {
+    if (!validateAddressForm() || !checkoutCart.value?.id) {
         return
     }
 
@@ -578,17 +713,15 @@ async function handleSubmit(): Promise<void> {
 async function completeCart(): Promise<void> {
     isCheckoutActive.value = false
 
-    const response = await fetch("/api/cart/complete-cart", {
+    const payload = await $fetch<CompleteCartPayload>("/api/cart/complete-cart", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
+        body: {
             cartId: checkoutCart.value?.id,
             shippingOptionId: selectedShippingOptionId.value
-        })
+        }
     })
 
-    const payload = (await response.json()) as CompleteCartPayload
     const orderId = payload.order?.id
 
     if (orderId) {
@@ -597,29 +730,45 @@ async function completeCart(): Promise<void> {
     }
 }
 
+const isCheckoutReady = ref(false)
+
 onMounted(async () => {
-    if (!regionCountries.value.length) {
-        await regionStore.fetchRegion()
-    }
+    try {
+        if (!regionCountries.value.length) {
+            await regionStore.fetchRegion()
+        }
 
-    if (!checkoutCart.value) {
-        await cartStore.loadCart()
-    }
+        if (!checkoutCart.value) {
+            await cartStore.loadCart()
+        }
 
-    if (!checkoutCart.value?.items?.length) {
-        await router.push("/cart")
-        return
-    }
+        if (!checkoutCart.value?.items?.length) {
+            await router.push("/cart")
+            return
+        }
 
-    syncAddressesFromCart(checkoutCart.value)
-    currentStep.value = deriveInitialStep()
-    stripe = await loadStripe(String(config.public.STRIPE_PUBLIC_KEY))
-    isBooting.value = false
-    posthog?.capture("checkout_started", {
-        cart_id: checkoutCart.value?.id,
-        item_count: checkoutCart.value?.items?.length,
-        cart_total: checkoutCart.value?.total
-    })
+        syncAddressesFromCart(checkoutCart.value)
+        currentStep.value = deriveInitialStep()
+
+        stripe = await loadStripe(String(config.public.STRIPE_PUBLIC_KEY))
+
+        isBooting.value = false
+        isCheckoutReady.value = true
+
+        posthog?.capture("checkout_started", {
+            cart_id: checkoutCart.value?.id,
+            item_count: checkoutCart.value?.items?.length,
+            cart_total: checkoutCart.value?.total
+        })
+
+        if (currentStep.value === "payment" && addressCompleted.value) {
+            await loadShippingOptions()
+        }
+    } catch (error) {
+        console.error("Checkout boot failed:", error)
+        errorMessage.value = "Could not prepare checkout"
+        isBooting.value = false
+    }
 })
 
 onBeforeRouteLeave(() => cleanup())
@@ -640,7 +789,7 @@ watch(
 watch(
     () => [checkoutCart.value?.id, addressCompleted.value] as const,
     async ([cartId, hasAddress]) => {
-        if (!isCheckoutActive.value) {
+        if (!isCheckoutReady.value || !isCheckoutActive.value) {
             return
         }
 
@@ -656,8 +805,7 @@ watch(
         if (currentStep.value === "payment") {
             scheduleRefresh()
         }
-    },
-    { immediate: true }
+    }
 )
 
 watch(selectedShippingOptionId, scheduleRefresh)
@@ -667,9 +815,9 @@ watch(cartFingerprint, scheduleRefresh)
 <template>
     <section class="checkout-page">
         <div class="checkout-page__hero">
-            <VContainer class="checkout-page__container">
+            <div class="checkout-page__container">
                 <div v-if="isBooting" class="checkout-page__loading-state">
-                    <VProgressCircular indeterminate color="primary" size="40" />
+                    <div class="checkout-page__spinner" aria-hidden="true"></div>
                     <p class="checkout-page__loading-text">Preparing your checkout...</p>
                 </div>
                 <template v-else>
@@ -697,11 +845,11 @@ watch(cartFingerprint, scheduleRefresh)
                             </div>
                         </div>
                     </div>
+
                     <div class="checkout-page__content-grid">
                         <div class="checkout-page__main">
-                            <VAlert v-if="errorMessage" type="error" variant="tonal" class="mb-4">
-                                {{ errorMessage }}
-                            </VAlert>
+                            <div v-if="errorMessage" class="checkout-page__alert" role="alert">{{ errorMessage }}</div>
+
                             <section
                                 class="checkout-page__section"
                                 :class="{ 'checkout-page__section--active': currentStep === 'account' }"
@@ -711,126 +859,236 @@ watch(cartFingerprint, scheduleRefresh)
                                     <h2 class="checkout-page__section-title">Account or guest</h2>
                                     <p class="checkout-page__section-text">Choose the quickest way to continue with this order.</p>
                                 </div>
+
                                 <div v-if="identityCompleted" class="checkout-page__status-card">
                                     <div>
                                         <strong class="checkout-page__status-title">Checkout identity ready</strong>
-                                        <p class="checkout-page__status-text">
-                                            {{ customer?.email || checkoutEmail }}
-                                        </p>
+                                        <p class="checkout-page__status-text">{{ customer?.email || checkoutEmail }}</p>
                                     </div>
-                                    <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'">
-                                        Continue
-                                    </VBtn>
+                                    <button type="button" class="ui-btn-secondary px-6" @click="currentStep = 'address'">Continue</button>
                                 </div>
+
                                 <div v-else class="checkout-page__section-card">
-                                    <VTabs v-model="authTab" grow class="checkout-page__tabs">
-                                        <VTab value="login" class="text-none">Login</VTab>
-                                        <VTab value="register" class="text-none">Create account</VTab>
-                                        <VTab value="guest" class="text-none">Guest</VTab>
-                                    </VTabs>
-                                    <VWindow v-model="authTab" class="checkout-page__window">
-                                        <VWindowItem value="login">
+                                    <div class="checkout-page__tabs" role="tablist" aria-label="Checkout account options">
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            class="checkout-page__tab"
+                                            :class="{ 'checkout-page__tab--active': authTab === 'login' }"
+                                            :aria-selected="authTab === 'login'"
+                                            @click="authTab = 'login'"
+                                        >
+                                            Login
+                                        </button>
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            class="checkout-page__tab"
+                                            :class="{ 'checkout-page__tab--active': authTab === 'register' }"
+                                            :aria-selected="authTab === 'register'"
+                                            @click="authTab = 'register'"
+                                        >
+                                            Create account
+                                        </button>
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            class="checkout-page__tab"
+                                            :class="{ 'checkout-page__tab--active': authTab === 'guest' }"
+                                            :aria-selected="authTab === 'guest'"
+                                            @click="authTab = 'guest'"
+                                        >
+                                            Guest
+                                        </button>
+                                    </div>
+
+                                    <div class="checkout-page__window">
+                                        <div v-if="authTab === 'login'">
                                             <div class="checkout-page__social-buttons">
-                                                <VBtn
-                                                    block
-                                                    class="checkout-page__social-btn text-none"
-                                                    color="white"
+                                                <button
+                                                    type="button"
+                                                    class="ui-btn-secondary checkout-page__social-btn w-full px-5"
                                                     @click="handleCheckoutSocialLogin('google')"
                                                 >
-                                                    <VImg src="/images/google_login_icon.svg" width="24" class="me-3" />
+                                                    <img
+                                                        src="/images/google_login_icon.svg"
+                                                        alt=""
+                                                        width="24"
+                                                        height="24"
+                                                        class="checkout-page__social-icon"
+                                                    />
                                                     Login with Google
-                                                </VBtn>
-                                                <VBtn
-                                                    block
-                                                    class="checkout-page__social-btn text-none"
-                                                    color="white"
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="ui-btn-secondary checkout-page__social-btn w-full px-5"
                                                     @click="handleCheckoutSocialLogin('facebook')"
                                                 >
-                                                    <VImg src="/images/facebook_login_icon.svg" width="24" class="me-3" />
+                                                    <img
+                                                        src="/images/facebook_login_icon.svg"
+                                                        alt=""
+                                                        width="24"
+                                                        height="24"
+                                                        class="checkout-page__social-icon"
+                                                    />
                                                     Login with Facebook
-                                                </VBtn>
+                                                </button>
                                             </div>
+
                                             <div class="checkout-page__divider"><span>Or continue with email</span></div>
-                                            <VForm ref="loginFormRef" class="checkout-page__form" @submit.prevent="handleCheckoutLogin">
-                                                <VTextField v-model="loginEmail" :rules="emailRules" label="Email" variant="outlined" />
-                                                <VTextField
-                                                    v-model="loginPassword"
-                                                    :rules="passwordRules"
-                                                    label="Password"
-                                                    type="password"
-                                                    variant="outlined"
-                                                />
-                                                <VBtn
-                                                    color="primary"
-                                                    rounded="pill"
-                                                    class="text-none"
-                                                    block
-                                                    :loading="isSubmitting || auth.loading.value"
-                                                    type="submit"
-                                                >
-                                                    Log in and continue
-                                                </VBtn>
-                                            </VForm>
-                                        </VWindowItem>
-                                        <VWindowItem value="register">
-                                            <VForm class="checkout-page__form" @submit.prevent="submitRegister">
-                                                <div class="checkout-page__name-grid">
-                                                    <VTextField v-model="regFirstName" label="First name" variant="outlined" required />
-                                                    <VTextField v-model="regLastName" label="Last name" variant="outlined" required />
+
+                                            <form class="checkout-page__form" novalidate @submit.prevent="handleCheckoutLogin">
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-login-email">Email</label>
+                                                    <input
+                                                        id="checkout-login-email"
+                                                        v-model="loginEmail"
+                                                        type="email"
+                                                        autocomplete="email"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!loginErrors.email }"
+                                                    />
+                                                    <p v-if="loginErrors.email" class="checkout-page__field-error">
+                                                        {{ loginErrors.email }}
+                                                    </p>
                                                 </div>
-                                                <VTextField
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-login-password">Password</label>
+                                                    <input
+                                                        id="checkout-login-password"
+                                                        v-model="loginPassword"
+                                                        type="password"
+                                                        autocomplete="current-password"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!loginErrors.password }"
+                                                    />
+                                                    <p v-if="loginErrors.password" class="checkout-page__field-error">
+                                                        {{ loginErrors.password }}
+                                                    </p>
+                                                </div>
+
+                                                <button
+                                                    type="submit"
+                                                    class="ui-btn-primary w-full justify-center px-6"
+                                                    :disabled="isSubmitting || auth.loading.value"
+                                                >
+                                                    {{ isSubmitting || auth.loading.value ? "Logging in..." : "Log in and continue" }}
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <form
+                                            v-else-if="authTab === 'register'"
+                                            class="checkout-page__form"
+                                            novalidate
+                                            @submit.prevent="submitRegister"
+                                        >
+                                            <div class="checkout-page__name-grid">
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-register-first-name"
+                                                    >First name</label
+                                                    >
+                                                    <input
+                                                        id="checkout-register-first-name"
+                                                        v-model="regFirstName"
+                                                        type="text"
+                                                        autocomplete="given-name"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!registerErrors.first_name }"
+                                                    />
+                                                    <p v-if="registerErrors.first_name" class="checkout-page__field-error">
+                                                        {{ registerErrors.first_name }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-register-last-name"
+                                                    >Last name</label
+                                                    >
+                                                    <input
+                                                        id="checkout-register-last-name"
+                                                        v-model="regLastName"
+                                                        type="text"
+                                                        autocomplete="family-name"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!registerErrors.last_name }"
+                                                    />
+                                                    <p v-if="registerErrors.last_name" class="checkout-page__field-error">
+                                                        {{ registerErrors.last_name }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-register-email">Email</label>
+                                                <input
+                                                    id="checkout-register-email"
                                                     v-model="regEmail"
-                                                    :rules="emailRules"
-                                                    label="Email"
                                                     type="email"
-                                                    variant="outlined"
-                                                    required
+                                                    autocomplete="email"
+                                                    class="ui-input checkout-page__field"
+                                                    :class="{ 'checkout-page__field--error': !!registerErrors.email }"
                                                 />
-                                                <VTextField
+                                                <p v-if="registerErrors.email" class="checkout-page__field-error">
+                                                    {{ registerErrors.email }}
+                                                </p>
+                                            </div>
+
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-register-password">Password</label>
+                                                <input
+                                                    id="checkout-register-password"
                                                     v-model="regPassword"
-                                                    :rules="passwordRules"
-                                                    label="Password"
                                                     type="password"
-                                                    variant="outlined"
-                                                    required
+                                                    autocomplete="new-password"
+                                                    class="ui-input checkout-page__field"
+                                                    :class="{ 'checkout-page__field--error': !!registerErrors.password }"
                                                 />
-                                                <VBtn
-                                                    color="primary"
-                                                    rounded="pill"
-                                                    class="text-none"
-                                                    block
-                                                    :loading="isSubmitting || auth.loading.value"
-                                                    type="submit"
-                                                >
-                                                    Create account and continue
-                                                </VBtn>
-                                            </VForm>
-                                        </VWindowItem>
-                                        <VWindowItem value="guest">
-                                            <VForm class="checkout-page__form" @submit.prevent="submitGuest">
-                                                <VTextField
+                                                <p v-if="registerErrors.password" class="checkout-page__field-error">
+                                                    {{ registerErrors.password }}
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="ui-btn-primary w-full justify-center px-6"
+                                                :disabled="isSubmitting || auth.loading.value"
+                                            >
+                                                {{
+                                                    isSubmitting || auth.loading.value
+                                                        ? "Creating account..."
+                                                        : "Create account and continue"
+                                                }}
+                                            </button>
+                                        </form>
+
+                                        <form v-else class="checkout-page__form" novalidate @submit.prevent="submitGuest">
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-guest-email">Email</label>
+                                                <input
+                                                    id="checkout-guest-email"
                                                     v-model="guestEmail"
-                                                    :rules="emailRules"
-                                                    label="Email"
                                                     type="email"
-                                                    variant="outlined"
-                                                    required
+                                                    autocomplete="email"
+                                                    class="ui-input checkout-page__field"
+                                                    :class="{ 'checkout-page__field--error': !!guestErrors.email }"
                                                 />
-                                                <VBtn
-                                                    color="primary"
-                                                    rounded="pill"
-                                                    class="text-none"
-                                                    block
-                                                    :loading="isSubmitting"
-                                                    type="submit"
-                                                >
-                                                    Continue as guest
-                                                </VBtn>
-                                            </VForm>
-                                        </VWindowItem>
-                                    </VWindow>
+                                                <p v-if="guestErrors.email" class="checkout-page__field-error">{{ guestErrors.email }}</p>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="ui-btn-primary w-full justify-center px-6"
+                                                :disabled="isSubmitting"
+                                            >
+                                                {{ isSubmitting ? "Continuing..." : "Continue as guest" }}
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </section>
+
                             <section
                                 class="checkout-page__section"
                                 :class="{ 'checkout-page__section--active': currentStep === 'address' }"
@@ -842,143 +1100,347 @@ watch(cartFingerprint, scheduleRefresh)
                                         Add the address details for this order without leaving checkout.
                                     </p>
                                 </div>
+
                                 <div v-if="!identityCompleted" class="checkout-page__disabled-card">
                                     Complete the account step first to unlock the address form.
                                 </div>
+
                                 <div v-else class="checkout-page__section-card">
-                                    <VForm ref="addressFormRef" class="checkout-page__form" @submit.prevent="submitAddresses">
+                                    <form class="checkout-page__form" novalidate @submit.prevent="submitAddresses">
                                         <div class="checkout-page__subsection">
                                             <h3 class="checkout-page__subsection-title">Billing address</h3>
                                             <div class="checkout-page__name-grid">
-                                                <VTextField
-                                                    v-model="billingAddress.first_name"
-                                                    label="First name"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-first-name"
+                                                    >First name</label
+                                                    >
+                                                    <input
+                                                        id="checkout-billing-first-name"
+                                                        v-model="billingAddress.first_name"
+                                                        type="text"
+                                                        autocomplete="billing given-name"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.first_name }"
+                                                    />
+                                                    <p v-if="billingErrors.first_name" class="checkout-page__field-error">
+                                                        {{ billingErrors.first_name }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-last-name"
+                                                    >Last name</label
+                                                    >
+                                                    <input
+                                                        id="checkout-billing-last-name"
+                                                        v-model="billingAddress.last_name"
+                                                        type="text"
+                                                        autocomplete="billing family-name"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.last_name }"
+                                                    />
+                                                    <p v-if="billingErrors.last_name" class="checkout-page__field-error">
+                                                        {{ billingErrors.last_name }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-billing-address-1"
+                                                >Address line 1</label
+                                                >
+                                                <input
+                                                    id="checkout-billing-address-1"
+                                                    v-model="billingAddress.address_1"
+                                                    type="text"
+                                                    autocomplete="billing address-line1"
+                                                    class="ui-input checkout-page__field"
+                                                    :class="{ 'checkout-page__field--error': !!billingErrors.address_1 }"
                                                 />
-                                                <VTextField
-                                                    v-model="billingAddress.last_name"
-                                                    label="Last name"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
+                                                <p v-if="billingErrors.address_1" class="checkout-page__field-error">
+                                                    {{ billingErrors.address_1 }}
+                                                </p>
+                                            </div>
+
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-billing-address-2"
+                                                >Address line 2</label
+                                                >
+                                                <input
+                                                    id="checkout-billing-address-2"
+                                                    v-model="billingAddress.address_2"
+                                                    type="text"
+                                                    autocomplete="billing address-line2"
+                                                    class="ui-input checkout-page__field"
                                                 />
                                             </div>
-                                            <VTextField
-                                                v-model="billingAddress.address_1"
-                                                label="Address line 1"
-                                                :rules="[addressRules.required]"
-                                                variant="outlined"
-                                            />
-                                            <VTextField v-model="billingAddress.address_2" label="Address line 2" variant="outlined" />
+
                                             <div class="checkout-page__triple-grid">
-                                                <VTextField
-                                                    v-model="billingAddress.postal_code"
-                                                    label="Postal code"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
-                                                <VTextField
-                                                    v-model="billingAddress.city"
-                                                    label="City"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
-                                                <VTextField
-                                                    v-model="billingAddress.province"
-                                                    label="Province / State"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-postal-code"
+                                                    >Postal code</label
+                                                    >
+                                                    <input
+                                                        id="checkout-billing-postal-code"
+                                                        v-model="billingAddress.postal_code"
+                                                        type="text"
+                                                        autocomplete="billing postal-code"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.postal_code }"
+                                                    />
+                                                    <p v-if="billingErrors.postal_code" class="checkout-page__field-error">
+                                                        {{ billingErrors.postal_code }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-city">City</label>
+                                                    <input
+                                                        id="checkout-billing-city"
+                                                        v-model="billingAddress.city"
+                                                        type="text"
+                                                        autocomplete="billing address-level2"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.city }"
+                                                    />
+                                                    <p v-if="billingErrors.city" class="checkout-page__field-error">
+                                                        {{ billingErrors.city }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-province"
+                                                    >Province / State</label
+                                                    >
+                                                    <input
+                                                        id="checkout-billing-province"
+                                                        v-model="billingAddress.province"
+                                                        type="text"
+                                                        autocomplete="billing address-level1"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.province }"
+                                                    />
+                                                    <p v-if="billingErrors.province" class="checkout-page__field-error">
+                                                        {{ billingErrors.province }}
+                                                    </p>
+                                                </div>
                                             </div>
+
                                             <div class="checkout-page__double-grid">
-                                                <VSelect
-                                                    v-model="billingAddress.country_code"
-                                                    :items="regionCountries"
-                                                    item-title="display_name"
-                                                    item-value="iso_2"
-                                                    label="Country"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
-                                                <VTextField
-                                                    v-model="billingAddress.phone"
-                                                    label="Phone"
-                                                    :rules="[addressRules.required, addressRules.phone]"
-                                                    variant="outlined"
-                                                />
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-country">Country</label>
+                                                    <select
+                                                        id="checkout-billing-country"
+                                                        v-model="billingAddress.country_code"
+                                                        class="checkout-page__select"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.country_code }"
+                                                    >
+                                                        <option value="">Select a country</option>
+                                                        <option
+                                                            v-for="country in regionCountries"
+                                                            :key="country.iso_2"
+                                                            :value="country.iso_2"
+                                                        >
+                                                            {{ country.display_name }}
+                                                        </option>
+                                                    </select>
+                                                    <p v-if="billingErrors.country_code" class="checkout-page__field-error">
+                                                        {{ billingErrors.country_code }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-billing-phone">Phone</label>
+                                                    <input
+                                                        id="checkout-billing-phone"
+                                                        v-model="billingAddress.phone"
+                                                        type="tel"
+                                                        autocomplete="billing tel"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!billingErrors.phone }"
+                                                    />
+                                                    <p v-if="billingErrors.phone" class="checkout-page__field-error">
+                                                        {{ billingErrors.phone }}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                        <VCheckbox v-model="useSeparateShipping" label="Use a separate shipping address" hide-details />
+
+                                        <label class="checkout-page__checkbox">
+                                            <input v-model="useSeparateShipping" type="checkbox" class="checkout-page__checkbox-input" />
+                                            <span>Use a separate shipping address</span>
+                                        </label>
+
                                         <div v-if="useSeparateShipping" class="checkout-page__subsection">
                                             <h3 class="checkout-page__subsection-title">Shipping address</h3>
                                             <div class="checkout-page__name-grid">
-                                                <VTextField
-                                                    v-model="shippingAddress.first_name"
-                                                    label="First name"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-first-name"
+                                                    >First name</label
+                                                    >
+                                                    <input
+                                                        id="checkout-shipping-first-name"
+                                                        v-model="shippingAddress.first_name"
+                                                        type="text"
+                                                        autocomplete="shipping given-name"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.first_name }"
+                                                    />
+                                                    <p v-if="shippingErrors.first_name" class="checkout-page__field-error">
+                                                        {{ shippingErrors.first_name }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-last-name"
+                                                    >Last name</label
+                                                    >
+                                                    <input
+                                                        id="checkout-shipping-last-name"
+                                                        v-model="shippingAddress.last_name"
+                                                        type="text"
+                                                        autocomplete="shipping family-name"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.last_name }"
+                                                    />
+                                                    <p v-if="shippingErrors.last_name" class="checkout-page__field-error">
+                                                        {{ shippingErrors.last_name }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-shipping-address-1"
+                                                >Address line 1</label
+                                                >
+                                                <input
+                                                    id="checkout-shipping-address-1"
+                                                    v-model="shippingAddress.address_1"
+                                                    type="text"
+                                                    autocomplete="shipping address-line1"
+                                                    class="ui-input checkout-page__field"
+                                                    :class="{ 'checkout-page__field--error': !!shippingErrors.address_1 }"
                                                 />
-                                                <VTextField
-                                                    v-model="shippingAddress.last_name"
-                                                    label="Last name"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
+                                                <p v-if="shippingErrors.address_1" class="checkout-page__field-error">
+                                                    {{ shippingErrors.address_1 }}
+                                                </p>
+                                            </div>
+
+                                            <div class="checkout-page__field-group">
+                                                <label class="checkout-page__field-label" for="checkout-shipping-address-2"
+                                                >Address line 2</label
+                                                >
+                                                <input
+                                                    id="checkout-shipping-address-2"
+                                                    v-model="shippingAddress.address_2"
+                                                    type="text"
+                                                    autocomplete="shipping address-line2"
+                                                    class="ui-input checkout-page__field"
                                                 />
                                             </div>
-                                            <VTextField
-                                                v-model="shippingAddress.address_1"
-                                                label="Address line 1"
-                                                :rules="[addressRules.required]"
-                                                variant="outlined"
-                                            />
-                                            <VTextField v-model="shippingAddress.address_2" label="Address line 2" variant="outlined" />
+
                                             <div class="checkout-page__triple-grid">
-                                                <VTextField
-                                                    v-model="shippingAddress.postal_code"
-                                                    label="Postal code"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
-                                                <VTextField
-                                                    v-model="shippingAddress.city"
-                                                    label="City"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
-                                                <VTextField
-                                                    v-model="shippingAddress.province"
-                                                    label="Province / State"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-postal-code"
+                                                    >Postal code</label
+                                                    >
+                                                    <input
+                                                        id="checkout-shipping-postal-code"
+                                                        v-model="shippingAddress.postal_code"
+                                                        type="text"
+                                                        autocomplete="shipping postal-code"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.postal_code }"
+                                                    />
+                                                    <p v-if="shippingErrors.postal_code" class="checkout-page__field-error">
+                                                        {{ shippingErrors.postal_code }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-city">City</label>
+                                                    <input
+                                                        id="checkout-shipping-city"
+                                                        v-model="shippingAddress.city"
+                                                        type="text"
+                                                        autocomplete="shipping address-level2"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.city }"
+                                                    />
+                                                    <p v-if="shippingErrors.city" class="checkout-page__field-error">
+                                                        {{ shippingErrors.city }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-province"
+                                                    >Province / State</label
+                                                    >
+                                                    <input
+                                                        id="checkout-shipping-province"
+                                                        v-model="shippingAddress.province"
+                                                        type="text"
+                                                        autocomplete="shipping address-level1"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.province }"
+                                                    />
+                                                    <p v-if="shippingErrors.province" class="checkout-page__field-error">
+                                                        {{ shippingErrors.province }}
+                                                    </p>
+                                                </div>
                                             </div>
+
                                             <div class="checkout-page__double-grid">
-                                                <VSelect
-                                                    v-model="shippingAddress.country_code"
-                                                    :items="regionCountries"
-                                                    item-title="display_name"
-                                                    item-value="iso_2"
-                                                    label="Country"
-                                                    :rules="[addressRules.required]"
-                                                    variant="outlined"
-                                                />
-                                                <VTextField
-                                                    v-model="shippingAddress.phone"
-                                                    label="Phone"
-                                                    :rules="[addressRules.required, addressRules.phone]"
-                                                    variant="outlined"
-                                                />
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-country"
+                                                    >Country</label
+                                                    >
+                                                    <select
+                                                        id="checkout-shipping-country"
+                                                        v-model="shippingAddress.country_code"
+                                                        class="checkout-page__select"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.country_code }"
+                                                    >
+                                                        <option value="">Select a country</option>
+                                                        <option
+                                                            v-for="country in regionCountries"
+                                                            :key="`shipping-${country.iso_2}`"
+                                                            :value="country.iso_2"
+                                                        >
+                                                            {{ country.display_name }}
+                                                        </option>
+                                                    </select>
+                                                    <p v-if="shippingErrors.country_code" class="checkout-page__field-error">
+                                                        {{ shippingErrors.country_code }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="checkout-page__field-group">
+                                                    <label class="checkout-page__field-label" for="checkout-shipping-phone">Phone</label>
+                                                    <input
+                                                        id="checkout-shipping-phone"
+                                                        v-model="shippingAddress.phone"
+                                                        type="tel"
+                                                        autocomplete="shipping tel"
+                                                        class="ui-input checkout-page__field"
+                                                        :class="{ 'checkout-page__field--error': !!shippingErrors.phone }"
+                                                    />
+                                                    <p v-if="shippingErrors.phone" class="checkout-page__field-error">
+                                                        {{ shippingErrors.phone }}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
+
                                         <div class="checkout-page__button-row">
-                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'account'">
+                                            <button type="button" class="ui-btn-secondary px-6" @click="currentStep = 'account'">
                                                 Back
-                                            </VBtn>
-                                            <VBtn color="primary" rounded="pill" class="text-none" :loading="isSubmitting" type="submit">
-                                                Save and continue
-                                            </VBtn>
+                                            </button>
+                                            <button type="submit" class="ui-btn-primary px-6" :disabled="isSubmitting">
+                                                {{ isSubmitting ? "Saving..." : "Save and continue" }}
+                                            </button>
                                         </div>
-                                    </VForm>
+                                    </form>
                                 </div>
                             </section>
 
@@ -993,43 +1455,64 @@ watch(cartFingerprint, scheduleRefresh)
                                         Choose a delivery method and finish payment on the same screen.
                                     </p>
                                 </div>
+
                                 <div v-if="!addressCompleted" class="checkout-page__disabled-card">
                                     Save your address details first to unlock shipping options and payment.
                                 </div>
+
                                 <div v-else class="checkout-page__section-card checkout-page__payment-grid">
                                     <div class="checkout-page__shipping-card">
                                         <div class="checkout-page__subsection-title">Shipping method</div>
                                         <template v-if="isShippingLoading">
-                                            <VSkeletonLoader type="list-item" />
-                                            <VSkeletonLoader type="list-item" />
+                                            <div class="checkout-page__shipping-skeleton"></div>
+                                            <div class="checkout-page__shipping-skeleton"></div>
                                         </template>
-                                        <VRadioGroup v-else v-model="selectedShippingOptionId" class="checkout-page__shipping-options">
-                                            <VRadio
+                                        <div
+                                            v-else-if="shippingOptions.length"
+                                            class="checkout-page__shipping-options"
+                                            role="radiogroup"
+                                            aria-label="Shipping method"
+                                        >
+                                            <label
                                                 v-for="option in shippingOptions"
                                                 :key="option.id"
-                                                :value="option.id"
-                                                :label="getShippingOptionLabel(option)"
-                                            />
-                                        </VRadioGroup>
+                                                class="checkout-page__shipping-option"
+                                                :class="{
+                                                    'checkout-page__shipping-option--active': selectedShippingOptionId === option.id
+                                                }"
+                                            >
+                                                <input
+                                                    v-model="selectedShippingOptionId"
+                                                    type="radio"
+                                                    :value="option.id"
+                                                    class="checkout-page__shipping-radio"
+                                                />
+                                                <span class="checkout-page__shipping-option-copy">{{
+                                                    getShippingOptionLabel(option)
+                                                }}</span>
+                                            </label>
+                                        </div>
+                                        <p v-else class="checkout-page__status-text">
+                                            No shipping options are available for this address yet.
+                                        </p>
                                     </div>
+
                                     <div class="checkout-page__payment-card">
                                         <div class="checkout-page__subsection-title">Payment details</div>
                                         <div id="link-authentication-element"></div>
                                         <div id="payment-element" class="checkout-page__payment-element"></div>
                                         <div class="checkout-page__button-row checkout-page__button-row--payment">
-                                            <VBtn variant="outlined" rounded="pill" class="text-none" @click="currentStep = 'address'">
+                                            <button type="button" class="ui-btn-secondary px-6" @click="currentStep = 'address'">
                                                 Back
-                                            </VBtn>
-                                            <VBtn
-                                                color="primary"
-                                                rounded="pill"
-                                                class="text-none"
-                                                :loading="isLoading || isPaymentInitializing"
-                                                :disabled="!clientSecretValue || isShippingLoading || isPaymentInitializing"
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="ui-btn-primary px-6"
+                                                :disabled="!clientSecretValue || isShippingLoading || isPaymentInitializing || isLoading"
                                                 @click="handleSubmit"
                                             >
-                                                Pay now
-                                            </VBtn>
+                                                {{ isLoading || isPaymentInitializing ? "Processing..." : "Pay now" }}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1042,13 +1525,13 @@ watch(cartFingerprint, scheduleRefresh)
                                 <h2 class="checkout-page__summary-title">Everything you are checking out with today.</h2>
                                 <div class="checkout-page__summary-items">
                                     <article v-for="item in lineItems" :key="item.id" class="checkout-page__summary-item">
-                                        <VImg
+                                        <img
                                             :src="item.thumbnail || '/images/placeholder.png'"
                                             :alt="item.product_title || 'Product image'"
                                             width="72"
                                             height="88"
                                             class="checkout-page__summary-image"
-                                            cover
+                                            loading="lazy"
                                         />
                                         <div class="checkout-page__summary-item-body">
                                             <strong class="checkout-page__summary-item-title">{{ item.product_title }}</strong>
@@ -1091,7 +1574,7 @@ watch(cartFingerprint, scheduleRefresh)
                         </aside>
                     </div>
                 </template>
-            </VContainer>
+            </div>
         </div>
     </section>
 </template>
@@ -1110,6 +1593,9 @@ watch(cartFingerprint, scheduleRefresh)
 .checkout-page__container {
     position: relative;
     z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
 }
 
 .checkout-page__hero-grid,
@@ -1272,6 +1758,29 @@ watch(cartFingerprint, scheduleRefresh)
     border-radius: 999px;
     background: rgba(247, 250, 255, 0.9);
     padding: 0.25rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
+.checkout-page__tab {
+    min-height: 2.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #4b5874;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.checkout-page__tab--active {
+    background: #ffffff;
+    color: #010c80;
+    box-shadow: 0 12px 24px rgba(8, 27, 90, 0.08);
 }
 
 .checkout-page__window,
@@ -1292,8 +1801,81 @@ watch(cartFingerprint, scheduleRefresh)
     justify-content: flex-start;
     min-height: 3.2rem;
     border: 1px solid rgba(8, 23, 63, 0.08);
-    border-radius: 999px;
     box-shadow: none;
+}
+
+.checkout-page__social-icon {
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+}
+
+.checkout-page__field-group {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.checkout-page__field-label {
+    color: #08173f;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.checkout-page__field,
+.checkout-page__select {
+    border-radius: 1rem;
+}
+
+.checkout-page__select {
+    min-height: 2.75rem;
+    width: 100%;
+    appearance: none;
+    border: 1px solid #cbd5e1;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5 10 12.5 15 7.5' stroke='%23475569' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+            right 0.9rem center / 0.95rem 0.95rem no-repeat;
+    padding: 0 2.75rem 0 1rem;
+    color: #1e293b;
+    font-size: 0.95rem;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.checkout-page__field--error {
+    border-color: #fca5a5;
+    box-shadow: 0 0 0 3px rgba(254, 226, 226, 0.9);
+}
+
+.checkout-page__field-error {
+    margin: 0;
+    color: #dc2626;
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.checkout-page__checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #08173f;
+    font-weight: 600;
+}
+
+.checkout-page__checkbox-input,
+.checkout-page__shipping-radio {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #010c80;
+}
+
+.checkout-page__alert {
+    border: 1px solid #fecaca;
+    border-radius: 1.2rem;
+    background: #fef2f2;
+    padding: 0.95rem 1rem;
+    color: #b91c1c;
 }
 
 .checkout-page__divider {
@@ -1360,6 +1942,45 @@ watch(cartFingerprint, scheduleRefresh)
     gap: 1rem;
 }
 
+.checkout-page__shipping-options {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.checkout-page__shipping-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(8, 23, 63, 0.1);
+    border-radius: 1rem;
+    background: rgba(247, 250, 255, 0.72);
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.checkout-page__shipping-option--active {
+    border-color: rgba(1, 12, 128, 0.3);
+    background: rgba(237, 242, 255, 0.92);
+    box-shadow: 0 10px 24px rgba(8, 27, 90, 0.08);
+}
+
+.checkout-page__shipping-option-copy {
+    color: #08173f;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.checkout-page__shipping-skeleton {
+    min-height: 4.2rem;
+    border-radius: 1rem;
+    background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), rgba(241, 245, 249, 1), rgba(226, 232, 240, 0.9));
+    background-size: 200% 100%;
+    animation: checkout-shimmer 1.4s linear infinite;
+}
+
 .checkout-page__payment-element {
     margin-top: 0.4rem;
 }
@@ -1413,6 +2034,15 @@ watch(cartFingerprint, scheduleRefresh)
     padding: 4rem 0;
 }
 
+.checkout-page__spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid rgba(1, 12, 128, 0.12);
+    border-top-color: #010c80;
+    border-radius: 999px;
+    animation: checkout-spin 0.8s linear infinite;
+}
+
 @keyframes checkout-rise {
     from {
         opacity: 0;
@@ -1422,6 +2052,26 @@ watch(cartFingerprint, scheduleRefresh)
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes checkout-shimmer {
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes checkout-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
     }
 }
 
@@ -1456,9 +2106,17 @@ watch(cartFingerprint, scheduleRefresh)
         padding: 3.75rem 0 3.5rem;
     }
 
+    .checkout-page__container {
+        padding: 0 1rem;
+    }
+
     .checkout-page__title {
         font-size: 2.8rem;
         line-height: 1;
+    }
+
+    .checkout-page__tabs {
+        grid-template-columns: 1fr;
     }
 
     .checkout-page__progress-card,
@@ -1495,6 +2153,11 @@ watch(cartFingerprint, scheduleRefresh)
     .checkout-page__progress-card,
     .checkout-page__main,
     .checkout-page__summary-column {
+        animation: none;
+    }
+
+    .checkout-page__shipping-skeleton,
+    .checkout-page__spinner {
         animation: none;
     }
 }
