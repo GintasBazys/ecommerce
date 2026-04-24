@@ -16,12 +16,13 @@ type AddressErrors = {
 
 type CountryOption = {
     iso_2: string
-    display_name: string
+    display_name?: string
 }
 
 const props = defineProps<{
     currentStep: string
     identityCompleted: boolean
+    addressCompleted: boolean
     useSeparateShipping: boolean
     billingAddress: Address
     shippingAddress: Address
@@ -47,12 +48,12 @@ function onSeparateShippingChange(event: Event): void {
 <template>
     <section class="grid gap-4">
         <div>
-            <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+            <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
                 Step 2
             </span>
             <h2
                 class="mt-4 text-[1.9rem] font-semibold leading-[1.03] tracking-[-0.04rem]"
-                :class="props.currentStep === 'address' ? 'text-brand-700' : 'text-slate-950'"
+                :class="props.currentStep === 'address' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Billing and shipping
             </h2>
@@ -67,8 +68,20 @@ function onSeparateShippingChange(event: Event): void {
 
         <div v-else class="rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6">
             <form class="grid gap-6" novalidate @submit.prevent="emit('submit')">
+                <div class="rounded-[1.35rem] border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-500">Delivery details</p>
+                            <h3 class="mt-2 text-lg font-semibold tracking-[-0.02em] text-slate-950">Set the billing and shipping information</h3>
+                        </div>
+                        <p class="text-sm leading-6 text-slate-600">We use these details for delivery, updates, and payment confirmation.</p>
+                    </div>
+                </div>
+
                 <CheckoutAddressFields
                     title="Billing address"
+                    eyebrow="Billing"
+                    description="The primary address for this order and payment record."
                     prefix="checkout-billing"
                     autocomplete-prefix="billing"
                     :address="props.billingAddress"
@@ -77,19 +90,28 @@ function onSeparateShippingChange(event: Event): void {
                     @update:field="emit('update:billingField', $event)"
                 />
 
-                <label class="inline-flex items-center gap-3 rounded-[1.2rem] border border-slate-200/80 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-900">
-                    <input
-                        type="checkbox"
-                        class="h-4 w-4 accent-brand-700"
-                        :checked="props.useSeparateShipping"
-                        @change="onSeparateShippingChange"
-                    />
-                    <span>Use a separate shipping address</span>
-                </label>
+                <div class="rounded-[1.3rem] border border-slate-200/80 bg-slate-950 p-4 text-white sm:p-5">
+                    <label class="flex cursor-pointer items-start gap-3">
+                        <input
+                            type="checkbox"
+                            class="mt-1 h-4 w-4 shrink-0 accent-[#cda45e]"
+                            :checked="props.useSeparateShipping"
+                            @change="onSeparateShippingChange"
+                        />
+                        <span class="grid gap-1">
+                            <span class="text-sm font-semibold text-white">Use a separate shipping address</span>
+                            <span class="text-sm leading-6 text-slate-300">
+                                Turn this on if billing and delivery details should be different for this order.
+                            </span>
+                        </span>
+                    </label>
+                </div>
 
                 <CheckoutAddressFields
                     v-if="props.useSeparateShipping"
                     title="Shipping address"
+                    eyebrow="Shipping"
+                    description="Where the order should arrive if it differs from billing."
                     prefix="checkout-shipping"
                     autocomplete-prefix="shipping"
                     :address="props.shippingAddress"
@@ -98,9 +120,19 @@ function onSeparateShippingChange(event: Event): void {
                     @update:field="emit('update:shippingField', $event)"
                 />
 
-                <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-                    <button type="button" class="ui-btn-secondary px-6" @click="emit('back')">Back</button>
-                    <button type="submit" class="ui-btn-primary px-6" :disabled="props.isSubmitting">
+                <div v-if="!props.addressCompleted || props.currentStep === 'address'" class="flex flex-col gap-3 sm:flex-row sm:justify-between">
+                    <button
+                        type="button"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                        @click="emit('back')"
+                    >
+                        Back
+                    </button>
+                    <button
+                        type="submit"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        :disabled="props.isSubmitting"
+                    >
                         {{ props.isSubmitting ? "Saving..." : "Save and continue" }}
                     </button>
                 </div>

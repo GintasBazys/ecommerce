@@ -56,6 +56,10 @@ const isPaymentInitializing = ref<boolean>(false)
 const isCheckoutActive = ref<boolean>(true)
 const isEditingIdentity = ref<boolean>(false)
 const hasExplicitGuestIdentity = ref<boolean>(false)
+const guestCheckoutEmailCookie = useCookie<string | null>("checkout_guest_email", {
+    sameSite: "lax",
+    path: "/"
+})
 
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
@@ -189,7 +193,12 @@ const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ??
 const lineItems = computed(() => checkoutCart.value?.items ?? [])
 const itemCount = computed<number>(() => lineItems.value.reduce((sum, item) => sum + Number(item.quantity), 0))
 const hasAuthenticatedIdentity = computed<boolean>(() => Boolean(customer.value?.id))
-const isGuestIdentity = computed<boolean>(() => !customer.value?.id && (hasExplicitGuestIdentity.value || (!checkoutCart.value?.customer_id && !!checkoutEmail.value)))
+const hasPersistedGuestIdentity = computed<boolean>(() => Boolean(checkoutEmail.value && guestCheckoutEmailCookie.value === checkoutEmail.value))
+const isGuestIdentity = computed<boolean>(
+    () =>
+        !customer.value?.id
+        && (hasExplicitGuestIdentity.value || hasPersistedGuestIdentity.value || (!checkoutCart.value?.customer_id && !!checkoutEmail.value))
+)
 const identityCompleted = computed<boolean>(() => hasAuthenticatedIdentity.value || isGuestIdentity.value)
 const shouldShowIdentityReady = computed<boolean>(() => identityCompleted.value && !(isGuestIdentity.value && isEditingIdentity.value))
 
@@ -334,9 +343,24 @@ function applyAddress(target: Address, source?: Partial<Address> | null): void {
     target.city = source?.city ?? ""
     target.province = source?.province ?? ""
     target.postal_code = source?.postal_code ?? ""
-    target.country_code = source?.country_code?.toUpperCase() ?? ""
+    target.country_code = source?.country_code?.toLowerCase() ?? ""
     target.phone = source?.phone ?? ""
     target.company = source?.company ?? ""
+}
+
+function getAddressComparisonSignature(address?: Partial<Address> | null): string {
+    return JSON.stringify({
+        first_name: address?.first_name ?? "",
+        last_name: address?.last_name ?? "",
+        address_1: address?.address_1 ?? "",
+        address_2: address?.address_2 ?? "",
+        city: address?.city ?? "",
+        province: address?.province ?? "",
+        postal_code: address?.postal_code ?? "",
+        country_code: address?.country_code?.toLowerCase() ?? "",
+        phone: address?.phone ?? "",
+        company: address?.company ?? ""
+    })
 }
 
 function syncAddressesFromCart(currentCart: CheckoutCart | null): void {
@@ -347,7 +371,7 @@ function syncAddressesFromCart(currentCart: CheckoutCart | null): void {
 
     if (currentShipping?.address_1) {
         applyAddress(shippingAddress, currentShipping)
-        useSeparateShipping.value = JSON.stringify(currentShipping) !== JSON.stringify(currentBilling)
+        useSeparateShipping.value = getAddressComparisonSignature(currentShipping) !== getAddressComparisonSignature(currentBilling)
         return
     }
 
@@ -448,6 +472,8 @@ async function ensureElements(secret: string): Promise<void> {
         return
     }
 
+    await nextTick()
+
     const linkElementRoot = document.getElementById("link-authentication-element")
     const paymentElementRoot = document.getElementById("payment-element")
 
@@ -547,6 +573,7 @@ function returnToAccountOptions(): void {
     authTab.value = "login"
     isEditingIdentity.value = true
     hasExplicitGuestIdentity.value = false
+    guestCheckoutEmailCookie.value = null
 }
 
 async function attachCustomerToCheckoutCart(): Promise<void> {
@@ -580,6 +607,7 @@ async function handleCheckoutLogin(): Promise<void> {
         }
 
         hasExplicitGuestIdentity.value = false
+        guestCheckoutEmailCookie.value = null
         await attachCustomerToCheckoutCart()
         await goToAddressStep()
     } finally {
@@ -616,6 +644,7 @@ async function submitRegister(): Promise<void> {
         }
 
         hasExplicitGuestIdentity.value = false
+        guestCheckoutEmailCookie.value = null
         await attachCustomerToCheckoutCart()
         await goToAddressStep()
     } finally {
@@ -640,6 +669,7 @@ async function submitGuest(): Promise<void> {
 
         await cartStore.loadCart()
         hasExplicitGuestIdentity.value = true
+        guestCheckoutEmailCookie.value = guestEmail.value
         isEditingIdentity.value = false
         await goToAddressStep()
     } catch (error: unknown) {
@@ -725,6 +755,8 @@ async function completeCart(): Promise<void> {
     const orderId = payload.order?.id
 
     if (orderId) {
+        guestCheckoutEmailCookie.value = null
+        hasExplicitGuestIdentity.value = false
         await createNewCart(cartStore)
         await router.push({ name: "order-completed", query: { orderId } })
     }
@@ -747,7 +779,11 @@ onMounted(async () => {
             return
         }
 
-        hasExplicitGuestIdentity.value = false
+        if (customer.value?.id || !checkoutEmail.value || guestCheckoutEmailCookie.value !== checkoutEmail.value) {
+            guestCheckoutEmailCookie.value = null
+        }
+
+        hasExplicitGuestIdentity.value = guestCheckoutEmailCookie.value === checkoutEmail.value
         isEditingIdentity.value = false
         syncAddressesFromCart(checkoutCart.value)
         currentStep.value = deriveInitialStep()
@@ -812,6 +848,22 @@ watch(
 
 watch(selectedShippingOptionId, scheduleRefresh)
 watch(cartFingerprint, scheduleRefresh)
+watch(
+    currentStep,
+    async (step) => {
+        if (step !== "payment" || !addressCompleted.value || !isCheckoutReady.value || !isCheckoutActive.value) {
+            return
+        }
+
+        await nextTick()
+
+        if (!shippingOptions.value.length) {
+            await loadShippingOptions()
+        }
+
+        scheduleRefresh()
+    }
+)
 </script>
 
 <template>
@@ -908,6 +960,7 @@ watch(cartFingerprint, scheduleRefresh)
                             <CheckoutAddressStep
                                 :current-step="currentStep"
                                 :identity-completed="identityCompleted"
+                                :address-completed="addressCompleted"
                                 :use-separate-shipping="useSeparateShipping"
                                 :billing-address="billingAddress"
                                 :shipping-address="shippingAddress"

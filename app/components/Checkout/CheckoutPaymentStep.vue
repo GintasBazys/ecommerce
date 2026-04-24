@@ -41,6 +41,13 @@ const emit = defineEmits<{
             Save your address details first to unlock shipping options and payment.
         </div>
 
+        <div
+            v-else-if="props.currentStep !== 'payment'"
+            class="rounded-[1.6rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+        >
+            Shipping options and payment will appear after the address step is saved.
+        </div>
+
         <div v-else class="grid gap-5 rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6 xl:grid-cols-2">
             <div class="grid gap-4">
                 <div>
