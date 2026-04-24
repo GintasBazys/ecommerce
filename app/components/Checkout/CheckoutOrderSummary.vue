@@ -108,7 +108,7 @@ const emit = defineEmits<{
         </div>
     </section>
 
-    <div v-else class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 xl:sticky xl:top-[calc(var(--site-header-offset,98px)+1rem)]">
+    <div v-else class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]">
         <span class="inline-flex min-h-9 items-center rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
             Order summary
         </span>

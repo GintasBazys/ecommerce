@@ -54,6 +54,8 @@ const isLoading = ref<boolean>(false)
 const isShippingLoading = ref<boolean>(true)
 const isPaymentInitializing = ref<boolean>(false)
 const isCheckoutActive = ref<boolean>(true)
+const isEditingIdentity = ref<boolean>(false)
+const hasExplicitGuestIdentity = ref<boolean>(false)
 
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
@@ -186,7 +188,10 @@ const checkoutEmail = computed<string>(() => checkoutCart.value?.email ?? "")
 const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ?? DEFAULT_CURENCY)
 const lineItems = computed(() => checkoutCart.value?.items ?? [])
 const itemCount = computed<number>(() => lineItems.value.reduce((sum, item) => sum + Number(item.quantity), 0))
-const identityCompleted = computed<boolean>(() => Boolean(customer.value?.id || checkoutEmail.value))
+const hasAuthenticatedIdentity = computed<boolean>(() => Boolean(customer.value?.id))
+const isGuestIdentity = computed<boolean>(() => !customer.value?.id && (hasExplicitGuestIdentity.value || (!checkoutCart.value?.customer_id && !!checkoutEmail.value)))
+const identityCompleted = computed<boolean>(() => hasAuthenticatedIdentity.value || isGuestIdentity.value)
+const shouldShowIdentityReady = computed<boolean>(() => identityCompleted.value && !(isGuestIdentity.value && isEditingIdentity.value))
 
 const addressCompleted = computed<boolean>(() => {
     const currentCart = checkoutCart.value
@@ -532,7 +537,16 @@ function scheduleRefresh(): void {
 
 async function goToAddressStep(): Promise<void> {
     errorMessage.value = null
+    isEditingIdentity.value = false
     currentStep.value = "address"
+}
+
+function returnToAccountOptions(): void {
+    errorMessage.value = null
+    currentStep.value = "account"
+    authTab.value = "login"
+    isEditingIdentity.value = true
+    hasExplicitGuestIdentity.value = false
 }
 
 async function attachCustomerToCheckoutCart(): Promise<void> {
@@ -565,6 +579,7 @@ async function handleCheckoutLogin(): Promise<void> {
             return
         }
 
+        hasExplicitGuestIdentity.value = false
         await attachCustomerToCheckoutCart()
         await goToAddressStep()
     } finally {
@@ -600,6 +615,7 @@ async function submitRegister(): Promise<void> {
             return
         }
 
+        hasExplicitGuestIdentity.value = false
         await attachCustomerToCheckoutCart()
         await goToAddressStep()
     } finally {
@@ -623,6 +639,8 @@ async function submitGuest(): Promise<void> {
         })
 
         await cartStore.loadCart()
+        hasExplicitGuestIdentity.value = true
+        isEditingIdentity.value = false
         await goToAddressStep()
     } catch (error: unknown) {
         errorMessage.value = error instanceof Error ? error.message : "Could not continue as guest"
@@ -729,6 +747,8 @@ onMounted(async () => {
             return
         }
 
+        hasExplicitGuestIdentity.value = false
+        isEditingIdentity.value = false
         syncAddressesFromCart(checkoutCart.value)
         currentStep.value = deriveInitialStep()
 
@@ -855,7 +875,8 @@ watch(cartFingerprint, scheduleRefresh)
                             <CheckoutAccountStep
                                 :current-step="currentStep"
                                 :auth-tab="authTab"
-                                :identity-completed="identityCompleted"
+                                :identity-completed="shouldShowIdentityReady"
+                                :is-guest-identity="isGuestIdentity"
                                 :checkout-identity="customer?.email || checkoutEmail"
                                 :login-email="loginEmail"
                                 :login-password="loginPassword"
@@ -881,7 +902,7 @@ watch(cartFingerprint, scheduleRefresh)
                                 @submit-register="submitRegister"
                                 @submit-guest="submitGuest"
                                 @social-login="handleCheckoutSocialLogin"
-                                @continue="currentStep = 'address'"
+                                @change-identity="returnToAccountOptions"
                             />
 
                             <CheckoutAddressStep
@@ -918,7 +939,7 @@ watch(cartFingerprint, scheduleRefresh)
                         </div>
                     </div>
 
-                    <aside class="hidden xl:block">
+                    <aside class="hidden xl:self-start xl:sticky xl:top-[calc(var(--site-header-offset,98px)+1rem)] xl:block">
                         <CheckoutOrderSummary
                             :item-count="itemCount"
                             :currency-code="currencyCode"
