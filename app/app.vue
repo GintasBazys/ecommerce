@@ -41,11 +41,6 @@ html {
     scrollbar-color: rgba(120, 53, 15, 0.78) rgba(241, 245, 249, 0.96);
 }
 
-html,
-body {
-    overflow-x: hidden;
-}
-
 main {
     padding-top: var(--site-header-offset, 98px);
 }
