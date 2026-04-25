@@ -20,8 +20,9 @@ type PricedCartLineItem = CartLineItemDTO & {
     unit_price?: number | null
 }
 
-const { cart } = storeToRefs(useCartStore())
-const { removeLineItem, updateLineItem, loadCart } = useCartStore()
+const cartStore = useCartStore()
+const { cart, recoveryMessage } = storeToRefs(cartStore)
+const { removeLineItem, updateLineItem, loadCart, clearRecoveryMessage } = cartStore
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
 const isApplyingCoupon = ref<boolean>(false)
@@ -255,6 +256,22 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                     <section
                         class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-panel sm:p-5"
                     >
+                        <div
+                            v-if="recoveryMessage"
+                            class="mb-4 flex items-start justify-between gap-3 rounded-[1.15rem] border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
+                            role="status"
+                        >
+                            <p>{{ recoveryMessage }}</p>
+                            <button
+                                type="button"
+                                class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                aria-label="Dismiss cart recovery message"
+                                @click="clearRecoveryMessage"
+                            >
+                                <span aria-hidden="true">x</span>
+                            </button>
+                        </div>
+
                         <div v-if="isCartLoading" class="grid justify-items-center gap-4 px-4 py-14 text-center">
                             <span
                                 class="inline-flex h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-700"

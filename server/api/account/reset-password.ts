@@ -1,4 +1,4 @@
-import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
+import { fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 type ResetPasswordBody = {
     token?: string
@@ -23,10 +23,28 @@ export default defineEventHandler(async (event) => {
         const response = await fetchMedusaResponse(event, "/auth/customer/emailpass/update", {
             method: "POST",
             includePublishableKey: false,
-            body: JSON.stringify({ email, password, token })
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ email, password })
         })
 
-        await assertMedusaResponse(response, "Failed to reset password")
+        if (!response.ok) {
+            const payload = await safeJson<ResetPasswordResponse>(response)
+
+            if (response.status === 401) {
+                throw createError({
+                    statusCode: 401,
+                    statusMessage: "This reset link has expired or has already been used. Please request a new password reset email."
+                })
+            }
+
+            throw createError({
+                statusCode: response.status,
+                statusMessage: payload?.message || "Failed to reset password"
+            })
+        }
+
         const result = await safeJson<ResetPasswordResponse>(response)
 
         return { success: result?.success ?? true, message: result?.message || "Password reset successful" }

@@ -1,37 +1,5 @@
-import type { H3Event } from "h3"
-
-import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
-import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
-
-type CartResponse = {
-    cart?: {
-        id: string
-        shipping_address?: {
-            country_code?: string | null
-        } | null
-        billing_address?: {
-            country_code?: string | null
-        } | null
-    }
-}
-
-async function createCart(event: H3Event, regionId: string, countryCode: string | null) {
-    const response = await fetchMedusaResponse(event, "/store/carts", {
-        method: "POST",
-        body: JSON.stringify({ region_id: regionId })
-    })
-
-    await assertMedusaResponse(response, "Failed to create cart")
-
-    const payload = await safeJson<CartResponse>(response)
-    const cart = payload?.cart
-
-    if (!cart?.id) {
-        throw createError({ statusCode: 502, statusMessage: "Invalid Medusa cart response" })
-    }
-
-    return await syncCartCountry(event, cart, countryCode)
-}
+import { createCartForRegion, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { fetchMedusaResponse, toUpstreamError } from "#server/utils/medusa-proxy"
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event)
@@ -49,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         if (!cartId) {
-            const cart = await createCart(event, regionId, countryCode)
+            const cart = await createCartForRegion(event, regionId, countryCode)
             setCookie(event, "cart_id", cart.id, cookieOptions)
 
             return { cart, regionId }
@@ -61,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
         if (!existingCartResponse.ok) {
             setCookie(event, "cart_id", "", { ...cookieOptions, maxAge: 0 })
-            const cart = await createCart(event, regionId, countryCode)
+            const cart = await createCartForRegion(event, regionId, countryCode)
             setCookie(event, "cart_id", cart.id, cookieOptions)
             return { cart, regionId }
         }

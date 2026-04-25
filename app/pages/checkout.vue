@@ -47,6 +47,7 @@ type CreatePaymentIntentPayload = {
 }
 type CompleteCartPayload = { order?: { id?: string } }
 type ShippingOptionsPayload = ShippingOption[] | { shipping_options?: ShippingOption[] }
+type ErrorWithMessage = { data?: { statusMessage?: string }; statusMessage?: string; message?: string }
 
 const cartStore = useCartStore()
 const customerStore = useCustomerStore()
@@ -256,6 +257,15 @@ const cartFingerprint = computed<string>(() => {
 function getAmountWithTax(item: CartLineItemDTO): number {
     const pricedItem = item as PricedCartLineItem
     return Number(pricedItem.total ?? pricedItem.unit_price ?? 0)
+}
+
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (typeof error === "object" && error !== null) {
+        const typedError = error as ErrorWithMessage
+        return typedError.data?.statusMessage ?? typedError.statusMessage ?? typedError.message ?? fallbackMessage
+    }
+
+    return fallbackMessage
 }
 
 function getAmountWithoutTax(item: CartLineItemDTO): number {
@@ -833,6 +843,7 @@ async function handleSubmit(): Promise<void> {
     }
 
     isLoading.value = true
+    errorMessage.value = null
 
     try {
         let result = await stripe.confirmPayment({ elements, redirect: "if_required" })
@@ -851,6 +862,9 @@ async function handleSubmit(): Promise<void> {
         }
 
         await completeCart()
+    } catch (error: unknown) {
+        console.error("Checkout submission failed:", error)
+        errorMessage.value = getErrorMessage(error, "Could not complete checkout")
     } finally {
         isLoading.value = false
     }
@@ -994,7 +1008,7 @@ watch(
             <template v-else>
                 <section class="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)] xl:items-start xl:gap-7">
                     <div class="space-y-5 sm:space-y-6">
-                        <div class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:rounded-[2rem] sm:p-7">
+                        <div class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:rounded-4xl sm:p-7">
                             <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
                                 Single-page checkout
                             </span>

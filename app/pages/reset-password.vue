@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
-const runtimeConfig = useRuntimeConfig()
-
 const token = computed(() => String(route.query.token || "").trim())
 const email = computed(() => String(route.query.email || "").trim())
 const password = ref<string>("")
@@ -44,37 +42,39 @@ async function handleSubmit(): Promise<void> {
     isLoading.value = true
 
     try {
-        const response = await fetch(`${runtimeConfig.public.MEDUSA_URL}/auth/customer/emailpass/update`, {
+        const response = await fetch("/api/account/reset-password", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token.value}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
+                token: token.value,
                 email: email.value,
                 password: password.value
             })
         })
 
+        const payload = (await response.json()) as { success?: boolean, message?: string }
+
         if (!response.ok) {
-            throw new Error("Failed to reset password")
+            errorMessage.value = payload.message || "Could not reset password. Please request a new reset link and try again."
+            return
         }
 
-        const payload = (await response.json()) as { success?: boolean }
-
         if (!payload.success) {
-            errorMessage.value = "Could not reset password. Please request a new reset link and try again."
+            errorMessage.value = payload.message || "Could not reset password. Please request a new reset link and try again."
             return
         }
 
         successMessage.value = "Password reset successfully. Redirecting to sign in..."
+        await router.replace({ path: route.path, query: {} })
 
         redirectTimer.value = setTimeout(() => {
             void router.push("/signin")
         }, 1500)
     } catch (error: unknown) {
         console.error(error)
-        errorMessage.value = "Error resetting password. Please try again."
+        errorMessage.value = "Error resetting password. Please request a new reset link and try again."
     } finally {
         isLoading.value = false
     }

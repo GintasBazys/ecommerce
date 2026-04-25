@@ -4,11 +4,14 @@ interface CartResponseInterface {
     cart: MedusaCart
     success?: boolean
     error?: string
+    recovered?: boolean
+    recoveryMessage?: string
 }
 
 export const useCartStore = defineStore("cart", () => {
     const cart = ref<MedusaCart>()
     const openCartDrawer = ref(false)
+    const recoveryMessage = ref<string | null>(null)
 
     const isUpdatingCart = ref(false)
 
@@ -50,6 +53,10 @@ export const useCartStore = defineStore("cart", () => {
         } catch (error) {
             console.error("Error loading cart:", error)
         }
+    }
+
+    const clearRecoveryMessage = () => {
+        recoveryMessage.value = null
     }
 
     const updateLineItem = (
@@ -96,6 +103,7 @@ export const useCartStore = defineStore("cart", () => {
                     })
 
                     if (response && response.success) {
+                        clearRecoveryMessage()
                         cart.value = response.cart
                         openCartDrawer.value = true
                     }
@@ -113,6 +121,7 @@ export const useCartStore = defineStore("cart", () => {
                     })
 
                     if (response && response.success) {
+                        clearRecoveryMessage()
                         cart.value = response.cart
                         openCartDrawer.value = true
                     }
@@ -134,6 +143,7 @@ export const useCartStore = defineStore("cart", () => {
                 })
 
                 if (response?.success) {
+                    recoveryMessage.value = response.recovered ? (response.recoveryMessage ?? null) : null
                     cart.value = response.cart.parent ?? response.cart
                 }
             } catch (err) {
@@ -149,6 +159,8 @@ export const useCartStore = defineStore("cart", () => {
         removeLineItem,
         itemCount,
         cart,
+        recoveryMessage,
+        clearRecoveryMessage,
         loadCart,
         openCartDrawer,
         isUpdatingCart

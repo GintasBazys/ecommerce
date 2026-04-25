@@ -6,8 +6,9 @@ import { usePostHog } from "~/composables/usePostHog"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
 
-const { cart, openCartDrawer } = storeToRefs(useCartStore())
-const { removeLineItem, updateLineItem } = useCartStore()
+const cartStore = useCartStore()
+const { cart, openCartDrawer, recoveryMessage } = storeToRefs(cartStore)
+const { removeLineItem, updateLineItem, clearRecoveryMessage } = cartStore
 const posthog = usePostHog()
 
 const isHydrated = ref(false)
@@ -298,6 +299,22 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                     </div>
 
                     <div class="cart-drawer__scroll px-3 py-3 sm:px-4 sm:py-4">
+                        <div
+                            v-if="recoveryMessage"
+                            class="mb-3 flex items-start justify-between gap-3 rounded-[1.15rem] border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
+                            role="status"
+                        >
+                            <p>{{ recoveryMessage }}</p>
+                            <button
+                                type="button"
+                                class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                aria-label="Dismiss cart recovery message"
+                                @click="clearRecoveryMessage"
+                            >
+                                <span aria-hidden="true">x</span>
+                            </button>
+                        </div>
+
                         <div v-if="cart?.items?.length" class="grid gap-3.5">
                             <article
                                 v-for="item in cart.items"

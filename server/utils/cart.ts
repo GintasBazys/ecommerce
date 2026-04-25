@@ -1,6 +1,6 @@
 import type { H3Event } from "h3"
 
-import { fetchMedusaJson } from "#server/utils/medusa-proxy"
+import { assertMedusaResponse, fetchMedusaJson, fetchMedusaResponse, safeJson } from "#server/utils/medusa-proxy"
 
 type CartAddress = {
     country_code?: string | null
@@ -9,11 +9,35 @@ type CartAddress = {
 
 type StoreCartLike = {
     id: string
+    region_id?: string | null
+    items?: Array<{ id: string }> | null
     shipping_address?: CartAddress | null
     billing_address?: CartAddress | null
 }
 
+type CartResponse = {
+    cart?: StoreCartLike
+}
+
 const CART_FIELDS = "+items.*,+shipping_methods.*"
+
+export async function createCartForRegion(event: H3Event, regionId: string, countryCode: string | null) {
+    const response = await fetchMedusaResponse(event, "/store/carts", {
+        method: "POST",
+        body: JSON.stringify({ region_id: regionId })
+    })
+
+    await assertMedusaResponse(response, "Failed to create cart")
+
+    const payload = await safeJson<CartResponse>(response)
+    const cart = payload?.cart
+
+    if (!cart?.id) {
+        throw createError({ statusCode: 502, statusMessage: "Invalid Medusa cart response" })
+    }
+
+    return await syncCartCountry(event, cart, countryCode)
+}
 
 export async function retrieveExpandedCart(event: H3Event, cartId: string) {
     const data = await fetchMedusaJson<{ cart?: StoreCartLike } | StoreCartLike>(
