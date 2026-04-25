@@ -18,7 +18,7 @@ const props = defineProps<{
             <AppBreadcrumbs :items="props.breadcrumbItems" class="mb-4" />
 
             <div
-                class="relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-[2rem]"
+                class="relative overflow-hidden rounded-panel border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
             >
                 <NuxtImage
                     :src="props.heroImage"
@@ -39,15 +39,15 @@ const props = defineProps<{
                     class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.14)_0%,rgba(15,23,42,0.1)_40%,rgba(15,23,42,0.5)_100%)]"
                 ></div>
 
-                <div class="relative z-10 flex min-h-[20rem] flex-col justify-between gap-8 p-4 sm:min-h-[24rem] sm:p-6 lg:min-h-[28rem]">
+                <div class="relative z-10 flex min-h-80 flex-col justify-between gap-8 p-4 sm:min-h-96 sm:p-6 lg:min-h-112">
                     <div
-                        class="text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                        class="w-fit text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                     >
                         <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                         {{ props.isAllProductsPage ? "All products" : "Category" }}
                     </div>
                     <div
-                        class="max-w-3xl rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
+                        class="max-w-3xl rounded-3xl border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
                     >
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 font-bold text-amber-100 uppercase"

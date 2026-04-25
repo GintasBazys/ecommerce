@@ -19,7 +19,7 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
 </script>
 
 <template>
-    <section class="site-hero relative isolate overflow-hidden bg-slate-950">
+    <section class="relative isolate min-h-screen overflow-hidden bg-slate-950">
         <NuxtImage
             :src="heroContent.image"
             :alt="heroContent.alt"
@@ -33,14 +33,17 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
             decoding="async"
             class="absolute inset-0 h-full w-full object-cover object-center"
         />
+        <div class="absolute inset-0 z-0 bg-linear-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30"></div>
 
         <div
             class="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pt-24 pb-12 sm:px-6 sm:pb-14 md:pt-28 md:pb-16 lg:pt-32 lg:pb-20"
         >
-            <div class="site-hero__panel w-full max-w-3xl rounded-4xl p-6 text-white sm:p-8 lg:p-10">
-                <h1 class="mt-5 max-w-[13ch] text-4xl leading-[0.95] font-bold tracking-[-0.05em] text-white sm:text-5xl lg:text-[4.25rem]">
+            <div
+                class="w-full max-w-3xl rounded-4xl border border-white/10 bg-white/10 p-6 text-white shadow-2xl backdrop-blur-md sm:p-8 lg:p-10"
+            >
+                <h1 class="mt-5 max-w-lg text-4xl leading-none font-bold tracking-tighter text-white sm:text-5xl lg:text-7xl">
                     A cleaner,
-                    <span class="text-accent-300 block font-medium tracking-[-0.03em] italic"> more thoughtful </span>
+                    <span class="text-accent-300 block font-medium tracking-tight italic"> more thoughtful </span>
                     online store experience.
                 </h1>
 
@@ -68,7 +71,7 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
                     <li
                         v-for="item in heroHighlights"
                         :key="item"
-                        class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-xs font-semibold tracking-[0.08em] text-slate-100"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-xs font-semibold tracking-widest text-slate-100"
                     >
                         <span class="bg-accent-300 h-1.5 w-1.5 rounded-full" aria-hidden="true"></span>
                         {{ item }}
@@ -78,31 +81,3 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
         </div>
     </section>
 </template>
-
-<style scoped lang="scss">
-.site-hero {
-    min-height: calc(100vh - var(--site-header-offset, 98px));
-}
-
-.site-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(90deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.72) 42%, rgba(2, 6, 23, 0.28) 100%);
-}
-
-.site-hero__panel {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 20px 48px rgba(2, 6, 23, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-@supports (height: 100svh) {
-    .site-hero {
-        min-height: calc(100svh - var(--site-header-offset, 98px));
-    }
-}
-</style>

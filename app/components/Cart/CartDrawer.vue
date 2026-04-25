@@ -244,26 +244,20 @@ function onDrawerKeydown(event: KeyboardEvent): void {
     <Teleport to="body">
         <div v-if="isHydrated">
             <transition name="fade">
-                <div
-                    v-if="openCartDrawer"
-                    class="fixed inset-0 z-80 bg-[linear-gradient(180deg,rgba(2,6,23,0.5),rgba(2,6,23,0.66))] backdrop-blur-[2px]"
-                    @click="closeDrawer"
-                ></div>
+                <div v-if="openCartDrawer" class="fixed inset-0 z-80 bg-slate-950/55 backdrop-blur-sm" @click="closeDrawer"></div>
             </transition>
 
             <aside
                 ref="drawerRef"
-                class="cart-drawer fixed right-0 bottom-0 z-85 w-full max-w-110 border-l border-white/60"
-                :class="openCartDrawer ? 'cart-drawer--open' : 'cart-drawer--closed'"
+                class="fixed top-0 right-0 bottom-0 z-85 w-full max-w-110 overflow-hidden border-l border-white/60 bg-gradient-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out"
+                :class="openCartDrawer ? 'translate-x-0' : 'translate-x-full'"
                 :aria-labelledby="titleId"
                 role="search"
                 @keydown="onDrawerKeydown"
             >
-                <div class="cart-drawer__inner">
-                    <div class="cart-drawer__top border-b border-slate-200/80 px-4 py-4 sm:px-5 sm:py-5">
-                        <div
-                            class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.45),rgba(148,163,184,0))]"
-                        ></div>
+                <div class="flex h-full min-h-0 flex-col">
+                    <div class="shrink-0 border-b border-slate-200/80 px-4 py-4 sm:px-5 sm:py-5">
+                        <div class="mb-4 h-px w-full bg-gradient-to-r from-slate-400/0 via-amber-500/45 to-slate-400/0"></div>
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <p
@@ -273,7 +267,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 </p>
                                 <h2
                                     :id="titleId"
-                                    class="mt-3 max-w-[12ch] text-xl leading-tight font-semibold tracking-[-0.03em] text-slate-950 sm:text-[1.75rem]"
+                                    class="mt-3 max-w-xs text-xl leading-tight font-semibold tracking-tight text-slate-950 sm:text-3xl"
                                 >
                                     Your order is nearly ready.
                                 </h2>
@@ -285,7 +279,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <button
                                 ref="closeButtonRef"
                                 type="button"
-                                class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-[0_10px_30px_rgba(8,27,90,0.08)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
+                                class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-xl transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 @click="closeDrawer"
                             >
                                 <span class="sr-only">Close cart drawer</span>
@@ -298,7 +292,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                         </div>
                     </div>
 
-                    <div class="cart-drawer__scroll px-3 py-3 sm:px-4 sm:py-4">
+                    <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4 sm:py-4">
                         <div
                             v-if="recoveryMessage"
                             class="rounded-card-sm mb-3 flex items-start justify-between gap-3 border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
@@ -319,7 +313,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <article
                                 v-for="item in cart.items"
                                 :key="item.id"
-                                class="grid grid-cols-[84px_minmax(0,1fr)] gap-3 rounded-[1.35rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-3 shadow-[0_14px_36px_rgba(8,27,90,0.07)] sm:grid-cols-[96px_minmax(0,1fr)]"
+                                class="rounded-card shadow-panel flex gap-3 border border-white/80 bg-gradient-to-b from-white to-slate-50 p-3"
                             >
                                 <NuxtImage
                                     :src="item.thumbnail || '/images/about-premium.jpg'"
@@ -333,14 +327,14 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 <div class="flex min-w-0 flex-col justify-between gap-3">
                                     <div>
                                         <p class="text-sm font-semibold text-slate-950">{{ item.product_title }}</p>
-                                        <p class="mt-1 text-xs tracking-[0.03em] text-slate-500">
+                                        <p class="mt-1 text-xs tracking-wide text-slate-500">
                                             {{ item.variant_title || "Standard option" }}
                                         </p>
                                     </div>
 
                                     <div class="flex items-end justify-between gap-3">
                                         <div
-                                            class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50/90 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
+                                            class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50/90 p-1 shadow-inner"
                                         >
                                             <button
                                                 type="button"
@@ -400,7 +394,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 
                         <section
                             v-else
-                            class="rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-6 text-center shadow-[0_18px_44px_rgba(8,27,90,0.08)]"
+                            class="shadow-panel rounded-3xl border border-white/80 bg-gradient-to-b from-white to-slate-50 p-6 text-center"
                         >
                             <div
                                 class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-900"
@@ -415,12 +409,8 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                         </section>
                     </div>
 
-                    <footer
-                        class="cart-drawer__footer border-t border-slate-200/80 bg-white/85 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur sm:px-5"
-                    >
-                        <div
-                            class="space-y-2 rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_36px_rgba(8,27,90,0.06)]"
-                        >
+                    <footer class="shrink-0 border-t border-slate-200/80 bg-white/85 p-4 pb-6 backdrop-blur sm:px-5">
+                        <div class="shadow-panel space-y-2 rounded-3xl border border-white/80 bg-gradient-to-b from-white to-slate-50 p-4">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm text-slate-600">Subtotal</span>
                                 <strong class="text-sm text-slate-950">{{ displaySubtotal }}</strong>
@@ -430,10 +420,8 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 <strong class="text-sm text-slate-950">{{ displayTaxTotal }}</strong>
                             </div>
                             <div class="pt-1">
-                                <div
-                                    class="mb-3 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.35),rgba(148,163,184,0))]"
-                                ></div>
-                                <p class="text-xs tracking-[0.04em] text-slate-500">Shipping is calculated during checkout.</p>
+                                <div class="mb-3 h-px w-full bg-gradient-to-r from-slate-400/0 via-amber-500/35 to-slate-400/0"></div>
+                                <p class="text-xs tracking-wide text-slate-500">Shipping is calculated during checkout.</p>
                             </div>
                         </div>
 
@@ -466,46 +454,3 @@ function onDrawerKeydown(event: KeyboardEvent): void {
         </div>
     </Teleport>
 </template>
-
-<style scoped>
-.cart-drawer {
-    top: 0;
-    background: linear-gradient(180deg, #fbfcfe 0%, #f6f8fc 58%, #f2f5fa 100%);
-    box-shadow: -12px 0 32px rgba(2, 6, 23, 0.14);
-    transform: translate3d(100%, 0, 0);
-    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
-    backface-visibility: hidden;
-    contain: layout paint style;
-    overflow: hidden;
-}
-
-.cart-drawer--open {
-    transform: translate3d(0, 0, 0);
-}
-
-.cart-drawer--closed {
-    transform: translate3d(100%, 0, 0);
-}
-
-.cart-drawer__inner {
-    display: flex;
-    height: 100%;
-    min-height: 0;
-    flex-direction: column;
-}
-
-.cart-drawer__top,
-.cart-drawer__footer {
-    flex: 0 0 auto;
-}
-
-.cart-drawer__scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-}
-</style>

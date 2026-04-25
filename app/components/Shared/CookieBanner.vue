@@ -4,9 +4,9 @@ const { accept, decline, isBannerVisible } = useCookieConsent()
 
 <template>
     <Teleport to="body">
-        <div v-if="isBannerVisible" class="fixed inset-x-0 bottom-0 z-[90] px-4 pb-4 sm:px-6 lg:px-8">
+        <div v-if="isBannerVisible" class="fixed inset-x-0 bottom-0 z-90 px-4 pb-4 sm:px-6 lg:px-8">
             <section
-                class="mx-auto w-full max-w-5xl rounded-[1.6rem] border border-slate-200 bg-white/95 p-4 text-slate-900 sm:p-5"
+                class="mx-auto w-full max-w-5xl rounded-3xl border border-slate-200 bg-white/95 p-4 text-slate-900 sm:p-5"
                 role="dialog"
                 aria-live="polite"
                 aria-label="Cookie preferences"
@@ -14,11 +14,11 @@ const { accept, decline, isBannerVisible } = useCookieConsent()
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
                         <span
-                            class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold tracking-[0.11em] text-slate-700 uppercase"
+                            class="text-label-xs tracking-label-tight inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 font-semibold text-slate-700 uppercase"
                         >
                             Cookie preferences
                         </span>
-                        <h2 class="mt-3 text-lg font-semibold tracking-[-0.02em] text-slate-950 sm:text-xl">
+                        <h2 class="mt-3 text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">
                             We use necessary cookies to keep the shop working and analytics cookies to understand site usage.
                         </h2>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
@@ -30,7 +30,7 @@ const { accept, decline, isBannerVisible } = useCookieConsent()
                         </p>
                     </div>
 
-                    <div class="grid gap-3 sm:grid-cols-2 lg:min-w-[19rem]">
+                    <div class="grid gap-3 sm:grid-cols-2 lg:min-w-76">
                         <button
                             type="button"
                             class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"

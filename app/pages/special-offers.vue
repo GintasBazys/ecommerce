@@ -44,12 +44,12 @@ useSeoMeta({
     <section
         class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
     >
-        <div class="px-0 pt-[3.75rem] pb-8 sm:pt-[4.5rem] xl:pt-[5.75rem]">
+        <div class="px-0 pt-15 pb-8 sm:pt-18 xl:pt-23">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
 
                 <div
-                    class="relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-[2rem]"
+                    class="relative overflow-hidden rounded-panel border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
                 >
                     <NuxtImage
                         src="/images/hero-premium.jpg"
@@ -71,16 +71,16 @@ useSeoMeta({
                     ></div>
 
                     <div
-                        class="relative z-10 flex min-h-[20rem] flex-col justify-between gap-8 p-4 sm:min-h-[24rem] sm:p-6 lg:min-h-[28rem]"
+                        class="relative z-10 flex min-h-80 flex-col justify-between gap-8 p-4 sm:min-h-96 sm:p-6 lg:min-h-112"
                     >
                         <div
-                            class="text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                            class="w-fit text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Sale campaign view
                         </div>
                         <div
-                            class="max-w-3xl rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
+                            class="max-w-3xl rounded-3xl border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
                         >
                             <span
                                 class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 font-bold text-amber-100 uppercase"
@@ -114,19 +114,19 @@ useSeoMeta({
         <div class="mx-auto w-full max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8">
             <div class="grid gap-4 sm:grid-cols-3">
                 <article
-                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                    class="rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
                 >
                     <p class="text-xs font-bold tracking-[0.16em] text-slate-500 uppercase">Sale products</p>
                     <p class="mt-2 text-2xl leading-none font-semibold text-slate-950">{{ saleProducts.length }}</p>
                 </article>
                 <article
-                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                    class="rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
                 >
                     <p class="text-xs font-bold tracking-[0.16em] text-slate-500 uppercase">Sorted by</p>
                     <p class="mt-2 text-base leading-6 font-semibold text-slate-950">Newest offers first</p>
                 </article>
                 <article
-                    class="rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
+                    class="rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_28px_rgba(8,27,90,0.06)]"
                 >
                     <p class="text-xs font-bold tracking-[0.16em] text-slate-500 uppercase">Mobile UX</p>
                     <p class="mt-2 text-base leading-6 font-semibold text-slate-950">Two products per row where space allows</p>
@@ -152,7 +152,7 @@ useSeoMeta({
 
             <div v-else-if="saleProducts.length" class="grid gap-6">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div class="max-w-[34rem]">
+                    <div class="max-w-136">
                         <span
                             class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                         >
@@ -177,7 +177,7 @@ useSeoMeta({
                 class="grid justify-items-start gap-4 rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-6 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-8"
             >
                 <div
-                    class="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-amber-200/70 bg-amber-50 text-amber-900"
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200/70 bg-amber-50 text-amber-900"
                 >
                     <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" stroke="currentColor" stroke-width="1.8">
                         <path d="M7 7h10l3 3-8 8-6-6 1-5Z" stroke-linecap="round" stroke-linejoin="round" />
@@ -188,7 +188,7 @@ useSeoMeta({
                     <h2 class="text-[1.7rem] leading-[1.05] font-bold tracking-[-0.04rem] text-slate-950">
                         No sale products live right now
                     </h2>
-                    <p class="mt-3 max-w-[34rem] text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
+                    <p class="mt-3 max-w-136 text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
                         The next offer drop will appear here automatically once discounted products are available.
                     </p>
                 </div>

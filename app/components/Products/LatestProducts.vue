@@ -16,10 +16,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 </script>
 
 <template>
-    <section
-        v-if="products?.length"
-        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(212,175,55,0.12),transparent_22%),linear-gradient(180deg,#fcfdff_0%,#f6f8fc_100%)] py-16 sm:py-18 lg:py-24"
-    >
+    <section v-if="products?.length" class="overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 py-16 sm:py-18 lg:py-24">
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-184">
@@ -28,13 +25,11 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
                     >
                         Latest Offers
                     </span>
-                    <h2
-                        class="mt-4 max-w-[13ch] text-[clamp(2rem,6vw,3.75rem)] leading-[0.97] font-bold tracking-[-0.05rem] text-slate-950"
-                    >
+                    <h2 class="mt-4 max-w-lg text-4xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-5xl lg:text-6xl">
                         Fresh arrivals with a more
-                        <span class="font-medium text-[#8a6a2f] italic">editorial rhythm</span>
+                        <span class="text-accent-700 font-medium italic">editorial rhythm</span>
                     </h2>
-                    <p class="mt-4 max-w-2xl text-[1rem] leading-8 text-slate-700">
+                    <p class="mt-4 max-w-2xl text-base leading-8 text-slate-700">
                         Browse newly added deals and current promotions in a calmer premium rail that feels easier to scan across mobile and
                         desktop.
                     </p>
@@ -42,7 +37,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
                 <NuxtLink
                     :to="ALL_PRODUCTS_URL_HANDLE"
-                    class="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden lg:self-auto"
+                    class="shadow-card inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden lg:self-auto"
                 >
                     Explore catalog
                 </NuxtLink>
@@ -50,15 +45,15 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
             <div class="relative mt-9">
                 <div
-                    class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-linear-to-r from-[#f8fafc] to-transparent lg:block"
+                    class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-linear-to-r from-slate-50 to-transparent lg:block"
                 ></div>
                 <div
-                    class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-linear-to-l from-[#f6f8fc] to-transparent lg:block"
+                    class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-linear-to-l from-slate-100 to-transparent lg:block"
                 ></div>
 
                 <div
                     ref="railRef"
-                    class="catalog-rail flex gap-4 overflow-x-auto pt-1 pr-6 pb-4 pl-0 sm:gap-5 sm:pr-8"
+                    class="flex gap-4 overflow-x-auto overflow-y-visible pt-1 pr-6 pb-4 pl-0 sm:gap-5 sm:pr-8"
                     aria-label="Latest products"
                     tabindex="0"
                     @pointerdown="onPointerDown"
@@ -68,7 +63,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
                     <div
                         v-for="product in products"
                         :key="product.id"
-                        class="rail-item shrink-0 basis-[82%] sm:basis-[47%] lg:basis-[31%] xl:basis-[24%] 2xl:basis-[20%]"
+                        class="min-w-0 shrink-0 basis-4/5 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5"
                     >
                         <ProductCard :product="product" />
                     </div>
@@ -77,40 +72,3 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
         </div>
     </section>
 </template>
-
-<style scoped>
-.catalog-rail {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-gutter: stable both-edges;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(120, 53, 15, 0.72) rgba(241, 245, 249, 0.92);
-    cursor: grab;
-    user-select: none;
-    scroll-behavior: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: none;
-}
-
-.rail-item {
-    min-width: 0;
-    scroll-snap-align: none;
-    scroll-snap-stop: normal;
-}
-
-@media (hover: none) and (pointer: coarse) {
-    .catalog-rail {
-        cursor: auto;
-        overscroll-behavior-x: auto;
-        user-select: auto;
-    }
-}
-
-.catalog-rail :deep(img) {
-    -webkit-user-drag: none;
-    user-select: none;
-}
-</style>

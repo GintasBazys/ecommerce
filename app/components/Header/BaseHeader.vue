@@ -191,7 +191,7 @@ function getProductMeta(product: ProductDTO): string {
     <header class="relative z-50">
         <div
             v-if="!bannerHidden"
-            class="fixed inset-x-0 top-0 z-50 h-8 border-b border-white/10 bg-[linear-gradient(90deg,#0f172a_0%,#1e293b_52%,#334155_100%)] text-white"
+            class="fixed inset-x-0 top-0 z-50 h-8 border-b border-white/10 bg-linear-to-r from-slate-900 via-slate-800 to-slate-700 text-white"
         >
             <div class="mx-auto flex h-full w-full max-w-7xl items-center justify-between px-4">
                 <p class="text-label-xs tracking-label-tight truncate font-semibold text-slate-100 uppercase">
@@ -213,7 +213,7 @@ function getProductMeta(product: ProductDTO): string {
         </div>
 
         <div
-            class="fixed inset-x-0 z-40 border-b border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.92))] shadow-[0_14px_38px_rgba(8,27,90,0.06)] backdrop-blur-xl"
+            class="shadow-panel fixed inset-x-0 z-40 border-b border-white/70 bg-linear-to-b from-white/95 to-slate-50/90 backdrop-blur-xl"
             :style="{ top: `${topOffset}px` }"
         >
             <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
@@ -224,7 +224,7 @@ function getProductMeta(product: ProductDTO): string {
                         width="640"
                         height="144"
                         fetchpriority="high"
-                        class="site-header__logo"
+                        class="block h-8 w-auto sm:h-9"
                     />
                 </NuxtLink>
 
@@ -269,20 +269,21 @@ function getProductMeta(product: ProductDTO): string {
                         <BaseSelect
                             v-if="isClientHydrated"
                             v-model="locationValue"
-                            class="site-header__country-select max-w-42.5 xl:max-w-47.5"
+                            class="max-w-44 xl:max-w-48"
                             :options="locationItems"
                             option-label-key="title"
                             :disabled="selectionLoading"
                         />
-                        <span
-                            v-else
-                            class="ui-input site-header__country-select inline-flex max-w-42.5 items-center pr-8 text-sm xl:max-w-47.5"
-                        >
+                        <span v-else class="ui-input shadow-card inline-flex max-w-44 items-center pr-8 text-sm xl:max-w-48">
                             Country
                         </span>
                     </label>
 
-                    <button type="button" class="site-header__icon-btn" @click="openSearchDialog">
+                    <button
+                        type="button"
+                        class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
+                        @click="openSearchDialog"
+                    >
                         <span class="sr-only">Search products</span>
                         <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <circle cx="11" cy="11" r="7" />
@@ -291,7 +292,9 @@ function getProductMeta(product: ProductDTO): string {
                     </button>
 
                     <NuxtLink to="/cart" class="relative inline-flex">
-                        <span class="site-header__icon-btn">
+                        <span
+                            class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
+                        >
                             <span class="sr-only">Open cart</span>
                             <svg
                                 viewBox="0 0 24 24"
@@ -312,7 +315,7 @@ function getProductMeta(product: ProductDTO): string {
                         </span>
                         <span
                             v-if="isClientHydrated && itemCount"
-                            class="bg-accent-500 absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold text-slate-950 ring-2 ring-white"
+                            class="bg-accent-500 text-label-xs absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1 font-semibold text-slate-950 ring-2 ring-white"
                         >
                             {{ itemCount < 99 ? itemCount : "99+" }}
                         </span>
@@ -320,20 +323,24 @@ function getProductMeta(product: ProductDTO): string {
 
                     <NuxtLink
                         v-if="isClientHydrated && customer?.id"
-                        class="hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
+                        class="shadow-card hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
                         to="/account"
                     >
                         Profile
                     </NuxtLink>
                     <NuxtLink
                         v-else
-                        class="hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 shadow-[0_10px_24px_rgba(8,27,90,0.05)] transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
+                        class="shadow-card hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
                         to="/signin"
                     >
                         Sign in
                     </NuxtLink>
 
-                    <button type="button" class="site-header__icon-btn xl:hidden" @click="drawer = true">
+                    <button
+                        type="button"
+                        class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden xl:hidden"
+                        @click="drawer = true"
+                    >
                         <span class="sr-only">Open menu</span>
                         <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
@@ -344,24 +351,18 @@ function getProductMeta(product: ProductDTO): string {
         </div>
 
         <transition name="fade">
-            <div
-                v-if="drawer"
-                class="fixed inset-0 z-60 bg-[linear-gradient(180deg,rgba(2,6,23,0.5),rgba(2,6,23,0.66))] backdrop-blur-[2px]"
-                @click="closeDrawer"
-            ></div>
+            <div v-if="drawer" class="fixed inset-0 z-60 bg-slate-950/55 backdrop-blur-sm" @click="closeDrawer"></div>
         </transition>
 
         <aside
-            class="site-drawer fixed right-0 bottom-0 z-65 w-75 border-l border-white/60 sm:w-85"
-            :class="drawer ? 'site-drawer--open' : 'site-drawer--closed'"
+            class="fixed right-0 bottom-0 z-65 w-72 overflow-hidden border-l border-white/60 bg-linear-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out sm:w-80"
+            :class="drawer ? 'translate-x-0' : 'translate-x-full'"
             :style="{ top: `${topOffset + headerHeight}px` }"
             aria-label="Mobile navigation"
         >
-            <div class="site-drawer__inner">
-                <div class="site-drawer__top px-4 pt-4 pb-4">
-                    <div
-                        class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.45),rgba(148,163,184,0))]"
-                    ></div>
+            <div class="flex h-full min-h-0 flex-col">
+                <div class="shrink-0 px-4 pt-4 pb-4">
+                    <div class="mb-4 h-px w-full bg-linear-to-r from-slate-400/0 via-amber-500/45 to-slate-400/0"></div>
 
                     <div class="flex items-center justify-between gap-3">
                         <div>
@@ -370,10 +371,14 @@ function getProductMeta(product: ProductDTO): string {
                             >
                                 Navigation
                             </p>
-                            <h2 class="mt-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">Menu</h2>
+                            <h2 class="mt-3 text-lg font-semibold tracking-tight text-slate-950">Menu</h2>
                         </div>
 
-                        <button type="button" class="site-header__icon-btn" @click="closeDrawer">
+                        <button
+                            type="button"
+                            class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
+                            @click="closeDrawer"
+                        >
                             <span class="sr-only">Close menu</span>
                             <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
                                 <path
@@ -384,29 +389,25 @@ function getProductMeta(product: ProductDTO): string {
                     </div>
                 </div>
 
-                <div class="site-drawer__scroll px-4 pb-6">
-                    <label
-                        class="mt-1 block rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_32px_rgba(8,27,90,0.06)]"
-                    >
+                <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pb-6">
+                    <label class="shadow-panel mt-1 block rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4">
                         <span class="text-label-xs tracking-label mb-2 block font-semibold text-slate-500 uppercase">Country</span>
 
                         <BaseSelect
                             v-if="isClientHydrated"
                             v-model="locationValue"
-                            class="site-header__country-select rounded-xl"
+                            class="rounded-xl"
                             :options="locationItems"
                             option-label-key="title"
                             :disabled="selectionLoading"
                         />
 
-                        <span v-else class="ui-input site-header__country-select inline-flex w-full items-center rounded-xl">
-                            Country
-                        </span>
+                        <span v-else class="ui-input shadow-card inline-flex w-full items-center rounded-xl"> Country </span>
                     </label>
 
                     <nav class="mt-5 grid gap-2" aria-label="Mobile links">
                         <NuxtLink
-                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
                             :to="ALL_PRODUCTS_URL_HANDLE"
                             @click="closeDrawer"
                         >
@@ -414,7 +415,7 @@ function getProductMeta(product: ProductDTO): string {
                         </NuxtLink>
 
                         <NuxtLink
-                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
                             to="/special-offers"
                             @click="closeDrawer"
                         >
@@ -424,7 +425,7 @@ function getProductMeta(product: ProductDTO): string {
                         <NuxtLink
                             v-for="cat in categories"
                             :key="cat.id"
-                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
                             :to="`${CATEGORY_HANDLE}/${cat.handle}`"
                             @click="closeDrawer"
                         >
@@ -433,7 +434,7 @@ function getProductMeta(product: ProductDTO): string {
 
                         <NuxtLink
                             v-if="isClientHydrated && customer?.id"
-                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
                             to="/account"
                             @click="closeDrawer"
                         >
@@ -442,7 +443,7 @@ function getProductMeta(product: ProductDTO): string {
 
                         <NuxtLink
                             v-else
-                            class="rounded-[1.1rem] border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
                             to="/signin"
                             @click="closeDrawer"
                         >
@@ -454,18 +455,12 @@ function getProductMeta(product: ProductDTO): string {
         </aside>
 
         <transition name="fade">
-            <div
-                v-if="searchDialog"
-                class="fixed inset-0 z-70 bg-[linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.74))] p-4 backdrop-blur-xs md:p-6"
-                @click.self="closeSearchDialog"
-            >
+            <div v-if="searchDialog" class="fixed inset-0 z-70 bg-slate-950/70 p-4 backdrop-blur-sm md:p-6" @click.self="closeSearchDialog">
                 <section
-                    class="mx-auto mt-14 max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-[1.8rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,248,252,0.94))] shadow-[0_30px_90px_rgba(2,6,23,0.26)]"
+                    class="mx-auto mt-14 max-h-screen w-full max-w-3xl overflow-hidden rounded-4xl border border-white/60 bg-linear-to-b from-white to-slate-50 shadow-2xl"
                 >
                     <div class="border-b border-slate-200/80 px-4 py-4 md:px-6">
-                        <div
-                            class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.45),rgba(148,163,184,0))]"
-                        ></div>
+                        <div class="mb-4 h-px w-full bg-linear-to-r from-slate-400/0 via-amber-500/45 to-slate-400/0"></div>
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <p
@@ -473,9 +468,13 @@ function getProductMeta(product: ProductDTO): string {
                                 >
                                     Search
                                 </p>
-                                <h2 class="mt-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">Search products</h2>
+                                <h2 class="mt-3 text-lg font-semibold tracking-tight text-slate-950">Search products</h2>
                             </div>
-                            <button type="button" class="site-header__icon-btn" @click="closeSearchDialog">
+                            <button
+                                type="button"
+                                class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
+                                @click="closeSearchDialog"
+                            >
                                 <span class="sr-only">Close search</span>
                                 <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
                                     <path
@@ -491,7 +490,7 @@ function getProductMeta(product: ProductDTO): string {
                             <span class="sr-only">Search by product name</span>
                             <input
                                 v-model="searchQuery"
-                                class="ui-input site-header__search-input rounded-2xl"
+                                class="ui-input shadow-card rounded-2xl border-slate-300 bg-linear-to-b from-white to-slate-50 text-slate-900"
                                 placeholder="Search by product name (min 3 chars)..."
                             />
                         </label>
@@ -504,14 +503,14 @@ function getProductMeta(product: ProductDTO): string {
                         </p>
                     </div>
 
-                    <div class="max-h-[58vh] overflow-y-auto px-4 py-3 md:px-6 md:py-4">
+                    <div class="max-h-96 overflow-y-auto px-4 py-3 md:px-6 md:py-4">
                         <div v-if="searchLoading" class="flex items-center justify-center py-12" role="status" aria-live="polite">
                             <span class="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-amber-700"></span>
                         </div>
 
                         <div
                             v-else-if="searchHasSearched && !searchResults.length"
-                            class="rounded-[1.4rem] border border-white/80 bg-white/80 px-4 py-8 text-center text-sm text-slate-600 shadow-[0_14px_30px_rgba(8,27,90,0.05)]"
+                            class="shadow-card rounded-3xl border border-white/80 bg-white/80 px-4 py-8 text-center text-sm text-slate-600"
                         >
                             No products found.
                         </div>
@@ -519,7 +518,7 @@ function getProductMeta(product: ProductDTO): string {
                         <NuxtLink
                             v-for="product in searchResults"
                             :key="product.id"
-                            class="flex items-center gap-3 rounded-[1.2rem] border border-transparent bg-white/72 px-3 py-3 shadow-[0_10px_24px_rgba(8,27,90,0.04)] transition hover:border-amber-200 hover:bg-white"
+                            class="shadow-card flex items-center gap-3 rounded-2xl border border-transparent bg-white/72 px-3 py-3 transition hover:border-amber-200 hover:bg-white"
                             :to="getProductPath(product.handle)"
                             @click="closeSearchDialog"
                         >
@@ -528,13 +527,13 @@ function getProductMeta(product: ProductDTO): string {
                                 :alt="product.title || 'Product image'"
                                 width="80"
                                 height="80"
-                                class="h-20 w-20 rounded-[0.95rem] bg-slate-100 object-cover"
+                                class="h-20 w-20 rounded-xl bg-slate-100 object-cover"
                             />
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-semibold text-slate-950">{{ product.title }}</p>
-                                <p class="truncate text-xs font-medium tracking-[0.03em] text-slate-600">{{ getProductMeta(product) }}</p>
+                                <p class="truncate text-xs font-medium tracking-wide text-slate-600">{{ getProductMeta(product) }}</p>
                             </div>
-                            <span class="text-xs font-semibold tracking-[0.08em] text-amber-900">Open</span>
+                            <span class="text-xs font-semibold tracking-widest text-amber-900">Open</span>
                         </NuxtLink>
                     </div>
                 </section>
@@ -542,105 +541,3 @@ function getProductMeta(product: ProductDTO): string {
         </transition>
     </header>
 </template>
-
-<style scoped>
-.site-header__country-select {
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
-    box-shadow: 0 10px 24px rgba(8, 27, 90, 0.05);
-    color: #0f172a;
-}
-
-.site-header__search-input {
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
-    box-shadow: 0 10px 24px rgba(8, 27, 90, 0.05);
-    color: #0f172a;
-}
-
-.site-header__icon-btn {
-    display: inline-flex;
-    min-height: 2.75rem;
-    min-width: 2.75rem;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(148, 163, 184, 0.32);
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
-    color: #334155;
-    box-shadow: 0 10px 24px rgba(8, 27, 90, 0.05);
-    transition:
-        color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.site-header__icon-btn:hover {
-    color: #78350f;
-    border-color: rgba(253, 230, 138, 0.9);
-    box-shadow: 0 14px 30px rgba(8, 27, 90, 0.08);
-    transform: translateY(-1px);
-}
-
-.site-header__icon-btn:focus-visible {
-    outline: 2px solid rgba(253, 230, 138, 0.9);
-    outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .site-header__icon-btn {
-        transition: none;
-    }
-}
-
-.site-header__logo {
-    display: block;
-    height: 2rem;
-    width: auto;
-}
-
-@media (min-width: 640px) {
-    .site-header__logo {
-        height: 2.25rem;
-    }
-}
-
-.site-drawer {
-    background: linear-gradient(180deg, #fbfcfe 0%, #f6f8fc 58%, #f2f5fa 100%);
-    box-shadow: -12px 0 32px rgba(2, 6, 23, 0.14);
-    transform: translate3d(100%, 0, 0);
-    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
-    backface-visibility: hidden;
-    contain: layout paint style;
-    overflow: hidden;
-}
-
-.site-drawer--open {
-    transform: translate3d(0, 0, 0);
-}
-
-.site-drawer--closed {
-    transform: translate3d(100%, 0, 0);
-}
-
-.site-drawer__inner {
-    display: flex;
-    height: 100%;
-    min-height: 0;
-    flex-direction: column;
-}
-
-.site-drawer__top {
-    flex: 0 0 auto;
-}
-
-.site-drawer__scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-}
-</style>
