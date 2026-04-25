@@ -93,7 +93,7 @@ function formatAddressLines(address: OrderAddress): string[] {
     >
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
             <section
-                class="rounded-[1.9rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_18px_48px_rgba(8,27,90,0.08)] sm:p-7 lg:p-8"
+                class="rounded-[1.9rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-panel sm:p-7 lg:p-8"
             >
                 <div v-if="pending" class="grid justify-items-center gap-4 px-4 py-14 text-center">
                     <span class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"></span>
@@ -223,7 +223,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                                             :alt="item.product_title || 'Product image'"
                                             width="88"
                                             height="108"
-                                            class="h-[108px] w-[88px] rounded-[1rem] bg-white object-cover"
+                                            class="h-27 w-22 rounded-2xl bg-white object-cover"
                                         />
                                         <div class="min-w-0 flex-1">
                                             <p class="text-sm font-semibold text-slate-950">{{ item.product_title }}</p>
@@ -245,7 +245,7 @@ function formatAddressLines(address: OrderAddress): string[] {
 
                         <aside class="xl:sticky xl:top-6 xl:self-start">
                             <div
-                                class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_18px_48px_rgba(8,27,90,0.08)] sm:p-6"
+                                class="rounded-panel border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-panel sm:p-6"
                             >
                                 <span
                                     class="border-brand-100 bg-brand-50 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border px-4 py-2 font-bold uppercase"
@@ -259,7 +259,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                                 </h2>
 
                                 <div
-                                    class="mt-5 rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4 shadow-[0_10px_26px_rgba(8,27,90,0.05)]"
+                                    class="mt-5 rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4 shadow-card"
                                 >
                                     <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Payment snapshot</p>
                                     <p class="mt-2 text-sm font-semibold text-slate-950">
