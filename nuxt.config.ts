@@ -41,23 +41,11 @@ export default defineNuxtConfig({
         "@pinia/nuxt",
         "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
-        "@nuxtjs/sitemap",
-        "@unlok-co/nuxt-stripe"
+        "@nuxtjs/sitemap"
     ],
 
     sitemap: {
         sources: ["/api/__sitemap__/urls"]
-    },
-
-    stripe: {
-        server: {
-            key: process.env.NUXT_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY,
-            options: {}
-        },
-        client: {
-            key: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY,
-            options: {}
-        }
     },
 
     runtimeConfig: {

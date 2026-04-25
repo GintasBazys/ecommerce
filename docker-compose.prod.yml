@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY:-}
         NUXT_PUBLIC_STRIPE_PUBLIC_KEY: ${NUXT_PUBLIC_STRIPE_PUBLIC_KEY:-}
     restart: unless-stopped
     env_file:

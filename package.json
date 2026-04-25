@@ -20,7 +20,6 @@
         "@nuxtjs/sitemap": "^8.0.13",
         "@pinia/nuxt": "^0.11.3",
         "@stripe/stripe-js": "^9.2.0",
-        "@unlok-co/nuxt-stripe": "^6.0.2",
         "@vueuse/core": "^14.2.1",
         "@vueuse/integrations": "^14.2.1",
         "better-sqlite3": "^12.9.0",
