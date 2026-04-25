@@ -1,29 +1,11 @@
-import { createCartForRegion, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
-
-type CartWithItems = {
-    id: string
-    region_id?: string | null
-    items?: Array<{ id: string }> | null
-}
-
-type ErrorWithStatusMessage = {
-    statusMessage?: string
-}
-
-function isPaymentSessionDeletionError(error: unknown): error is ErrorWithStatusMessage {
-    return typeof error === "object"
-        && error !== null
-        && "statusMessage" in error
-        && typeof (error as ErrorWithStatusMessage).statusMessage === "string"
-        && (error as ErrorWithStatusMessage).statusMessage!.toLowerCase().includes("delete payment sessions")
-}
 
 export default defineEventHandler(async (event) => {
     const cartId = getRouterParam(event, "cartId")
     const lineItemId = getRouterParam(event, "lineItemId")
     const countryCode = getCookie(event, "country_code") || null
-    let currentCart: CartWithItems | null = null
+    let currentCart: Awaited<ReturnType<typeof retrieveExpandedCart>> | null = null
 
     if (!cartId || !lineItemId) {
         throw createError({
@@ -33,7 +15,7 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        currentCart = await retrieveExpandedCart(event, cartId) as CartWithItems
+        currentCart = await retrieveExpandedCart(event, cartId)
 
         await fetchMedusaJson(event, `/store/carts/${cartId}/line-items/${lineItemId}`, {
             method: "DELETE"
@@ -46,24 +28,21 @@ export default defineEventHandler(async (event) => {
             cart: await syncCartCountry(event, updatedCart, countryCode)
         }
     } catch (error: unknown) {
-        if (isPaymentSessionDeletionError(error)) {
-            currentCart = currentCart ?? await retrieveExpandedCart(event, cartId) as CartWithItems
-            const isRemovingLastItem = (currentCart.items?.length ?? 0) <= 1
+        if (isPoisonedPaymentSessionError(error)) {
+            currentCart = currentCart ?? await retrieveExpandedCart(event, cartId)
+            const nextItems = (currentCart.items ?? []).filter((item) => item.id !== lineItemId)
 
-            if (isRemovingLastItem && currentCart.region_id) {
-                const replacementCart = await createCartForRegion(event, currentCart.region_id, countryCode)
-                setCookie(event, "cart_id", replacementCart.id, {
-                    path: "/",
-                    sameSite: "lax",
-                    secure: process.env.NODE_ENV === "production"
-                })
+            const recoveredCart = await recoverPoisonedCart({
+                event,
+                currentCart,
+                nextItems,
+                countryCode,
+                emptyMessage: "Your previous checkout payment session could not be cleared, so we started a fresh cart for you.",
+                preservedMessage: "Your previous checkout payment session could not be cleared, so we moved your remaining items into a fresh cart."
+            })
 
-                return {
-                    success: true,
-                    cart: replacementCart,
-                    recovered: true,
-                    recoveryMessage: "Your previous checkout payment session could not be cleared, so we started a fresh cart for you."
-                }
+            if (recoveredCart) {
+                return recoveredCart
             }
         }
 

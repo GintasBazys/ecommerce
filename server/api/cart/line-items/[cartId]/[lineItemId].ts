@@ -1,4 +1,4 @@
-import { retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 type UpdateLineItemBody = {
@@ -17,8 +17,11 @@ export default defineEventHandler(async (event) => {
     }
 
     const countryCode = getCookie(event, "country_code") || null
+    let currentCart: Awaited<ReturnType<typeof retrieveExpandedCart>> | null = null
 
     try {
+        currentCart = await retrieveExpandedCart(event, cartId)
+
         await fetchMedusaJson(event, `/store/carts/${cartId}/line-items/${lineItemId}`, {
             method: "DELETE"
         })
@@ -38,6 +41,31 @@ export default defineEventHandler(async (event) => {
             cart: await syncCartCountry(event, updatedCart, countryCode)
         }
     } catch (error: unknown) {
+        if (isPoisonedPaymentSessionError(error)) {
+            currentCart = currentCart ?? await retrieveExpandedCart(event, cartId)
+
+            const nextItems = (currentCart.items ?? []).flatMap((item) => {
+                if (item.id === lineItemId) {
+                    return [{ ...item, variant_id, quantity }]
+                }
+
+                return [item]
+            })
+
+            const recoveredCart = await recoverPoisonedCart({
+                event,
+                currentCart,
+                nextItems,
+                countryCode,
+                emptyMessage: "Your previous checkout payment session could not be cleared, so we started a fresh cart and reapplied your quantity change.",
+                preservedMessage: "Your previous checkout payment session could not be cleared, so we moved your cart into a fresh cart and reapplied your quantity change."
+            })
+
+            if (recoveredCart) {
+                return recoveredCart
+            }
+        }
+
         throw toUpstreamError(error, "Unable to update line item")
     }
 })

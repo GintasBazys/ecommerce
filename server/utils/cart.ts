@@ -10,7 +10,11 @@ type CartAddress = {
 type StoreCartLike = {
     id: string
     region_id?: string | null
-    items?: Array<{ id: string }> | null
+    items?: Array<{
+        id: string
+        variant_id?: string | null
+        quantity?: number | null
+    }> | null
     shipping_address?: CartAddress | null
     billing_address?: CartAddress | null
 }
@@ -20,6 +24,77 @@ type CartResponse = {
 }
 
 const CART_FIELDS = "+items.*,+shipping_methods.*"
+
+export type RecoverableCartItem = NonNullable<StoreCartLike["items"]>[number]
+
+type RecoveryResponse = {
+    success: true
+    cart: StoreCartLike
+    recovered: true
+    recoveryMessage: string
+}
+
+type RecoverPoisonedCartOptions = {
+    event: H3Event
+    currentCart: StoreCartLike
+    nextItems: RecoverableCartItem[]
+    countryCode: string | null
+    emptyMessage: string
+    preservedMessage: string
+}
+
+export function isPoisonedPaymentSessionError(error: unknown): error is { statusMessage?: string } {
+    return typeof error === "object"
+        && error !== null
+        && "statusMessage" in error
+        && typeof error.statusMessage === "string"
+        && error.statusMessage.toLowerCase().includes("payment session")
+}
+
+export async function recoverPoisonedCart({
+    event,
+    currentCart,
+    nextItems,
+    countryCode,
+    emptyMessage,
+    preservedMessage
+}: RecoverPoisonedCartOptions): Promise<RecoveryResponse | null> {
+    const regionId = currentCart.region_id ?? (getCookie(event, "region_id") || null)
+
+    if (!regionId) {
+        return null
+    }
+
+    const replacementCart = await createCartForRegion(event, regionId, countryCode)
+
+    for (const item of nextItems) {
+        if (!item.variant_id || !item.quantity || item.quantity <= 0) {
+            continue
+        }
+
+        await fetchMedusaJson(event, `/store/carts/${replacementCart.id}/line-items`, {
+            method: "POST",
+            body: JSON.stringify({
+                variant_id: item.variant_id,
+                quantity: item.quantity
+            })
+        })
+    }
+
+    const hydratedReplacementCart = await retrieveExpandedCart(event, replacementCart.id)
+    setCookie(event, "cart_id", replacementCart.id, {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production"
+    })
+
+    return {
+        success: true,
+        cart: await syncCartCountry(event, hydratedReplacementCart, countryCode),
+        recovered: true,
+        recoveryMessage: nextItems.length ? preservedMessage : emptyMessage
+    }
+}
 
 export async function createCartForRegion(event: H3Event, regionId: string, countryCode: string | null) {
     const response = await fetchMedusaResponse(event, "/store/carts", {
