@@ -33,7 +33,7 @@ const emit = defineEmits<{
                 <span class="text-sm font-medium text-slate-500">Select option</span>
                 <span class="text-sm font-semibold text-slate-900">{{ selectedVariantTitle }}</span>
             </div>
-            <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+            <div class="flex gap-2.5 flex-wrap">
                 <button
                     v-for="variant in variants"
                     :key="variant.id"

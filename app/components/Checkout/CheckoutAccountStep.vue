@@ -2,6 +2,7 @@
 type LoginErrors = {
     email: string
     password: string
+    verification: string
 }
 
 type RegisterErrors = {
@@ -9,6 +10,7 @@ type RegisterErrors = {
     last_name: string
     email: string
     password: string
+    verification: string
 }
 
 type GuestErrors = {
@@ -33,6 +35,11 @@ const props = defineProps<{
     loginErrors: LoginErrors
     registerErrors: RegisterErrors
     guestErrors: GuestErrors
+    turnstileSiteKey: string
+    loginTurnstileToken: string
+    registerTurnstileToken: string
+    loginTurnstileResetKey: number
+    registerTurnstileResetKey: number
     isSubmitting: boolean
     isAuthLoading: boolean
 }>()
@@ -45,7 +52,10 @@ const emit = defineEmits<{
     "update:regLastName": [value: string]
     "update:regEmail": [value: string]
     "update:regPassword": [value: string]
+    "update:loginTurnstileToken": [value: string]
+    "update:registerTurnstileToken": [value: string]
     "update:guestEmail": [value: string]
+    "turnstile-error": [target: "login" | "register", message: string]
     "submit-login": []
     "submit-register": []
     "submit-guest": []
@@ -202,6 +212,19 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             <p v-if="props.loginErrors.password" class="text-sm leading-6 text-rose-600">{{ props.loginErrors.password }}</p>
                         </label>
 
+                        <div>
+                            <FormsTurnstileWidget
+                                :site-key="props.turnstileSiteKey"
+                                action="login"
+                                :reset-key="props.loginTurnstileResetKey"
+                                :model-value="props.loginTurnstileToken"
+                                @update:model-value="emit('update:loginTurnstileToken', $event)"
+                                @error="emit('turnstile-error', 'login', $event)"
+                                @expired="emit('turnstile-error', 'login', $event)"
+                            />
+                            <p v-if="props.loginErrors.verification" class="text-sm leading-6 text-rose-600">{{ props.loginErrors.verification }}</p>
+                        </div>
+
                         <button
                             type="submit"
                             class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
@@ -266,6 +289,19 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                         />
                         <p v-if="props.registerErrors.password" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.password }}</p>
                     </label>
+
+                    <div>
+                        <FormsTurnstileWidget
+                            :site-key="props.turnstileSiteKey"
+                            action="register"
+                            :reset-key="props.registerTurnstileResetKey"
+                            :model-value="props.registerTurnstileToken"
+                            @update:model-value="emit('update:registerTurnstileToken', $event)"
+                            @error="emit('turnstile-error', 'register', $event)"
+                            @expired="emit('turnstile-error', 'register', $event)"
+                        />
+                        <p v-if="props.registerErrors.verification" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.verification }}</p>
+                    </div>
 
                     <button
                         type="submit"

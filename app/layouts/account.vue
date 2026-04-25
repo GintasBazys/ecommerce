@@ -103,6 +103,10 @@ const customerLabel = computed(() => {
 })
 
 function isActivePath(path: string): boolean {
+    if (path === "/account") {
+        return route.path === path
+    }
+
     return route.path === path || route.path.startsWith(`${path}/`)
 }
 

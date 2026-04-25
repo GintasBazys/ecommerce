@@ -5,6 +5,7 @@ import type { OrderDTO } from "@medusajs/types"
 import { ORDER_STATUS } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
+import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
 type OrdersListItem = OrderDTO & {
     fulfillment_status?: string | null
@@ -20,8 +21,10 @@ useHead({ title: "Orders | Ecommerce" })
 const runtimeConfig = useRuntimeConfig()
 const page = ref(1)
 const perPage = ref(10)
+const ordersStartRef = ref<HTMLElement | null>(null)
 const perPageOptions = [5, 10, 20, 50]
 const skeletonRows = Array.from({ length: 5 }, (_, index) => index)
+const perPageSelectOptions = perPageOptions.map((option) => ({ label: String(option), value: option }))
 
 const { data: ordersData, pending } = await useFetch<OrdersResponse>(
     () => {
@@ -44,6 +47,29 @@ const { data: ordersData, pending } = await useFetch<OrdersResponse>(
 
 watch(perPage, () => {
     page.value = 1
+})
+
+watch(page, async (currentPage, previousPage) => {
+    if (!import.meta.client || !previousPage || currentPage === previousPage) {
+        return
+    }
+
+    await nextTick()
+
+    const anchorTop = ordersStartRef.value?.getBoundingClientRect().top
+
+    if (anchorTop == null) {
+        return
+    }
+
+    const rawHeaderOffset = window.getComputedStyle(document.documentElement).getPropertyValue("--site-header-offset")
+    const headerOffset = Number.parseInt(rawHeaderOffset, 10) || 0
+    const extraOffset = 80
+
+    window.scrollTo({
+        top: Math.max(0, window.scrollY + anchorTop - headerOffset - extraOffset),
+        behavior: "smooth"
+    })
 })
 
 const orders = computed<OrdersListItem[]>(() => (ordersData.value?.orders || []) as OrdersListItem[])
@@ -91,15 +117,16 @@ function changePage(nextPage: number): void {
 
                     <label class="grid gap-1 text-sm font-medium text-slate-700">
                         <span>Show per page</span>
-                        <select
+                        <BaseSelect
                             v-model="perPage"
-                            class="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-slate-950 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
-                        >
-                            <option v-for="option in perPageOptions" :key="option" :value="option">{{ option }}</option>
-                        </select>
+                            :options="perPageSelectOptions"
+                            class="min-w-[8.5rem] rounded-full shadow-none focus:border-amber-300 focus:ring-amber-200"
+                        />
                     </label>
                 </div>
             </div>
+
+            <div ref="ordersStartRef"></div>
 
             <div v-if="pending" class="mt-6 grid gap-3" aria-hidden="true">
                 <div v-for="row in skeletonRows" :key="row" class="rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4">

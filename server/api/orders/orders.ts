@@ -16,7 +16,13 @@ export default defineEventHandler(async (event) => {
     const limit = Math.max(1, parseInt(String(limitParam), 10) || 10)
     const offset = (page - 1) * limit
 
-    const data = await fetchMedusaJson<OrdersResponse>(event, `/store/orders?offset=${offset}&limit=${limit}`, {
+    const params = new URLSearchParams({
+        offset: String(offset),
+        limit: String(limit),
+        order: "-created_at"
+    })
+
+    const data = await fetchMedusaJson<OrdersResponse>(event, `/store/orders?${params.toString()}`, {
         method: "GET"
     })
 

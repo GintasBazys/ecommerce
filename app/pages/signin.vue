@@ -5,11 +5,12 @@ useHead({ title: "Signin | Ecommerce" })
 definePageMeta({ layout: "default" })
 
 const router = useRouter()
+const config = useRuntimeConfig()
 
 const showResetDialog = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
-const loginErrors = ref<{ email: string; password: string }>({ email: "", password: "" })
+const loginErrors = ref<{ email: string; password: string; verification: string }>({ email: "", password: "", verification: "" })
 const resetEmailError = ref<string>("")
 
 const snackbar = ref<boolean>(false)
@@ -19,11 +20,14 @@ const snackbarTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
+const loginTurnstileToken = ref<string>("")
+const loginTurnstileResetKey = ref<number>(0)
 
 const resetEmail = ref<string>("")
 
 const auth = useCustomerAuth()
 const posthog = usePostHog()
+const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 
 function isValidEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -44,7 +48,7 @@ function showSnackbar(message: string, tone: "success" | "error"): void {
 }
 
 async function handleLogin(): Promise<void> {
-    loginErrors.value = { email: "", password: "" }
+    loginErrors.value = { email: "", password: "", verification: "" }
 
     if (!loginEmail.value) {
         loginErrors.value.email = "E-mail is required"
@@ -56,12 +60,23 @@ async function handleLogin(): Promise<void> {
         loginErrors.value.password = "Password is required"
     }
 
-    if (loginErrors.value.email || loginErrors.value.password) {
+    if (!turnstileSiteKey.value) {
+        loginErrors.value.verification = "Verification is currently unavailable. Please try again later."
+    } else if (!loginTurnstileToken.value) {
+        loginErrors.value.verification = "Complete verification before logging in."
+    }
+
+    if (loginErrors.value.email || loginErrors.value.password || loginErrors.value.verification) {
         return
     }
 
-    const customer = await auth.login(loginEmail.value, loginPassword.value, { loadCart: true })
+    const customer = await auth.login(loginEmail.value, loginPassword.value, {
+        loadCart: true,
+        turnstileToken: loginTurnstileToken.value
+    })
     if (!customer) {
+        loginTurnstileToken.value = ""
+        loginTurnstileResetKey.value += 1
         showSnackbar("Login failed", "error")
         return
     }
@@ -70,6 +85,15 @@ async function handleLogin(): Promise<void> {
     posthog?.capture("user_signed_in", { method: "email" })
 
     await router.push("/")
+}
+
+function handleTurnstileToken(token: string): void {
+    loginTurnstileToken.value = token
+    loginErrors.value.verification = ""
+}
+
+function handleTurnstileError(message: string): void {
+    loginErrors.value.verification = message
 }
 
 async function handleSocialLogin(provider: "google" | "facebook") {
@@ -222,6 +246,19 @@ onBeforeUnmount(() => {
                             >
                                 Forgot password?
                             </button>
+                        </div>
+
+                        <div>
+                            <FormsTurnstileWidget
+                                :site-key="turnstileSiteKey"
+                                action="login"
+                                :reset-key="loginTurnstileResetKey"
+                                :model-value="loginTurnstileToken"
+                                @update:model-value="handleTurnstileToken"
+                                @error="handleTurnstileError"
+                                @expired="handleTurnstileError"
+                            />
+                            <p v-if="loginErrors.verification" class="mt-1 text-sm text-rose-600">{{ loginErrors.verification }}</p>
                         </div>
 
                         <button

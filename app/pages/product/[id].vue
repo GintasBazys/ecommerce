@@ -464,7 +464,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
         <Teleport to="body">
             <div
                 v-if="customer && showReviewForm"
-                class="fixed inset-0 z-90 flex items-end bg-slate-950/55 p-4 sm:items-center sm:justify-center"
+                class="fixed inset-0 z-90 flex items-end bg-slate-950/55 p-3 sm:items-center sm:justify-center sm:p-4"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="product-review-dialog-title"

@@ -36,14 +36,18 @@ export function useCustomerAuth() {
         }
     }
 
-    async function login(email: string, password: string, opts?: { loadCart?: boolean }) {
+    async function login(email: string, password: string, opts?: { loadCart?: boolean; turnstileToken?: string }) {
         loading.value = true
         error.value = null
         try {
             const res = await $fetch<{ success: boolean; customer: CustomerDTO | null }>("/api/account/login", {
                 method: "POST",
                 credentials: "include",
-                body: { email, password }
+                body: {
+                    email,
+                    password,
+                    turnstileToken: opts?.turnstileToken
+                }
             })
 
             if (!res.customer) {
@@ -72,6 +76,7 @@ export function useCustomerAuth() {
             password: string
             first_name: string
             last_name: string
+            turnstileToken?: string
         },
         opts?: { loadCart?: boolean }
     ) {

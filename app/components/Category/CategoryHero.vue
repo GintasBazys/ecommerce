@@ -28,21 +28,18 @@ const props = defineProps<{
                     quality="72"
                     loading="lazy"
                     decoding="async"
-                    class="block min-h-[20rem] w-full object-cover object-center sm:min-h-[24rem] lg:min-h-[28rem]"
+                    class="absolute inset-0 h-full w-full object-cover object-center"
                 />
                 <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.78)_0%,rgba(2,6,23,0.52)_38%,rgba(2,6,23,0.18)_68%,rgba(2,6,23,0.18)_100%)]"></div>
                 <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.14)_0%,rgba(15,23,42,0.1)_40%,rgba(15,23,42,0.5)_100%)]"></div>
 
-                <div class="absolute inset-x-4 top-4 sm:inset-x-6 sm:top-6">
+                <div class="relative z-10 flex min-h-[20rem] flex-col justify-between gap-8 p-4 sm:min-h-[24rem] sm:p-6 lg:min-h-[28rem]">
                     <div
                         class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                     >
                         <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                         {{ props.isAllProductsPage ? "All products" : "Category" }}
                     </div>
-                </div>
-
-                <div class="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-6">
                     <div
                         class="max-w-3xl rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
                     >

@@ -81,11 +81,15 @@ const guestCheckoutEmailCookie = useCookie<string | null>("checkout_guest_email"
 
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
+const loginTurnstileToken = ref<string>("")
+const loginTurnstileResetKey = ref<number>(0)
 
 const regFirstName = ref<string>("")
 const regLastName = ref<string>("")
 const regEmail = ref<string>("")
 const regPassword = ref<string>("")
+const registerTurnstileToken = ref<string>("")
+const registerTurnstileResetKey = ref<number>(0)
 
 const guestEmail = ref<string>("")
 
@@ -120,6 +124,7 @@ const useSeparateShipping = ref<boolean>(false)
 type LoginErrors = {
     email: string
     password: string
+    verification: string
 }
 
 type RegisterErrors = {
@@ -127,6 +132,7 @@ type RegisterErrors = {
     last_name: string
     email: string
     password: string
+    verification: string
 }
 
 type GuestErrors = {
@@ -146,14 +152,16 @@ type AddressErrors = {
 
 const loginErrors = reactive<LoginErrors>({
     email: "",
-    password: ""
+    password: "",
+    verification: ""
 })
 
 const registerErrors = reactive<RegisterErrors>({
     first_name: "",
     last_name: "",
     email: "",
-    password: ""
+    password: "",
+    verification: ""
 })
 
 const guestErrors = reactive<GuestErrors>({
@@ -213,6 +221,7 @@ const addressRules = {
 }
 
 const checkoutCart = computed<CheckoutCart | null>(() => cart.value ?? null)
+const turnstileSiteKey = computed<string>(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const checkoutEmail = computed<string>(() => checkoutCart.value?.email ?? "")
 const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ?? DEFAULT_CURENCY)
 const lineItems = computed(() => checkoutCart.value?.items ?? [])
@@ -313,7 +322,13 @@ function validateLoginForm(): boolean {
     loginErrors.email = runValidationRules(loginEmail.value, emailRules)
     loginErrors.password = runValidationRules(loginPassword.value, passwordRules)
 
-    return !loginErrors.email && !loginErrors.password
+    if (!turnstileSiteKey.value) {
+        loginErrors.verification = "Verification is currently unavailable. Please try again later."
+    } else if (!loginTurnstileToken.value) {
+        loginErrors.verification = "Complete verification before logging in."
+    }
+
+    return !loginErrors.email && !loginErrors.password && !loginErrors.verification
 }
 
 function validateRegisterForm(): boolean {
@@ -323,7 +338,13 @@ function validateRegisterForm(): boolean {
     registerErrors.email = runValidationRules(regEmail.value, emailRules)
     registerErrors.password = runValidationRules(regPassword.value, passwordRules)
 
-    return !registerErrors.first_name && !registerErrors.last_name && !registerErrors.email && !registerErrors.password
+    if (!turnstileSiteKey.value) {
+        registerErrors.verification = "Verification is currently unavailable. Please try again later."
+    } else if (!registerTurnstileToken.value) {
+        registerErrors.verification = "Complete verification before creating your account."
+    }
+
+    return !registerErrors.first_name && !registerErrors.last_name && !registerErrors.email && !registerErrors.password && !registerErrors.verification
 }
 
 function validateGuestForm(): boolean {
@@ -726,9 +747,14 @@ async function handleCheckoutLogin(): Promise<void> {
     isSubmitting.value = true
 
     try {
-        const loggedInCustomer = await auth.login(loginEmail.value, loginPassword.value, { loadCart: false })
+        const loggedInCustomer = await auth.login(loginEmail.value, loginPassword.value, {
+            loadCart: false,
+            turnstileToken: loginTurnstileToken.value
+        })
         if (!loggedInCustomer) {
             errorMessage.value = auth.error.value ?? "Login failed"
+            loginTurnstileToken.value = ""
+            loginTurnstileResetKey.value += 1
             return
         }
 
@@ -759,13 +785,16 @@ async function submitRegister(): Promise<void> {
                 email: regEmail.value,
                 password: regPassword.value,
                 first_name: regFirstName.value,
-                last_name: regLastName.value
+                last_name: regLastName.value,
+                turnstileToken: registerTurnstileToken.value
             },
             { loadCart: false }
         )
 
         if (!registeredCustomer) {
             errorMessage.value = auth.error.value ?? "Registration failed"
+            registerTurnstileToken.value = ""
+            registerTurnstileResetKey.value += 1
             return
         }
 
@@ -776,6 +805,25 @@ async function submitRegister(): Promise<void> {
     } finally {
         isSubmitting.value = false
     }
+}
+
+function updateLoginTurnstileToken(value: string): void {
+    loginTurnstileToken.value = value
+    loginErrors.verification = ""
+}
+
+function updateRegisterTurnstileToken(value: string): void {
+    registerTurnstileToken.value = value
+    registerErrors.verification = ""
+}
+
+function handleTurnstileError(target: "login" | "register", message: string): void {
+    if (target === "login") {
+        loginErrors.verification = message
+        return
+    }
+
+    registerErrors.verification = message
 }
 
 async function submitGuest(): Promise<void> {
@@ -1071,6 +1119,11 @@ watch(
                                 :login-errors="loginErrors"
                                 :register-errors="registerErrors"
                                 :guest-errors="guestErrors"
+                                :turnstile-site-key="turnstileSiteKey"
+                                :login-turnstile-token="loginTurnstileToken"
+                                :register-turnstile-token="registerTurnstileToken"
+                                :login-turnstile-reset-key="loginTurnstileResetKey"
+                                :register-turnstile-reset-key="registerTurnstileResetKey"
                                 :is-submitting="isSubmitting"
                                 :is-auth-loading="auth.loading.value"
                                 @update:auth-tab="authTab = $event"
@@ -1080,7 +1133,10 @@ watch(
                                 @update:reg-last-name="regLastName = $event"
                                 @update:reg-email="regEmail = $event"
                                 @update:reg-password="regPassword = $event"
+                                @update:login-turnstile-token="updateLoginTurnstileToken"
+                                @update:register-turnstile-token="updateRegisterTurnstileToken"
                                 @update:guest-email="guestEmail = $event"
+                                @turnstile-error="handleTurnstileError"
                                 @submit-login="handleCheckoutLogin"
                                 @submit-register="submitRegister"
                                 @submit-guest="submitGuest"
