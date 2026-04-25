@@ -75,7 +75,8 @@ const categoryThumbnail = computed(() => {
         return null
     }
 
-    const images = ((category.value as ProductCategoryDTO & { product_category_image?: CategoryImage[] })?.product_category_image ?? []) as CategoryImage[]
+    const images = ((category.value as ProductCategoryDTO & { product_category_image?: CategoryImage[] })?.product_category_image ??
+        []) as CategoryImage[]
     return images.find((image) => image.type === "thumbnail")?.url || null
 })
 
@@ -196,7 +197,10 @@ useHead(() => {
         return {
             title: "404 | Ecommerce",
             meta: [
-                { name: "description", content: "The requested page could not be found. Continue browsing current products and active storefront pages." },
+                {
+                    name: "description",
+                    content: "The requested page could not be found. Continue browsing current products and active storefront pages."
+                },
                 { name: "robots", content: "noindex,follow" }
             ]
         }
@@ -206,7 +210,10 @@ useHead(() => {
 
     if (!hasFacetedQuery.value && totalPages.value > 1) {
         if (currentPage.value > 1) {
-            links.push({ rel: "prev", href: absoluteUrl(currentPage.value - 1 === 1 ? categoryPath.value : `${categoryPath.value}?page=${currentPage.value - 1}`) })
+            links.push({
+                rel: "prev",
+                href: absoluteUrl(currentPage.value - 1 === 1 ? categoryPath.value : `${categoryPath.value}?page=${currentPage.value - 1}`)
+            })
         }
 
         if (currentPage.value < totalPages.value) {
@@ -274,7 +281,10 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
 <template>
     <NotFoundPageContent v-if="notFoundPath" :requested-path="notFoundPath" />
-    <section v-else class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]">
+    <section
+        v-else
+        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
+    >
         <CategoryHero
             :breadcrumb-items="breadcrumbItems"
             :hero-eyebrow="heroEyebrow"
@@ -339,7 +349,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
             </Teleport>
 
             <div class="grid gap-6 xl:grid-cols-[minmax(17rem,19rem)_minmax(0,1fr)] xl:gap-8">
-                <aside class="hidden xl:grid xl:sticky xl:top-6 xl:self-start">
+                <aside class="hidden xl:sticky xl:top-6 xl:grid xl:self-start">
                     <CategoryFiltersPanel
                         v-model:selected-child-category-ids="selectedChildCategoryIds"
                         v-model:selected-collection-ids="selectedCollectionIds"

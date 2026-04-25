@@ -116,7 +116,7 @@ const productImages = computed<GalleryImage[]>(() => {
     const fallbackImage = product.value?.thumbnail || "/images/placeholder.png"
     const gallery = (product.value?.images ?? [])
         .map((image, index) => {
-            const src = typeof image.url === "string" && image.url.trim() ? image.url : ""
+            const src = image.url.trim() ? image.url : ""
 
             if (!src) {
                 return null
@@ -179,9 +179,7 @@ const metadataAverageRating = computed<number | null>(() => {
     return rating > 0 ? Number(rating.toFixed(1)) : null
 })
 const metadataReviewCount = computed<number | null>(() => {
-    const value = Number(
-        productMetadata.value.reviewCount || productMetadata.value.reviewsCount || productMetadata.value.review_count || 0
-    )
+    const value = Number(productMetadata.value.reviewCount || productMetadata.value.reviewsCount || productMetadata.value.review_count || 0)
 
     return value > 0 ? value : null
 })
@@ -393,7 +391,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
 
 <template>
     <section v-if="product" class="bg-slate-50">
-        <div class="px-0 pb-10 pt-15 sm:pb-12 sm:pt-18 xl:pb-16 xl:pt-23">
+        <div class="px-0 pt-15 pb-10 sm:pt-18 sm:pb-12 xl:pt-23 xl:pb-16">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 <div class="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(21rem,0.98fr)] xl:gap-8">
                     <ProductPageGallery
@@ -412,7 +410,8 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                             :product-title="product.title"
                             :product-subtitle="product.subtitle"
                             :product-description="
-                                product.description || 'A refined product pick designed to feel premium, practical, and easy to wear every day.'
+                                product.description ||
+                                    'A refined product pick designed to feel premium, practical, and easy to wear every day.'
                             "
                             :product-tags="productTags"
                             :selected-variant="selectedVariant"
@@ -444,7 +443,8 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
                 <div class="mt-8">
                     <ProductPageDetails
                         :product-description="
-                            product.description || 'A carefully selected product with balanced styling, everyday function, and a polished finish.'
+                            product.description ||
+                                'A carefully selected product with balanced styling, everyday function, and a polished finish.'
                         "
                     />
                 </div>

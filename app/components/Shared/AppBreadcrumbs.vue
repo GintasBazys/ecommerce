@@ -30,7 +30,7 @@ withDefaults(
                 v-if="item.to && index < items.length - 1"
                 :to="item.to"
                 class="transition"
-                :class="tone === 'inverse' ? 'text-white/85 hover:text-white' : 'text-slate-600 hover:text-brand-700'"
+                :class="tone === 'inverse' ? 'text-white/85 hover:text-white' : 'hover:text-brand-700 text-slate-600'"
             >
                 {{ item.label }}
             </NuxtLink>

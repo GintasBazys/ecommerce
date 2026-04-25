@@ -80,7 +80,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
     <section class="grid gap-4">
         <div>
             <span
-                class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-label-sm font-bold tracking-label text-amber-900 uppercase"
+                class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
             >
                 Step 1
             </span>
@@ -203,7 +203,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                                 :class="props.loginErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:loginEmail', getInputValue($event))"
                             />
-                            <span v-if="props.loginErrors.email" class="block text-sm leading-6 text-rose-600">{{ props.loginErrors.email }}</span>
+                            <span v-if="props.loginErrors.email" class="block text-sm leading-6 text-rose-600">{{
+                                props.loginErrors.email
+                            }}</span>
                         </label>
 
                         <label class="grid gap-2">
@@ -289,7 +291,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             :class="props.registerErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:regEmail', getInputValue($event))"
                         />
-                        <span v-if="props.registerErrors.email" class="block text-sm leading-6 text-rose-600">{{ props.registerErrors.email }}</span>
+                        <span v-if="props.registerErrors.email" class="block text-sm leading-6 text-rose-600">{{
+                            props.registerErrors.email
+                        }}</span>
                     </label>
 
                     <label class="grid gap-2">
@@ -346,7 +350,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             :class="props.guestErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:guestEmail', getInputValue($event))"
                         />
-                        <span v-if="props.guestErrors.email" class="block text-sm leading-6 text-rose-600">{{ props.guestErrors.email }}</span>
+                        <span v-if="props.guestErrors.email" class="block text-sm leading-6 text-rose-600">{{
+                            props.guestErrors.email
+                        }}</span>
                     </label>
 
                     <button

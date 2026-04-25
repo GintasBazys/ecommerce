@@ -60,7 +60,7 @@ function onSeparateShippingChange(event: Event): void {
     <section class="grid gap-4">
         <div>
             <span
-                class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-label-sm font-bold tracking-label text-amber-900 uppercase"
+                class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
             >
                 Step 2
             </span>

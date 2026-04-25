@@ -24,7 +24,7 @@ const approachSteps = [
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="mx-auto mb-8 max-w-215 text-center">
                 <span
-                    class="bg-brand-100 text-brand-700 inline-flex min-h-[2.3rem] items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                    class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-[2.3rem] items-center rounded-full px-4 py-2 font-bold uppercase"
                 >
                     Our Approach
                 </span>
@@ -47,11 +47,11 @@ const approachSteps = [
                         width="1800"
                         height="1200"
                         format="webp"
-                        class="max-h-105 w-full rounded-card object-cover lg:h-full lg:max-h-none"
+                        class="rounded-card max-h-105 w-full object-cover lg:h-full lg:max-h-none"
                     />
                 </div>
 
-                <div class="grid content-start gap-4 rounded-card border border-slate-200 bg-white/90 p-5 sm:p-6">
+                <div class="rounded-card grid content-start gap-4 border border-slate-200 bg-white/90 p-5 sm:p-6">
                     <h3 class="text-[1.45rem] leading-8 font-semibold text-slate-950">How we work</h3>
                     <p class="text-[0.98rem] leading-7 text-slate-600">
                         We balance product quality, transparent pricing, and speed of execution. That balance is what shapes every release,

@@ -145,26 +145,24 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <main
-        class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900"
-    >
-        <section class="mx-auto w-full max-w-6xl px-4 pb-14 pt-6 sm:px-6 lg:px-8 lg:pt-10">
+    <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900">
+        <section class="mx-auto w-full max-w-6xl px-4 pt-6 pb-14 sm:px-6 lg:px-8 lg:pt-10">
             <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-8">
                 <div class="space-y-6">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold uppercase tracking-[0.13em] text-slate-700"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-[0.13em] text-slate-700 uppercase"
                     >
                         Welcome back
                     </span>
-                    <h1 class="max-w-[13ch] text-4xl font-semibold leading-[0.95] tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                    <h1 class="max-w-[13ch] text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-slate-950 sm:text-6xl">
                         Sign in to pick up your order exactly where you left it.
                     </h1>
                     <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
                         Access your saved details, revisit recent orders, and move from cart to checkout with less friction.
                     </p>
                     <div class="rounded-3xl border border-slate-200 bg-white/85 p-4 sm:p-5">
-                        <p class="text-xs font-medium uppercase tracking-[0.1em] text-slate-500">Member access</p>
-                        <p class="mt-1 text-sm font-semibold leading-6 text-slate-900 sm:text-base">
+                        <p class="text-xs font-medium tracking-[0.1em] text-slate-500 uppercase">Member access</p>
+                        <p class="mt-1 text-sm leading-6 font-semibold text-slate-900 sm:text-base">
                             Faster checkout, order history, and saved profile details
                         </p>
                     </div>
@@ -173,20 +171,22 @@ onBeforeUnmount(() => {
                 <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <div>
                         <span
-                            class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-label-tight text-slate-700"
+                            class="tracking-label-tight inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold text-slate-700 uppercase"
                         >
                             Account login
                         </span>
                         <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
                             Enter your details and continue.
                         </h2>
-                        <p class="mt-3 text-sm leading-7 text-slate-600">Use social sign-in or your email and password. You can reset access anytime.</p>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">
+                            Use social sign-in or your email and password. You can reset access anytime.
+                        </p>
                     </div>
 
                     <div class="mt-6 grid gap-3">
                         <button
                             type="button"
-                            class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="handleSocialLogin('google')"
                         >
                             <img src="/images/google_login_icon.svg" width="24" height="24" alt="" aria-hidden="true" />
@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
                         </button>
                         <button
                             type="button"
-                            class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="handleSocialLogin('facebook')"
                         >
                             <img src="/images/facebook_login_icon.svg" width="24" height="24" alt="" aria-hidden="true" />
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
                         </button>
                     </div>
 
-                    <div class="relative my-6 text-center text-xs font-medium uppercase tracking-[0.08em] text-slate-500">
+                    <div class="relative my-6 text-center text-xs font-medium tracking-[0.08em] text-slate-500 uppercase">
                         <span class="absolute inset-x-0 top-1/2 -z-0 border-t border-slate-200" aria-hidden="true"></span>
                         <span class="relative z-10 bg-white px-3">Or continue with email</span>
                     </div>
@@ -241,7 +241,7 @@ onBeforeUnmount(() => {
                         <div class="flex justify-end">
                             <button
                                 type="button"
-                                class="text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-200"
+                                class="text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-hidden"
                                 @click="showResetDialog = true"
                             >
                                 Forgot password?
@@ -263,7 +263,7 @@ onBeforeUnmount(() => {
 
                         <button
                             type="submit"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                         >
                             Log in
                         </button>
@@ -295,7 +295,7 @@ onBeforeUnmount(() => {
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <span
-                                class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold uppercase tracking-[0.11em] text-slate-700"
+                                class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold tracking-[0.11em] text-slate-700 uppercase"
                             >
                                 Password reset
                             </span>
@@ -305,7 +305,7 @@ onBeforeUnmount(() => {
                         </div>
                         <button
                             type="button"
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:text-slate-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="showResetDialog = false"
                         >
                             <span aria-hidden="true">×</span>
@@ -334,7 +334,7 @@ onBeforeUnmount(() => {
 
                         <button
                             type="submit"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                         >
                             Send reset link
                         </button>

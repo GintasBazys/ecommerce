@@ -65,8 +65,8 @@ const emit = defineEmits<{
                 </div>
 
                 <template v-if="props.isShippingLoading">
-                    <div class="h-[4.2rem] animate-pulse rounded-[1rem] border border-slate-200/80 bg-slate-100"></div>
-                    <div class="h-[4.2rem] animate-pulse rounded-[1rem] border border-slate-200/80 bg-slate-100"></div>
+                    <div class="h-[4.2rem] animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
+                    <div class="h-[4.2rem] animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
                 </template>
 
                 <div v-else-if="props.shippingOptions.length" class="grid gap-3" role="radiogroup" aria-label="Shipping method">

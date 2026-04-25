@@ -54,7 +54,7 @@ const emit = defineEmits<{
 
         <div class="mt-5 grid gap-3 sm:grid-cols-3">
             <div v-for="fact in productFacts" :key="fact.label" class="rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4">
-                <span class="block text-[0.82rem] tracking-label-tight text-slate-500 uppercase">{{ fact.label }}</span>
+                <span class="tracking-label-tight block text-[0.82rem] text-slate-500 uppercase">{{ fact.label }}</span>
                 <strong class="mt-2 block text-sm leading-6 text-slate-950">{{ fact.value }}</strong>
             </div>
         </div>

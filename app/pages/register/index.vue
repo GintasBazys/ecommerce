@@ -244,15 +244,15 @@ onUnmounted(() => {
 
 <template>
     <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900">
-        <section class="mx-auto w-full max-w-6xl px-4 pb-14 pt-6 sm:px-6 lg:px-8 lg:pt-10">
+        <section class="mx-auto w-full max-w-6xl px-4 pt-6 pb-14 sm:px-6 lg:px-8 lg:pt-10">
             <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-8">
                 <div class="space-y-6">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold uppercase tracking-[0.13em] text-slate-700"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-[0.13em] text-slate-700 uppercase"
                     >
                         Create an account
                     </span>
-                    <h1 class="max-w-[13ch] text-4xl font-semibold leading-[0.95] tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                    <h1 class="max-w-[13ch] text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-slate-950 sm:text-6xl">
                         Join the shop and keep every order detail in one calm place.
                     </h1>
                     <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -260,8 +260,8 @@ onUnmounted(() => {
                     </p>
 
                     <div class="rounded-3xl border border-slate-200 bg-white/85 p-4 sm:p-5">
-                        <p class="text-xs font-medium uppercase tracking-[0.1em] text-slate-500">Why create one?</p>
-                        <p class="mt-1 text-sm font-semibold leading-6 text-slate-900 sm:text-base">
+                        <p class="text-xs font-medium tracking-[0.1em] text-slate-500 uppercase">Why create one?</p>
+                        <p class="mt-1 text-sm leading-6 font-semibold text-slate-900 sm:text-base">
                             Saved customer details, easier reorders, and a smoother path from cart to delivery
                         </p>
                     </div>
@@ -269,11 +269,13 @@ onUnmounted(() => {
 
                 <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-label-tight text-slate-700"
+                        class="tracking-label-tight inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold text-slate-700 uppercase"
                     >
                         Account details
                     </span>
-                    <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">Set up your profile in a minute.</h2>
+                    <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                        Set up your profile in a minute.
+                    </h2>
                     <p class="mt-3 text-sm leading-7 text-slate-600">
                         Add your basic information and choose a password to start shopping with a saved account.
                     </p>
@@ -347,7 +349,7 @@ onUnmounted(() => {
 
                         <button
                             type="submit"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300 disabled:cursor-not-allowed disabled:opacity-70"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
                             :disabled="isLoading"
                         >
                             {{ isLoading ? "Creating account..." : "Register" }}

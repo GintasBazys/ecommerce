@@ -48,7 +48,7 @@ function backToHome() {
                 <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
 
                 <div
-                    class="shadow-panel overflow-hidden rounded-panel border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] sm:rounded-4xl"
+                    class="shadow-panel rounded-panel overflow-hidden border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] sm:rounded-4xl"
                 >
                     <div class="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,24rem)] lg:gap-8 lg:p-9 xl:p-10">
                         <div class="max-w-3xl">
@@ -82,9 +82,7 @@ function backToHome() {
                         </div>
 
                         <div class="grid gap-4 self-start">
-                            <div
-                                class="rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-5 shadow-card"
-                            >
+                            <div class="shadow-card rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-5">
                                 <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Error status</p>
                                 <p class="mt-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">
                                     {{ statusCode }}

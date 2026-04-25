@@ -106,7 +106,7 @@ function changePage(nextPage: number): void {
     <div class="grid gap-5">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 shadow-sm">
-                <span class="block text-label-sm font-semibold tracking-label text-slate-500 uppercase">Saved entries</span>
+                <span class="text-label-sm tracking-label block font-semibold text-slate-500 uppercase">Saved entries</span>
                 <strong class="mt-1 block text-2xl font-semibold text-slate-950">{{ totalCount }}</strong>
             </div>
 

@@ -14,7 +14,7 @@ const { accept, decline, isBannerVisible } = useCookieConsent()
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
                         <span
-                            class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold uppercase tracking-[0.11em] text-slate-700"
+                            class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold tracking-[0.11em] text-slate-700 uppercase"
                         >
                             Cookie preferences
                         </span>
@@ -22,7 +22,8 @@ const { accept, decline, isBannerVisible } = useCookieConsent()
                             We use necessary cookies to keep the shop working and analytics cookies to understand site usage.
                         </h2>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Analytics are optional and only start if you accept. Declining will not affect checkout, account access, or cart features.
+                            Analytics are optional and only start if you accept. Declining will not affect checkout, account access, or cart
+                            features.
                             <NuxtLink to="/privacy" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
                                 Read the privacy policy
                             </NuxtLink>
@@ -32,14 +33,14 @@ const { accept, decline, isBannerVisible } = useCookieConsent()
                     <div class="grid gap-3 sm:grid-cols-2 lg:min-w-[19rem]">
                         <button
                             type="button"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="accept"
                         >
                             Accept
                         </button>
                         <button
                             type="button"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="decline"
                         >
                             Decline

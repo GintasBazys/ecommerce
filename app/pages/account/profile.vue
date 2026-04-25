@@ -96,7 +96,7 @@ async function onSubmit(): Promise<void> {
     <div class="grid gap-5">
         <section class="grid gap-4 lg:grid-cols-2">
             <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <span class="text-label-sm font-semibold tracking-label text-slate-500 uppercase">Account email</span>
+                <span class="text-label-sm tracking-label font-semibold text-slate-500 uppercase">Account email</span>
                 <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
                     {{ customer?.email || "Saved to your account" }}
                 </strong>
@@ -104,7 +104,7 @@ async function onSubmit(): Promise<void> {
             </article>
 
             <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <span class="text-label-sm font-semibold tracking-label text-slate-500 uppercase">Customer name</span>
+                <span class="text-label-sm tracking-label font-semibold text-slate-500 uppercase">Customer name</span>
                 <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
                     {{ customerFullName }}
                 </strong>
@@ -117,7 +117,7 @@ async function onSubmit(): Promise<void> {
         <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
             <div class="max-w-3xl">
                 <span
-                    class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                    class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                 >
                     Profile details
                 </span>

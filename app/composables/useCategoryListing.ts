@@ -3,13 +3,7 @@ import type { Ref } from "vue"
 import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from "vue-router"
 
 import { formatPrice } from "@/utils/formatPrice"
-import type {
-    CategoryProductsFacets,
-    CategoryProductsResponse,
-    CategorySortOption,
-    FacetItem,
-    PriceRange
-} from "~/types/category-listing"
+import type { CategoryProductsFacets, CategoryProductsResponse, CategorySortOption, FacetItem, PriceRange } from "~/types/category-listing"
 
 type FetchSource = "initial" | "sort" | "filters" | "pagination"
 
@@ -282,7 +276,8 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
 
         const queryMinPrice = parseQueryNumber(query.minPrice)
         const queryMaxPrice = parseQueryNumber(query.maxPrice)
-        pendingQueryPrice.value = queryMinPrice !== undefined || queryMaxPrice !== undefined ? { min: queryMinPrice, max: queryMaxPrice } : null
+        pendingQueryPrice.value =
+            queryMinPrice !== undefined || queryMaxPrice !== undefined ? { min: queryMinPrice, max: queryMaxPrice } : null
 
         isApplyingQueryState.value = false
     }

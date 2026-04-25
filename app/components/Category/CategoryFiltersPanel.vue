@@ -168,7 +168,7 @@ function getCheckboxValue(event: Event): boolean {
         <div class="mb-4 flex items-start justify-between gap-3">
             <div>
                 <span
-                    class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                    class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                 >
                     Filters
                 </span>

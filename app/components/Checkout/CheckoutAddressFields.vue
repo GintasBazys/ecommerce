@@ -55,7 +55,7 @@ const countryOptions = computed(() => [
 </script>
 
 <template>
-    <section class="grid gap-5 rounded-card border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+    <section class="rounded-card grid gap-5 border border-slate-200/80 bg-white/90 p-4 sm:p-5">
         <div>
             <span
                 v-if="props.eyebrow"

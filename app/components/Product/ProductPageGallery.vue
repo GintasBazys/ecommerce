@@ -56,13 +56,16 @@ function syncActiveImageFromScroll(): void {
 
 <template>
     <div class="relative rounded-[1.75rem] border border-slate-200 bg-white p-3 shadow-sm sm:rounded-4xl sm:p-4 lg:sticky lg:top-6">
-        <div v-if="isOnSale" class="absolute left-5 top-5 z-10 inline-flex rounded-full bg-rose-500 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-white">
+        <div
+            v-if="isOnSale"
+            class="text-label-sm tracking-label absolute top-5 left-5 z-10 inline-flex rounded-full bg-rose-500 px-4 py-2 font-bold text-white uppercase"
+        >
             Sale
         </div>
 
         <div
             ref="mobileGalleryTrack"
-            class="-mx-3 flex snap-x snap-mandatory overflow-x-auto px-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:hidden"
+            class="-mx-3 flex snap-x snap-mandatory overflow-x-auto px-3 [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
             @scroll.passive="syncActiveImageFromScroll"
         >
             <div v-for="(image, index) in productImages" :key="image.id" class="min-w-full snap-center px-0.5">
@@ -99,7 +102,9 @@ function syncActiveImageFromScroll(): void {
                     :key="image.id"
                     type="button"
                     class="overflow-hidden rounded-2xl border bg-slate-50 p-1.5 text-left transition motion-reduce:transition-none"
-                    :class="index === activeImageIndex ? 'border-amber-300 ring-1 ring-amber-100' : 'border-slate-200 hover:border-amber-200'"
+                    :class="
+                        index === activeImageIndex ? 'border-amber-300 ring-1 ring-amber-100' : 'border-slate-200 hover:border-amber-200'
+                    "
                     :aria-pressed="index === activeImageIndex"
                     :aria-label="`Show image ${index + 1}`"
                     @click="selectImage(index)"

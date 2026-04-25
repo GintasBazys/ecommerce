@@ -227,11 +227,13 @@ const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ??
 const lineItems = computed(() => checkoutCart.value?.items ?? [])
 const itemCount = computed<number>(() => lineItems.value.reduce((sum, item) => sum + Number(item.quantity), 0))
 const hasAuthenticatedIdentity = computed<boolean>(() => Boolean(customer.value?.id))
-const hasPersistedGuestIdentity = computed<boolean>(() => Boolean(checkoutEmail.value && guestCheckoutEmailCookie.value === checkoutEmail.value))
+const hasPersistedGuestIdentity = computed<boolean>(() =>
+    Boolean(checkoutEmail.value && guestCheckoutEmailCookie.value === checkoutEmail.value)
+)
 const isGuestIdentity = computed<boolean>(
     () =>
-        !customer.value?.id
-        && (hasExplicitGuestIdentity.value || hasPersistedGuestIdentity.value || (!checkoutCart.value?.customer_id && !!checkoutEmail.value))
+        !customer.value?.id &&
+        (hasExplicitGuestIdentity.value || hasPersistedGuestIdentity.value || (!checkoutCart.value?.customer_id && !!checkoutEmail.value))
 )
 const identityCompleted = computed<boolean>(() => hasAuthenticatedIdentity.value || isGuestIdentity.value)
 const shouldShowIdentityReady = computed<boolean>(() => identityCompleted.value && !(isGuestIdentity.value && isEditingIdentity.value))
@@ -344,7 +346,13 @@ function validateRegisterForm(): boolean {
         registerErrors.verification = "Complete verification before creating your account."
     }
 
-    return !registerErrors.first_name && !registerErrors.last_name && !registerErrors.email && !registerErrors.password && !registerErrors.verification
+    return (
+        !registerErrors.first_name &&
+        !registerErrors.last_name &&
+        !registerErrors.email &&
+        !registerErrors.password &&
+        !registerErrors.verification
+    )
 }
 
 function validateGuestForm(): boolean {
@@ -1027,58 +1035,70 @@ watch(
 
 watch(selectedShippingOptionId, scheduleRefresh)
 watch(cartFingerprint, scheduleRefresh)
-watch(
-    currentStep,
-    async (step) => {
-        if (step !== "payment" || !addressCompleted.value || !isCheckoutReady.value || !isCheckoutActive.value) {
-            return
-        }
-
-        await nextTick()
-
-        if (!shippingOptions.value.length) {
-            await loadShippingOptions()
-        }
-
-        await refreshCheckout()
+watch(currentStep, async (step) => {
+    if (step !== "payment" || !addressCompleted.value || !isCheckoutReady.value || !isCheckoutActive.value) {
+        return
     }
-)
+
+    await nextTick()
+
+    if (!shippingOptions.value.length) {
+        await loadShippingOptions()
+    }
+
+    await refreshCheckout()
+})
 </script>
 
 <template>
-    <main class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.08),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_38%,#f6f9ff_100%)] pb-14 pt-[calc(var(--site-header-offset,98px)+1rem)] sm:pb-18 sm:pt-[calc(var(--site-header-offset,98px)+1.5rem)]">
+    <main
+        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.08),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_38%,#f6f9ff_100%)] pt-[calc(var(--site-header-offset,98px)+1rem)] pb-14 sm:pt-[calc(var(--site-header-offset,98px)+1.5rem)] sm:pb-18"
+    >
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
             <div v-if="isBooting" class="grid justify-items-center gap-4 px-4 py-20 text-center">
-                <span class="inline-flex h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-700"></span>
+                <span class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"></span>
                 <p class="text-sm leading-6 text-slate-600">Preparing your checkout...</p>
             </div>
 
             <template v-else>
                 <section class="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)] xl:items-start xl:gap-7">
                     <div class="space-y-5 sm:space-y-6">
-                        <div class="rounded-panel border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:rounded-4xl sm:p-7">
-                            <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-amber-900">
+                        <div
+                            class="rounded-panel border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:rounded-4xl sm:p-7"
+                        >
+                            <span
+                                class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
+                            >
                                 Single-page checkout
                             </span>
-                            <h1 class="mt-4 max-w-[12ch] text-[2.2rem] font-bold leading-[0.96] tracking-[-0.06rem] text-slate-950 sm:text-[3rem] lg:text-[4.2rem]">
+                            <h1
+                                class="mt-4 max-w-[12ch] text-[2.2rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3rem] lg:text-[4.2rem]"
+                            >
                                 Move from cart to confirmation in one calm, guided flow.
                             </h1>
                             <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
-                                Sign in or continue as a guest, add your delivery details, pick shipping, and finish payment without hopping across separate pages.
+                                Sign in or continue as a guest, add your delivery details, pick shipping, and finish payment without hopping
+                                across separate pages.
                             </p>
 
                             <div class="mt-6 grid gap-3 md:grid-cols-3">
                                 <div class="rounded-[1.3rem] border border-slate-200/80 bg-white/90 p-4">
                                     <p class="text-sm font-semibold text-slate-950">One clear flow</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">Identity, address, shipping, and payment stay in one place.</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                                        Identity, address, shipping, and payment stay in one place.
+                                    </p>
                                 </div>
                                 <div class="rounded-[1.3rem] border border-slate-200/80 bg-white/90 p-4">
                                     <p class="text-sm font-semibold text-slate-950">Mobile-first pacing</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">The layout keeps key actions within easy reach on smaller screens.</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                                        The layout keeps key actions within easy reach on smaller screens.
+                                    </p>
                                 </div>
                                 <div class="rounded-[1.3rem] border border-slate-200/80 bg-white/90 p-4">
                                     <p class="text-sm font-semibold text-slate-950">Final totals visible</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">Order details stay close by before you confirm payment.</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                                        Order details stay close by before you confirm payment.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -1098,7 +1118,11 @@ watch(
                             @toggle="isOrderSummaryOpen = !isOrderSummaryOpen"
                         />
 
-                        <div v-if="errorMessage" class="rounded-[1.2rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700" role="alert">
+                        <div
+                            v-if="errorMessage"
+                            class="rounded-[1.2rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700"
+                            role="alert"
+                        >
                             {{ errorMessage }}
                         </div>
 
@@ -1180,7 +1204,7 @@ watch(
                         </div>
                     </div>
 
-                    <aside class="hidden xl:self-start xl:sticky xl:top-[calc(var(--site-header-offset,98px)+1rem)] xl:block">
+                    <aside class="hidden xl:sticky xl:top-[calc(var(--site-header-offset,98px)+1rem)] xl:block xl:self-start">
                         <CheckoutOrderSummary
                             :item-count="itemCount"
                             :currency-code="currencyCode"

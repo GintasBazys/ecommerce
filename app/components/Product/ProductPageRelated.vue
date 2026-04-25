@@ -12,15 +12,20 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
 </script>
 
 <template>
-    <section v-if="relatedProducts.length" class="mt-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white px-5 py-6 shadow-sm sm:rounded-4xl sm:px-7 sm:py-8 xl:px-8">
+    <section
+        v-if="relatedProducts.length"
+        class="mt-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white px-5 py-6 shadow-sm sm:rounded-4xl sm:px-7 sm:py-8 xl:px-8"
+    >
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-184">
-                <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-amber-900">
+                <span
+                    class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
+                >
                     Related products
                 </span>
-                <h2 class="mt-4 max-w-[13ch] text-[clamp(2rem,6vw,3.25rem)] font-bold leading-[0.97] tracking-[-0.05rem] text-slate-950">
+                <h2 class="mt-4 max-w-[13ch] text-[clamp(2rem,6vw,3.25rem)] leading-[0.97] font-bold tracking-[-0.05rem] text-slate-950">
                     More from the same
-                    <span class="font-medium italic text-[#8a6a2f]">shopping lane</span>
+                    <span class="font-medium text-[#8a6a2f] italic">shopping lane</span>
                 </h2>
                 <p class="mt-4 max-w-2xl text-[1rem] leading-8 text-slate-700">
                     Picked from the same category so the next suggestion still feels aligned with what you are viewing now.
@@ -29,7 +34,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
 
             <NuxtLink
                 to="/special-offers"
-                class="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 lg:self-auto"
+                class="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden lg:self-auto"
             >
                 Explore more picks
             </NuxtLink>
@@ -38,7 +43,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
         <div class="mt-9">
             <div
                 ref="relatedRailRef"
-                class="flex gap-4 overflow-x-auto pb-4 pr-6 pt-1 [overscroll-behavior-x:contain] [scrollbar-color:rgba(120,53,15,0.72)_rgba(241,245,249,0.92)] [scrollbar-gutter:stable_both-edges] [scrollbar-width:thin] cursor-grab sm:gap-5 sm:pr-8"
+                class="flex cursor-grab gap-4 overflow-x-auto [overscroll-behavior-x:contain] pt-1 pr-6 pb-4 [scrollbar-color:rgba(120,53,15,0.72)_rgba(241,245,249,0.92)] [scrollbar-gutter:stable_both-edges] [scrollbar-width:thin] sm:gap-5 sm:pr-8"
                 aria-label="Related products"
                 tabindex="0"
                 @pointerdown="onPointerDown"

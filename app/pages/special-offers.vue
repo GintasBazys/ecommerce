@@ -74,7 +74,7 @@ useSeoMeta({
                         class="relative z-10 flex min-h-[20rem] flex-col justify-between gap-8 p-4 sm:min-h-[24rem] sm:p-6 lg:min-h-[28rem]"
                     >
                         <div
-                            class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 text-label-sm font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                            class="text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Sale campaign view
@@ -83,7 +83,7 @@ useSeoMeta({
                             class="max-w-3xl rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
                         >
                             <span
-                                class="inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 text-label-sm font-bold tracking-label text-amber-100 uppercase"
+                                class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 font-bold text-amber-100 uppercase"
                             >
                                 Special offers
                             </span>
@@ -154,7 +154,7 @@ useSeoMeta({
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div class="max-w-[34rem]">
                         <span
-                            class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                            class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                         >
                             On sale now
                         </span>

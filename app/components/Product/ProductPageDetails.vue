@@ -6,10 +6,12 @@ defineProps<{
 
 <template>
     <div class="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-4xl sm:p-7 xl:p-8">
-        <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-brand-700">
+        <span
+            class="bg-brand-100 text-label-sm tracking-label text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+        >
             Product details
         </span>
-        <h2 class="mt-4 max-w-[14ch] text-[1.9rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.3rem]">
+        <h2 class="mt-4 max-w-[14ch] text-[1.9rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.3rem]">
             More context before you commit.
         </h2>
 

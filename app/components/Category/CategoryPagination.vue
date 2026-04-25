@@ -44,7 +44,7 @@ const props = defineProps<{
             <span
                 v-else
                 aria-current="page"
-                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-brand-700 bg-brand-700 px-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(8,27,90,0.08)]"
+                class="border-brand-700 bg-brand-700 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(8,27,90,0.08)]"
             >
                 {{ item }}
             </span>

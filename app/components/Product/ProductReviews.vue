@@ -47,9 +47,7 @@ const safeReviews = computed<SafeReview[]>(() =>
                 <template v-if="props.reviewCount && props.reviewCount > 0"> across {{ props.reviewCount }} shopper responses </template>
                 . Written reviews are not available to show for this product yet.
             </template>
-            <template v-else>
-                No reviews yet. Be the first to write one.
-            </template>
+            <template v-else> No reviews yet. Be the first to write one. </template>
         </div>
 
         <div v-else class="grid gap-3 md:grid-cols-2">
@@ -65,7 +63,7 @@ const safeReviews = computed<SafeReview[]>(() =>
                             <span v-for="star in 5" :key="star" aria-hidden="true">{{ star <= review.rating ? "★" : "☆" }}</span>
                         </div>
                     </div>
-                    <div class="text-xs font-medium uppercase tracking-label-tight text-slate-500">
+                    <div class="tracking-label-tight text-xs font-medium text-slate-500 uppercase">
                         {{ formatDate(review.createdAt) }}
                     </div>
                 </div>

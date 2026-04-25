@@ -34,7 +34,7 @@ function onDelete(): void {
         <div>
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <span class="text-label-eyebrow font-bold uppercase tracking-label-tight text-brand-700">
+                    <span class="text-label-eyebrow tracking-label-tight text-brand-700 font-bold uppercase">
                         {{ props.address.address_name?.toUpperCase() || "UNNAMED ADDRESS" }}
                     </span>
                     <h3 class="mt-2 text-[1.05rem] font-semibold text-slate-950">
@@ -45,7 +45,7 @@ function onDelete(): void {
                 <div class="inline-flex gap-2">
                     <button
                         type="button"
-                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         aria-label="Edit address"
                         @click="onEdit"
                     >
@@ -56,7 +56,7 @@ function onDelete(): void {
                     </button>
                     <button
                         type="button"
-                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-200 motion-reduce:transition-none"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         aria-label="Delete address"
                         @click="onDelete"
                     >

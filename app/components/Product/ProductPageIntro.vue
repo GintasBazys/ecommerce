@@ -35,7 +35,9 @@ defineProps<{
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
-                    <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-brand-700">
+                    <span
+                        class="bg-brand-100 text-label-sm tracking-label text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+                    >
                         Product detail
                     </span>
                 </div>
@@ -52,10 +54,12 @@ defineProps<{
             </div>
 
             <div>
-                <h1 class="max-w-[12ch] text-[2.2rem] font-bold leading-[0.96] tracking-[-0.06rem] text-slate-950 sm:text-[3.1rem] xl:text-[4.25rem]">
+                <h1
+                    class="max-w-[12ch] text-[2.2rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3.1rem] xl:text-[4.25rem]"
+                >
                     {{ productTitle }}
                 </h1>
-                <p v-if="productSubtitle" class="mt-3 text-sm font-semibold uppercase tracking-widest text-slate-700">
+                <p v-if="productSubtitle" class="mt-3 text-sm font-semibold tracking-widest text-slate-700 uppercase">
                     {{ productSubtitle }}
                 </p>
                 <p class="mt-4 max-w-2xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
@@ -75,7 +79,7 @@ defineProps<{
 
             <div v-if="selectedVariant" class="border-t border-slate-200 pt-5">
                 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                    <span class="text-[2rem] font-bold leading-none text-slate-950 sm:text-[2.5rem]">{{ displayPrice }}</span>
+                    <span class="text-[2rem] leading-none font-bold text-slate-950 sm:text-[2.5rem]">{{ displayPrice }}</span>
                     <del v-if="isOnSale && originalPrice" class="text-base font-semibold text-rose-500">{{ originalPrice }}</del>
                 </div>
                 <p class="mt-3 text-sm leading-6 text-slate-500">{{ taxLabel }}</p>

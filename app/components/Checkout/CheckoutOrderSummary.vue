@@ -34,7 +34,7 @@ const emit = defineEmits<{
         >
             <span class="grid gap-1">
                 <span class="text-sm font-semibold text-slate-950">Order summary</span>
-                <span class="text-xs tracking-label text-slate-500 uppercase">
+                <span class="tracking-label text-xs text-slate-500 uppercase">
                     {{ props.itemCount }} item{{ props.itemCount === 1 ? "" : "s" }}
                 </span>
             </span>
@@ -109,7 +109,7 @@ const emit = defineEmits<{
         class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]"
     >
         <span
-            class="border-brand-100 bg-brand-50 text-brand-700 inline-flex min-h-9 items-center rounded-full border px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+            class="border-brand-100 bg-brand-50 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border px-4 py-2 font-bold uppercase"
         >
             Order summary
         </span>

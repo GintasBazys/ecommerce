@@ -380,15 +380,15 @@ onBeforeUnmount(() => {
 
 <template>
     <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_42%,#fff7ed_100%)] text-slate-900">
-        <section class="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-6xl items-center px-4 pb-14 pt-8 sm:px-6 lg:px-8">
+        <section class="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-6xl items-center px-4 pt-8 pb-14 sm:px-6 lg:px-8">
             <div class="grid w-full items-start gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-8">
                 <div class="space-y-6">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold uppercase tracking-[0.13em] text-slate-700"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-[0.13em] text-slate-700 uppercase"
                     >
                         Social sign-in
                     </span>
-                    <h1 class="max-w-[13ch] text-4xl font-semibold leading-[0.95] tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                    <h1 class="max-w-[13ch] text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-slate-950 sm:text-6xl">
                         We are finishing your {{ providerLabel }} authentication.
                     </h1>
                     <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -398,7 +398,7 @@ onBeforeUnmount(() => {
 
                 <div class="rounded-panel border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-label-tight text-slate-700"
+                        class="tracking-label-tight inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold text-slate-700 uppercase"
                     >
                         Authentication status
                     </span>
@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
 
                     <div v-if="isLoading" class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5" aria-live="polite">
                         <div class="h-2.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuetext="Authenticating">
-                            <div class="h-full w-3/5 rounded-full bg-slate-900/85 animate-pulse"></div>
+                            <div class="h-full w-3/5 animate-pulse rounded-full bg-slate-900/85"></div>
                         </div>
                         <p class="mt-3 text-sm text-slate-600">{{ loadingMessage }}</p>
                     </div>
@@ -415,7 +415,7 @@ onBeforeUnmount(() => {
                     <div v-else-if="stage === 'error'" class="mt-6 grid gap-3">
                         <button
                             type="button"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300 disabled:cursor-not-allowed disabled:opacity-70"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
                             :disabled="isRetrying"
                             @click="retrySocialLogin"
                         >
@@ -423,7 +423,7 @@ onBeforeUnmount(() => {
                         </button>
                         <NuxtLink
                             to="/signin"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                         >
                             Back to sign in
                         </NuxtLink>

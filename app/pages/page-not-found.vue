@@ -15,7 +15,12 @@ if (event) {
 
 useHead({
     title: "404 | Ecommerce",
-    meta: [{ name: "description", content: "The requested page could not be found. Continue browsing current products and active storefront pages." }]
+    meta: [
+        {
+            name: "description",
+            content: "The requested page could not be found. Continue browsing current products and active storefront pages."
+        }
+    ]
 })
 </script>
 

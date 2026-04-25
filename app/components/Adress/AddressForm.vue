@@ -91,7 +91,7 @@ function save(): void {
                 <div class="overflow-y-auto px-5 pt-5 pb-5 sm:px-7 sm:pt-7 sm:pb-7">
                     <div class="pr-12">
                         <span
-                            class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                            class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                         >
                             Address details
                         </span>

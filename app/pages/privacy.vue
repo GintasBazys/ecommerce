@@ -10,13 +10,13 @@ useHead({
 
 <template>
     <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900">
-        <section class="mx-auto w-full max-w-5xl px-4 pb-14 pt-8 sm:px-6 lg:px-8 lg:pt-12">
+        <section class="mx-auto w-full max-w-5xl px-4 pt-8 pb-14 sm:px-6 lg:px-8 lg:pt-12">
             <div class="rounded-[1.9rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7 lg:p-9">
                 <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
 
                 <div class="max-w-3xl">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-label-tight text-slate-700"
+                        class="tracking-label-tight inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold text-slate-700 uppercase"
                     >
                         Privacy policy
                     </span>
@@ -27,11 +27,13 @@ useHead({
                     </p>
                 </div>
 
-                <article class="prose prose-slate mt-8 max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.02em] prose-p:text-slate-600 prose-li:text-slate-600">
+                <article
+                    class="prose prose-slate prose-headings:font-semibold prose-headings:tracking-[-0.02em] prose-p:text-slate-600 prose-li:text-slate-600 mt-8 max-w-none"
+                >
                     <p><strong>Effective date:</strong> [Date]</p>
                     <p>
-                        This Privacy Policy describes how [Your Company Name] ("we," "our," or "us") collects, uses, and shares
-                        information when you visit or make a purchase from [Website URL] (the "Site").
+                        This Privacy Policy describes how [Your Company Name] ("we," "our," or "us") collects, uses, and shares information
+                        when you visit or make a purchase from [Website URL] (the "Site").
                     </p>
 
                     <h2>1. Information We Collect</h2>
@@ -67,8 +69,8 @@ useHead({
 
                     <h2>5. Cookies</h2>
                     <p>
-                        We use necessary cookies to keep the storefront, cart, and account experience working correctly. We only use analytics
-                        cookies after you explicitly accept them through our cookie banner.
+                        We use necessary cookies to keep the storefront, cart, and account experience working correctly. We only use
+                        analytics cookies after you explicitly accept them through our cookie banner.
                     </p>
                     <p>
                         When analytics cookies are accepted, we use PostHog to understand how visitors use the site so we can improve
@@ -77,9 +79,7 @@ useHead({
                     </p>
 
                     <h2>6. Your Rights</h2>
-                    <p>
-                        You can access, update, or delete your data and opt out of marketing by contacting us or using unsubscribe links.
-                    </p>
+                    <p>You can access, update, or delete your data and opt out of marketing by contacting us or using unsubscribe links.</p>
 
                     <h2>7. Third-Party Links</h2>
                     <p>Our Site may link to third-party sites. We are not responsible for their privacy practices.</p>

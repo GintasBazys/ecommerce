@@ -58,7 +58,7 @@ const arrowBackgroundStyle = {
 <template>
     <select
         v-model="model"
-        class="h-11 w-full appearance-none rounded-2xl border border-slate-300 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-4 pr-10 text-sm font-medium text-slate-900 shadow-[0_10px_24px_rgba(8,27,90,0.05)] outline-hidden transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-70"
+        class="focus:border-brand-500 focus:ring-brand-100 h-11 w-full appearance-none rounded-2xl border border-slate-300 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-4 pr-10 text-sm font-medium text-slate-900 shadow-[0_10px_24px_rgba(8,27,90,0.05)] outline-hidden transition focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-70"
         :style="arrowBackgroundStyle"
         v-bind="$attrs"
     >

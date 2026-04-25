@@ -69,7 +69,7 @@ const emit = defineEmits<{
 
             <div class="grid gap-4 md:grid-cols-[auto_1fr] md:items-end md:justify-between">
                 <div>
-                    <p class="text-label-sm font-bold tracking-label text-slate-500 uppercase">Quantity</p>
+                    <p class="text-label-sm tracking-label font-bold text-slate-500 uppercase">Quantity</p>
                     <div
                         class="mt-2 inline-flex items-center rounded-full border border-slate-200 bg-slate-50/90 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
                     >
@@ -104,7 +104,7 @@ const emit = defineEmits<{
                 </div>
 
                 <div class="md:justify-self-end md:text-right">
-                    <p class="text-label-sm font-bold tracking-label text-slate-500 uppercase">Line total</p>
+                    <p class="text-label-sm tracking-label font-bold text-slate-500 uppercase">Line total</p>
                     <div class="mt-2 text-slate-950 md:[&_.taxed-line-price]:justify-items-end">
                         <TaxedLinePrice :amount-with-tax="props.amountWithTax" :amount-without-tax="props.amountWithoutTax" />
                     </div>

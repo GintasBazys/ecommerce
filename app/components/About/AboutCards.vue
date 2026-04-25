@@ -27,12 +27,12 @@ const storePillars = [
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="mx-auto max-w-210 text-center">
                 <span
-                    class="inline-flex min-h-[2.3rem] items-center rounded-full bg-brand-100 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-brand-700"
+                    class="bg-brand-100 text-label-sm tracking-label text-brand-700 inline-flex min-h-[2.3rem] items-center rounded-full px-4 py-2 font-bold uppercase"
                 >
                     Our Store
                 </span>
                 <h2
-                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] font-bold leading-none tracking-[-0.05rem] text-slate-950 md:max-w-[15ch] md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98]"
+                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] leading-none font-bold tracking-[-0.05rem] text-slate-950 md:max-w-[15ch] md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98]"
                 >
                     Built for shoppers who want less noise and better decisions.
                 </h2>
@@ -46,7 +46,7 @@ const storePillars = [
                 <article
                     v-for="item in storePillars"
                     :key="item.title"
-                    class="grid h-full content-start justify-items-center gap-4 rounded-card border border-slate-200 bg-white/90 p-5 text-center transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_14px_38px_rgba(8,27,90,0.1)] motion-reduce:transition-none"
+                    class="rounded-card hover:border-brand-200 grid h-full content-start justify-items-center gap-4 border border-slate-200 bg-white/90 p-5 text-center transition hover:-translate-y-1 hover:shadow-[0_14px_38px_rgba(8,27,90,0.1)] motion-reduce:transition-none"
                 >
                     <div
                         class="flex h-[5.7rem] w-[5.7rem] items-center justify-center rounded-[1.25rem] bg-[linear-gradient(145deg,rgba(1,12,128,0.08),rgba(0,128,255,0.16))]"
@@ -59,7 +59,7 @@ const storePillars = [
                             class="h-[4.2rem] w-[4.2rem] object-contain"
                         />
                     </div>
-                    <h3 class="text-[1.08rem] font-semibold leading-6 text-slate-950">{{ item.title }}</h3>
+                    <h3 class="text-[1.08rem] leading-6 font-semibold text-slate-950">{{ item.title }}</h3>
                     <p class="text-[0.94rem] leading-7 text-slate-500">{{ item.description }}</p>
                 </article>
             </div>
