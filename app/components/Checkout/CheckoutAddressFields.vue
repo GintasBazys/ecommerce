@@ -55,11 +55,11 @@ const countryOptions = computed(() => [
 </script>
 
 <template>
-    <section class="grid gap-5 rounded-[1.35rem] border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+    <section class="grid gap-5 rounded-card border border-slate-200/80 bg-white/90 p-4 sm:p-5">
         <div>
             <span
                 v-if="props.eyebrow"
-                class="inline-flex min-h-8 items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                class="text-label-xs tracking-label inline-flex min-h-8 items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 font-bold text-amber-900 uppercase"
             >
                 {{ props.eyebrow }}
             </span>
@@ -79,7 +79,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'first_name', value: ($event.target as HTMLInputElement).value })"
                 />
-                <p v-if="props.errors.first_name" class="text-sm leading-6 text-rose-600">{{ props.errors.first_name }}</p>
+                <span v-if="props.errors.first_name" class="block text-sm leading-6 text-rose-600">{{ props.errors.first_name }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -93,7 +93,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'last_name', value: ($event.target as HTMLInputElement).value })"
                 />
-                <p v-if="props.errors.last_name" class="text-sm leading-6 text-rose-600">{{ props.errors.last_name }}</p>
+                <span v-if="props.errors.last_name" class="block text-sm leading-6 text-rose-600">{{ props.errors.last_name }}</span>
             </label>
         </div>
 
@@ -108,7 +108,7 @@ const countryOptions = computed(() => [
                 :class="props.errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                 @input="emit('update:field', { field: 'address_1', value: ($event.target as HTMLInputElement).value })"
             />
-            <p v-if="props.errors.address_1" class="text-sm leading-6 text-rose-600">{{ props.errors.address_1 }}</p>
+            <span v-if="props.errors.address_1" class="block text-sm leading-6 text-rose-600">{{ props.errors.address_1 }}</span>
         </label>
 
         <label class="grid gap-2">
@@ -135,7 +135,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'postal_code', value: ($event.target as HTMLInputElement).value })"
                 />
-                <p v-if="props.errors.postal_code" class="text-sm leading-6 text-rose-600">{{ props.errors.postal_code }}</p>
+                <span v-if="props.errors.postal_code" class="block text-sm leading-6 text-rose-600">{{ props.errors.postal_code }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -149,7 +149,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'city', value: ($event.target as HTMLInputElement).value })"
                 />
-                <p v-if="props.errors.city" class="text-sm leading-6 text-rose-600">{{ props.errors.city }}</p>
+                <span v-if="props.errors.city" class="block text-sm leading-6 text-rose-600">{{ props.errors.city }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -163,7 +163,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'province', value: ($event.target as HTMLInputElement).value })"
                 />
-                <p v-if="props.errors.province" class="text-sm leading-6 text-rose-600">{{ props.errors.province }}</p>
+                <span v-if="props.errors.province" class="block text-sm leading-6 text-rose-600">{{ props.errors.province }}</span>
             </label>
         </div>
 
@@ -178,7 +178,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @update:model-value="emit('update:field', { field: 'country_code', value: String($event) })"
                 />
-                <p v-if="props.errors.country_code" class="text-sm leading-6 text-rose-600">{{ props.errors.country_code }}</p>
+                <span v-if="props.errors.country_code" class="block text-sm leading-6 text-rose-600">{{ props.errors.country_code }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -192,7 +192,7 @@ const countryOptions = computed(() => [
                     :class="props.errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'phone', value: ($event.target as HTMLInputElement).value })"
                 />
-                <p v-if="props.errors.phone" class="text-sm leading-6 text-rose-600">{{ props.errors.phone }}</p>
+                <span v-if="props.errors.phone" class="block text-sm leading-6 text-rose-600">{{ props.errors.phone }}</span>
             </label>
         </div>
     </section>

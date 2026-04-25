@@ -35,7 +35,7 @@ const props = defineProps<{
 
                 <div class="relative z-10 flex min-h-[20rem] flex-col justify-between gap-8 p-4 sm:min-h-[24rem] sm:p-6 lg:min-h-[28rem]">
                     <div
-                        class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 text-label-sm font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                     >
                         <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                         {{ props.isAllProductsPage ? "All products" : "Category" }}
@@ -43,7 +43,7 @@ const props = defineProps<{
                     <div
                         class="max-w-3xl rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
                     >
-                        <span class="inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-100">
+                        <span class="inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-amber-100">
                             {{ props.heroEyebrow }}
                         </span>
                         <h1 class="mt-4 text-[2rem] font-bold leading-none tracking-[-0.05rem] text-white sm:text-[2.8rem] sm:leading-[0.96] lg:text-[3.6rem]">

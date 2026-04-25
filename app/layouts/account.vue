@@ -142,7 +142,7 @@ async function handleLogout(): Promise<void> {
 
 <template>
     <main class="min-h-screen bg-slate-50">
-        <div class="mx-auto w-full max-w-7xl px-4 pb-10 pt-12 sm:px-6 sm:pb-12 sm:pt-16 xl:pb-16">
+        <div class="mx-auto w-full max-w-7xl px-4 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-12 xl:pb-16">
             <header class="max-w-4xl">
                 <div class="grid gap-4">
                     <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
@@ -162,18 +162,28 @@ async function handleLogout(): Promise<void> {
                     </nav>
 
                     <div class="flex flex-wrap gap-3">
-                        <div v-for="item in accountStatus" :key="item.label" class="min-w-[10rem] rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                            <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">{{ item.label }}</span>
+                        <div
+                            v-for="item in accountStatus"
+                            :key="item.label"
+                            class="min-w-[10rem] rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+                        >
+                            <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">{{
+                                item.label
+                            }}</span>
                             <strong class="mt-1 block text-sm font-semibold text-slate-950">{{ item.value }}</strong>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-5">
-                    <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                    <span
+                        class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+                    >
                         {{ pageContent.eyebrow }}
                     </span>
-                    <h1 class="mt-4 max-w-[14ch] text-[2.4rem] font-bold leading-[0.96] tracking-[-0.06rem] text-slate-950 sm:text-[3rem] xl:text-[3.6rem]">
+                    <h1
+                        class="mt-4 max-w-[14ch] text-[2.4rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3rem] xl:text-[3.6rem]"
+                    >
                         {{ pageContent.title }}
                     </h1>
                     <p class="mt-4 max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
@@ -185,13 +195,15 @@ async function handleLogout(): Promise<void> {
             <div class="mt-8 grid gap-5 xl:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)] xl:items-start">
                 <aside class="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 xl:sticky xl:top-6">
                     <div class="flex items-center gap-4 rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4">
-                        <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-sm font-bold uppercase tracking-[0.08em] text-amber-900 ring-1 ring-amber-100">
+                        <div
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-sm font-bold tracking-[0.08em] text-amber-900 uppercase ring-1 ring-amber-100"
+                        >
                             {{ customerLabel.slice(0, 2) }}
                         </div>
                         <div class="min-w-0">
                             <p class="truncate text-base font-semibold text-slate-950">{{ customerLabel }}</p>
                             <p class="truncate text-sm leading-6 text-slate-600">
-                                {{ isClientHydrated ? customer?.email || 'Signed in customer' : 'Signed in customer' }}
+                                {{ isClientHydrated ? customer?.email || "Signed in customer" : "Signed in customer" }}
                             </p>
                         </div>
                     </div>
@@ -210,10 +222,27 @@ async function handleLogout(): Promise<void> {
                         >
                             <span
                                 class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border"
-                                :class="isActivePath(item.to) ? 'border-amber-200 bg-white text-amber-900' : 'border-slate-200 bg-white text-slate-500'"
+                                :class="
+                                    isActivePath(item.to)
+                                        ? 'border-amber-200 bg-white text-amber-900'
+                                        : 'border-slate-200 bg-white text-slate-500'
+                                "
                             >
-                                <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                    <path v-for="path in iconPaths(item.icon)" :key="path" :d="path" stroke-linecap="round" stroke-linejoin="round" />
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    class="h-4.5 w-4.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        v-for="path in iconPaths(item.icon)"
+                                        :key="path"
+                                        :d="path"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
                                 </svg>
                             </span>
                             <span>{{ item.label }}</span>
@@ -222,7 +251,7 @@ async function handleLogout(): Promise<void> {
 
                     <button
                         type="button"
-                        class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                        class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         @click="handleLogout"
                     >
                         Log out

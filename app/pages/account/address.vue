@@ -106,15 +106,11 @@ function changePage(nextPage: number): void {
     <div class="grid gap-5">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 shadow-sm">
-                <span class="block text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Saved entries</span>
+                <span class="block text-label-sm font-semibold tracking-label text-slate-500 uppercase">Saved entries</span>
                 <strong class="mt-1 block text-2xl font-semibold text-slate-950">{{ totalCount }}</strong>
             </div>
 
-            <button
-                type="button"
-                class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
-                @click="showAdd = true"
-            >
+            <button type="button" class="ui-btn-accent min-h-12 px-6 motion-reduce:transition-none" @click="showAdd = true">
                 Add new address
             </button>
         </div>
@@ -148,9 +144,15 @@ function changePage(nextPage: number): void {
             </div>
 
             <div v-else class="grid gap-4 rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900">
+                <div
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900"
+                >
                     <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                        <path d="M12 21s-5.5-5.7-5.5-10a5.5 5.5 0 1 1 11 0c0 4.3-5.5 10-5.5 10Z" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M12 21s-5.5-5.7-5.5-10a5.5 5.5 0 1 1 11 0c0 4.3-5.5 10-5.5 10Z"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                         <path d="M12 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </div>
@@ -200,7 +202,11 @@ function changePage(nextPage: number): void {
                 </button>
             </div>
 
-            <div v-if="error" class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700" role="alert">
+            <div
+                v-if="error"
+                class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700"
+                role="alert"
+            >
                 {{ error }}
             </div>
         </section>

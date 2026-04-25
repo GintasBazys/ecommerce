@@ -56,7 +56,7 @@ function syncActiveImageFromScroll(): void {
 
 <template>
     <div class="relative rounded-[1.75rem] border border-slate-200 bg-white p-3 shadow-sm sm:rounded-4xl sm:p-4 lg:sticky lg:top-6">
-        <div v-if="isOnSale" class="absolute left-5 top-5 z-10 inline-flex rounded-full bg-rose-500 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-white">
+        <div v-if="isOnSale" class="absolute left-5 top-5 z-10 inline-flex rounded-full bg-rose-500 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-white">
             Sale
         </div>
 

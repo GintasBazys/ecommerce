@@ -45,7 +45,7 @@ const highlights = [
                         </div>
 
                         <div
-                            class="about-badge absolute left-3 top-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 sm:left-5 sm:top-5"
+                            class="about-badge text-label-sm absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 sm:top-5 sm:left-5"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Trusted since 2012
@@ -56,7 +56,7 @@ const highlights = [
                         >
                             <div class="flex flex-wrap items-end justify-between gap-3">
                                 <div>
-                                    <span class="text-[0.73rem] font-bold uppercase tracking-[0.14em] text-amber-200">
+                                    <span class="text-label-eyebrow-sm tracking-label font-bold text-amber-200 uppercase">
                                         Trusted ecommerce
                                     </span>
                                     <div class="mt-2 flex items-end gap-2">
@@ -80,16 +80,16 @@ const highlights = [
 
                 <div class="about-copy rounded-[1.8rem] p-6 sm:p-8 xl:p-10">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                     >
                         Who We Are
                     </span>
 
                     <h2
-                        class="mt-4 max-w-[10ch] text-[clamp(1.9rem,8vw,2.6rem)] font-bold leading-[1] tracking-[-0.06rem] text-slate-950 md:text-[clamp(2.25rem,4vw,3.6rem)] md:leading-[0.95]"
+                        class="mt-4 max-w-[10ch] text-[clamp(1.9rem,8vw,2.6rem)] leading-[1] font-bold tracking-[-0.06rem] text-slate-950 md:text-[clamp(2.25rem,4vw,3.6rem)] md:leading-[0.95]"
                     >
                         A cleaner,
-                        <span class="block font-medium italic tracking-[-0.04rem] text-[#8a6a2f]"> more thoughtful </span>
+                        <span class="block font-medium tracking-[-0.04rem] text-[#8a6a2f] italic"> more thoughtful </span>
                         online store experience.
                     </h2>
 
@@ -102,7 +102,7 @@ const highlights = [
                         <article
                             v-for="(item, index) in highlights"
                             :key="item.title"
-                            class="about-highlight rounded-[1.15rem] border border-slate-200/80 p-4 motion-reduce:transition-none"
+                            class="about-highlight rounded-card-sm border border-slate-200/80 p-4 motion-reduce:transition-none"
                         >
                             <div class="flex items-center gap-3">
                                 <div
@@ -110,7 +110,7 @@ const highlights = [
                                 >
                                     0{{ index + 1 }}
                                 </div>
-                                <h3 class="text-base font-semibold leading-6 text-slate-950">{{ item.title }}</h3>
+                                <h3 class="text-base leading-6 font-semibold text-slate-950">{{ item.title }}</h3>
                             </div>
                             <p class="mt-3 text-[0.95rem] leading-7 text-slate-700">{{ item.text }}</p>
                         </article>

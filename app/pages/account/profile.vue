@@ -96,7 +96,7 @@ async function onSubmit(): Promise<void> {
     <div class="grid gap-5">
         <section class="grid gap-4 lg:grid-cols-2">
             <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <span class="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Account email</span>
+                <span class="text-label-sm font-semibold tracking-label text-slate-500 uppercase">Account email</span>
                 <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
                     {{ customer?.email || "Saved to your account" }}
                 </strong>
@@ -104,20 +104,24 @@ async function onSubmit(): Promise<void> {
             </article>
 
             <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <span class="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Customer name</span>
+                <span class="text-label-sm font-semibold tracking-label text-slate-500 uppercase">Customer name</span>
                 <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
                     {{ customerFullName }}
                 </strong>
-                <p class="mt-2 text-sm leading-6 text-slate-600">Keep your personal details current so delivery and support stay accurate.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                    Keep your personal details current so delivery and support stay accurate.
+                </p>
             </article>
         </section>
 
         <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
             <div class="max-w-3xl">
-                <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                <span
+                    class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                >
                     Profile details
                 </span>
-                <h2 class="mt-4 text-[1.85rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
+                <h2 class="mt-4 text-[1.85rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
                     Keep your account details up to date.
                 </h2>
                 <p class="mt-3 text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
@@ -148,7 +152,7 @@ async function onSubmit(): Promise<void> {
                             v-model="customerData.first_name"
                             type="text"
                             autocomplete="given-name"
-                            class="min-h-12 rounded-2xl border bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:outline-hidden focus:ring-2"
+                            class="min-h-12 rounded-2xl border bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:ring-2 focus:outline-hidden"
                             :class="
                                 fieldErrors.first_name
                                     ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-100'
@@ -167,7 +171,7 @@ async function onSubmit(): Promise<void> {
                             v-model="customerData.last_name"
                             type="text"
                             autocomplete="family-name"
-                            class="min-h-12 rounded-2xl border bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:outline-hidden focus:ring-2"
+                            class="min-h-12 rounded-2xl border bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:ring-2 focus:outline-hidden"
                             :class="
                                 fieldErrors.last_name
                                     ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-100'
@@ -186,7 +190,7 @@ async function onSubmit(): Promise<void> {
                             v-model="customerData.phone"
                             type="tel"
                             autocomplete="tel"
-                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                             placeholder="Add a phone number"
                         />
                     </div>
@@ -198,7 +202,7 @@ async function onSubmit(): Promise<void> {
                             v-model="customerData.company_name"
                             type="text"
                             autocomplete="organization"
-                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                             placeholder="Add a company name"
                         />
                     </div>
@@ -206,12 +210,8 @@ async function onSubmit(): Promise<void> {
 
                 <div class="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
                     <p class="text-sm leading-6 text-slate-500">Changes are saved to your account immediately after a successful update.</p>
-                    <button
-                        type="submit"
-                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
-                        :disabled="isSubmitting"
-                    >
-                        {{ isSubmitting ? 'Saving...' : 'Save changes' }}
+                    <button type="submit" class="ui-btn-accent min-h-12 px-6 motion-reduce:transition-none" :disabled="isSubmitting">
+                        {{ isSubmitting ? "Saving..." : "Save changes" }}
                     </button>
                 </div>
             </form>

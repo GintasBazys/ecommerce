@@ -16,7 +16,7 @@ useHead({
 
                 <div class="max-w-3xl">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-label-tight text-slate-700"
                     >
                         Privacy policy
                     </span>

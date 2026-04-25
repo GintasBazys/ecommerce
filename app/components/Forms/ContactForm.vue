@@ -238,7 +238,7 @@ onUnmounted(() => {
                     name="subject"
                     type="text"
                     placeholder="Example: Order update"
-                    class="w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                     :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': !!formErrors.subject }"
                     required
                 />
@@ -253,7 +253,7 @@ onUnmounted(() => {
                     name="email"
                     type="email"
                     placeholder="name@example.com"
-                    class="w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                     :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': !!formErrors.email }"
                     required
                 />
@@ -268,7 +268,7 @@ onUnmounted(() => {
                     name="phone"
                     type="tel"
                     placeholder="+370"
-                    class="w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                 />
             </div>
 
@@ -280,7 +280,7 @@ onUnmounted(() => {
                     name="orderNumber"
                     type="text"
                     placeholder="Optional"
-                    class="w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                 />
             </div>
 
@@ -292,7 +292,7 @@ onUnmounted(() => {
                     name="message"
                     rows="6"
                     placeholder="How can we help? Include any useful order or product details."
-                    class="w-full rounded-[1.25rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.25rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                     :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': !!formErrors.message }"
                     required
                 ></textarea>
@@ -312,10 +312,10 @@ onUnmounted(() => {
             </button>
         </div>
 
-        <div v-if="errorMessage" class="rounded-[1.15rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div v-if="errorMessage" class="rounded-card-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {{ errorMessage }}
         </div>
-        <div v-if="successMessage" class="rounded-[1.15rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div v-if="successMessage" class="rounded-card-sm border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {{ successMessage }}
         </div>
     </form>

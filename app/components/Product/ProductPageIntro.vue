@@ -35,7 +35,7 @@ defineProps<{
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
-                    <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                    <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-brand-700">
                         Product detail
                     </span>
                 </div>

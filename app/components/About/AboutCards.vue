@@ -27,7 +27,7 @@ const storePillars = [
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="mx-auto max-w-210 text-center">
                 <span
-                    class="inline-flex min-h-[2.3rem] items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                    class="inline-flex min-h-[2.3rem] items-center rounded-full bg-brand-100 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-brand-700"
                 >
                     Our Store
                 </span>
@@ -46,7 +46,7 @@ const storePillars = [
                 <article
                     v-for="item in storePillars"
                     :key="item.title"
-                    class="grid h-full content-start justify-items-center gap-4 rounded-[1.35rem] border border-slate-200 bg-white/90 p-5 text-center transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_14px_38px_rgba(8,27,90,0.1)] motion-reduce:transition-none"
+                    class="grid h-full content-start justify-items-center gap-4 rounded-card border border-slate-200 bg-white/90 p-5 text-center transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_14px_38px_rgba(8,27,90,0.1)] motion-reduce:transition-none"
                 >
                     <div
                         class="flex h-[5.7rem] w-[5.7rem] items-center justify-center rounded-[1.25rem] bg-[linear-gradient(145deg,rgba(1,12,128,0.08),rgba(0,128,255,0.16))]"

@@ -15,7 +15,7 @@ const emit = defineEmits<{
 
 <template>
     <div v-if="props.loading" class="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-        <div class="h-full w-1/3 animate-[category-progress_1.2s_ease-in-out_infinite] rounded-full bg-brand-700"></div>
+        <div class="bg-brand-700 h-full w-1/3 animate-[category-progress_1.2s_ease-in-out_infinite] rounded-full"></div>
     </div>
 
     <div v-if="props.gridIsInitialLoading" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
@@ -41,15 +41,9 @@ const emit = defineEmits<{
         v-else
         class="grid justify-items-center gap-3 rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] px-6 py-8 text-center shadow-[0_14px_36px_rgba(8,27,90,0.06)]"
     >
-        <h2 class="text-[1.4rem] font-semibold leading-[1.15] text-slate-950">No products match these filters.</h2>
+        <h2 class="text-[1.4rem] leading-[1.15] font-semibold text-slate-950">No products match these filters.</h2>
         <p class="max-w-120 text-sm leading-6 text-slate-600">{{ props.emptyStateText }}</p>
-        <button
-            type="button"
-            class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a]"
-            @click="emit('clearAll')"
-        >
-            Reset filters
-        </button>
+        <button type="button" class="ui-btn-accent" @click="emit('clearAll')">Reset filters</button>
     </div>
 </template>
 

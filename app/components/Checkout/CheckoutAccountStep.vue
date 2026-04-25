@@ -79,18 +79,18 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 <template>
     <section class="grid gap-4">
         <div>
-            <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
+            <span
+                class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-label-sm font-bold tracking-label text-amber-900 uppercase"
+            >
                 Step 1
             </span>
             <h2
-                class="mt-4 text-[1.9rem] font-semibold leading-[1.03] tracking-[-0.04rem]"
+                class="mt-4 text-[1.9rem] leading-[1.03] font-semibold tracking-[-0.04rem]"
                 :class="props.currentStep === 'account' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Account or guest
             </h2>
-            <p class="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-                Choose the quickest way to continue with this order.
-            </p>
+            <p class="mt-3 text-sm leading-7 text-slate-600 sm:text-base">Choose the quickest way to continue with this order.</p>
         </div>
 
         <div
@@ -98,7 +98,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
             class="flex flex-col gap-4 rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:flex-row sm:items-center sm:justify-between"
         >
             <div>
-                <span class="inline-flex min-h-8 items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-amber-900">
+                <span
+                    class="text-label-xs tracking-label inline-flex min-h-8 items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 font-bold text-amber-900 uppercase"
+                >
                     Ready for checkout
                 </span>
                 <strong class="mt-3 block text-base font-semibold text-slate-950">Checkout identity ready</strong>
@@ -107,7 +109,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
             <div v-if="props.isGuestIdentity" class="flex flex-col gap-3 sm:flex-row">
                 <button
                     type="button"
-                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                     @click="emit('change-identity')"
                 >
                     Sign in or create account
@@ -115,11 +117,14 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
             </div>
         </div>
 
-        <div v-else class="rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6">
-            <div class="rounded-[1.35rem] border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+        <div
+            v-else
+            class="rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6"
+        >
+            <div class="rounded-card border border-slate-200/80 bg-white/90 p-4 sm:p-5">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-500">Checkout access</p>
+                        <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Checkout access</p>
                         <h3 class="mt-2 text-lg font-semibold tracking-[-0.02em] text-slate-950">Choose how you want to continue</h3>
                     </div>
                     <p class="text-sm leading-6 text-slate-600">Sign in faster, create an account, or finish as a guest.</p>
@@ -131,7 +136,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     type="button"
                     :class="[
                         tabBaseClass,
-                        props.authTab === 'login' ? 'bg-[#cda45e] text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
+                        props.authTab === 'login' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
                     ]"
                     @click="emit('update:authTab', 'login')"
                 >
@@ -141,7 +146,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     type="button"
                     :class="[
                         tabBaseClass,
-                        props.authTab === 'register' ? 'bg-[#cda45e] text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
+                        props.authTab === 'register' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
                     ]"
                     @click="emit('update:authTab', 'register')"
                 >
@@ -151,7 +156,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     type="button"
                     :class="[
                         tabBaseClass,
-                        props.authTab === 'guest' ? 'bg-[#cda45e] text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
+                        props.authTab === 'guest' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
                     ]"
                     @click="emit('update:authTab', 'guest')"
                 >
@@ -164,7 +169,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     <div class="grid gap-3">
                         <button
                             type="button"
-                            class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="emit('social-login', 'google')"
                         >
                             <img :src="googleIconUrl" width="24" height="24" alt="" aria-hidden="true" class="block h-6 w-6 shrink-0" />
@@ -172,7 +177,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                         </button>
                         <button
                             type="button"
-                            class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
+                            class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="emit('social-login', 'facebook')"
                         >
                             <img :src="facebookIconUrl" width="24" height="24" alt="" aria-hidden="true" class="block h-6 w-6 shrink-0" />
@@ -182,7 +187,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 
                     <div class="relative text-center text-sm text-slate-500">
                         <div class="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-200"></div>
-                        <span class="relative bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-3">Or continue with email</span>
+                        <span class="relative bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-3"
+                        >Or continue with email</span
+                        >
                     </div>
 
                     <form class="grid gap-4" novalidate @submit.prevent="emit('submit-login')">
@@ -196,7 +203,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                                 :class="props.loginErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:loginEmail', getInputValue($event))"
                             />
-                            <p v-if="props.loginErrors.email" class="text-sm leading-6 text-rose-600">{{ props.loginErrors.email }}</p>
+                            <span v-if="props.loginErrors.email" class="block text-sm leading-6 text-rose-600">{{ props.loginErrors.email }}</span>
                         </label>
 
                         <label class="grid gap-2">
@@ -209,7 +216,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                                 :class="props.loginErrors.password ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:loginPassword', getInputValue($event))"
                             />
-                            <p v-if="props.loginErrors.password" class="text-sm leading-6 text-rose-600">{{ props.loginErrors.password }}</p>
+                            <span v-if="props.loginErrors.password" class="block text-sm leading-6 text-rose-600">
+                                {{ props.loginErrors.password }}
+                            </span>
                         </label>
 
                         <div>
@@ -222,12 +231,14 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                                 @error="emit('turnstile-error', 'login', $event)"
                                 @expired="emit('turnstile-error', 'login', $event)"
                             />
-                            <p v-if="props.loginErrors.verification" class="text-sm leading-6 text-rose-600">{{ props.loginErrors.verification }}</p>
+                            <p v-if="props.loginErrors.verification" class="text-sm leading-6 text-rose-600">
+                                {{ props.loginErrors.verification }}
+                            </p>
                         </div>
 
                         <button
                             type="submit"
-                            class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                            class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="props.isSubmitting || props.isAuthLoading"
                         >
                             {{ props.isSubmitting || props.isAuthLoading ? "Logging in..." : "Log in and continue" }}
@@ -247,7 +258,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                                 :class="props.registerErrors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:regFirstName', getInputValue($event))"
                             />
-                            <p v-if="props.registerErrors.first_name" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.first_name }}</p>
+                            <span v-if="props.registerErrors.first_name" class="block text-sm leading-6 text-rose-600">
+                                {{ props.registerErrors.first_name }}
+                            </span>
                         </label>
 
                         <label class="grid gap-2">
@@ -260,7 +273,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                                 :class="props.registerErrors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:regLastName', getInputValue($event))"
                             />
-                            <p v-if="props.registerErrors.last_name" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.last_name }}</p>
+                            <span v-if="props.registerErrors.last_name" class="block text-sm leading-6 text-rose-600">
+                                {{ props.registerErrors.last_name }}
+                            </span>
                         </label>
                     </div>
 
@@ -274,7 +289,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             :class="props.registerErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:regEmail', getInputValue($event))"
                         />
-                        <p v-if="props.registerErrors.email" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.email }}</p>
+                        <span v-if="props.registerErrors.email" class="block text-sm leading-6 text-rose-600">{{ props.registerErrors.email }}</span>
                     </label>
 
                     <label class="grid gap-2">
@@ -287,7 +302,9 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             :class="props.registerErrors.password ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:regPassword', getInputValue($event))"
                         />
-                        <p v-if="props.registerErrors.password" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.password }}</p>
+                        <span v-if="props.registerErrors.password" class="block text-sm leading-6 text-rose-600">
+                            {{ props.registerErrors.password }}
+                        </span>
                     </label>
 
                     <div>
@@ -300,12 +317,14 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             @error="emit('turnstile-error', 'register', $event)"
                             @expired="emit('turnstile-error', 'register', $event)"
                         />
-                        <p v-if="props.registerErrors.verification" class="text-sm leading-6 text-rose-600">{{ props.registerErrors.verification }}</p>
+                        <p v-if="props.registerErrors.verification" class="text-sm leading-6 text-rose-600">
+                            {{ props.registerErrors.verification }}
+                        </p>
                     </div>
 
                     <button
                         type="submit"
-                        class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="props.isSubmitting || props.isAuthLoading"
                     >
                         {{ props.isSubmitting || props.isAuthLoading ? "Creating account..." : "Create account and continue" }}
@@ -327,12 +346,12 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                             :class="props.guestErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:guestEmail', getInputValue($event))"
                         />
-                        <p v-if="props.guestErrors.email" class="text-sm leading-6 text-rose-600">{{ props.guestErrors.email }}</p>
+                        <span v-if="props.guestErrors.email" class="block text-sm leading-6 text-rose-600">{{ props.guestErrors.email }}</span>
                     </label>
 
                     <button
                         type="submit"
-                        class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="props.isSubmitting"
                     >
                         {{ props.isSubmitting ? "Continuing..." : "Continue as guest" }}

@@ -39,7 +39,7 @@ useStructuredData(() => [breadcrumbSchema.value], "about-structured-data")
                 <div class="max-w-[42rem]">
                     <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                        class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-brand-700"
                     >
                         About the store
                     </span>

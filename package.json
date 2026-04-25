@@ -45,6 +45,7 @@
         "eslint": "^10.2.0",
         "happy-dom": "^20.9.0",
         "prettier": "3.8.3",
+        "prettier-plugin-tailwindcss": "^0.7.3",
         "sass": "1.99.0",
         "sass-loader": "^16.0.7",
         "tailwindcss": "^4.2.2",

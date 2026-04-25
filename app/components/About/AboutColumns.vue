@@ -24,12 +24,12 @@ const approachSteps = [
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="mx-auto mb-8 max-w-215 text-center">
                 <span
-                    class="inline-flex min-h-[2.3rem] items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                    class="bg-brand-100 text-brand-700 inline-flex min-h-[2.3rem] items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
                 >
                     Our Approach
                 </span>
                 <h2
-                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] font-bold leading-none tracking-[-0.05rem] text-slate-950 md:max-w-100 md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98] lg:max-w-200"
+                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] leading-none font-bold tracking-[-0.05rem] text-slate-950 md:max-w-100 md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98] lg:max-w-200"
                 >
                     A practical framework that keeps quality high and experience simple.
                 </h2>
@@ -47,12 +47,12 @@ const approachSteps = [
                         width="1800"
                         height="1200"
                         format="webp"
-                        class="max-h-105 w-full rounded-[1.35rem] object-cover lg:h-full lg:max-h-none"
+                        class="max-h-105 w-full rounded-card object-cover lg:h-full lg:max-h-none"
                     />
                 </div>
 
-                <div class="grid content-start gap-4 rounded-[1.35rem] border border-slate-200 bg-white/90 p-5 sm:p-6">
-                    <h3 class="text-[1.45rem] font-semibold leading-8 text-slate-950">How we work</h3>
+                <div class="grid content-start gap-4 rounded-card border border-slate-200 bg-white/90 p-5 sm:p-6">
+                    <h3 class="text-[1.45rem] leading-8 font-semibold text-slate-950">How we work</h3>
                     <p class="text-[0.98rem] leading-7 text-slate-600">
                         We balance product quality, transparent pricing, and speed of execution. That balance is what shapes every release,
                         campaign, and customer flow in the store.
@@ -65,12 +65,12 @@ const approachSteps = [
                             class="grid grid-cols-[auto_1fr] gap-3 rounded-2xl border border-slate-200 bg-slate-50/90 p-3.5"
                         >
                             <span
-                                class="inline-flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#010c80_0%,#0056d6_100%)] text-[0.72rem] font-bold tracking-[0.08em] text-white"
+                                class="text-label-xs inline-flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#010c80_0%,#0056d6_100%)] font-bold tracking-[0.08em] text-white"
                             >
                                 0{{ index + 1 }}
                             </span>
                             <div class="min-w-0">
-                                <h4 class="text-base font-semibold leading-6 text-slate-950">{{ step.title }}</h4>
+                                <h4 class="text-base leading-6 font-semibold text-slate-950">{{ step.title }}</h4>
                                 <p class="mt-1 text-[0.92rem] leading-6 text-slate-500">{{ step.text }}</p>
                             </div>
                         </article>

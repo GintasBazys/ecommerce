@@ -65,7 +65,7 @@ const safeReviews = computed<SafeReview[]>(() =>
                             <span v-for="star in 5" :key="star" aria-hidden="true">{{ star <= review.rating ? "★" : "☆" }}</span>
                         </div>
                     </div>
-                    <div class="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
+                    <div class="text-xs font-medium uppercase tracking-label-tight text-slate-500">
                         {{ formatDate(review.createdAt) }}
                     </div>
                 </div>

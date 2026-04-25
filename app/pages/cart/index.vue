@@ -71,7 +71,9 @@ const trimmedCouponCode = computed<string>(() => couponCode.value.trim())
 const displayShippingAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.shipping_total || 0) : 0))
 const displaySubtotalAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.subtotal || 0) : 0))
 const displayTaxAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.tax_total || 0) : 0))
-const displayTotalAmount = computed<number>(() => Math.max(0, hasCartItems.value ? Number(cart.value?.total || 0) - displayShippingAmount.value : 0))
+const displayTotalAmount = computed<number>(() =>
+    Math.max(0, hasCartItems.value ? Number(cart.value?.total || 0) - displayShippingAmount.value : 0)
+)
 const isCheckoutDisabled = computed<boolean>(() => !hasCartItems.value || isCartDirty.value || displayTotalAmount.value <= 0)
 const isCouponDisabled = computed<boolean>(
     () => !hasCartItems.value || isCartDirty.value || isApplyingCoupon.value || !trimmedCouponCode.value
@@ -246,25 +248,25 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
 
 <template>
     <main
-        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#f6f9ff_100%)] pb-14 pt-[calc(var(--site-header-offset,98px)+1.25rem)] sm:pb-18 sm:pt-[calc(var(--site-header-offset,98px)+1.75rem)]"
+        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#f6f9ff_100%)] pt-[calc(var(--site-header-offset,98px)+1.25rem)] pb-14 sm:pt-[calc(var(--site-header-offset,98px)+1.75rem)] sm:pb-18"
     >
-        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 pt-8">
+        <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6">
             <section class="grid gap-5 lg:gap-7 xl:grid-cols-[minmax(0,1.15fr)_minmax(21rem,0.85fr)]">
                 <div class="space-y-5 sm:space-y-6">
                     <CartHero :total="displayTotal" :item-count="cartItemCount" :continue-shopping-url="ALL_PRODUCTS_URL_HANDLE" />
 
                     <section
-                        class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-panel sm:p-5"
+                        class="shadow-panel rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 sm:p-5"
                     >
                         <div
                             v-if="recoveryMessage"
-                            class="mb-4 flex items-start justify-between gap-3 rounded-[1.15rem] border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
+                            class="rounded-card-sm mb-4 flex items-start justify-between gap-3 border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
                             role="status"
                         >
                             <p>{{ recoveryMessage }}</p>
                             <button
                                 type="button"
-                                class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 aria-label="Dismiss cart recovery message"
                                 @click="clearRecoveryMessage"
                             >
@@ -274,7 +276,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
 
                         <div v-if="isCartLoading" class="grid justify-items-center gap-4 px-4 py-14 text-center">
                             <span
-                                class="inline-flex h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-700"
+                                class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"
                             ></span>
                             <p class="text-sm leading-6 text-slate-600">Loading your cart...</p>
                         </div>
@@ -303,7 +305,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                                 </p>
                                 <button
                                     type="button"
-                                    class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                    class="ui-btn-accent min-h-12 px-6"
                                     :disabled="!isCartDirty || isUpdatingCart"
                                     @click="updateCart"
                                 >
@@ -344,19 +346,14 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.04rem] text-slate-950">
+                                <h2 class="text-[1.55rem] leading-[1.08] font-semibold tracking-[-0.04rem] text-slate-950">
                                     Your cart is empty
                                 </h2>
                                 <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
                                     Add a few products you love and come back here to review everything before checkout.
                                 </p>
                             </div>
-                            <NuxtLink
-                                :to="ALL_PRODUCTS_URL_HANDLE"
-                                class="inline-flex min-h-12 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
-                            >
-                                Browse products
-                            </NuxtLink>
+                            <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="ui-btn-accent min-h-12 px-6"> Browse products </NuxtLink>
                         </div>
                     </section>
                 </div>

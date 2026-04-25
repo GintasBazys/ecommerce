@@ -168,17 +168,17 @@ function getCheckboxValue(event: Event): boolean {
         <div class="mb-4 flex items-start justify-between gap-3">
             <div>
                 <span
-                    class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                    class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
                 >
                     Filters
                 </span>
-                <h2 class="mt-3 text-[1.3rem] font-semibold leading-[1.1] text-slate-950">{{ props.sidebarTitle }}</h2>
+                <h2 class="mt-3 text-[1.3rem] leading-[1.1] font-semibold text-slate-950">{{ props.sidebarTitle }}</h2>
             </div>
             <div class="flex items-center gap-3">
                 <button
                     v-if="props.activeFilterCount"
                     type="button"
-                    class="text-sm font-semibold text-brand-700 transition hover:text-brand-900"
+                    class="text-brand-700 hover:text-brand-900 text-sm font-semibold transition"
                     @click="emit('clearAll')"
                 >
                     Clear all
@@ -198,7 +198,7 @@ function getCheckboxValue(event: Event): boolean {
         </div>
 
         <div class="grid gap-3">
-            <section v-if="props.childCategoryFacets.length" class="overflow-hidden rounded-[1.15rem] border border-slate-200 bg-white">
+            <section v-if="props.childCategoryFacets.length" class="rounded-card-sm overflow-hidden border border-slate-200 bg-white">
                 <button
                     type="button"
                     class="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left"
@@ -221,7 +221,7 @@ function getCheckboxValue(event: Event): boolean {
                         <input
                             :checked="selectedChildCategoryIds.includes(item.id)"
                             type="checkbox"
-                            class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200"
+                            class="text-brand-700 focus:ring-brand-200 mt-1 h-4 w-4 rounded border-slate-300"
                             @change="toggleSelection('child', item.id, getCheckboxValue($event))"
                         />
                         <span>{{ item.label }} ({{ item.count }})</span>
@@ -229,7 +229,7 @@ function getCheckboxValue(event: Event): boolean {
                 </div>
             </section>
 
-            <section v-if="props.facets.types.length" class="overflow-hidden rounded-[1.15rem] border border-slate-200 bg-white">
+            <section v-if="props.facets.types.length" class="rounded-card-sm overflow-hidden border border-slate-200 bg-white">
                 <button
                     type="button"
                     class="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left"
@@ -252,7 +252,7 @@ function getCheckboxValue(event: Event): boolean {
                         <input
                             :checked="selectedTypeIds.includes(item.id)"
                             type="checkbox"
-                            class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200"
+                            class="text-brand-700 focus:ring-brand-200 mt-1 h-4 w-4 rounded border-slate-300"
                             @change="toggleSelection('type', item.id, getCheckboxValue($event))"
                         />
                         <span>{{ item.label }} ({{ item.count }})</span>
@@ -260,7 +260,7 @@ function getCheckboxValue(event: Event): boolean {
                 </div>
             </section>
 
-            <section v-if="props.facets.collections.length" class="overflow-hidden rounded-[1.15rem] border border-slate-200 bg-white">
+            <section v-if="props.facets.collections.length" class="rounded-card-sm overflow-hidden border border-slate-200 bg-white">
                 <button
                     type="button"
                     class="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left"
@@ -283,7 +283,7 @@ function getCheckboxValue(event: Event): boolean {
                         <input
                             :checked="selectedCollectionIds.includes(item.id)"
                             type="checkbox"
-                            class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200"
+                            class="text-brand-700 focus:ring-brand-200 mt-1 h-4 w-4 rounded border-slate-300"
                             @change="toggleSelection('collection', item.id, getCheckboxValue($event))"
                         />
                         <span>{{ item.label }} ({{ item.count }})</span>
@@ -291,7 +291,7 @@ function getCheckboxValue(event: Event): boolean {
                 </div>
             </section>
 
-            <section v-if="props.facets.tags.length" class="overflow-hidden rounded-[1.15rem] border border-slate-200 bg-white">
+            <section v-if="props.facets.tags.length" class="rounded-card-sm overflow-hidden border border-slate-200 bg-white">
                 <button
                     type="button"
                     class="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left"
@@ -314,7 +314,7 @@ function getCheckboxValue(event: Event): boolean {
                         <input
                             :checked="selectedTagIds.includes(item.id)"
                             type="checkbox"
-                            class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200"
+                            class="text-brand-700 focus:ring-brand-200 mt-1 h-4 w-4 rounded border-slate-300"
                             @change="toggleSelection('tag', item.id, getCheckboxValue($event))"
                         />
                         <span>{{ item.label }} ({{ item.count }})</span>
@@ -322,7 +322,7 @@ function getCheckboxValue(event: Event): boolean {
                 </div>
             </section>
 
-            <section class="overflow-hidden rounded-[1.15rem] border border-slate-200 bg-white">
+            <section class="rounded-card-sm overflow-hidden border border-slate-200 bg-white">
                 <button
                     type="button"
                     class="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left"
@@ -341,7 +341,7 @@ function getCheckboxValue(event: Event): boolean {
                         <input
                             v-model="inStockOnly"
                             type="checkbox"
-                            class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200"
+                            class="text-brand-700 focus:ring-brand-200 mt-1 h-4 w-4 rounded border-slate-300"
                         />
                         <span>Only show products in stock</span>
                     </label>
@@ -350,7 +350,7 @@ function getCheckboxValue(event: Event): boolean {
 
             <section
                 v-if="props.facets.price.max > props.facets.price.min"
-                class="overflow-hidden rounded-[1.15rem] border border-slate-200 bg-white"
+                class="rounded-card-sm overflow-hidden border border-slate-200 bg-white"
             >
                 <button
                     type="button"
@@ -375,7 +375,7 @@ function getCheckboxValue(event: Event): boolean {
                                 :max="props.facets.price.max"
                                 :step="props.priceStep"
                                 type="range"
-                                class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
+                                class="accent-brand-700 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200"
                             />
                             <input
                                 v-model="priceRangeMax"
@@ -383,7 +383,7 @@ function getCheckboxValue(event: Event): boolean {
                                 :max="props.facets.price.max"
                                 :step="props.priceStep"
                                 type="range"
-                                class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
+                                class="accent-brand-700 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200"
                             />
                             <div class="grid grid-cols-2 gap-3 text-sm text-slate-600">
                                 <div class="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-2">Min: {{ priceRange[0] }}</div>
@@ -402,13 +402,7 @@ function getCheckboxValue(event: Event): boolean {
                 >
                     Reset price
                 </button>
-                <button
-                    type="button"
-                    class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-4 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a]"
-                    @click="emit('applyPriceRange')"
-                >
-                    Apply price
-                </button>
+                <button type="button" class="ui-btn-accent px-4" @click="emit('applyPriceRange')">Apply price</button>
             </div>
         </div>
     </div>

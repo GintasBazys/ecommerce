@@ -15,7 +15,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
     <section v-if="relatedProducts.length" class="mt-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white px-5 py-6 shadow-sm sm:rounded-4xl sm:px-7 sm:py-8 xl:px-8">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-184">
-                <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
+                <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-amber-900">
                     Related products
                 </span>
                 <h2 class="mt-4 max-w-[13ch] text-[clamp(2rem,6vw,3.25rem)] font-bold leading-[0.97] tracking-[-0.05rem] text-slate-950">

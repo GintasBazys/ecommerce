@@ -68,18 +68,18 @@ useSeoMeta({
     <section
         class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
     >
-        <div class="px-0 pb-8 pt-[3.75rem] sm:pt-[4.5rem] xl:pt-[5.75rem]">
+        <div class="px-0 pt-[3.75rem] pb-8 sm:pt-[4.5rem] xl:pt-[5.75rem]">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 <div class="grid items-end gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.02fr)] xl:gap-10">
                     <div class="max-w-[40rem] xl:pb-6">
                         <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
                         <span
-                            class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                            class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                         >
                             Customer care
                         </span>
                         <h1
-                            class="mt-4 text-[2.1rem] font-bold leading-[1] tracking-[-0.06rem] text-slate-950 sm:text-[2.9rem] sm:leading-[0.98] xl:max-w-[11ch] xl:text-[4.25rem] xl:leading-[0.96]"
+                            class="mt-4 text-[2.1rem] leading-[1] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[2.9rem] sm:leading-[0.98] xl:max-w-[11ch] xl:text-[4.25rem] xl:leading-[0.96]"
                         >
                             Support designed to feel as calm and considered as the storefront.
                         </h1>
@@ -125,7 +125,7 @@ useSeoMeta({
                         </div>
 
                         <div
-                            class="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.1)] sm:left-5 sm:top-5"
+                            class="text-label-sm absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.1)] sm:top-5 sm:left-5"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Real support from Vilnius
@@ -136,7 +136,7 @@ useSeoMeta({
                         >
                             <div class="flex flex-wrap items-end justify-between gap-3">
                                 <div>
-                                    <span class="text-[0.73rem] font-bold uppercase tracking-[0.14em] text-amber-200"
+                                    <span class="text-label-eyebrow-sm tracking-label font-bold text-amber-200 uppercase"
                                     >Average response</span
                                     >
                                     <div class="mt-2 flex items-end gap-2">
@@ -172,17 +172,17 @@ useSeoMeta({
                     >
                         <img :src="channel.icon" alt="" class="h-10 w-10" loading="lazy" width="40" height="40" />
                     </div>
-                    <h2 class="mt-4 text-xl font-semibold leading-7 text-slate-950">{{ channel.title }}</h2>
+                    <h2 class="mt-4 text-xl leading-7 font-semibold text-slate-950">{{ channel.title }}</h2>
                     <p class="mt-2 text-sm leading-7 text-slate-600">{{ channel.detail }}</p>
                     <p class="mt-3 text-sm font-semibold text-slate-800">{{ channel.meta }}</p>
                     <NuxtLink
                         v-if="channel.to"
                         :to="channel.to"
-                        class="mt-4 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-900"
+                        class="text-brand-700 hover:text-brand-900 mt-4 inline-flex text-sm font-semibold"
                     >
                         {{ channel.cta }}
                     </NuxtLink>
-                    <a v-else :href="channel.href" class="mt-4 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-900">
+                    <a v-else :href="channel.href" class="text-brand-700 hover:text-brand-900 mt-4 inline-flex text-sm font-semibold">
                         {{ channel.cta }}
                     </a>
                 </article>
@@ -194,11 +194,11 @@ useSeoMeta({
                 <div>
                     <div class="max-w-[38rem]">
                         <span
-                            class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
+                            class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                         >
                             Send a message
                         </span>
-                        <h2 class="mt-4 text-[1.95rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.5rem]">
+                        <h2 class="mt-4 text-[1.95rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.5rem]">
                             Share the details and the team will take it from there.
                         </h2>
                         <p class="mt-4 text-base leading-7 text-slate-600 sm:text-[1.02rem] sm:leading-8">
@@ -219,11 +219,11 @@ useSeoMeta({
                         class="rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-6 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-8"
                     >
                         <span
-                            class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                            class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                         >
                             Support desk
                         </span>
-                        <h2 class="mt-4 text-[1.6rem] font-bold leading-[1.05] tracking-[-0.04rem] text-slate-950">
+                        <h2 class="mt-4 text-[1.6rem] leading-[1.05] font-bold tracking-[-0.04rem] text-slate-950">
                             Built for practical support before and after checkout.
                         </h2>
                         <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
@@ -248,18 +248,18 @@ useSeoMeta({
 
                     <div class="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-[0_12px_28px_rgba(8,27,90,0.05)] sm:p-8">
                         <span
-                            class="inline-flex min-h-9 items-center rounded-full bg-slate-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-slate-700"
+                            class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full bg-slate-100 px-4 py-2 font-bold text-slate-700 uppercase"
                         >
                             Before you send
                         </span>
-                        <h2 class="mt-4 text-[1.45rem] font-bold leading-[1.08] tracking-[-0.04rem] text-slate-950">
+                        <h2 class="mt-4 text-[1.45rem] leading-[1.08] font-bold tracking-[-0.04rem] text-slate-950">
                             A few direct details help us reply faster.
                         </h2>
                         <ul class="mt-5 grid gap-4">
                             <li
                                 v-for="item in contactChecklist"
                                 :key="item"
-                                class="flex items-start gap-3 rounded-[1.15rem] border border-slate-200 bg-slate-50/80 p-4"
+                                class="rounded-card-sm flex items-start gap-3 border border-slate-200 bg-slate-50/80 p-4"
                             >
                                 <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500"></span>
                                 <span class="text-sm leading-6 text-slate-700">{{ item }}</span>

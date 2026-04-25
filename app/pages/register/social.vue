@@ -396,9 +396,9 @@ onBeforeUnmount(() => {
                     </p>
                 </div>
 
-                <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
+                <div class="rounded-panel border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold uppercase tracking-label-tight text-slate-700"
                     >
                         Authentication status
                     </span>

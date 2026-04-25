@@ -34,7 +34,7 @@ function onDelete(): void {
         <div>
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <span class="text-[0.74rem] font-bold uppercase tracking-[0.12em] text-brand-700">
+                    <span class="text-label-eyebrow font-bold uppercase tracking-label-tight text-brand-700">
                         {{ props.address.address_name?.toUpperCase() || "UNNAMED ADDRESS" }}
                     </span>
                     <h3 class="mt-2 text-[1.05rem] font-semibold text-slate-950">

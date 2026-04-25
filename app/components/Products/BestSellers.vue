@@ -24,7 +24,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
             <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-184">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-label-sm font-bold uppercase tracking-label text-amber-900"
                     >
                         Bestsellers
                     </span>

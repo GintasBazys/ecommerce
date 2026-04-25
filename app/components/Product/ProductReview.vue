@@ -48,22 +48,29 @@ function handleCancel(): void {
 </script>
 
 <template>
-    <div class="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-white shadow-[0_24px_64px_rgba(2,6,23,0.2)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-4xl">
+    <div
+        class="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-white shadow-[0_24px_64px_rgba(2,6,23,0.2)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-4xl"
+    >
         <button
             type="button"
-            class="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+            class="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
             aria-label="Close review form"
             @click="handleCancel"
         >
             <span aria-hidden="true" class="text-lg leading-none">×</span>
         </button>
 
-        <div class="overflow-y-auto px-5 pb-5 pt-5 sm:px-7 sm:pb-7 sm:pt-7">
+        <div class="overflow-y-auto px-5 pt-5 pb-5 sm:px-7 sm:pt-7 sm:pb-7">
             <div class="pr-12">
-                <p class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                <p
+                    class="bg-brand-100 text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+                >
                     Share feedback
                 </p>
-                <h2 id="product-review-dialog-title" class="mt-4 text-[1.85rem] font-bold leading-[1.02] tracking-[-0.04rem] text-slate-950">
+                <h2
+                    id="product-review-dialog-title"
+                    class="mt-4 text-[1.85rem] leading-[1.02] font-bold tracking-[-0.04rem] text-slate-950"
+                >
                     Write a review
                 </h2>
                 <p class="mt-3 max-w-136 text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
@@ -79,7 +86,7 @@ function handleCancel(): void {
                         v-model="form.title"
                         type="text"
                         placeholder="Summarize your experience"
-                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                         required
                     />
                 </div>
@@ -91,8 +98,12 @@ function handleCancel(): void {
                             v-for="value in 5"
                             :key="value"
                             type="button"
-                            class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border text-lg transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
-                            :class="value <= form.rating ? 'border-amber-300 bg-amber-50 text-amber-500' : 'border-slate-200 bg-white text-slate-300 hover:border-amber-200 hover:text-amber-400'"
+                            class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border text-lg transition focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
+                            :class="
+                                value <= form.rating
+                                    ? 'border-amber-300 bg-amber-50 text-amber-500'
+                                    : 'border-slate-200 bg-white text-slate-300 hover:border-amber-200 hover:text-amber-400'
+                            "
                             :aria-checked="form.rating === value"
                             role="radio"
                             @click="form.rating = value"
@@ -109,7 +120,7 @@ function handleCancel(): void {
                         v-model="form.content"
                         rows="5"
                         placeholder="Share your thoughts"
-                        class="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                        class="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                         required
                     ></textarea>
                 </div>
@@ -122,7 +133,7 @@ function handleCancel(): void {
                             v-model="form.firstName"
                             type="text"
                             placeholder="Your first name"
-                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                         />
                     </div>
                     <div class="grid gap-2">
@@ -132,7 +143,7 @@ function handleCancel(): void {
                             v-model="form.lastName"
                             type="text"
                             placeholder="Your last name"
-                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:outline-hidden focus:ring-2 focus:ring-amber-200"
+                            class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                         />
                     </div>
                 </div>
@@ -140,26 +151,18 @@ function handleCancel(): void {
                 <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-end">
                     <button
                         type="button"
-                        class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                        class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         @click="handleCancel"
                     >
                         Cancel
                     </button>
-                    <button
-                        type="submit"
-                        class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-6 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
-                        :disabled="!isValid"
-                    >
+                    <button type="submit" class="ui-btn-accent px-6 motion-reduce:transition-none" :disabled="!isValid">
                         Submit review
                     </button>
                 </div>
             </form>
 
-            <div
-                v-if="snackbar"
-                class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
-                role="alert"
-            >
+            <div v-if="snackbar" class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
                 {{ snackbarText }}
             </div>
         </div>

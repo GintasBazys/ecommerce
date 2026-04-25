@@ -267,13 +267,13 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <p
-                                    class="inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-amber-900"
+                                    class="text-label-xs tracking-label inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 font-semibold text-amber-900 uppercase"
                                 >
                                     Cart overview
                                 </p>
                                 <h2
                                     :id="titleId"
-                                    class="mt-3 max-w-[12ch] text-xl font-semibold leading-tight tracking-[-0.03em] text-slate-950 sm:text-[1.75rem]"
+                                    class="mt-3 max-w-[12ch] text-xl leading-tight font-semibold tracking-[-0.03em] text-slate-950 sm:text-[1.75rem]"
                                 >
                                     Your order is nearly ready.
                                 </h2>
@@ -285,7 +285,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <button
                                 ref="closeButtonRef"
                                 type="button"
-                                class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-[0_10px_30px_rgba(8,27,90,0.08)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-[0_10px_30px_rgba(8,27,90,0.08)] transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 @click="closeDrawer"
                             >
                                 <span class="sr-only">Close cart drawer</span>
@@ -301,13 +301,13 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                     <div class="cart-drawer__scroll px-3 py-3 sm:px-4 sm:py-4">
                         <div
                             v-if="recoveryMessage"
-                            class="mb-3 flex items-start justify-between gap-3 rounded-[1.15rem] border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
+                            class="rounded-card-sm mb-3 flex items-start justify-between gap-3 border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
                             role="status"
                         >
                             <p>{{ recoveryMessage }}</p>
                             <button
                                 type="button"
-                                class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 aria-label="Dismiss cart recovery message"
                                 @click="clearRecoveryMessage"
                             >
@@ -344,7 +344,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                         >
                                             <button
                                                 type="button"
-                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                                                 :disabled="(qtyMap[item.id] ?? 1) <= 1"
                                                 :aria-label="`Decrease quantity for ${item.product_title}`"
                                                 @click="decrementQty(item.id)"
@@ -356,7 +356,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                             }}</span>
                                             <button
                                                 type="button"
-                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                                                 :disabled="
                                                     (qtyMap[item.id] ?? Number(item.quantity)) >= (item.stocked_quantity ?? Infinity)
                                                 "
@@ -373,7 +373,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                             </p>
                                             <button
                                                 type="button"
-                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 transition hover:border-rose-200 hover:text-rose-600 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-200"
+                                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 transition hover:border-rose-200 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
                                                 :aria-label="`Remove ${item.product_title}`"
                                                 @click="removeItem(item.id)"
                                             >
@@ -411,12 +411,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <p class="mt-2 text-sm leading-6 text-slate-700">
                                 Add a few pieces you love and they will appear here for a quick final review.
                             </p>
-                            <NuxtLink
-                                :to="ALL_PRODUCTS_URL_HANDLE"
-                                class="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
-                            >
-                                Keep shopping
-                            </NuxtLink>
+                            <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="ui-btn-accent mt-5"> Keep shopping </NuxtLink>
                         </section>
                     </div>
 
@@ -446,7 +441,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <button
                                 v-if="isCartDirty"
                                 type="button"
-                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#cda45e] px-5 text-sm font-semibold text-slate-950 transition hover:bg-[#d8b57a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                class="ui-btn-accent w-full"
                                 :disabled="!isCartDirty || isAnyUpdating"
                                 @click="updateCart"
                             >
@@ -459,7 +454,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 
                             <NuxtLink
                                 to="/cart"
-                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                                class="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }"
                             >
                                 Go to cart

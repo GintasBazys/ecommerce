@@ -98,10 +98,12 @@ function changePage(nextPage: number): void {
         <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-7">
             <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+                    <span
+                        class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+                    >
                         Order history
                     </span>
-                    <h2 class="mt-4 text-[1.85rem] font-bold leading-[1.02] tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
+                    <h2 class="mt-4 text-[1.85rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
                         Review every purchase in one place.
                     </h2>
                     <p class="mt-3 max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
@@ -111,7 +113,7 @@ function changePage(nextPage: number): void {
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <div class="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
-                        <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">Total orders</span>
+                        <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Total orders</span>
                         <strong class="mt-1 block text-base font-semibold text-slate-950">{{ totalOrders }}</strong>
                     </div>
 
@@ -146,40 +148,40 @@ function changePage(nextPage: number): void {
             </div>
 
             <div v-else-if="orders.length" class="mt-6 grid gap-3">
-                <article
-                    v-for="order in orders"
-                    :key="order.id"
-                    class="rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4 sm:p-5"
-                >
+                <article v-for="order in orders" :key="order.id" class="rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4 sm:p-5">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div class="grid flex-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                             <div>
-                                <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">Order #</span>
+                                <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Order #</span>
                                 <strong class="mt-1 block text-sm font-semibold text-slate-950">{{ order.display_id }}</strong>
                             </div>
                             <div>
-                                <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">Date</span>
+                                <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Date</span>
                                 <strong class="mt-1 block text-sm font-semibold text-slate-950">{{ formatDate(order.created_at) }}</strong>
                             </div>
                             <div>
-                                <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">Total</span>
+                                <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Total</span>
                                 <strong class="mt-1 block text-sm font-semibold text-slate-950">
                                     {{ formatPrice(Number(order.total), order.currency_code) }}
                                 </strong>
                             </div>
                             <div>
-                                <span class="block text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-500">Currency</span>
-                                <strong class="mt-1 block text-sm font-semibold text-slate-950">{{ order.currency_code.toUpperCase() }}</strong>
+                                <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Currency</span>
+                                <strong class="mt-1 block text-sm font-semibold text-slate-950">{{
+                                    order.currency_code.toUpperCase()
+                                }}</strong>
                             </div>
                         </div>
 
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center lg:justify-end">
-                            <span class="inline-flex min-h-10 items-center rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-semibold text-slate-900">
+                            <span
+                                class="border-brand-100 bg-brand-50 inline-flex min-h-10 items-center rounded-full border px-4 py-2 text-sm font-semibold text-slate-900"
+                            >
                                 {{ orderStatusLabel(order.fulfillment_status) }}
                             </span>
                             <NuxtLink
                                 :to="`/account/orders/${order.id}`"
-                                class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 motion-reduce:transition-none"
+                                class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                             >
                                 View order
                             </NuxtLink>
@@ -189,7 +191,9 @@ function changePage(nextPage: number): void {
             </div>
 
             <div v-else class="mt-6 grid gap-4 rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900">
+                <div
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900"
+                >
                     <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <path d="M6 7h12" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M8 4h8v4H8z" stroke-linecap="round" stroke-linejoin="round" />

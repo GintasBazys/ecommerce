@@ -50,17 +50,17 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
 
 <template>
     <footer class="site-footer text-white">
-        <div class="mx-auto w-full max-w-7xl px-4 pb-8 pt-14 md:px-6 md:pt-16">
+        <div class="mx-auto w-full max-w-7xl px-4 pt-14 pb-8 md:px-6 md:pt-16">
             <section
                 class="site-footer__hero grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-end lg:gap-8 lg:p-8"
             >
                 <div>
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-amber-200/20 bg-amber-50/10 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-100"
+                        class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/20 bg-amber-50/10 px-4 py-2 font-bold text-amber-100 uppercase"
                     >
                         Ecommerce
                     </span>
-                    <h2 class="mt-4 max-w-[14ch] text-[clamp(2rem,8vw,3.45rem)] font-bold leading-[0.96] tracking-[-0.05em] text-white">
+                    <h2 class="mt-4 max-w-[14ch] text-[clamp(2rem,8vw,3.45rem)] leading-[0.96] font-bold tracking-[-0.05em] text-white">
                         A more polished finish to every shopping journey.
                     </h2>
                     <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-200/88 sm:text-base sm:leading-8">
@@ -69,16 +69,14 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </p>
 
                     <div class="mt-6 flex flex-wrap gap-3">
-                        <div class="site-footer__metric rounded-[1.15rem] px-4 py-3">
-                            <span class="block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                        <div class="site-footer__metric rounded-card-sm px-4 py-3">
+                            <span class="text-label-xs tracking-label block font-semibold text-slate-300 uppercase">
                                 Worldwide delivery
                             </span>
                             <strong class="mt-1 block text-base font-semibold text-white">Mobile-first checkout flow</strong>
                         </div>
-                        <div class="site-footer__metric rounded-[1.15rem] px-4 py-3">
-                            <span class="block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-300">
-                                Trusted support
-                            </span>
+                        <div class="site-footer__metric rounded-card-sm px-4 py-3">
+                            <span class="text-label-xs tracking-label block font-semibold text-slate-300 uppercase"> Trusted support </span>
                             <strong class="mt-1 block text-base font-semibold text-white">Real help before and after purchase</strong>
                         </div>
                     </div>
@@ -88,7 +86,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     <div
                         class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(253,230,138,0.55),rgba(148,163,184,0))]"
                     ></div>
-                    <p class="text-[0.74rem] font-bold uppercase tracking-[0.14em] text-amber-100">Need help?</p>
+                    <p class="text-label-eyebrow tracking-label font-bold text-amber-100 uppercase">Need help?</p>
                     <h3 class="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">Talk to support</h3>
                     <p class="mt-3 max-w-[24rem] text-sm leading-7 text-slate-200/86">
                         Questions about products, shipping, or returns? Reach out and we will help you move forward quickly.
@@ -178,7 +176,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                 </section>
 
                 <section class="site-footer__payments rounded-3xl p-4 md:p-5">
-                    <p class="text-[0.74rem] font-bold uppercase tracking-[0.14em] text-amber-100">Accepted payments</p>
+                    <p class="text-label-eyebrow tracking-label font-bold text-amber-100 uppercase">Accepted payments</p>
                     <p class="mt-3 text-sm leading-7 text-slate-200/82">
                         Secure payment methods with a clear checkout flow and transparent order confirmation.
                     </p>
@@ -197,7 +195,9 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
             <div class="site-footer__bottom flex flex-wrap items-center justify-between gap-3 px-1 pt-6">
                 <p class="text-sm text-slate-300/90">Copyright Gintas Bazys {{ currentYear }}. All rights reserved.</p>
                 <div class="flex flex-wrap items-center gap-3">
-                    <button type="button" class="site-footer__bottom-link text-sm font-semibold" @click="openBanner">Cookie Settings</button>
+                    <button type="button" class="site-footer__bottom-link text-sm font-semibold" @click="openBanner">
+                        Cookie Settings
+                    </button>
                     <NuxtLink to="/privacy" class="site-footer__bottom-link text-sm font-semibold">Privacy Policy</NuxtLink>
                 </div>
             </div>

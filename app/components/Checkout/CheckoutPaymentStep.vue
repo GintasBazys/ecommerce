@@ -24,11 +24,13 @@ const emit = defineEmits<{
 <template>
     <section class="grid gap-4">
         <div>
-            <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
+            <span
+                class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
+            >
                 Step 3
             </span>
             <h2
-                class="mt-4 text-[1.9rem] font-semibold leading-[1.03] tracking-[-0.04rem]"
+                class="mt-4 text-[1.9rem] leading-[1.03] font-semibold tracking-[-0.04rem]"
                 :class="props.currentStep === 'payment' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Shipping and payment
@@ -38,7 +40,10 @@ const emit = defineEmits<{
             </p>
         </div>
 
-        <div v-if="!props.addressCompleted" class="rounded-[1.6rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600">
+        <div
+            v-if="!props.addressCompleted"
+            class="rounded-[1.6rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+        >
             Save your address details first to unlock shipping options and payment.
         </div>
 
@@ -49,7 +54,10 @@ const emit = defineEmits<{
             Shipping options and payment will appear after the address step is saved.
         </div>
 
-        <div v-else class="grid gap-5 rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6 xl:grid-cols-2 xl:items-start">
+        <div
+            v-else
+            class="grid gap-5 rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6 xl:grid-cols-2 xl:items-start"
+        >
             <div class="grid content-start gap-4">
                 <div>
                     <h3 class="text-base font-semibold text-slate-950">Shipping method</h3>
@@ -65,20 +73,26 @@ const emit = defineEmits<{
                     <label
                         v-for="option in props.shippingOptions"
                         :key="option.id"
-                        class="flex self-start items-center gap-3 rounded-[1.2rem] border px-4 py-4 transition"
-                        :class="props.selectedShippingOptionId === option.id ? 'border-amber-300 bg-amber-50/70' : 'border-slate-200/80 bg-white/90 hover:border-amber-200'"
+                        class="flex items-center gap-3 self-start rounded-[1.2rem] border px-4 py-4 transition"
+                        :class="
+                            props.selectedShippingOptionId === option.id
+                                ? 'border-amber-300 bg-amber-50/70'
+                                : 'border-slate-200/80 bg-white/90 hover:border-amber-200'
+                        "
                     >
                         <input
                             :checked="props.selectedShippingOptionId === option.id"
                             type="radio"
                             :value="option.id"
-                            class="mt-1 h-4 w-4 accent-[#cda45e]"
+                            class="accent-accent-500 mt-1 h-4 w-4"
                             @change="emit('update:selectedShippingOptionId', option.id)"
                         />
-                        <span class="min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-900">{{ props.getShippingOptionLabel(option) }}</span>
+                        <span class="min-w-0 flex-1 text-sm leading-6 font-semibold text-slate-900">{{
+                            props.getShippingOptionLabel(option)
+                        }}</span>
                         <span
                             v-if="props.selectedShippingOptionId === option.id"
-                            class="inline-flex min-h-7 items-center rounded-full border border-amber-200 bg-amber-100 px-3 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                            class="text-label-2xs tracking-label inline-flex min-h-7 items-center rounded-full border border-amber-200 bg-amber-100 px-3 font-bold text-amber-900 uppercase"
                         >
                             Selected
                         </span>
@@ -102,7 +116,7 @@ const emit = defineEmits<{
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
                     <button
                         type="button"
-                        class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                         :disabled="props.isRedirectingToOrder"
                         @click="emit('back')"
                     >
@@ -110,11 +124,23 @@ const emit = defineEmits<{
                     </button>
                     <button
                         type="button"
-                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
-                        :disabled="!props.clientSecretValue || props.isShippingLoading || props.isPaymentInitializing || props.isLoading || props.isRedirectingToOrder"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
+                        :disabled="
+                            !props.clientSecretValue ||
+                                props.isShippingLoading ||
+                                props.isPaymentInitializing ||
+                                props.isLoading ||
+                                props.isRedirectingToOrder
+                        "
                         @click="emit('submit')"
                     >
-                        {{ props.isRedirectingToOrder ? "Finishing order..." : props.isLoading || props.isPaymentInitializing ? "Processing..." : "Pay now" }}
+                        {{
+                            props.isRedirectingToOrder
+                                ? "Finishing order..."
+                                : props.isLoading || props.isPaymentInitializing
+                                    ? "Processing..."
+                                    : "Pay now"
+                        }}
                     </button>
                 </div>
             </div>

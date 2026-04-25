@@ -194,12 +194,12 @@ function getProductMeta(product: ProductDTO): string {
             class="fixed inset-x-0 top-0 z-50 h-8 border-b border-white/10 bg-[linear-gradient(90deg,#0f172a_0%,#1e293b_52%,#334155_100%)] text-white"
         >
             <div class="mx-auto flex h-full w-full max-w-7xl items-center justify-between px-4">
-                <p class="truncate text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-100">
+                <p class="text-label-xs tracking-label-tight truncate font-semibold text-slate-100 uppercase">
                     Free shipping on orders over 35 EUR
                 </p>
                 <button
                     type="button"
-                    class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/25"
+                    class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
                     @click="bannerHidden = true"
                 >
                     <span class="sr-only">Dismiss shipping notice</span>
@@ -247,7 +247,7 @@ function getProductMeta(product: ProductDTO): string {
 
                 <div class="flex items-center gap-2">
                     <label class="hidden items-center gap-2 lg:flex">
-                        <span class="hidden items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500 xl:flex">
+                        <span class="hidden items-center gap-1 text-xs font-semibold tracking-wide text-slate-500 uppercase xl:flex">
                             <svg
                                 viewBox="0 0 20 20"
                                 fill="none"
@@ -312,7 +312,7 @@ function getProductMeta(product: ProductDTO): string {
                         </span>
                         <span
                             v-if="isClientHydrated && itemCount"
-                            class="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#cda45e] px-1 text-[11px] font-semibold text-slate-950 ring-2 ring-white"
+                            class="bg-accent-500 absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold text-slate-950 ring-2 ring-white"
                         >
                             {{ itemCount < 99 ? itemCount : "99+" }}
                         </span>
@@ -358,7 +358,7 @@ function getProductMeta(product: ProductDTO): string {
             aria-label="Mobile navigation"
         >
             <div class="site-drawer__inner">
-                <div class="site-drawer__top px-4 pb-4 pt-4">
+                <div class="site-drawer__top px-4 pt-4 pb-4">
                     <div
                         class="mb-4 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.45),rgba(148,163,184,0))]"
                     ></div>
@@ -366,7 +366,7 @@ function getProductMeta(product: ProductDTO): string {
                     <div class="flex items-center justify-between gap-3">
                         <div>
                             <p
-                                class="inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-amber-900"
+                                class="text-label-2xs tracking-label inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 font-semibold text-amber-900 uppercase"
                             >
                                 Navigation
                             </p>
@@ -388,7 +388,7 @@ function getProductMeta(product: ProductDTO): string {
                     <label
                         class="mt-1 block rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_14px_32px_rgba(8,27,90,0.06)]"
                     >
-                        <span class="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Country</span>
+                        <span class="text-label-xs tracking-label mb-2 block font-semibold text-slate-500 uppercase">Country</span>
 
                         <BaseSelect
                             v-if="isClientHydrated"
@@ -469,7 +469,7 @@ function getProductMeta(product: ProductDTO): string {
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <p
-                                    class="inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-amber-900"
+                                    class="text-label-2xs tracking-label inline-flex rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 font-semibold text-amber-900 uppercase"
                                 >
                                     Search
                                 </p>

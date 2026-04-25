@@ -34,17 +34,13 @@ const emit = defineEmits<{
         >
             <span class="grid gap-1">
                 <span class="text-sm font-semibold text-slate-950">Order summary</span>
-                <span class="text-xs uppercase tracking-[0.14em] text-slate-500">
+                <span class="text-xs tracking-label text-slate-500 uppercase">
                     {{ props.itemCount }} item{{ props.itemCount === 1 ? "" : "s" }}
                 </span>
             </span>
             <span class="flex items-center gap-3">
                 <strong class="text-base font-semibold text-slate-950">{{ formatPrice(props.total, props.currencyCode) }}</strong>
-                <span
-                    class="text-slate-500 transition-transform"
-                    :class="props.isOpen ? 'rotate-180' : ''"
-                    aria-hidden="true"
-                >
+                <span class="text-slate-500 transition-transform" :class="props.isOpen ? 'rotate-180' : ''" aria-hidden="true">
                     <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">
                         <path d="m5 7.5 5 5 5-5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
@@ -98,7 +94,7 @@ const emit = defineEmits<{
                     <span>Tax</span>
                     <span class="font-semibold text-slate-950">{{ formatPrice(props.taxTotal, props.currencyCode) }}</span>
                 </div>
-                <div class="flex items-center justify-between gap-3 rounded-[1.15rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+                <div class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                     <span class="text-sm font-semibold text-slate-900">Total</span>
                     <strong class="text-base font-semibold tracking-[-0.02em] text-slate-950">
                         {{ formatPrice(props.total, props.currencyCode) }}
@@ -108,16 +104,19 @@ const emit = defineEmits<{
         </div>
     </section>
 
-    <div v-else class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]">
-        <span class="inline-flex min-h-9 items-center rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+    <div
+        v-else
+        class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]"
+    >
+        <span
+            class="border-brand-100 bg-brand-50 text-brand-700 inline-flex min-h-9 items-center rounded-full border px-4 py-2 text-label-sm font-bold tracking-label uppercase"
+        >
             Order summary
         </span>
-        <h2 class="mt-4 max-w-[11ch] text-[1.85rem] font-semibold leading-[1.02] tracking-[-0.04rem] text-slate-950 sm:text-[2.2rem]">
+        <h2 class="mt-4 max-w-[11ch] text-[1.85rem] leading-[1.02] font-semibold tracking-[-0.04rem] text-slate-950 sm:text-[2.2rem]">
             Everything included in this checkout.
         </h2>
-        <p class="mt-3 text-sm leading-7 text-slate-600">
-            Review items, totals, and delivery costs before payment.
-        </p>
+        <p class="mt-3 text-sm leading-7 text-slate-600">Review items, totals, and delivery costs before payment.</p>
 
         <div class="mt-5 grid gap-4">
             <article
@@ -139,10 +138,7 @@ const emit = defineEmits<{
                     <span class="text-sm leading-6 text-slate-600">Qty {{ item.quantity }}</span>
                 </div>
                 <div class="text-right text-slate-950">
-                    <TaxedLinePrice
-                        :amount-with-tax="props.getAmountWithTax(item)"
-                        :amount-without-tax="props.getAmountWithoutTax(item)"
-                    />
+                    <TaxedLinePrice :amount-with-tax="props.getAmountWithTax(item)" :amount-without-tax="props.getAmountWithoutTax(item)" />
                 </div>
             </article>
         </div>
