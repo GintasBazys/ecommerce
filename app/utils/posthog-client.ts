@@ -29,7 +29,6 @@ export function initPostHogClient(config: PostHogConfig, router: Router): PostHo
             capture_exceptions: true,
             autocapture: false,
             disable_session_recording: true,
-            ip: false
         })
     }
 

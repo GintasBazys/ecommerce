@@ -22,21 +22,21 @@ const storePillars = [
 
 <template>
     <section
-        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] py-[3.25rem] sm:py-14 lg:py-[5.5rem]"
+        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] py-13 sm:py-14 lg:py-22"
     >
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-            <div class="mx-auto max-w-[52.5rem] text-center">
+            <div class="mx-auto max-w-210 text-center">
                 <span
                     class="inline-flex min-h-[2.3rem] items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
                 >
                     Our Store
                 </span>
                 <h2
-                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] font-bold leading-[1] tracking-[-0.05rem] text-slate-950 md:max-w-[15ch] md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98]"
+                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] font-bold leading-none tracking-[-0.05rem] text-slate-950 md:max-w-[15ch] md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98]"
                 >
                     Built for shoppers who want less noise and better decisions.
                 </h2>
-                <p class="mx-auto mt-4 max-w-[47.5rem] text-base leading-7 text-slate-600">
+                <p class="mx-auto mt-4 max-w-190 text-base leading-7 text-slate-600">
                     Our store is designed around clarity: thoughtful products, cleaner browsing, and a checkout flow that removes friction
                     instead of adding it.
                 </p>

@@ -1,7 +1,5 @@
 import { PostHog } from "posthog-node"
 
-import { hasAnalyticsConsent } from "./cookie-consent"
-
 let client: PostHog | null = null
 
 export function useServerPostHog() {

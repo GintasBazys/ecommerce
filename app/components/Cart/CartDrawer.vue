@@ -105,26 +105,23 @@ type PricedCartLineItem = CartLineItemDTO & {
     unit_price?: number | null
 }
 
-const displayTotal = computed<string>(() => {
-    const sum = (cart.value?.items || []).reduce((acc, item) => {
-        const qty = qtyMap[item.id] ?? Number(item.quantity)
-        return acc + qty * Number(item.unit_price)
-    }, 0)
-
-    return formatPrice(sum, cart.value?.currency_code ?? DEFAULT_CURENCY)
-})
-
-const displayTaxTotal = computed<string>(() =>
-    formatPrice(Number(cart.value?.tax_total || 0), cart.value?.currency_code ?? DEFAULT_CURENCY)
-)
-
-function getItemDisplayTotal(item: CartLineItemDTO): string {
+function getItemDisplayTotalAmount(item: CartLineItemDTO): number {
     const pricedItem = item as PricedCartLineItem
     const savedQuantity = Math.max(Number(item.quantity) || 1, 1)
     const desiredQuantity = Math.max(Number(qtyMap[item.id] ?? item.quantity) || 1, 1)
     const unitAmountWithTax = pricedItem.total != null ? Number(pricedItem.total) / savedQuantity : Number(pricedItem.unit_price ?? 0)
 
-    return formatPrice(unitAmountWithTax * desiredQuantity, cart.value?.currency_code ?? DEFAULT_CURENCY)
+    return unitAmountWithTax * desiredQuantity
+}
+
+const hasCartItems = computed<boolean>(() => Boolean(cart.value?.items?.length))
+const displaySubtotalAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.subtotal || 0) : 0))
+const displayTaxAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.tax_total || 0) : 0))
+const displaySubtotal = computed<string>(() => formatPrice(displaySubtotalAmount.value, cart.value?.currency_code ?? DEFAULT_CURENCY))
+const displayTaxTotal = computed<string>(() => formatPrice(displayTaxAmount.value, cart.value?.currency_code ?? DEFAULT_CURENCY))
+
+function getItemDisplayTotal(item: CartLineItemDTO): string {
+    return formatPrice(getItemDisplayTotalAmount(item), cart.value?.currency_code ?? DEFAULT_CURENCY)
 }
 
 async function removeItem(lineItemId: string): Promise<void> {
@@ -414,7 +411,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                         >
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm text-slate-600">Subtotal</span>
-                                <strong class="text-sm text-slate-950">{{ displayTotal }}</strong>
+                                <strong class="text-sm text-slate-950">{{ displaySubtotal }}</strong>
                             </div>
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm text-slate-600">Tax</span>

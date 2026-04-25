@@ -8,6 +8,7 @@ import CategoryHero from "~/components/Category/CategoryHero.vue"
 import CategoryPagination from "~/components/Category/CategoryPagination.vue"
 import CategoryResultsGrid from "~/components/Category/CategoryResultsGrid.vue"
 import CategoryToolbar from "~/components/Category/CategoryToolbar.vue"
+import NotFoundPageContent from "~/components/Shared/NotFoundPageContent.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 definePageMeta({ layout: "default" })
@@ -17,11 +18,13 @@ const ALL_PRODUCTS_DESCRIPTION =
     "Browse the full product catalog with category filters, sorting, and clear paginated navigation across every listing page."
 
 const route = useRoute()
+const event = useRequestEvent()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { absoluteUrl } = useSiteIdentity()
 
 const disablePanelTransitions = ref(false)
 const isMobileFilterDrawerOpen = ref(false)
+const notFoundPath = ref<string | null>(null)
 const productsStartRef = ref<HTMLElement | null>(null)
 const category = ref<ProductCategoryDTO | null>(null)
 const isAllProductsPage = computed(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
@@ -86,11 +89,6 @@ const basePageDescription = computed<string>(() => (isAllProductsPage.value ? AL
 const sidebarTitle = computed<string>(() => (isAllProductsPage.value ? "Refine every product" : "Refine this category"))
 const emptyStateText = computed<string>(() => "Try clearing some filters or adjusting the selected price range.")
 const heroEyebrow = computed<string>(() => (isAllProductsPage.value ? "Store catalog" : "Category"))
-const browsingNotes = computed<string[]>(() => [
-    isAllProductsPage.value ? "Full catalog with live Medusa filters" : "Focused category view with live inventory and pricing",
-    "Two products per row on mobile for faster scanning",
-    activeFilterCount.value ? `${activeFilterCount.value} active filters applied` : "Sort and filters stay available in this pass"
-])
 const currentListingPath = computed<string>(() => {
     if (currentPage.value <= 1) {
         return categoryPath.value
@@ -118,7 +116,7 @@ const metaDescription = computed<string>(() => {
 const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: pageHeading.value }])
 
 const collectionSchema = computed<SchemaNode | null>(() => {
-    if (!pageHeading.value) {
+    if (notFoundPath.value || !pageHeading.value) {
         return null
     }
 
@@ -144,31 +142,44 @@ const collectionSchema = computed<SchemaNode | null>(() => {
 })
 
 const breadcrumbSchema = computed<SchemaNode | null>(() =>
-    createBreadcrumbSchema(
-        [
-            { name: "Home", path: "/" },
-            { name: pageHeading.value, path: categoryPath.value }
-        ],
-        absoluteUrl
-    )
+    notFoundPath.value
+        ? null
+        : createBreadcrumbSchema(
+              [
+                  { name: "Home", path: "/" },
+                  { name: pageHeading.value, path: categoryPath.value }
+              ],
+              absoluteUrl
+          )
 )
+
+function markNotFound() {
+    notFoundPath.value = route.fullPath
+
+    if (event) {
+        setResponseStatus(event, 404)
+    }
+}
 
 async function loadCategoryPage() {
     isChangingCategoryPage.value = true
+    notFoundPath.value = null
     category.value = null
     resetCategoryPageState()
     applyQueryStateFromRoute(route.query)
 
     if (!isAllProductsPage.value) {
-        const { data } = await useFetch<ProductCategoryDTO | null>(() => `/api/categories/${String(route.params.slug || "")}`)
-
-        if (!data.value) {
-            isChangingCategoryPage.value = false
-            await navigateTo("/page-not-found")
-            return
+        try {
+            category.value = await $fetch<ProductCategoryDTO | null>(`/api/categories/${String(route.params.slug || "")}`)
+        } catch {
+            category.value = null
         }
 
-        category.value = data.value
+        if (!category.value) {
+            markNotFound()
+            isChangingCategoryPage.value = false
+            return
+        }
     }
 
     try {
@@ -181,6 +192,16 @@ async function loadCategoryPage() {
 await loadCategoryPage()
 
 useHead(() => {
+    if (notFoundPath.value) {
+        return {
+            title: "404 | Ecommerce",
+            meta: [
+                { name: "description", content: "The requested page could not be found. Continue browsing current products and active storefront pages." },
+                { name: "robots", content: "noindex,follow" }
+            ]
+        }
+    }
+
     const links: { rel: string; href: string }[] = [{ rel: "canonical", href: absoluteUrl(canonicalPath.value) }]
 
     if (!hasFacetedQuery.value && totalPages.value > 1) {
@@ -252,14 +273,14 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 </script>
 
 <template>
-    <section class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]">
+    <NotFoundPageContent v-if="notFoundPath" :requested-path="notFoundPath" />
+    <section v-else class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]">
         <CategoryHero
             :breadcrumb-items="breadcrumbItems"
             :hero-eyebrow="heroEyebrow"
             :page-heading="pageHeading"
             :description="basePageDescription"
             :hero-image="heroImage"
-            :browsing-notes="browsingNotes"
             :is-all-products-page="isAllProductsPage"
         />
 

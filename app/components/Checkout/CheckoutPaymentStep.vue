@@ -10,6 +10,7 @@ const props = defineProps<{
     clientSecretValue: string | null
     isPaymentInitializing: boolean
     isLoading: boolean
+    isRedirectingToOrder: boolean
     getShippingOptionLabel: (_option: ShippingOption) => string
 }>()
 
@@ -23,12 +24,12 @@ const emit = defineEmits<{
 <template>
     <section class="grid gap-4">
         <div>
-            <span class="inline-flex min-h-9 items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700">
+            <span class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900">
                 Step 3
             </span>
             <h2
                 class="mt-4 text-[1.9rem] font-semibold leading-[1.03] tracking-[-0.04rem]"
-                :class="props.currentStep === 'payment' ? 'text-brand-700' : 'text-slate-950'"
+                :class="props.currentStep === 'payment' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Shipping and payment
             </h2>
@@ -48,8 +49,8 @@ const emit = defineEmits<{
             Shipping options and payment will appear after the address step is saved.
         </div>
 
-        <div v-else class="grid gap-5 rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6 xl:grid-cols-2">
-            <div class="grid gap-4">
+        <div v-else class="grid gap-5 rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6 xl:grid-cols-2 xl:items-start">
+            <div class="grid content-start gap-4">
                 <div>
                     <h3 class="text-base font-semibold text-slate-950">Shipping method</h3>
                     <p class="mt-1 text-sm leading-6 text-slate-600">Select the option that best fits this order.</p>
@@ -64,43 +65,56 @@ const emit = defineEmits<{
                     <label
                         v-for="option in props.shippingOptions"
                         :key="option.id"
-                        class="flex items-start gap-3 rounded-[1.2rem] border px-4 py-4 transition"
-                        :class="props.selectedShippingOptionId === option.id ? 'border-brand-300 bg-brand-50/70' : 'border-slate-200/80 bg-white/90'"
+                        class="flex self-start items-center gap-3 rounded-[1.2rem] border px-4 py-4 transition"
+                        :class="props.selectedShippingOptionId === option.id ? 'border-amber-300 bg-amber-50/70' : 'border-slate-200/80 bg-white/90 hover:border-amber-200'"
                     >
                         <input
                             :checked="props.selectedShippingOptionId === option.id"
                             type="radio"
                             :value="option.id"
-                            class="mt-1 h-4 w-4 accent-brand-700"
+                            class="mt-1 h-4 w-4 accent-[#cda45e]"
                             @change="emit('update:selectedShippingOptionId', option.id)"
                         />
-                        <span class="text-sm font-semibold leading-6 text-slate-900">{{ props.getShippingOptionLabel(option) }}</span>
+                        <span class="min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-900">{{ props.getShippingOptionLabel(option) }}</span>
+                        <span
+                            v-if="props.selectedShippingOptionId === option.id"
+                            class="inline-flex min-h-7 items-center rounded-full border border-amber-200 bg-amber-100 px-3 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-amber-900"
+                        >
+                            Selected
+                        </span>
                     </label>
                 </div>
 
                 <p v-else class="text-sm leading-7 text-slate-600">No shipping options are available for this address yet.</p>
             </div>
 
-            <div class="grid gap-4">
+            <div class="grid content-start gap-4">
                 <div>
                     <h3 class="text-base font-semibold text-slate-950">Payment details</h3>
                     <p class="mt-1 text-sm leading-6 text-slate-600">Your payment is confirmed securely before the order is completed.</p>
                 </div>
 
-                <div class="rounded-[1.2rem] border border-slate-200/80 bg-white/90 p-4">
+                <div class="rounded-[1.2rem] border border-slate-200/80 bg-white/90 p-4 sm:p-5">
                     <div id="link-authentication-element"></div>
                     <div id="payment-element" class="mt-4"></div>
                 </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-                    <button type="button" class="ui-btn-secondary px-6" @click="emit('back')">Back</button>
                     <button
                         type="button"
-                        class="ui-btn-primary px-6"
-                        :disabled="!props.clientSecretValue || props.isShippingLoading || props.isPaymentInitializing || props.isLoading"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200"
+                        :disabled="props.isRedirectingToOrder"
+                        @click="emit('back')"
+                    >
+                        Back
+                    </button>
+                    <button
+                        type="button"
+                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        :disabled="!props.clientSecretValue || props.isShippingLoading || props.isPaymentInitializing || props.isLoading || props.isRedirectingToOrder"
                         @click="emit('submit')"
                     >
-                        {{ props.isLoading || props.isPaymentInitializing ? "Processing..." : "Pay now" }}
+                        {{ props.isRedirectingToOrder ? "Finishing order..." : props.isLoading || props.isPaymentInitializing ? "Processing..." : "Pay now" }}
                     </button>
                 </div>
             </div>

@@ -51,9 +51,9 @@ const emit = defineEmits<{
                 </button>
                 <label class="grid gap-1 text-sm font-semibold text-slate-700">
                     <span>Sort by</span>
-                    <div class="w-full sm:min-w-60 lg:max-w-68">
+                    <span class="w-full sm:min-w-60 lg:max-w-68">
                         <BaseSelect v-model="sortOption" :options="props.sortOptions" option-label-key="text" :disabled="props.loading" />
-                    </div>
+                    </span>
                 </label>
             </div>
         </div>

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { BlogPostsResponse } from "~/types/blog"
 
+import BlogCard from "~/components/Blog/BlogCard.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 
 const { data: latestPostsData, error: latestPostsError } = await useAsyncData("latest-blog-posts", () =>
     $fetch<BlogPostsResponse>("/api/blog/posts", {
-        params: {
+        query: {
             limit: 3,
             offset: 0
         }

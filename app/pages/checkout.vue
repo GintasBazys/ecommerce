@@ -18,7 +18,23 @@ useHead({ title: "Checkout | Ecommerce" })
 
 type CheckoutStep = "account" | "address" | "payment"
 type AuthTab = "login" | "register" | "guest"
-type CheckoutCart = CartDTO & { email?: string | null }
+type EditableAddressField =
+    | "first_name"
+    | "last_name"
+    | "address_1"
+    | "address_2"
+    | "city"
+    | "province"
+    | "postal_code"
+    | "country_code"
+    | "phone"
+type CheckoutCartShippingMethod = {
+    shipping_option_id?: string | null
+}
+type CheckoutCart = CartDTO & {
+    email?: string | null
+    shipping_methods?: CheckoutCartShippingMethod[] | null
+}
 type PricedCartLineItem = CartLineItemDTO & {
     subtotal?: number | null
     total?: number | null
@@ -51,6 +67,7 @@ const isBooting = ref<boolean>(true)
 const isSubmitting = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
+const isRedirectingToOrder = ref<boolean>(false)
 const isShippingLoading = ref<boolean>(true)
 const isPaymentInitializing = ref<boolean>(false)
 const isCheckoutActive = ref<boolean>(true)
@@ -169,6 +186,13 @@ let elements: StripeElements | null = null
 let paymentElement: StripePaymentElement | null = null
 let linkAuthElement: StripeLinkAuthenticationElement | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
+let shippingOptionsRequest: Promise<void> | null = null
+let shippingOptionsRequestCartId = ""
+let shippingMethodRequest: Promise<void> | null = null
+let shippingMethodRequestContext = ""
+let paymentIntentRequest: Promise<void> | null = null
+let paymentIntentRequestSignature = ""
+let refreshCheckoutRequest: Promise<void> | null = null
 
 const clientSecretValue = ref<string | null>(null)
 const shippingOptions = ref<ShippingOption[]>([])
@@ -348,6 +372,14 @@ function applyAddress(target: Address, source?: Partial<Address> | null): void {
     target.company = source?.company ?? ""
 }
 
+function updateBillingAddressField(payload: { field: EditableAddressField; value: string }): void {
+    billingAddress[payload.field] = payload.value
+}
+
+function updateShippingAddressField(payload: { field: EditableAddressField; value: string }): void {
+    shippingAddress[payload.field] = payload.value
+}
+
 function getAddressComparisonSignature(address?: Partial<Address> | null): string {
     return JSON.stringify({
         first_name: address?.first_name ?? "",
@@ -395,10 +427,21 @@ function getPaymentSignature(): string {
     return `${cartFingerprint.value}|${selectedShippingOptionId.value ?? ""}`
 }
 
+function getPersistedShippingOptionId(currentCart: CheckoutCart | null): string | null {
+    return currentCart?.shipping_methods?.[0]?.shipping_option_id ?? null
+}
+
 function clearPaymentState(): void {
     clientSecretValue.value = null
     lastPaymentSignature.value = ""
     lastAppliedShippingContext.value = ""
+    shippingOptionsRequest = null
+    shippingOptionsRequestCartId = ""
+    shippingMethodRequest = null
+    shippingMethodRequestContext = ""
+    paymentIntentRequest = null
+    paymentIntentRequestSignature = ""
+    refreshCheckoutRequest = null
 
     if (debounceTimer) {
         clearTimeout(debounceTimer)
@@ -421,27 +464,55 @@ async function loadShippingOptions(): Promise<void> {
         return
     }
 
+    const cartId = checkoutCart.value.id
+
+    if (shippingOptionsRequest && shippingOptionsRequestCartId === cartId) {
+        await shippingOptionsRequest
+        return
+    }
+
     isShippingLoading.value = true
 
-    try {
-        const data = await $fetch<ShippingOptionsPayload>("/api/orders/shipping-options", {
-            method: "POST",
-            credentials: "include",
-            body: {
-                cart_id: checkoutCart.value.id
+    shippingOptionsRequestCartId = cartId
+    shippingOptionsRequest = (async () => {
+        try {
+            const data = await $fetch<ShippingOptionsPayload>("/api/orders/shipping-options", {
+                method: "POST",
+                credentials: "include",
+                body: {
+                    cart_id: cartId
+                }
+            })
+
+            const options = Array.isArray(data) ? data : (data.shipping_options ?? [])
+
+            if (checkoutCart.value?.id !== cartId) {
+                return
             }
-        })
 
-        const options = Array.isArray(data) ? data : (data.shipping_options ?? [])
+            shippingOptions.value = options
 
-        shippingOptions.value = options
-        selectedShippingOptionId.value ||= options[0]?.id ?? null
-    } catch (error) {
-        console.error("Failed to load shipping options:", error)
-        errorMessage.value = "Could not load shipping options"
-    } finally {
-        isShippingLoading.value = false
-    }
+            const persistedShippingOptionId = getPersistedShippingOptionId(checkoutCart.value)
+            const nextSelectedShippingOptionId = options.some((option) => option.id === selectedShippingOptionId.value)
+                ? selectedShippingOptionId.value
+                : persistedShippingOptionId
+
+            selectedShippingOptionId.value = options.some((option) => option.id === nextSelectedShippingOptionId)
+                ? nextSelectedShippingOptionId
+                : null
+        } catch (error) {
+            console.error("Failed to load shipping options:", error)
+            errorMessage.value = "Could not load shipping options"
+        } finally {
+            if (shippingOptionsRequestCartId === cartId) {
+                shippingOptionsRequest = null
+                shippingOptionsRequestCartId = ""
+                isShippingLoading.value = false
+            }
+        }
+    })()
+
+    await shippingOptionsRequest
 }
 
 async function updateShippingOption(): Promise<void> {
@@ -454,17 +525,34 @@ async function updateShippingOption(): Promise<void> {
         return
     }
 
-    await $fetch("/api/orders/shipping-methods", {
-        method: "POST",
-        credentials: "include",
-        body: {
-            cart_id: checkoutCart.value.id,
-            option_id: selectedShippingOptionId.value
-        }
-    })
+    if (shippingMethodRequest && shippingMethodRequestContext === context) {
+        await shippingMethodRequest
+        return
+    }
 
-    lastAppliedShippingContext.value = context
-    await cartStore.loadCart()
+    shippingMethodRequestContext = context
+    shippingMethodRequest = (async () => {
+        await $fetch("/api/orders/shipping-methods", {
+            method: "POST",
+            credentials: "include",
+            body: {
+                cart_id: checkoutCart.value?.id,
+                option_id: selectedShippingOptionId.value
+            }
+        })
+
+        lastAppliedShippingContext.value = context
+        await cartStore.loadCart()
+    })()
+
+    try {
+        await shippingMethodRequest
+    } finally {
+        if (shippingMethodRequestContext === context) {
+            shippingMethodRequest = null
+            shippingMethodRequestContext = ""
+        }
+    }
 }
 
 async function ensureElements(secret: string): Promise<void> {
@@ -510,23 +598,41 @@ async function createOrUpdatePaymentIntent(): Promise<void> {
         return
     }
 
-    const payload = await $fetch<CreatePaymentIntentPayload>("/api/orders/create-payment-intent", {
-        method: "POST",
-        credentials: "include",
-        body: {
-            cartId: checkoutCart.value.id,
-            shippingOptionId: selectedShippingOptionId.value
-        }
-    })
-
-    const secret = payload.clientSecret ?? payload.client_secret
-
-    if (!secret) {
+    const signature = getPaymentSignature()
+    if (paymentIntentRequest && paymentIntentRequestSignature === signature) {
+        await paymentIntentRequest
         return
     }
 
-    clientSecretValue.value = secret
-    await ensureElements(secret)
+    paymentIntentRequestSignature = signature
+    paymentIntentRequest = (async () => {
+        const payload = await $fetch<CreatePaymentIntentPayload>("/api/orders/create-payment-intent", {
+            method: "POST",
+            credentials: "include",
+            body: {
+                cartId: checkoutCart.value?.id,
+                shippingOptionId: selectedShippingOptionId.value
+            }
+        })
+
+        const secret = payload.clientSecret ?? payload.client_secret
+
+        if (!secret) {
+            return
+        }
+
+        clientSecretValue.value = secret
+        await ensureElements(secret)
+    })()
+
+    try {
+        await paymentIntentRequest
+    } finally {
+        if (paymentIntentRequestSignature === signature) {
+            paymentIntentRequest = null
+            paymentIntentRequestSignature = ""
+        }
+    }
 }
 
 async function refreshCheckout(): Promise<void> {
@@ -534,19 +640,29 @@ async function refreshCheckout(): Promise<void> {
         return
     }
 
+    if (refreshCheckoutRequest) {
+        await refreshCheckoutRequest
+        return
+    }
+
     isPaymentInitializing.value = true
 
-    try {
-        await updateShippingOption()
-        const signature = getPaymentSignature()
+    refreshCheckoutRequest = (async () => {
+        try {
+            await updateShippingOption()
+            const signature = getPaymentSignature()
 
-        if (signature !== lastPaymentSignature.value) {
-            await createOrUpdatePaymentIntent()
-            lastPaymentSignature.value = signature
+            if (signature !== lastPaymentSignature.value) {
+                await createOrUpdatePaymentIntent()
+                lastPaymentSignature.value = signature
+            }
+        } finally {
+            isPaymentInitializing.value = false
+            refreshCheckoutRequest = null
         }
-    } finally {
-        isPaymentInitializing.value = false
-    }
+    })()
+
+    await refreshCheckoutRequest
 }
 
 function scheduleRefresh(): void {
@@ -741,8 +857,6 @@ async function handleSubmit(): Promise<void> {
 }
 
 async function completeCart(): Promise<void> {
-    isCheckoutActive.value = false
-
     const payload = await $fetch<CompleteCartPayload>("/api/cart/complete-cart", {
         method: "POST",
         credentials: "include",
@@ -755,10 +869,11 @@ async function completeCart(): Promise<void> {
     const orderId = payload.order?.id
 
     if (orderId) {
+        isRedirectingToOrder.value = true
         guestCheckoutEmailCookie.value = null
         hasExplicitGuestIdentity.value = false
-        await createNewCart(cartStore)
         await router.push({ name: "order-completed", query: { orderId } })
+        await createNewCart(cartStore)
     }
 }
 
@@ -801,6 +916,8 @@ onMounted(async () => {
 
         if (currentStep.value === "payment" && addressCompleted.value) {
             await loadShippingOptions()
+            await nextTick()
+            await refreshCheckout()
         }
     } catch (error) {
         console.error("Checkout boot failed:", error)
@@ -861,7 +978,7 @@ watch(
             await loadShippingOptions()
         }
 
-        scheduleRefresh()
+        await refreshCheckout()
     }
 )
 </script>
@@ -969,8 +1086,8 @@ watch(
                                 :countries="regionCountries"
                                 :is-submitting="isSubmitting"
                                 @update:use-separate-shipping="useSeparateShipping = $event"
-                                @update:billing-field="billingAddress[$event.field] = $event.value"
-                                @update:shipping-field="shippingAddress[$event.field] = $event.value"
+                                @update:billing-field="updateBillingAddressField"
+                                @update:shipping-field="updateShippingAddressField"
                                 @back="currentStep = 'account'"
                                 @submit="submitAddresses"
                             />
@@ -984,6 +1101,7 @@ watch(
                                 :client-secret-value="clientSecretValue"
                                 :is-payment-initializing="isPaymentInitializing"
                                 :is-loading="isLoading"
+                                :is-redirecting-to-order="isRedirectingToOrder"
                                 :get-shipping-option-label="getShippingOptionLabel"
                                 @update:selected-shipping-option-id="selectedShippingOptionId = $event"
                                 @back="currentStep = 'address'"

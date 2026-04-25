@@ -4,6 +4,11 @@ import NotFoundPageContent from "~/components/Shared/NotFoundPageContent.vue"
 const route = useRoute()
 const event = useRequestEvent()
 
+const requestedPath = computed(() => {
+    const source = route.query.from
+    return typeof source === "string" && source.trim() ? source : route.path
+})
+
 if (event) {
     setResponseStatus(event, 404)
 }
@@ -15,5 +20,5 @@ useHead({
 </script>
 
 <template>
-    <NotFoundPageContent :requested-path="route.path" />
+    <NotFoundPageContent :requested-path="requestedPath" />
 </template>

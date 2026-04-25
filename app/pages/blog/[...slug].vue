@@ -2,6 +2,8 @@
 import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogPost, BlogPostResponse, BlogPostsResponse } from "~/types/blog"
 
+import BlogCard from "~/components/Blog/BlogCard.vue"
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 import { formatDate } from "~/utils/formatDate"

@@ -14,6 +14,17 @@ type AddressErrors = {
     phone: string
 }
 
+type EditableAddressField =
+    | "first_name"
+    | "last_name"
+    | "address_1"
+    | "address_2"
+    | "city"
+    | "province"
+    | "postal_code"
+    | "country_code"
+    | "phone"
+
 type CountryOption = {
     iso_2: string
     display_name?: string
@@ -34,8 +45,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     "update:useSeparateShipping": [value: boolean]
-    "update:billingField": [payload: { field: keyof Address; value: string }]
-    "update:shippingField": [payload: { field: keyof Address; value: string }]
+    "update:billingField": [payload: { field: EditableAddressField; value: string }]
+    "update:shippingField": [payload: { field: EditableAddressField; value: string }]
     back: []
     submit: []
 }>()

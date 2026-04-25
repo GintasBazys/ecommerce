@@ -67,16 +67,20 @@ const isCartDirty = computed<boolean>(() => Object.entries(qtyMap).some(([id, qt
 const hasCartItems = computed<boolean>(() => Boolean(cart.value?.items?.length))
 const isUpdatingCart = computed<boolean>(() => Object.values(updating).some(Boolean))
 const trimmedCouponCode = computed<string>(() => couponCode.value.trim())
-const isCheckoutDisabled = computed<boolean>(() => !hasCartItems.value || isCartDirty.value || Number(cart.value?.total) <= 0)
+const displayShippingAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.shipping_total || 0) : 0))
+const displaySubtotalAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.subtotal || 0) : 0))
+const displayTaxAmount = computed<number>(() => (hasCartItems.value ? Number(cart.value?.tax_total || 0) : 0))
+const displayTotalAmount = computed<number>(() => Math.max(0, hasCartItems.value ? Number(cart.value?.total || 0) - displayShippingAmount.value : 0))
+const isCheckoutDisabled = computed<boolean>(() => !hasCartItems.value || isCartDirty.value || displayTotalAmount.value <= 0)
 const isCouponDisabled = computed<boolean>(
     () => !hasCartItems.value || isCartDirty.value || isApplyingCoupon.value || !trimmedCouponCode.value
 )
 const currencyCode = computed<string>(() => cart.value?.currency_code ?? DEFAULT_CURENCY)
 const cartItemCount = computed<number>(() => (cart.value?.items ?? []).reduce((total, item) => total + Number(item.quantity || 0), 0))
 const appliedPromotionCount = computed<number>(() => cart.value?.promotions?.length ?? 0)
-const displaySubtotal = computed<string>(() => formatPrice(Number(cart.value?.subtotal || 0), currencyCode.value))
-const displayTax = computed<string>(() => formatPrice(Number(cart.value?.tax_total || 0), currencyCode.value))
-const displayTotal = computed<string>(() => formatPrice(Number(cart.value?.total || 0), currencyCode.value))
+const displaySubtotal = computed<string>(() => formatPrice(displaySubtotalAmount.value, currencyCode.value))
+const displayTax = computed<string>(() => formatPrice(displayTaxAmount.value, currencyCode.value))
+const displayTotal = computed<string>(() => formatPrice(displayTotalAmount.value, currencyCode.value))
 const couponHint = computed<string>(() => {
     if (!hasCartItems.value) {
         return "Add an item to your cart to unlock promo codes."

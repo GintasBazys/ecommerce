@@ -18,11 +18,11 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 <template>
     <section
         v-if="products?.length"
-        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(212,175,55,0.12),transparent_22%),linear-gradient(180deg,#fcfdff_0%,#f6f8fc_100%)] py-[4rem] sm:py-18 lg:py-24"
+        class="overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(212,175,55,0.12),transparent_22%),linear-gradient(180deg,#fcfdff_0%,#f6f8fc_100%)] py-16 sm:py-18 lg:py-24"
     >
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-                <div class="max-w-[46rem]">
+                <div class="max-w-184">
                     <span
                         class="inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-amber-900"
                     >
@@ -34,7 +34,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
                         Fresh arrivals with a more
                         <span class="font-medium italic text-[#8a6a2f]">editorial rhythm</span>
                     </h2>
-                    <p class="mt-4 max-w-[42rem] text-[1rem] leading-8 text-slate-700">
+                    <p class="mt-4 max-w-2xl text-[1rem] leading-8 text-slate-700">
                         Browse newly added deals and current promotions in a calmer premium rail that feels easier to scan across mobile and
                         desktop.
                     </p>
@@ -50,10 +50,10 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
             <div class="relative mt-9">
                 <div
-                    class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-gradient-to-r from-[#f8fafc] to-transparent lg:block"
+                    class="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-linear-to-r from-[#f8fafc] to-transparent lg:block"
                 ></div>
                 <div
-                    class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-gradient-to-l from-[#f6f8fc] to-transparent lg:block"
+                    class="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-linear-to-l from-[#f6f8fc] to-transparent lg:block"
                 ></div>
 
                 <div

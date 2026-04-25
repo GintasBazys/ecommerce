@@ -14,6 +14,17 @@ type AddressErrors = {
     phone: string
 }
 
+type EditableAddressField =
+    | "first_name"
+    | "last_name"
+    | "address_1"
+    | "address_2"
+    | "city"
+    | "province"
+    | "postal_code"
+    | "country_code"
+    | "phone"
+
 type CountryOption = {
     iso_2: string
     display_name?: string
@@ -31,7 +42,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    "update:field": [payload: { field: keyof Address; value: string }]
+    "update:field": [payload: { field: EditableAddressField; value: string }]
 }>()
 
 const countryOptions = computed(() => [

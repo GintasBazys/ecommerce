@@ -19,21 +19,21 @@ const approachSteps = [
 
 <template>
     <section
-        class="overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(0,128,255,0.1),transparent_26%),linear-gradient(180deg,#ffffff_0%,#f6f9ff_100%)] py-[3.25rem] sm:py-14 lg:py-[5.5rem]"
+        class="overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(0,128,255,0.1),transparent_26%),linear-gradient(180deg,#ffffff_0%,#f6f9ff_100%)] py-13 sm:py-14 lg:py-22"
     >
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-            <div class="mx-auto mb-8 max-w-[53.75rem] text-center">
+            <div class="mx-auto mb-8 max-w-215 text-center">
                 <span
                     class="inline-flex min-h-[2.3rem] items-center rounded-full bg-brand-100 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-brand-700"
                 >
                     Our Approach
                 </span>
                 <h2
-                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] font-bold leading-[1] tracking-[-0.05rem] text-slate-950 md:max-w-[25rem] md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98] lg:max-w-[50rem]"
+                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] font-bold leading-none tracking-[-0.05rem] text-slate-950 md:max-w-100 md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98] lg:max-w-200"
                 >
                     A practical framework that keeps quality high and experience simple.
                 </h2>
-                <p class="mx-auto mt-4 max-w-[48.75rem] text-base leading-7 text-slate-600">
+                <p class="mx-auto mt-4 max-w-195 text-base leading-7 text-slate-600">
                     The way we operate is straightforward: curate better, communicate clearly, and keep every step from product discovery to
                     post-purchase support easy to trust.
                 </p>
@@ -47,7 +47,7 @@ const approachSteps = [
                         width="1800"
                         height="1200"
                         format="webp"
-                        class="max-h-[420px] w-full rounded-[1.35rem] object-cover lg:h-full lg:max-h-none"
+                        class="max-h-105 w-full rounded-[1.35rem] object-cover lg:h-full lg:max-h-none"
                     />
                 </div>
 
