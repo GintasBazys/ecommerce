@@ -8,3 +8,21 @@
         font-family: "Archivo", sans-serif;
     }
 }
+
+@layer components {
+    .ui-icon-btn {
+        @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-brand-300 hover:text-brand-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-300;
+    }
+
+    .ui-btn-primary {
+        @apply inline-flex min-h-11 items-center justify-center rounded-full bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .ui-btn-secondary {
+        @apply inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:border-brand-300 hover:text-brand-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .ui-input {
+        @apply h-11 w-full rounded-full border border-slate-300 bg-white px-4 text-sm text-slate-800 outline-hidden transition placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+    }
+}
