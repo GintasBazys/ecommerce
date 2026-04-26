@@ -196,9 +196,14 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                         <label class="grid gap-2">
                             <span class="text-sm font-semibold text-slate-900">Email</span>
                             <input
+                                id="checkout-login-email"
+                                name="email"
                                 :value="props.loginEmail"
                                 type="email"
                                 autocomplete="email"
+                                inputmode="email"
+                                autocapitalize="none"
+                                spellcheck="false"
                                 class="ui-input rounded-2xl"
                                 :class="props.loginErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:loginEmail', getInputValue($event))"
@@ -211,6 +216,8 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                         <label class="grid gap-2">
                             <span class="text-sm font-semibold text-slate-900">Password</span>
                             <input
+                                id="checkout-login-password"
+                                name="password"
                                 :value="props.loginPassword"
                                 type="password"
                                 autocomplete="current-password"
@@ -253,6 +260,8 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                         <label class="grid gap-2">
                             <span class="text-sm font-semibold text-slate-900">First name</span>
                             <input
+                                id="checkout-first-name"
+                                name="given-name"
                                 :value="props.regFirstName"
                                 type="text"
                                 autocomplete="given-name"
@@ -268,6 +277,8 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                         <label class="grid gap-2">
                             <span class="text-sm font-semibold text-slate-900">Last name</span>
                             <input
+                                id="checkout-last-name"
+                                name="family-name"
                                 :value="props.regLastName"
                                 type="text"
                                 autocomplete="family-name"
@@ -284,9 +295,14 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     <label class="grid gap-2">
                         <span class="text-sm font-semibold text-slate-900">Email</span>
                         <input
+                            id="checkout-register-email"
+                            name="email"
                             :value="props.regEmail"
                             type="email"
                             autocomplete="email"
+                            inputmode="email"
+                            autocapitalize="none"
+                            spellcheck="false"
                             class="ui-input rounded-2xl"
                             :class="props.registerErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:regEmail', getInputValue($event))"
@@ -299,6 +315,8 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     <label class="grid gap-2">
                         <span class="text-sm font-semibold text-slate-900">Password</span>
                         <input
+                            id="checkout-register-password"
+                            name="new-password"
                             :value="props.regPassword"
                             type="password"
                             autocomplete="new-password"
@@ -343,9 +361,14 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                     <label class="grid gap-2">
                         <span class="text-sm font-semibold text-slate-900">Email</span>
                         <input
+                            id="checkout-guest-email"
+                            name="email"
                             :value="props.guestEmail"
                             type="email"
                             autocomplete="email"
+                            inputmode="email"
+                            autocapitalize="none"
+                            spellcheck="false"
                             class="ui-input rounded-2xl"
                             :class="props.guestErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:guestEmail', getInputValue($event))"

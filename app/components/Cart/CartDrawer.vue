@@ -11,7 +11,7 @@ const { cart, openCartDrawer, recoveryMessage } = storeToRefs(cartStore)
 const { removeLineItem, updateLineItem, clearRecoveryMessage } = cartStore
 const posthog = usePostHog()
 
-const isHydrated = ref(false)
+const isHydrated = ref<boolean>(false)
 const drawerRef = ref<HTMLElement | null>(null)
 const closeButtonRef = ref<HTMLButtonElement | null>(null)
 const titleId = useId()

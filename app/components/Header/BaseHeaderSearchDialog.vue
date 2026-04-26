@@ -18,11 +18,11 @@ const emit = defineEmits<{
 }>()
 
 const searchInputRef = ref<HTMLInputElement | null>(null)
-const searchQuery = ref("")
-const searchLoading = ref(false)
+const searchQuery = ref<string>("")
+const searchLoading = ref<boolean>(false)
 const searchResults = ref<ProductDTO[]>([])
-const searchHasSearched = ref(false)
-const normalizedSearchQuery = computed(() => searchQuery.value.trim())
+const searchHasSearched = ref<boolean>(false)
+const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
 
 const runSearch = debounce(async (value: string) => {
     if (value.length < 3) {

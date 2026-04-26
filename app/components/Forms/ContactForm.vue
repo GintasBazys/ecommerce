@@ -26,11 +26,11 @@ const runtimeConfig = useRuntimeConfig()
 const turnstileSiteKey = computed(() => String(runtimeConfig.public.TURNSTILE_SITE_KEY || ""))
 const widgetContainer = ref<HTMLElement | null>(null)
 const widgetId = ref<string | null>(null)
-const turnstileToken = ref("")
+const turnstileToken = ref<string>("")
 
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
-const loading = ref(false)
+const loading = ref<boolean>(false)
 const formSubject = useState<string>("contact-form-subject", () => "New submission")
 
 const form = reactive<ContactFormState>({

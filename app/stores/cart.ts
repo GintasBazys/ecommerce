@@ -10,10 +10,10 @@ interface CartResponseInterface {
 
 export const useCartStore = defineStore("cart", () => {
     const cart = ref<MedusaCart>()
-    const openCartDrawer = ref(false)
+    const openCartDrawer = ref<boolean>(false)
     const recoveryMessage = ref<string | null>(null)
 
-    const isUpdatingCart = ref(false)
+    const isUpdatingCart = ref<boolean>(false)
 
     let mutationChain: Promise<void> = Promise.resolve()
     let activeMutations = 0

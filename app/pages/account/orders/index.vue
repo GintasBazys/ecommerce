@@ -19,8 +19,8 @@ definePageMeta({
 useHead({ title: "Orders | Medusa Commerce" })
 
 const runtimeConfig = useRuntimeConfig()
-const page = ref(1)
-const perPage = ref(10)
+const page = ref<number>(1)
+const perPage = ref<number>(10)
 const ordersStartRef = ref<HTMLElement | null>(null)
 const perPageOptions = [5, 10, 20, 50]
 const skeletonRows = Array.from({ length: 5 }, (_, index) => index)

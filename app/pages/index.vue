@@ -7,7 +7,7 @@ import LatestProducts from "@/components/Products/LatestProducts.vue"
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
 const DeferredLatestPosts = defineAsyncComponent(() => import("@/components/About/LatestPosts.vue"))
-const showLatestPosts = ref(false)
+const showLatestPosts = ref<boolean>(false)
 
 onMounted(() => {
     window.setTimeout(() => {

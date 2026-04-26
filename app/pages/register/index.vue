@@ -17,7 +17,7 @@ const posthog = usePostHog()
 const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const widgetContainer = ref<HTMLElement | null>(null)
 const widgetId = ref<string | null>(null)
-const turnstileToken = ref("")
+const turnstileToken = ref<string>("")
 
 const snackbar = ref<boolean>(false)
 const snackbarText = ref<string>("")

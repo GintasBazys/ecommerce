@@ -34,9 +34,9 @@ useStructuredData(() => [breadcrumbSchema.value], "about-structured-data")
     <section
         class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.08),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
     >
-        <div class="px-0 pt-[3.75rem] pb-4 sm:pt-[4.5rem] md:pt-[4.5rem] xl:pt-[5.75rem]">
+        <div class="px-0 pt-15 pb-4 sm:pt-18 md:pt-18 xl:pt-23">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-                <div class="max-w-[42rem]">
+                <div class="max-w-2xl">
                     <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
                     <span
                         class="bg-brand-100 text-label-sm tracking-label text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
@@ -44,7 +44,7 @@ useStructuredData(() => [breadcrumbSchema.value], "about-structured-data")
                         About the store
                     </span>
                     <h1
-                        class="mt-4 text-[2rem] leading-[1] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[2.75rem] sm:leading-[0.98] xl:text-[4.25rem] xl:leading-[0.96]"
+                        class="mt-4 text-[2rem] leading-none font-bold tracking-[-0.06rem] text-slate-950 sm:text-[2.75rem] sm:leading-[0.98] xl:text-[4.25rem] xl:leading-[0.96]"
                     >
                         Get the story behind the curated storefront experience.
                     </h1>
@@ -55,7 +55,6 @@ useStructuredData(() => [breadcrumbSchema.value], "about-structured-data")
             </div>
         </div>
         <AboutCta :extra-spacer-class="'pb-0'" />
-        <AboutCards />
         <AboutColumns />
     </section>
 </template>

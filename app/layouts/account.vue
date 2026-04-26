@@ -3,7 +3,7 @@ const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)
-const isClientHydrated = ref(false)
+const isClientHydrated = ref<boolean>(false)
 
 onMounted(() => {
     isClientHydrated.value = true

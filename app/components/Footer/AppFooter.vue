@@ -6,6 +6,8 @@ import { ALL_PRODUCTS_URL_HANDLE, BLOG_HANDLE, CATEGORY_HANDLE } from "~/utils/c
 
 const { categories } = useProductStore()
 
+const LazyNewsletterComponent = defineAsyncComponent(() => import("@/components/Newsletter/NewsletterComponent.vue"))
+
 const helpLinks: NavLink[] = [
     { label: "FAQ", to: "/faq" },
     { label: "Returns", to: "/returns" },
@@ -27,7 +29,7 @@ const paymentIcons = [
 ]
 
 const currentYear = useState<number>("footer-current-year", () => new Date().getFullYear())
-const isClientHydrated = ref(false)
+const isClientHydrated = ref<boolean>(false)
 const supportEmail = "info@medusa-commerce.de"
 const supportPhone = "+370 600 00000"
 const supportPhoneHref = "tel:+37060000000"
@@ -120,7 +122,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </div>
                 </aside>
             </section>
-
+            <LazyNewsletterComponent />
             <div class="grid gap-4 py-7 lg:grid-cols-4 lg:gap-6">
                 <section class="rounded-3xl border border-white/15 bg-white/5 p-4 shadow-xl md:p-5">
                     <button

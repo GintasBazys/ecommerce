@@ -97,7 +97,7 @@ useSeoMeta({
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                                 <NuxtLink to="/contact" class="ui-btn-accent min-h-12 px-6"> Ask about an offer </NuxtLink>
                                 <NuxtLink
-                                    to="/products"
+                                    to="/category/all-products"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-semibold text-white transition hover:bg-white/16 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-hidden"
                                 >
                                     Browse full catalog

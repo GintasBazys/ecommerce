@@ -22,12 +22,11 @@ const event = useRequestEvent()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { absoluteUrl } = useSiteIdentity()
 
-const disablePanelTransitions = ref(false)
-const isMobileFilterDrawerOpen = ref(false)
+const isMobileFilterDrawerOpen = ref<boolean>(false)
 const notFoundPath = ref<string | null>(null)
 const productsStartRef = ref<HTMLElement | null>(null)
 const category = ref<ProductCategoryDTO | null>(null)
-const isAllProductsPage = computed(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
+const isAllProductsPage = computed<string>(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
 
 const {
     products,
@@ -251,15 +250,6 @@ watch(currentPage, async (page, previousPage) => {
     productsStartRef.value?.scrollIntoView({ behavior: "smooth", block: "start" })
 })
 
-onMounted(() => {
-    if (!import.meta.client) {
-        return
-    }
-
-    const userAgent = window.navigator.userAgent || ""
-    disablePanelTransitions.value = /Android/i.test(userAgent)
-})
-
 watch(isMobileFilterDrawerOpen, (isOpen) => {
     if (!import.meta.client) {
         return
@@ -331,7 +321,6 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                     v-model:price-range="priceRange"
                                     :sidebar-title="sidebarTitle"
                                     :active-filter-count="activeFilterCount"
-                                    :disable-panel-transitions="disablePanelTransitions"
                                     :child-category-facets="childCategoryFacets"
                                     :facets="facets"
                                     :price-summary="priceSummary"
@@ -349,7 +338,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
             </Teleport>
 
             <div class="grid gap-6 xl:grid-cols-[minmax(17rem,19rem)_minmax(0,1fr)] xl:gap-8">
-                <aside class="hidden xl:sticky xl:top-6 xl:grid xl:self-start">
+                <aside class="hidden xl:sticky xl:top-10 xl:grid xl:self-start">
                     <CategoryFiltersPanel
                         v-model:selected-child-category-ids="selectedChildCategoryIds"
                         v-model:selected-collection-ids="selectedCollectionIds"
@@ -359,7 +348,6 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         v-model:price-range="priceRange"
                         :sidebar-title="sidebarTitle"
                         :active-filter-count="activeFilterCount"
-                        :disable-panel-transitions="disablePanelTransitions"
                         :child-category-facets="childCategoryFacets"
                         :facets="facets"
                         :price-summary="priceSummary"

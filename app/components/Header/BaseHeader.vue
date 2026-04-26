@@ -4,11 +4,11 @@ import BaseSelect from "~/components/Shared/BaseSelect.vue"
 const LazyHeaderSearchDialog = defineAsyncComponent(() => import("~/components/Header/BaseHeaderSearchDialog.vue"))
 const LazyHeaderMobileDrawer = defineAsyncComponent(() => import("~/components/Header/BaseHeaderMobileDrawer.vue"))
 
-const drawer = ref(false)
-const searchDialog = ref(false)
-const selectionLoading = ref(false)
-const isClientHydrated = ref(false)
-const currentAnnouncementIndex = ref(0)
+const drawer = ref<boolean>(false)
+const searchDialog = ref<boolean>(false)
+const selectionLoading = ref<boolean>(false)
+const isClientHydrated = ref<boolean>(false)
+const currentAnnouncementIndex = ref<number>(0)
 const announcementBarDismissed = useCookie<boolean>("announcement_bar_dismissed", {
     default: () => false,
     maxAge: 60 * 60 * 24 * 30,
@@ -227,9 +227,13 @@ function dismissAnnouncementBar(): void {
                     </button>
                 </div>
 
-                <component :is="currentAnnouncement.link_url ? 'a' : 'div'" :href="currentAnnouncement.link_url || undefined" class="min-w-0 text-center">
+                <component
+                    :is="currentAnnouncement.link_url ? 'a' : 'div'"
+                    :href="currentAnnouncement.link_url || undefined"
+                    class="min-w-0 text-center"
+                >
                     <p
-                        class="truncate text-label-xs font-semibold tracking-label-tight text-slate-100 uppercase"
+                        class="text-label-xs tracking-label-tight truncate font-semibold text-slate-100 uppercase"
                         :class="currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : ''"
                         aria-live="polite"
                     >
@@ -237,7 +241,7 @@ function dismissAnnouncementBar(): void {
                     </p>
                 </component>
 
-                <div class="justify-self-end flex items-center gap-1">
+                <div class="flex items-center gap-1 justify-self-end">
                     <button
                         v-if="hasMultipleAnnouncements"
                         type="button"
@@ -276,7 +280,14 @@ function dismissAnnouncementBar(): void {
         >
             <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
                 <NuxtLink to="/" class="inline-flex shrink-0 items-center">
-                    <img src="/images/logo.svg" alt="Medusa Commerce" width="640" height="144" fetchpriority="high" class="block h-8 w-auto sm:h-9" />
+                    <img
+                        src="/images/logo.svg"
+                        alt="Medusa Commerce"
+                        width="640"
+                        height="144"
+                        fetchpriority="high"
+                        class="block h-8 w-auto sm:h-9"
+                    />
                 </NuxtLink>
 
                 <nav class="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
@@ -299,7 +310,14 @@ function dismissAnnouncementBar(): void {
                 <div class="flex items-center gap-2">
                     <label class="hidden items-center gap-2 lg:flex">
                         <span class="hidden items-center gap-1 text-xs font-semibold tracking-wide text-slate-500 uppercase xl:flex">
-                            <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                            <svg
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                class="h-4 w-4"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                aria-hidden="true"
+                            >
                                 <path
                                     d="M10 18c3.866-3.588 5.8-6.422 5.8-8.5A5.8 5.8 0 1 0 4.2 9.5C4.2 11.578 6.134 14.412 10 18Z"
                                     stroke-linecap="round"
@@ -319,7 +337,9 @@ function dismissAnnouncementBar(): void {
                             :disabled="selectionLoading"
                             @update:model-value="updateLocation(String($event))"
                         />
-                        <span v-else class="ui-input shadow-card inline-flex max-w-44 items-center pr-8 text-sm xl:max-w-48"> Country </span>
+                        <span v-else class="ui-input shadow-card inline-flex max-w-44 items-center pr-8 text-sm xl:max-w-48">
+                            Country
+                        </span>
                     </label>
 
                     <button
@@ -339,7 +359,14 @@ function dismissAnnouncementBar(): void {
                             class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                         >
                             <span class="sr-only">Open cart</span>
-                            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                class="h-5 w-5"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                            >
                                 <path
                                     d="M3 4h2l1.2 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.5L20 7H7"
                                     stroke-linecap="round"

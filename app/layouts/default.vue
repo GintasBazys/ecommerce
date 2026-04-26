@@ -1,10 +1,9 @@
 <script setup lang="ts">
 const LazyCartDrawer = defineAsyncComponent(() => import("@/components/Cart/CartDrawer.vue"))
-const LazyNewsletterComponent = defineAsyncComponent(() => import("@/components/Newsletter/NewsletterComponent.vue"))
 const LazyPoliciesBlock = defineAsyncComponent(() => import("@/components/About/PoliciesBlock.vue"))
 const { cart, openCartDrawer } = storeToRefs(useCartStore())
 const isClientHydrated = ref<boolean>(false)
-const showDeferredSections = ref(false)
+const showDeferredSections = ref<boolean>(false)
 
 onMounted(() => {
     isClientHydrated.value = true
@@ -29,7 +28,6 @@ onMounted(() => {
         <div>
             <slot></slot>
         </div>
-        <LazyNewsletterComponent v-if="showDeferredSections" />
         <LazyPoliciesBlock v-if="showDeferredSections" />
         <LazyCartDrawer v-if="isClientHydrated && cart && openCartDrawer" />
     </main>

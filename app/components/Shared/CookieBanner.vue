@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { accept, decline, isBannerVisible } = useCookieConsent()
-const canRenderBanner = ref(false)
+const canRenderBanner = ref<boolean>(false)
 
 onMounted(() => {
     window.setTimeout(() => {

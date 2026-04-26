@@ -12,18 +12,18 @@ definePageMeta({
 useHead({ title: "Addresses | Medusa Commerce" })
 
 const LIMIT = 3
-const page = ref(1)
-const limit = ref(LIMIT)
+const page = ref<number>(1)
+const limit = ref<number>(LIMIT)
 const offset = computed(() => (page.value - 1) * limit.value)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / limit.value)))
 const skeletonCards = Array.from({ length: LIMIT }, (_, index) => index)
 
-const loading = ref(false)
+const loading = ref<boolean>(false)
 const addresses = ref<CustomerAddressDTO[]>([])
-const totalCount = ref(0)
+const totalCount = ref<number>(0)
 const error = ref<string | null>(null)
-const showAdd = ref(false)
-const showEdit = ref(false)
+const showAdd = ref<boolean>(false)
+const showEdit = ref<boolean>(false)
 const editAddr = ref<Partial<CustomerAddressDTO>>({})
 
 async function fetchPage(): Promise<void> {

@@ -947,7 +947,7 @@ async function completeCart(): Promise<void> {
     }
 }
 
-const isCheckoutReady = ref(false)
+const isCheckoutReady = ref<boolean>(false)
 
 onMounted(async () => {
     try {
@@ -1076,31 +1076,6 @@ watch(currentStep, async (step) => {
                             >
                                 Move from cart to confirmation in one calm, guided flow.
                             </h1>
-                            <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
-                                Sign in or continue as a guest, add your delivery details, pick shipping, and finish payment without hopping
-                                across separate pages.
-                            </p>
-
-                            <div class="mt-6 grid gap-3 md:grid-cols-3">
-                                <div class="rounded-[1.3rem] border border-slate-200/80 bg-white/90 p-4">
-                                    <p class="text-sm font-semibold text-slate-950">One clear flow</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">
-                                        Identity, address, shipping, and payment stay in one place.
-                                    </p>
-                                </div>
-                                <div class="rounded-[1.3rem] border border-slate-200/80 bg-white/90 p-4">
-                                    <p class="text-sm font-semibold text-slate-950">Mobile-first pacing</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">
-                                        The layout keeps key actions within easy reach on smaller screens.
-                                    </p>
-                                </div>
-                                <div class="rounded-[1.3rem] border border-slate-200/80 bg-white/90 p-4">
-                                    <p class="text-sm font-semibold text-slate-950">Final totals visible</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">
-                                        Order details stay close by before you confirm payment.
-                                    </p>
-                                </div>
-                            </div>
                         </div>
 
                         <CheckoutOrderSummary

@@ -29,7 +29,6 @@ type SelectionGroup = "child" | "collection" | "type" | "tag"
 const props = defineProps<{
     sidebarTitle: string
     activeFilterCount: number
-    disablePanelTransitions: boolean
     childCategoryFacets: FacetItem[]
     facets: CategoryProductsFacets
     priceSummary: string
@@ -207,7 +206,6 @@ function getCheckboxValue(event: Event): boolean {
                     <span class="font-semibold text-slate-950">Subcategories</span>
                     <span
                         class="text-slate-500"
-                        :class="props.disablePanelTransitions ? '' : 'transition-transform duration-200'"
                         :style="isSectionOpen('subcategories') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
@@ -238,7 +236,6 @@ function getCheckboxValue(event: Event): boolean {
                     <span class="font-semibold text-slate-950">Product types</span>
                     <span
                         class="text-slate-500"
-                        :class="props.disablePanelTransitions ? '' : 'transition-transform duration-200'"
                         :style="isSectionOpen('types') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
@@ -269,7 +266,6 @@ function getCheckboxValue(event: Event): boolean {
                     <span class="font-semibold text-slate-950">Collections</span>
                     <span
                         class="text-slate-500"
-                        :class="props.disablePanelTransitions ? '' : 'transition-transform duration-200'"
                         :style="isSectionOpen('collections') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
@@ -300,7 +296,6 @@ function getCheckboxValue(event: Event): boolean {
                     <span class="font-semibold text-slate-950">Tags</span>
                     <span
                         class="text-slate-500"
-                        :class="props.disablePanelTransitions ? '' : 'transition-transform duration-200'"
                         :style="isSectionOpen('tags') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
@@ -331,7 +326,6 @@ function getCheckboxValue(event: Event): boolean {
                     <span class="font-semibold text-slate-950">Availability</span>
                     <span
                         class="text-slate-500"
-                        :class="props.disablePanelTransitions ? '' : 'transition-transform duration-200'"
                         :style="isSectionOpen('availability') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
@@ -360,7 +354,6 @@ function getCheckboxValue(event: Event): boolean {
                     <span class="font-semibold text-slate-950">Price</span>
                     <span
                         class="text-slate-500"
-                        :class="props.disablePanelTransitions ? '' : 'transition-transform duration-200'"
                         :style="isSectionOpen('price') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >

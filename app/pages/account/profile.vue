@@ -18,7 +18,7 @@ const customerData = reactive<Customer>({
     company_name: customer.value?.company_name ?? ""
 })
 
-const isSubmitting = ref(false)
+const isSubmitting = ref<boolean>(false)
 const feedback = reactive({
     visible: false,
     text: "",

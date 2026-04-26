@@ -12,7 +12,7 @@ export function useCustomerAuth() {
     const customerStore = useCustomerStore()
     const cartStore = useCartStore()
 
-    const loading = ref(false)
+    const loading = ref<boolean>(false)
     const error = ref<string | null>(null)
 
     function clearError() {

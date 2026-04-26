@@ -161,14 +161,14 @@ onBeforeUnmount(() => {
                         Access your saved details, revisit recent orders, and move from cart to checkout with less friction.
                     </p>
                     <div class="rounded-3xl border border-slate-200 bg-white/85 p-4 sm:p-5">
-                        <p class="text-xs font-medium tracking-[0.1em] text-slate-500 uppercase">Member access</p>
+                        <p class="text-xs font-medium tracking-widest text-slate-500 uppercase">Member access</p>
                         <p class="mt-1 text-sm leading-6 font-semibold text-slate-900 sm:text-base">
                             Faster checkout, order history, and saved profile details
                         </p>
                     </div>
                 </div>
 
-                <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
+                <div class="rounded-panel border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <div>
                         <span
                             class="tracking-label-tight inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold text-slate-700 uppercase"
@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div class="relative my-6 text-center text-xs font-medium tracking-[0.08em] text-slate-500 uppercase">
-                        <span class="absolute inset-x-0 top-1/2 -z-0 border-t border-slate-200" aria-hidden="true"></span>
+                        <span class="absolute inset-x-0 top-1/2 z-0 border-t border-slate-200" aria-hidden="true"></span>
                         <span class="relative z-10 bg-white px-3">Or continue with email</span>
                     </div>
 

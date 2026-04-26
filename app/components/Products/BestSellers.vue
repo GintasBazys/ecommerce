@@ -5,11 +5,10 @@ import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const productStore = useProductStore()
 const { bestSellers } = storeToRefs(productStore)
-const HOMEPAGE_PRODUCT_LIMIT = 8
 
 await callOnce(async () => {
     await productStore.fetchBestSellers(regionStoreId.value ?? "", selectedCountryCode.value ?? "", {
-        limit: HOMEPAGE_PRODUCT_LIMIT,
+        limit: LIMIT,
         view: "card"
     })
 })
@@ -20,7 +19,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 </script>
 
 <template>
-    <section v-if="bestSellers?.length" class="overflow-hidden bg-gradient-to-b from-slate-100 to-white py-16 sm:py-18 lg:py-24">
+    <section v-if="bestSellers?.length" class="overflow-hidden bg-linear-to-b from-slate-100 to-white py-16 sm:py-18 lg:py-24">
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-184">
