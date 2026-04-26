@@ -25,7 +25,7 @@ const quickLinks = [
 ] as const
 
 useHead(() => ({
-    title: `${statusCode.value} | Ecommerce`,
+    title: `${statusCode.value} | Medusa Commerce`,
     meta: [
         {
             name: "description",

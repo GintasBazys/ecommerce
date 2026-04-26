@@ -9,7 +9,7 @@ definePageMeta({
     middleware: ["auth"]
 })
 
-useHead({ title: "Addresses | Ecommerce" })
+useHead({ title: "Addresses | Medusa Commerce" })
 
 const LIMIT = 3
 const page = ref(1)

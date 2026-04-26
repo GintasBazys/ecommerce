@@ -4,7 +4,7 @@ import type { CustomerResponseInterface } from "@/types/interfaces"
 import { usePostHog } from "~/composables/usePostHog"
 
 useHead({
-    title: "Register | Ecommerce"
+    title: "Register | Medusa Commerce"
 })
 
 definePageMeta({

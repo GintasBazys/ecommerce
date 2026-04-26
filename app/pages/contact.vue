@@ -55,12 +55,12 @@ const contactChecklist = [
 ]
 
 useHead({
-    title: "Contact us | Ecommerce"
+    title: "Contact us | Medusa Commerce"
 })
 
 useSeoMeta({
     description:
-        "Contact Ecommerce for product questions, order updates, delivery support, and returns guidance through a calmer premium support experience."
+        "Contact Medusa Commerce for product questions, order updates, delivery support, and returns guidance through a calmer premium support experience."
 })
 </script>
 

@@ -42,7 +42,7 @@ const approachSteps = [
             <div class="grid items-stretch gap-5 lg:grid-cols-2 xl:gap-10">
                 <div>
                     <NuxtImage
-                        src="/images/about-premium.jpg"
+                        src="/images/about/about-premium.jpg"
                         alt="Elegant modern living room with premium furniture and styling"
                         width="1800"
                         height="1200"

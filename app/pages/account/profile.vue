@@ -6,7 +6,7 @@ definePageMeta({
     middleware: ["auth"]
 })
 
-useHead({ title: "Profile | Ecommerce" })
+useHead({ title: "Profile | Medusa Commerce" })
 
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)

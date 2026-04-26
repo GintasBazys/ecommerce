@@ -75,7 +75,7 @@ const { data: relatedPostsData } = await useAsyncData(`related-${slug.value}`, a
 const relatedPosts = computed(() => relatedPostsData.value || [])
 
 useHead(() => ({
-    title: `${currentPost.value?.title ?? "Shop"} | Ecommerce`,
+    title: `${currentPost.value?.title ?? "Shop"} | Medusa Commerce`,
     meta: [
         {
             name: "description",

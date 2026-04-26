@@ -22,9 +22,12 @@ const emit = defineEmits<{
 
 <template>
     <article
-        class="grid gap-4 rounded-[1.4rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_12px_30px_rgba(8,27,90,0.05)] sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-5 sm:p-5"
+        class="grid items-center gap-4 rounded-[1.4rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_12px_30px_rgba(8,27,90,0.05)] sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-5 sm:p-5"
     >
-        <NuxtLink :to="`${PRODUCT_URL_HANDLE}/${props.item.product_handle}`" class="rounded-card-sm block overflow-hidden bg-slate-100">
+        <NuxtLink
+            :to="`${PRODUCT_URL_HANDLE}/${props.item.product_handle}`"
+            class="rounded-card-sm block h-fit overflow-hidden bg-slate-100"
+        >
             <NuxtImg
                 :src="props.item.thumbnail || '/images/placeholder.png'"
                 :alt="props.item.product_title ?? ''"

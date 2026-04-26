@@ -14,7 +14,7 @@ import { usePostHog } from "~/composables/usePostHog"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
 definePageMeta({ layout: "checkout" })
-useHead({ title: "Checkout | Ecommerce" })
+useHead({ title: "Checkout | Medusa Commerce" })
 
 type CheckoutStep = "account" | "address" | "payment"
 type AuthTab = "login" | "register" | "guest"

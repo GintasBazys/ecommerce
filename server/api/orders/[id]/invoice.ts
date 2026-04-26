@@ -546,7 +546,7 @@ export default defineEventHandler(async (event) => {
         color: rgb(0.16, 0.27, 0.56)
     })
 
-    context.page.drawText("Ecommerce", {
+    context.page.drawText("Medusa Commerce", {
         x: margin + 18,
         y: context.y - 18,
         size: 22,

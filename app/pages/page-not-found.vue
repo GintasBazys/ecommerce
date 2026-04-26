@@ -14,7 +14,7 @@ if (event) {
 }
 
 useHead({
-    title: "404 | Ecommerce",
+    title: "404 | Medusa Commerce",
     meta: [
         {
             name: "description",

@@ -79,7 +79,7 @@ const relatedProducts = computed<ProductDTO[]>(() => {
 })
 
 useHead({
-    title: `${product.value?.title || "Product"} | Ecommerce`
+    title: `${product.value?.title || "Product"} | Medusa Commerce`
 })
 
 const selectedVariantId = ref<string | null>(product.value?.variants?.[0]?.id ?? null)

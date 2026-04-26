@@ -100,10 +100,10 @@ const currentListingPath = computed<string>(() => {
 const canonicalPath = computed<string>(() => (hasFacetedQuery.value ? categoryPath.value : currentListingPath.value))
 const metaTitle = computed<string>(() => {
     if (currentPage.value <= 1) {
-        return `${pageHeading.value} | Ecommerce`
+        return `${pageHeading.value} | Medusa Commerce`
     }
 
-    return `${pageHeading.value} - Page ${currentPage.value} | Ecommerce`
+    return `${pageHeading.value} - Page ${currentPage.value} | Medusa Commerce`
 })
 const metaDescription = computed<string>(() => {
     const baseDescription = basePageDescription.value || `Browse products in ${pageHeading.value}.`
@@ -195,7 +195,7 @@ await loadCategoryPage()
 useHead(() => {
     if (notFoundPath.value) {
         return {
-            title: "404 | Ecommerce",
+            title: "404 | Medusa Commerce",
             meta: [
                 {
                     name: "description",

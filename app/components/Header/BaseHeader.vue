@@ -523,7 +523,7 @@ function getProductMeta(product: ProductDTO): string {
                             @click="closeSearchDialog"
                         >
                             <NuxtImage
-                                :src="product.thumbnail || product.images?.[0]?.url || '/images/about_banner.webp'"
+                                :src="product.thumbnail || product.images?.[0]?.url || '/images/about/about-premium.jpg'"
                                 :alt="product.title || 'Product image'"
                                 width="80"
                                 height="80"

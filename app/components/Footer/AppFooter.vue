@@ -58,7 +58,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     <span
                         class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/20 bg-amber-50/10 px-4 py-2 font-bold text-amber-100 uppercase"
                     >
-                        Ecommerce
+                        Medusa Commerce
                     </span>
                     <h2 class="mt-4 max-w-lg text-4xl leading-tight font-bold tracking-tighter text-white sm:text-5xl lg:text-6xl">
                         A more polished finish to every shopping journey.

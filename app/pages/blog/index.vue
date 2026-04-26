@@ -67,7 +67,9 @@ const activeCategory = computed<BlogCategory | null>(() => {
     return categories.value.find((category) => category.slug === currentCategory.value) || null
 })
 const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Blog" }])
-const pageTitle = computed<string>(() => (activeCategory.value ? `${activeCategory.value.name} Blog | Ecommerce` : "Blog | Ecommerce"))
+const pageTitle = computed<string>(() =>
+    activeCategory.value ? `${activeCategory.value.name} Blog | Medusa Commerce` : "Blog | Medusa Commerce"
+)
 const pageDescription = computed<string>(() =>
     activeCategory.value
         ? `Browse published articles in ${activeCategory.value.name} with a premium editorial layout.`

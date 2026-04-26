@@ -5,7 +5,7 @@ import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 import { formatDate } from "~/utils/formatDate"
 
-const FALLBACK_IMAGE = "/images/about-premium.jpg"
+const FALLBACK_IMAGE = "/images/about/about-premium.jpg"
 
 const { article, compact = false } = defineProps<{
     article: BlogPostSummary

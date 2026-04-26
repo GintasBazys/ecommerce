@@ -11,7 +11,7 @@ import { formatPrice } from "~/utils/formatPrice"
 
 definePageMeta({ layout: "checkout" })
 
-useHead({ title: "Cart | Ecommerce" })
+useHead({ title: "Cart | Medusa Commerce" })
 
 type PricedCartLineItem = CartLineItemDTO & {
     subtotal?: number | null

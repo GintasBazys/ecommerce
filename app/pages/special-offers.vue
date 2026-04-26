@@ -32,7 +32,7 @@ const saleProducts = computed<ProductDTO[]>(() =>
 )
 
 useHead({
-    title: "Special Offers | Ecommerce"
+    title: "Special Offers | Medusa Commerce"
 })
 
 useSeoMeta({
@@ -49,7 +49,7 @@ useSeoMeta({
                 <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
 
                 <div
-                    class="relative overflow-hidden rounded-panel border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
+                    class="rounded-panel relative overflow-hidden border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
                 >
                     <NuxtImage
                         src="/images/hero-premium.jpg"
@@ -70,11 +70,9 @@ useSeoMeta({
                         class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.14)_0%,rgba(15,23,42,0.1)_40%,rgba(15,23,42,0.5)_100%)]"
                     ></div>
 
-                    <div
-                        class="relative z-10 flex min-h-80 flex-col justify-between gap-8 p-4 sm:min-h-96 sm:p-6 lg:min-h-112"
-                    >
+                    <div class="relative z-10 flex min-h-80 flex-col justify-between gap-8 p-4 sm:min-h-96 sm:p-6 lg:min-h-112">
                         <div
-                            class="w-fit text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                            class="text-label-sm inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Sale campaign view

@@ -364,7 +364,7 @@ async function retrySocialLogin(): Promise<void> {
 }
 
 useHead({
-    title: "Social Sign-in | Ecommerce"
+    title: "Social Sign-in | Medusa Commerce"
 })
 
 onMounted(() => {

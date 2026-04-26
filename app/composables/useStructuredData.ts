@@ -72,7 +72,7 @@ export function useSiteIdentity(): {
 
     const siteName = computed<string>(() => {
         const configuredSiteName = config.public.SITE_NAME
-        return typeof configuredSiteName === "string" && configuredSiteName.trim() ? configuredSiteName : "Ecommerce"
+        return typeof configuredSiteName === "string" && configuredSiteName.trim() ? configuredSiteName : "Medusa Commerce"
     })
 
     const siteUrl = computed<string>(() => {

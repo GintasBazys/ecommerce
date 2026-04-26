@@ -316,7 +316,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 class="rounded-card shadow-panel flex gap-3 border border-white/80 bg-gradient-to-b from-white to-slate-50 p-3"
                             >
                                 <NuxtImage
-                                    :src="item.thumbnail || '/images/about-premium.jpg'"
+                                    :src="item.thumbnail || '/images/about/about-premium.jpg'"
                                     :alt="item.product_title || 'Product image'"
                                     width="96"
                                     height="112"

@@ -16,7 +16,7 @@ definePageMeta({
     middleware: ["auth"]
 })
 
-useHead({ title: "Orders | Ecommerce" })
+useHead({ title: "Orders | Medusa Commerce" })
 
 const runtimeConfig = useRuntimeConfig()
 const page = ref(1)

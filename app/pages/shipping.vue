@@ -102,11 +102,12 @@ function toggleFaq(index: number): void {
 }
 
 useHead({
-    title: "Payment & Shipping | Ecommerce"
+    title: "Payment & Shipping | Medusa Commerce"
 })
 
 useSeoMeta({
-    description: "Review Ecommerce payment methods, shipping options, order processing, tracking, and international delivery guidance."
+    description:
+        "Review Medusa Commerce payment methods, shipping options, order processing, tracking, and international delivery guidance."
 })
 </script>
 

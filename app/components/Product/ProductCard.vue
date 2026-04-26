@@ -6,7 +6,7 @@ import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
-const FALLBACK_IMAGE = "/images/about-premium.jpg"
+const FALLBACK_IMAGE = "/images/about/about-premium.jpg"
 
 const { product, compact = false } = defineProps<{
     product: ProductDTO

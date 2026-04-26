@@ -105,11 +105,12 @@ function toggleFaq(index: number): void {
 }
 
 useHead({
-    title: "Returns | Ecommerce"
+    title: "Returns | Medusa Commerce"
 })
 
 useSeoMeta({
-    description: "Read the Ecommerce returns policy, return window, refund timing, and support guidance in a clear mobile-first format."
+    description:
+        "Read the Medusa Commerce returns policy, return window, refund timing, and support guidance in a clear mobile-first format."
 })
 </script>
 

@@ -18,7 +18,7 @@ const props = defineProps<{
             <AppBreadcrumbs :items="props.breadcrumbItems" class="mb-4" />
 
             <div
-                class="relative overflow-hidden rounded-panel border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
+                class="rounded-panel relative overflow-hidden border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
             >
                 <NuxtImage
                     :src="props.heroImage"
@@ -41,7 +41,7 @@ const props = defineProps<{
 
                 <div class="relative z-10 flex min-h-80 flex-col justify-between gap-8 p-4 sm:min-h-96 sm:p-6 lg:min-h-112">
                     <div
-                        class="w-fit text-label-sm inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                        class="text-label-sm inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
                     >
                         <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                         {{ props.isAllProductsPage ? "All products" : "Category" }}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePostHog } from "~/composables/usePostHog"
 
-useHead({ title: "Signin | Ecommerce" })
+useHead({ title: "Signin | Medusa Commerce" })
 definePageMeta({ layout: "default" })
 
 const router = useRouter()

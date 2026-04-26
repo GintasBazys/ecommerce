@@ -99,11 +99,11 @@ function togglePanel(sectionId: string, itemIndex: number): void {
 }
 
 useHead({
-    title: "FAQ | Ecommerce"
+    title: "FAQ | Medusa Commerce"
 })
 
 useSeoMeta({
-    description: "Browse common answers about delivery, orders, returns, exchanges, and support before contacting the Ecommerce team."
+    description: "Browse common answers about delivery, orders, returns, exchanges, and support before contacting the Medusa Commerce team."
 })
 
 const faqSchema = computed<SchemaNode>(() => ({

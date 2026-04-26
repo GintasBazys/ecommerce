@@ -6,7 +6,7 @@ definePageMeta({
     middleware: ["auth"]
 })
 
-useHead({ title: "Order Details | Ecommerce" })
+useHead({ title: "Order Details | Medusa Commerce" })
 </script>
 
 <template>

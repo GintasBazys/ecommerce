@@ -9,12 +9,12 @@ const { absoluteUrl } = useSiteIdentity()
 const breadcrumbItems = [{ label: "Home", to: "/" }, { label: "About" }]
 
 useHead({
-    title: "About | Ecommerce"
+    title: "About | Medusa Commerce"
 })
 
 useSeoMeta({
     description:
-        "Learn how Ecommerce curates products, supports customers, and builds a calmer shopping experience from discovery to delivery."
+        "Learn how Medusa Commerce curates products, supports customers, and builds a calmer shopping experience from discovery to delivery."
 })
 
 const breadcrumbSchema = computed<SchemaNode>(() =>

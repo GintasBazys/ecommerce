@@ -3,17 +3,17 @@ import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 const storePillars = [
     {
-        image: "/images/about_store-curated.svg",
+        image: "/images/about/about_store-curated.svg",
         title: "Curated selection",
         description: "We pick practical, design-forward products that are easy to mix into daily routines."
     },
     {
-        image: "/images/about_store-value.svg",
+        image: "/images/about/about_store-value.svg",
         title: "Clear value",
         description: "Every item is priced with transparent value in mind, with no clutter around the buying flow."
     },
     {
-        image: "/images/about_store-delivery.svg",
+        image: "/images/about/about_store-delivery.svg",
         title: "Reliable delivery",
         description: "Orders move quickly, updates stay clear, and support is available when details matter."
     }

@@ -9,7 +9,7 @@ const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
 
 useHead({
-    title: "Shop | Ecommerce"
+    title: "Shop | Medusa Commerce"
 })
 
 useStructuredData(

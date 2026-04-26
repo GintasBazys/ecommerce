@@ -21,7 +21,7 @@ export default defineNuxtConfig({
         head: {
             charset: "utf-8",
             viewport: "width=device-width, initial-scale=1",
-            title: "Ecommerce",
+            title: "Medusa Commerce",
             htmlAttrs: {
                 lang: "en"
             },
@@ -36,13 +36,7 @@ export default defineNuxtConfig({
         domains: [...new Set(imageDomains)]
     },
 
-    modules: [
-        "@nuxt/eslint",
-        "@pinia/nuxt",
-        "pinia-plugin-persistedstate/nuxt",
-        "@nuxt/image",
-        "@nuxtjs/sitemap"
-    ],
+    modules: ["@nuxt/eslint", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt", "@nuxt/image", "@nuxtjs/sitemap"],
 
     sitemap: {
         sources: ["/api/__sitemap__/urls"]
@@ -61,7 +55,7 @@ export default defineNuxtConfig({
             PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY || process.env.PUBLISHABLE_KEY,
             STRIPE_PUBLIC_KEY: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY,
             TURNSTILE_SITE_KEY: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY || process.env.TURNSTILE_SITE_KEY,
-            SITE_NAME: process.env.SITE_NAME || "Ecommerce",
+            SITE_NAME: process.env.SITE_NAME || "Medusa Commerce",
             SITE_URL: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || ""
         },
         secret: {
