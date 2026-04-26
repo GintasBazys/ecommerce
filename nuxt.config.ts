@@ -9,15 +9,11 @@ const posthogHost = process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.postho
 export default defineNuxtConfig({
     compatibilityDate: "2026-01-26",
 
+    features: {
+        inlineStyles: true
+    },
+
     app: {
-        layoutTransition: {
-            name: "page",
-            mode: "out-in"
-        },
-        pageTransition: {
-            name: "page",
-            mode: "out-in"
-        },
         head: {
             charset: "utf-8",
             viewport: "width=device-width, initial-scale=1",
