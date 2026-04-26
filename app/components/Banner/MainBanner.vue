@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const heroContent = {
@@ -12,27 +11,47 @@ const heroContent = {
     secondaryLabel: "Browse all products",
     secondaryTo: ALL_PRODUCTS_URL_HANDLE,
     image: "/images/hero-premium-1600.jpg",
+    mobileImage: "/images/hero-premium-mobile.jpg",
     alt: "Premium modern interior with marble and wood details"
 } as const
 
 const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real people"] as const
+
+useHead({
+    link: [
+        {
+            rel: "preload",
+            as: "image",
+            href: heroContent.mobileImage,
+            media: "(max-width: 767px)",
+            fetchpriority: "high"
+        },
+        {
+            rel: "preload",
+            as: "image",
+            href: heroContent.image,
+            media: "(min-width: 768px)",
+            fetchpriority: "high"
+        }
+    ]
+})
 </script>
 
 <template>
     <section class="relative isolate min-h-screen overflow-hidden bg-slate-950">
-        <NuxtImage
-            :src="heroContent.image"
-            :alt="heroContent.alt"
-            width="1600"
-            height="941"
-            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1280px"
-            format="webp"
-            quality="56"
-            loading="eager"
-            :preload="{ fetchPriority: 'high' }"
-            decoding="async"
-            class="absolute inset-0 h-full w-full object-cover object-center"
-        />
+        <picture>
+            <source :srcset="heroContent.mobileImage" media="(max-width: 767px)" />
+            <img
+                :src="heroContent.image"
+                :alt="heroContent.alt"
+                width="1600"
+                height="941"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                class="absolute inset-0 h-full w-full object-cover object-center"
+            />
+        </picture>
         <div class="absolute inset-0 z-0 bg-linear-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30"></div>
 
         <div
