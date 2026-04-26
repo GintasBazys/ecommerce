@@ -301,7 +301,7 @@ onUnmounted(() => {
         </div>
 
         <div class="rounded-[1.25rem] border border-slate-200 bg-slate-50/80 p-4">
-            <div ref="widgetContainer" class="min-h-[4.25rem]"></div>
+            <div ref="widgetContainer" class="min-h-17"></div>
             <p class="mt-3 text-sm leading-6 text-slate-600">Spam protection is required before sending this form.</p>
         </div>
 

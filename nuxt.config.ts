@@ -77,7 +77,7 @@ export default defineNuxtConfig({
             ]
         },
         optimizeDeps: {
-            include: ["@stripe/stripe-js"]
+            include: ["@stripe/stripe-js", "posthog-js", "lodash-es/debounce"]
         }
     }
 })

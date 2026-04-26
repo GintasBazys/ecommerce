@@ -69,18 +69,15 @@ const debouncedAddToCart = debounce(addToCart, 300)
 
 <template>
     <article
-        class="group grid h-full overflow-hidden rounded-[1.4rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] shadow-[0_14px_34px_rgba(8,27,90,0.06)] transition duration-300 focus-within:-translate-y-1 focus-within:border-amber-200 focus-within:shadow-[0_22px_54px_rgba(8,27,90,0.12)] hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_22px_54px_rgba(8,27,90,0.12)] motion-reduce:transition-none"
+        class="group rounded-card shadow-card focus-within:shadow-elevated hover:shadow-elevated grid h-full overflow-hidden border border-white/80 bg-linear-to-b from-white to-slate-50 transition duration-300 focus-within:-translate-y-1 focus-within:border-amber-200 hover:-translate-y-1 hover:border-amber-200 motion-reduce:transition-none"
         :class="
             compact
-                ? 'rounded-card-sm shadow-[0_10px_24px_rgba(8,27,90,0.05)] focus-within:translate-y-0 focus-within:shadow-[0_14px_30px_rgba(8,27,90,0.08)] hover:translate-y-0 hover:shadow-[0_14px_30px_rgba(8,27,90,0.08)]'
+                ? 'rounded-card-sm shadow-card focus-within:shadow-card hover:shadow-card focus-within:translate-y-0 hover:translate-y-0'
                 : ''
         "
     >
         <NuxtLink :to="productHref" class="block text-inherit no-underline focus-visible:outline-hidden">
-            <div
-                class="relative aspect-[0.96] overflow-hidden bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#edf2f7_100%)]"
-                :class="compact ? 'aspect-[0.82]' : ''"
-            >
+            <div class="relative aspect-square overflow-hidden bg-linear-to-b from-slate-50 to-slate-200">
                 <NuxtImage
                     :src="productImage"
                     :alt="product.title || 'Product image'"
@@ -89,26 +86,26 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     height="840"
                     :sizes="compact ? '(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw' : '280px md:33vw xl:22vw'"
                     densities="x1 x2"
-                    class="h-full w-full object-cover transition duration-500 group-focus-within:scale-[1.03] group-hover:scale-[1.03] motion-reduce:transition-none"
+                    class="h-full w-full object-cover transition duration-500 group-focus-within:scale-105 group-hover:scale-105 motion-reduce:transition-none"
                 />
                 <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-slate-950/18 to-transparent"></div>
 
                 <span
                     v-if="isOnSale"
-                    class="text-label-xs tracking-label-tight absolute top-3 right-3 inline-flex min-h-8 items-center rounded-full border border-rose-200 bg-white/92 px-3 py-1 font-semibold text-rose-600 uppercase shadow-[0_10px_24px_rgba(8,27,90,0.08)]"
-                    :class="compact ? 'top-2 right-2 px-2.5 text-[0.64rem]' : ''"
+                    class="text-label-xs tracking-label-tight shadow-card absolute top-3 right-3 inline-flex min-h-8 items-center rounded-full border border-rose-200 bg-white/92 px-3 py-1 font-semibold text-rose-600 uppercase"
+                    :class="compact ? 'top-2 right-2 px-2 text-xs' : ''"
                 >
                     Sale
                 </span>
             </div>
         </NuxtLink>
 
-        <div class="grid flex-1 grid-rows-[auto_1fr_auto] gap-4 p-4 sm:p-[1.05rem]" :class="compact ? 'gap-3 p-3' : ''">
+        <div class="flex flex-1 flex-col gap-4 p-4 sm:p-4" :class="compact ? 'gap-3 p-3' : ''">
             <div class="flex items-start justify-between gap-3">
                 <span
                     class="text-label-2xs tracking-label-tight inline-flex min-h-8 items-center rounded-full border px-3 py-1 font-semibold uppercase"
                     :class="[
-                        compact ? 'min-h-7 px-2 py-1 text-[0.62rem] tracking-widest' : '',
+                        compact ? 'min-h-7 px-2 py-1 text-xs tracking-widest' : '',
                         selectedVariant?.inventory_quantity
                             ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                             : 'border-slate-300 bg-slate-100 text-slate-700'
@@ -120,17 +117,14 @@ const debouncedAddToCart = debounce(addToCart, 300)
 
             <div class="min-w-0">
                 <NuxtLink :to="productHref" class="text-inherit no-underline focus-visible:outline-hidden">
-                    <h3
-                        class="product-card__title text-[1rem] leading-6 font-semibold text-slate-950"
-                        :class="compact ? 'text-[0.92rem] leading-5' : ''"
-                    >
+                    <h3 class="line-clamp-2 text-base leading-6 font-semibold text-slate-950" :class="compact ? 'text-sm leading-5' : ''">
                         {{ product.title }}
                     </h3>
                 </NuxtLink>
 
                 <p
-                    class="product-card__description mt-2 text-[0.92rem] leading-7 text-slate-600"
-                    :class="compact ? 'mt-1.5 text-[0.82rem] leading-6' : ''"
+                    class="mt-2 line-clamp-2 min-h-13 text-sm leading-7 text-slate-600 md:min-h-0"
+                    :class="compact ? 'mt-1.5 text-sm leading-6' : ''"
                 >
                     {{ productDescription }}
                 </p>
@@ -160,23 +154,23 @@ const debouncedAddToCart = debounce(addToCart, 300)
             <div class="grid gap-3 border-t border-slate-200/80 pt-3" :class="compact ? 'gap-2 pt-2.5' : ''">
                 <div class="grid gap-1">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-[1.05rem] leading-none font-semibold text-slate-950" :class="compact ? 'text-[0.95rem]' : ''">{{
+                        <span class="text-lg leading-none font-semibold text-slate-950" :class="compact ? 'text-base' : ''">{{
                             displayPrice
                         }}</span>
-                        <del v-if="isOnSale && originalPrice" class="text-[0.9rem] text-rose-500" :class="compact ? 'text-label-sm' : ''">
+                        <del v-if="isOnSale && originalPrice" class="text-sm text-rose-500" :class="compact ? 'text-label-sm' : ''">
                             {{ originalPrice }}
                         </del>
                     </div>
-                    <span class="text-label-sm tracking-[0.08em] text-slate-500 uppercase" :class="compact ? 'text-[0.68rem]' : ''">{{
+                    <span class="text-label-sm tracking-wider text-slate-500 uppercase" :class="compact ? 'text-xs' : ''">{{
                         taxLabel
                     }}</span>
-                    <span class="truncate text-[0.82rem] text-slate-600" :class="compact ? 'text-label-xs' : ''">{{ variantLabel }}</span>
+                    <span class="truncate text-sm text-slate-600" :class="compact ? 'text-label-xs' : ''">{{ variantLabel }}</span>
                 </div>
 
                 <button
                     type="button"
                     class="ui-btn-accent w-full px-4 disabled:bg-slate-200 disabled:text-slate-500"
-                    :class="compact ? 'min-h-9 px-3 text-[0.82rem]' : ''"
+                    :class="compact ? 'min-h-9 px-3 text-sm' : ''"
                     :disabled="loading || !selectedVariant?.inventory_quantity"
                     @click="debouncedAddToCart"
                 >
@@ -190,27 +184,3 @@ const debouncedAddToCart = debounce(addToCart, 300)
         </div>
     </article>
 </template>
-
-<style scoped>
-.product-card__title,
-.product-card__description {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-}
-
-.product-card__title {
-    -webkit-line-clamp: 2;
-}
-
-.product-card__description {
-    min-height: 3.2rem;
-    -webkit-line-clamp: 2;
-}
-
-@media screen and (max-width: 767px) {
-    .product-card__description {
-        min-height: auto;
-    }
-}
-</style>

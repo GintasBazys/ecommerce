@@ -8,7 +8,6 @@ import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
-const bannerHidden = ref<boolean>(false)
 const drawer = ref<boolean>(false)
 const searchDialog = ref<boolean>(false)
 const searchQuery = ref<string>("")
@@ -18,8 +17,39 @@ const searchHasSearched = ref<boolean>(false)
 const selectionLoading = ref<boolean>(false)
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
 const isClientHydrated = ref<boolean>(false)
+const currentAnnouncementIndex = ref<number>(0)
+const announcementBarDismissed = useCookie<boolean>("announcement_bar_dismissed", {
+    default: () => false,
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: "lax",
+    path: "/"
+})
+
+type AnnouncementMessage = {
+    id: string
+    message: string
+    link_url?: string | null
+    is_active: boolean
+    starts_at?: string | null
+    ends_at?: string | null
+    sort_order: number
+}
+
+type AnnouncementBarResponse = {
+    announcement_messages: AnnouncementMessage[]
+}
 
 const route = useRoute()
+
+const { data: announcementBarData } = await useAsyncData<AnnouncementBarResponse>(
+    "announcement-bar-messages",
+    () => $fetch("/api/announcement-bar/messages"),
+    {
+        default: () => ({
+            announcement_messages: []
+        })
+    }
+)
 
 const regionStore = useRegionStore()
 const { customer } = storeToRefs(useCustomerStore())
@@ -27,10 +57,16 @@ const { itemCount } = storeToRefs(useCartStore())
 const { categories } = storeToRefs(useProductStore())
 const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
 
-const topOffset = computed<number>(() => (bannerHidden.value ? 0 : 32))
+const announcementMessages = computed<AnnouncementMessage[]>(() => announcementBarData.value?.announcement_messages || [])
+const currentAnnouncement = computed<AnnouncementMessage | null>(() => announcementMessages.value[currentAnnouncementIndex.value] || null)
+const hasMultipleAnnouncements = computed<boolean>(() => announcementMessages.value.length > 1)
+const announcementBarVisible = computed<boolean>(() => announcementMessages.value.length > 0 && !announcementBarDismissed.value)
+const topOffset = computed<number>(() => (announcementBarVisible.value ? 40 : 0))
 const headerHeight = 64
-const headerOffset = computed<number>(() => (bannerHidden.value ? headerHeight : headerHeight + 32))
+const headerOffset = computed<number>(() => (announcementBarVisible.value ? headerHeight + 40 : headerHeight))
 const regionId = computed<string>(() => regionStoreId.value ?? "")
+
+let announcementRotationInterval: number | null = null
 
 const locationItems = computed(() =>
     availableCountries.value.map((country) => ({
@@ -119,16 +155,41 @@ watch(
     { immediate: true }
 )
 
+watch(
+    announcementMessages,
+    (messages) => {
+        if (!messages.length) {
+            currentAnnouncementIndex.value = 0
+            return
+        }
+
+        if (currentAnnouncementIndex.value >= messages.length) {
+            currentAnnouncementIndex.value = 0
+        }
+    },
+    { immediate: true }
+)
+
 onBeforeUnmount(() => {
     if (!import.meta.client) {
         return
     }
 
+    stopAnnouncementRotation()
     document.documentElement.style.removeProperty("--site-header-offset")
 })
 
 onMounted(() => {
     isClientHydrated.value = true
+    syncAnnouncementRotation()
+})
+
+watch([announcementBarVisible, hasMultipleAnnouncements], () => {
+    if (!import.meta.client) {
+        return
+    }
+
+    syncAnnouncementRotation()
 })
 
 function openSearchDialog(): void {
@@ -166,6 +227,47 @@ function closeDrawer(): void {
     drawer.value = false
 }
 
+function showPreviousAnnouncement(): void {
+    if (!announcementMessages.value.length) {
+        return
+    }
+
+    currentAnnouncementIndex.value =
+        (currentAnnouncementIndex.value - 1 + announcementMessages.value.length) % announcementMessages.value.length
+}
+
+function showNextAnnouncement(): void {
+    if (!announcementMessages.value.length) {
+        return
+    }
+
+    currentAnnouncementIndex.value = (currentAnnouncementIndex.value + 1) % announcementMessages.value.length
+}
+
+function stopAnnouncementRotation(): void {
+    if (announcementRotationInterval !== null) {
+        window.clearInterval(announcementRotationInterval)
+        announcementRotationInterval = null
+    }
+}
+
+function syncAnnouncementRotation(): void {
+    stopAnnouncementRotation()
+
+    if (!announcementBarVisible.value || !hasMultipleAnnouncements.value) {
+        return
+    }
+
+    announcementRotationInterval = window.setInterval(() => {
+        showNextAnnouncement()
+    }, 5000)
+}
+
+function dismissAnnouncementBar(): void {
+    announcementBarDismissed.value = true
+    stopAnnouncementRotation()
+}
+
 function getProductPath(handle?: string | null): string {
     return handle ? `${PRODUCT_URL_HANDLE}/${handle}` : ALL_PRODUCTS_URL_HANDLE
 }
@@ -190,25 +292,72 @@ function getProductMeta(product: ProductDTO): string {
 <template>
     <header class="relative z-50">
         <div
-            v-if="!bannerHidden"
-            class="fixed inset-x-0 top-0 z-50 h-8 border-b border-white/10 bg-linear-to-r from-slate-900 via-slate-800 to-slate-700 text-white"
+            v-if="announcementBarVisible && currentAnnouncement"
+            class="fixed inset-x-0 top-0 z-50 h-10 border-b border-white/10 bg-linear-to-r from-slate-900 via-slate-800 to-slate-700 text-white"
         >
-            <div class="mx-auto flex h-full w-full max-w-7xl items-center justify-between px-4">
-                <p class="text-label-xs tracking-label-tight truncate font-semibold text-slate-100 uppercase">
-                    Free shipping on orders over 35 EUR
-                </p>
-                <button
-                    type="button"
-                    class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
-                    @click="bannerHidden = true"
+            <div class="mx-auto grid h-full w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-2 px-3 sm:px-4">
+                <div class="flex items-center gap-1">
+                    <button
+                        v-if="hasMultipleAnnouncements"
+                        type="button"
+                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
+                        @click="showPreviousAnnouncement"
+                    >
+                        <span class="sr-only">Previous announcement</span>
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                            <path
+                                fill-rule="evenodd"
+                                d="M12.78 4.47a.75.75 0 0 1 0 1.06L8.31 10l4.47 4.47a.75.75 0 0 1-1.06 1.06l-5-5a.75.75 0 0 1 0-1.06l5-5a.75.75 0 0 1 1.06 0Z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                <component
+                    :is="currentAnnouncement.link_url ? 'a' : 'div'"
+                    :href="currentAnnouncement.link_url || undefined"
+                    class="min-w-0 text-center"
                 >
-                    <span class="sr-only">Dismiss shipping notice</span>
-                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-                        <path
-                            d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
-                        />
-                    </svg>
-                </button>
+                    <p
+                        class="truncate text-label-xs font-semibold tracking-label-tight text-slate-100 uppercase"
+                        :class="currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : ''"
+                        aria-live="polite"
+                    >
+                        {{ currentAnnouncement.message }}
+                    </p>
+                </component>
+
+                <div class="justify-self-end flex items-center gap-1">
+                    <button
+                        v-if="hasMultipleAnnouncements"
+                        type="button"
+                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
+                        @click="showNextAnnouncement"
+                    >
+                        <span class="sr-only">Next announcement</span>
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                            <path
+                                fill-rule="evenodd"
+                                d="M7.22 15.53a.75.75 0 0 1 0-1.06L11.69 10 7.22 5.53a.75.75 0 1 1 1.06-1.06l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 0 1-1.06 0Z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
+                        @click="dismissAnnouncementBar"
+                    >
+                        <span class="sr-only">Dismiss announcement bar</span>
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                            <path
+                                d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 

@@ -53,8 +53,8 @@ const emit = defineEmits<{
         </div>
 
         <div class="mt-5 grid gap-3 sm:grid-cols-3">
-            <div v-for="fact in productFacts" :key="fact.label" class="rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4">
-                <span class="tracking-label-tight block text-[0.82rem] text-slate-500 uppercase">{{ fact.label }}</span>
+            <div v-for="fact in productFacts" :key="fact.label" class="rounded-card-sm border border-slate-200 bg-slate-50 p-4">
+                <span class="tracking-label-tight text-label-sm block text-slate-500 uppercase">{{ fact.label }}</span>
                 <strong class="mt-2 block text-sm leading-6 text-slate-950">{{ fact.value }}</strong>
             </div>
         </div>
@@ -87,7 +87,7 @@ const emit = defineEmits<{
 
             <button
                 type="button"
-                class="ui-btn-accent w-full px-6 text-base motion-reduce:transition-none sm:w-auto sm:min-w-[16rem]"
+                class="ui-btn-accent w-full px-6 text-base motion-reduce:transition-none sm:w-auto sm:min-w-64"
                 :disabled="!selectedVariant || quantity < 1 || quantity > maxStock || adding"
                 @click="emit('add-to-cart')"
             >
@@ -95,14 +95,12 @@ const emit = defineEmits<{
             </button>
         </div>
 
-        <div v-else class="mt-5 rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+        <div v-else class="rounded-card-sm mt-5 border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
             This variant is currently unavailable. Try another option or browse related products below.
         </div>
 
         <div class="mt-5 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3">
-            <div
-                class="flex items-center gap-3 rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700"
-            >
+            <div class="rounded-card-sm flex items-center gap-3 border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700">
                 <span
                     class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-900 ring-1 ring-amber-100"
                 >
@@ -115,9 +113,7 @@ const emit = defineEmits<{
                 </span>
                 <span>Fast regional delivery</span>
             </div>
-            <div
-                class="flex items-center gap-3 rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700"
-            >
+            <div class="rounded-card-sm flex items-center gap-3 border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700">
                 <span
                     class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-900 ring-1 ring-amber-100"
                 >
@@ -130,9 +126,7 @@ const emit = defineEmits<{
                 </span>
                 <span>Easy returns and exchanges</span>
             </div>
-            <div
-                class="flex items-center gap-3 rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700"
-            >
+            <div class="rounded-card-sm flex items-center gap-3 border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700">
                 <span
                     class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-900 ring-1 ring-amber-100"
                 >

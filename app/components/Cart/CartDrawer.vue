@@ -249,7 +249,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 
             <aside
                 ref="drawerRef"
-                class="fixed top-0 right-0 bottom-0 z-85 w-full max-w-110 overflow-hidden border-l border-white/60 bg-gradient-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out"
+                class="fixed top-0 right-0 bottom-0 z-85 w-full max-w-110 overflow-hidden border-l border-white/60 bg-linear-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out"
                 :class="openCartDrawer ? 'translate-x-0' : 'translate-x-full'"
                 :aria-labelledby="titleId"
                 role="search"
@@ -257,7 +257,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
             >
                 <div class="flex h-full min-h-0 flex-col">
                     <div class="shrink-0 border-b border-slate-200/80 px-4 py-4 sm:px-5 sm:py-5">
-                        <div class="mb-4 h-px w-full bg-gradient-to-r from-slate-400/0 via-amber-500/45 to-slate-400/0"></div>
+                        <div class="mb-4 h-px w-full bg-linear-to-r from-slate-400/0 via-amber-500/45 to-slate-400/0"></div>
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <p
@@ -313,7 +313,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             <article
                                 v-for="item in cart.items"
                                 :key="item.id"
-                                class="rounded-card shadow-panel flex gap-3 border border-white/80 bg-gradient-to-b from-white to-slate-50 p-3"
+                                class="rounded-card shadow-panel flex gap-3 border border-white/80 bg-linear-to-b from-white to-slate-50 p-3"
                             >
                                 <NuxtImage
                                     :src="item.thumbnail || '/images/about/about-premium.jpg'"
@@ -394,7 +394,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 
                         <section
                             v-else
-                            class="shadow-panel rounded-3xl border border-white/80 bg-gradient-to-b from-white to-slate-50 p-6 text-center"
+                            class="shadow-panel rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-6 text-center"
                         >
                             <div
                                 class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-900"
@@ -410,7 +410,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                     </div>
 
                     <footer class="shrink-0 border-t border-slate-200/80 bg-white/85 p-4 pb-6 backdrop-blur sm:px-5">
-                        <div class="shadow-panel space-y-2 rounded-3xl border border-white/80 bg-gradient-to-b from-white to-slate-50 p-4">
+                        <div class="shadow-panel space-y-2 rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm text-slate-600">Subtotal</span>
                                 <strong class="text-sm text-slate-950">{{ displaySubtotal }}</strong>
@@ -420,7 +420,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 <strong class="text-sm text-slate-950">{{ displayTaxTotal }}</strong>
                             </div>
                             <div class="pt-1">
-                                <div class="mb-3 h-px w-full bg-gradient-to-r from-slate-400/0 via-amber-500/35 to-slate-400/0"></div>
+                                <div class="mb-3 h-px w-full bg-linear-to-r from-slate-400/0 via-amber-500/35 to-slate-400/0"></div>
                                 <p class="text-xs tracking-wide text-slate-500">Shipping is calculated during checkout.</p>
                             </div>
                         </div>

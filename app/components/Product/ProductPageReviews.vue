@@ -14,7 +14,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="mt-8 rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-4xl sm:p-7 xl:p-8">
+    <div class="rounded-panel mt-8 border border-slate-200 bg-white p-5 shadow-sm sm:rounded-4xl sm:p-7 xl:p-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <span
@@ -22,10 +22,8 @@ const emit = defineEmits<{
                 >
                     Customer feedback
                 </span>
-                <h2 class="mt-4 text-[1.9rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.3rem]">
-                    What shoppers are saying.
-                </h2>
-                <p class="mt-3 max-w-xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950 sm:text-4xl">What shoppers are saying.</h2>
+                <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
                     Read recent feedback from verified shoppers before making a decision.
                 </p>
             </div>

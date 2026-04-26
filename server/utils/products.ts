@@ -14,8 +14,14 @@ type StoreProductsResponse<Product> = {
 
 type ProductPrice = {
     calculated_amount?: number | null
+    calculated_amount_with_tax?: number | null
+    calculated_amount_without_tax?: number | null
     original_amount?: number | null
+    original_amount_with_tax?: number | null
+    original_amount_without_tax?: number | null
     currency_code?: string | null
+    is_calculated_price_tax_inclusive?: boolean | null
+    is_original_price_tax_inclusive?: boolean | null
 }
 
 type ProductVariantPricing = {
@@ -31,6 +37,36 @@ type ProductFetchOptions = {
 type ProductPriceField = keyof Pick<ProductPrice, "calculated_amount" | "original_amount">
 type ProductWithUnknownVariants = {
     variants?: unknown[] | null
+}
+
+function getResolvedVariantPrice(price: ProductPrice | null | undefined, field: ProductPriceField): number | null {
+    if (!price) {
+        return null
+    }
+
+    const baseAmount = price[field]
+
+    if (field === "original_amount") {
+        if (price.is_original_price_tax_inclusive && typeof baseAmount === "number") {
+            return baseAmount
+        }
+
+        if (typeof price.original_amount_with_tax === "number") {
+            return price.original_amount_with_tax
+        }
+
+        return typeof baseAmount === "number" ? baseAmount : null
+    }
+
+    if (price.is_calculated_price_tax_inclusive && typeof baseAmount === "number") {
+        return baseAmount
+    }
+
+    if (typeof price.calculated_amount_with_tax === "number") {
+        return price.calculated_amount_with_tax
+    }
+
+    return typeof baseAmount === "number" ? baseAmount : null
 }
 
 export async function fetchAllStoreProducts<Product>(event: H3Event, searchParams: URLSearchParams, options: ProductFetchOptions = {}) {
@@ -115,7 +151,7 @@ async function fetchStoreProductsPage<Product>(event: H3Event, searchParams: URL
 
 export function getProductPrices(product: ProductWithUnknownVariants, field: ProductPriceField = "calculated_amount") {
     return (product.variants ?? [])
-        .map((variant) => (variant as ProductVariantPricing).calculated_price?.[field])
+        .map((variant) => getResolvedVariantPrice((variant as ProductVariantPricing).calculated_price, field))
         .filter((value): value is number => typeof value === "number")
 }
 

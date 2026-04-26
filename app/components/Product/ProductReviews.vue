@@ -40,7 +40,7 @@ const safeReviews = computed<SafeReview[]>(() =>
     <div class="mt-5">
         <div
             v-if="safeReviews.length === 0"
-            class="rounded-[1.3rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+            class="rounded-card border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             <template v-if="props.averageRating && props.averageRating > 0">
                 Rated {{ props.averageRating.toFixed(1) }} out of 5
@@ -54,7 +54,7 @@ const safeReviews = computed<SafeReview[]>(() =>
             <article
                 v-for="review in safeReviews"
                 :key="review.id"
-                class="h-full rounded-[1.3rem] border border-slate-200/80 bg-slate-50/80 p-5"
+                class="rounded-card h-full border border-slate-200/80 bg-slate-50/80 p-5"
             >
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
@@ -69,7 +69,7 @@ const safeReviews = computed<SafeReview[]>(() =>
                 </div>
 
                 <h3 class="mt-4 text-base font-semibold text-slate-950">{{ review.title }}</h3>
-                <p class="mt-2 text-sm leading-7 text-slate-600 sm:text-[0.95rem]">{{ review.content }}</p>
+                <p class="mt-2 text-sm leading-7 text-slate-600">{{ review.content }}</p>
             </article>
         </div>
     </div>

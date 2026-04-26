@@ -8,14 +8,12 @@ const props = defineProps<{
 
 <template>
     <div
-        class="overflow-hidden rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_18px_48px_rgba(8,27,90,0.08)] sm:rounded-[2rem] sm:p-7"
+        class="rounded-panel shadow-panel overflow-hidden border border-white/80 bg-gradient-to-b from-white to-slate-50 p-5 sm:rounded-4xl sm:p-7"
     >
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="max-w-2xl">
                 <span class="ui-badge-accent"> Shopping cart </span>
-                <h1
-                    class="mt-4 max-w-[12ch] text-[2.2rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3rem] lg:text-[4.2rem]"
-                >
+                <h1 class="mt-4 max-w-lg text-4xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-5xl lg:text-7xl">
                     Review your picks before you head to checkout.
                 </h1>
                 <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
@@ -26,9 +24,9 @@ const props = defineProps<{
 
             <div class="grid w-full gap-3 sm:w-auto sm:min-w-72">
                 <NuxtLink :to="props.continueShoppingUrl" class="ui-btn-accent min-h-12"> Continue shopping </NuxtLink>
-                <div class="rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-4 shadow-[0_10px_26px_rgba(8,27,90,0.05)]">
+                <div class="rounded-card shadow-card border border-slate-200/80 bg-white/80 p-4">
                     <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Current total</p>
-                    <p class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">
+                    <p class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
                         {{ props.total }}
                     </p>
                     <p class="mt-2 text-sm leading-6 text-slate-600">
@@ -39,15 +37,15 @@ const props = defineProps<{
         </div>
 
         <div class="mt-6 grid gap-4 md:grid-cols-3">
-            <div class="rounded-[1.35rem] border border-slate-200/80 bg-white/80 p-4">
+            <div class="rounded-card border border-slate-200/80 bg-white/80 p-4">
                 <p class="text-sm font-semibold text-slate-950">Save cart changes first</p>
                 <p class="mt-1 text-sm leading-6 text-slate-600">Live totals update after cart changes are applied.</p>
             </div>
-            <div class="rounded-[1.35rem] border border-slate-200/80 bg-white/80 p-4">
+            <div class="rounded-card border border-slate-200/80 bg-white/80 p-4">
                 <p class="text-sm font-semibold text-slate-950">Promo codes before checkout</p>
                 <p class="mt-1 text-sm leading-6 text-slate-600">Apply promotions here once quantities are final.</p>
             </div>
-            <div class="rounded-[1.35rem] border border-slate-200/80 bg-white/80 p-4">
+            <div class="rounded-card border border-slate-200/80 bg-white/80 p-4">
                 <p class="text-sm font-semibold text-slate-950">Shipping next step</p>
                 <p class="mt-1 text-sm leading-6 text-slate-600">Delivery options and shipping costs are confirmed during checkout.</p>
             </div>

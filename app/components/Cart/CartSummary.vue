@@ -37,18 +37,16 @@ function onCouponInput(event: Event): void {
 </script>
 
 <template>
-    <div
-        class="overflow-hidden rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_18px_48px_rgba(8,27,90,0.08)] sm:p-6"
-    >
+    <div class="rounded-panel shadow-panel overflow-hidden border border-white/80 bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6">
         <span class="ui-badge-brand"> Order summary </span>
-        <h2 class="mt-4 text-[1.8rem] leading-[1.05] font-semibold tracking-[-0.04rem] text-slate-950 sm:text-[2.2rem]">
+        <h2 class="mt-4 text-3xl leading-tight font-semibold tracking-tight text-slate-950 sm:text-4xl">
             A clean view of what you are about to order.
         </h2>
         <p class="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
             Apply a promotion, review the totals, and continue once cart updates are saved.
         </p>
 
-        <div class="mt-5 rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4 shadow-[0_10px_26px_rgba(8,27,90,0.05)]">
+        <div class="rounded-card shadow-card mt-5 border border-slate-200/80 bg-white/85 p-4">
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Cart snapshot</p>
@@ -91,7 +89,7 @@ function onCouponInput(event: Event): void {
             <div
                 v-for="promo in props.promotions"
                 :key="promo.id"
-                class="flex items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 p-4"
+                class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 p-4"
             >
                 <div>
                     <p class="font-semibold text-slate-950">{{ promo.code }}</p>
@@ -114,7 +112,7 @@ function onCouponInput(event: Event): void {
             </div>
         </div>
 
-        <div class="my-5 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.38),rgba(148,163,184,0))]"></div>
+        <div class="my-5 h-px w-full bg-gradient-to-r from-slate-400/0 via-amber-500/40 to-slate-400/0"></div>
 
         <div class="grid gap-3">
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
@@ -125,9 +123,9 @@ function onCouponInput(event: Event): void {
                 <span>Tax</span>
                 <span class="font-semibold text-slate-950">{{ props.tax }}</span>
             </div>
-            <div class="flex items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+            <div class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                 <span class="text-sm font-semibold text-slate-900">Total</span>
-                <strong class="text-lg font-semibold tracking-[-0.02em] text-slate-950">
+                <strong class="text-lg font-semibold tracking-tight text-slate-950">
                     {{ props.total }}
                 </strong>
             </div>
