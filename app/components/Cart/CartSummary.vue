@@ -37,7 +37,7 @@ function onCouponInput(event: Event): void {
 </script>
 
 <template>
-    <div class="rounded-panel shadow-panel overflow-hidden border border-white/80 bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6">
+    <div class="rounded-panel shadow-panel overflow-hidden border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:p-6">
         <span class="ui-badge-brand"> Order summary </span>
         <h2 class="mt-4 text-3xl leading-tight font-semibold tracking-tight text-slate-950 sm:text-4xl">
             A clean view of what you are about to order.
@@ -112,7 +112,7 @@ function onCouponInput(event: Event): void {
             </div>
         </div>
 
-        <div class="my-5 h-px w-full bg-gradient-to-r from-slate-400/0 via-amber-500/40 to-slate-400/0"></div>
+        <div class="my-5 h-px w-full bg-linear-to-r from-slate-400/0 via-amber-500/40 to-slate-400/0"></div>
 
         <div class="grid gap-3">
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
