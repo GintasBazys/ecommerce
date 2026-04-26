@@ -1,20 +1,31 @@
 <script setup lang="ts">
-import AppFooter from "@/components/Footer/AppFooter.vue"
 import BaseHeader from "@/components/Header/BaseHeader.vue"
-import CookieBanner from "@/components/Shared/CookieBanner.vue"
 
 const { organizationSchema, websiteSchema } = useSiteIdentity()
+const LazyAppFooter = defineAsyncComponent(() => import("@/components/Footer/AppFooter.vue"))
+const LazyCookieBanner = defineAsyncComponent(() => import("@/components/Shared/CookieBanner.vue"))
 const archivoFontHref = "https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap"
+const showDeferredChrome = ref(false)
+
+onMounted(() => {
+    const revealDeferredChrome = () => {
+        showDeferredChrome.value = true
+    }
+
+    const requestIdleCallback = window.requestIdleCallback
+
+    if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(revealDeferredChrome)
+        return
+    }
+
+    window.setTimeout(revealDeferredChrome, 1200)
+})
 
 useHead({
     link: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
-        {
-            rel: "preload",
-            as: "style",
-            href: archivoFontHref
-        },
         {
             rel: "stylesheet",
             href: archivoFontHref,
@@ -38,13 +49,13 @@ useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global
     <NuxtLayout>
         <NuxtPage />
     </NuxtLayout>
-    <CookieBanner />
-    <AppFooter />
+    <LazyCookieBanner v-if="showDeferredChrome" />
+    <LazyAppFooter v-if="showDeferredChrome" />
 </template>
 
 <style lang="scss">
 html {
-    font-family: "Archivo", sans-serif;
+    font-family: "Archivo", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     scrollbar-gutter: stable;
     scrollbar-width: thin;
     scrollbar-color: rgba(120, 53, 15, 0.78) rgba(241, 245, 249, 0.96);

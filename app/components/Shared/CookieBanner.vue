@@ -1,10 +1,17 @@
 <script setup lang="ts">
 const { accept, decline, isBannerVisible } = useCookieConsent()
+const canRenderBanner = ref(false)
+
+onMounted(() => {
+    window.setTimeout(() => {
+        canRenderBanner.value = true
+    }, 800)
+})
 </script>
 
 <template>
     <Teleport to="body">
-        <div v-if="isBannerVisible" class="fixed inset-x-0 bottom-0 z-90 px-4 pb-4 sm:px-6 lg:px-8">
+        <div v-if="canRenderBanner && isBannerVisible" class="fixed inset-x-0 bottom-0 z-90 px-4 pb-4 sm:px-6 lg:px-8">
             <section
                 class="mx-auto w-full max-w-5xl rounded-3xl border border-slate-200 bg-white/95 p-4 text-slate-900 sm:p-5"
                 role="dialog"
