@@ -34,6 +34,8 @@ const articleDate = computed<string>(() => formatDate(article.publishedAt))
                     height="640"
                     sizes="320px md:50vw xl:33vw"
                     densities="x1 x2"
+                    loading="lazy"
+                    decoding="async"
                     class="h-full w-full object-cover transition duration-500 group-hover:scale-105 motion-reduce:transition-none"
                 />
                 <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-slate-950/18 to-transparent"></div>

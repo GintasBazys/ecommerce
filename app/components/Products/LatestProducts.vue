@@ -5,9 +5,13 @@ import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 const productStore = useProductStore()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { products } = storeToRefs(useProductStore())
+const HOMEPAGE_PRODUCT_LIMIT = 8
 
 await callOnce(async () => {
-    await productStore.fetchData(regionStoreId.value ?? "", selectedCountryCode.value ?? "")
+    await productStore.fetchData(regionStoreId.value ?? "", selectedCountryCode.value ?? "", {
+        limit: HOMEPAGE_PRODUCT_LIMIT,
+        view: "card"
+    })
 })
 
 const railRef = ref<HTMLElement | null>(null)

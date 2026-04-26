@@ -11,7 +11,7 @@ const heroContent = {
     ctaTo: "/special-offers",
     secondaryLabel: "Browse all products",
     secondaryTo: ALL_PRODUCTS_URL_HANDLE,
-    image: "/images/hero-premium.jpg",
+    image: "/images/hero-premium-1600.jpg",
     alt: "Premium modern interior with marble and wood details"
 } as const
 
@@ -23,11 +23,11 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
         <NuxtImage
             :src="heroContent.image"
             :alt="heroContent.alt"
-            width="2400"
-            height="1411"
-            sizes="(max-width: 767px) 100vw, (max-width: 1280px) 100vw, (max-width: 1920px) 100vw, 1920px"
+            width="1600"
+            height="941"
+            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1280px"
             format="webp"
-            quality="64"
+            quality="56"
             loading="eager"
             :preload="{ fetchPriority: 'high' }"
             decoding="async"

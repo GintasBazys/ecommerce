@@ -1,4 +1,4 @@
-import type { ProductDTO, ProductCategoryDTO, CartDTO } from "@medusajs/types"
+import type { ProductDTO, CartDTO } from "@medusajs/types"
 
 import { LIMIT } from "@/utils/consts"
 
@@ -7,6 +7,17 @@ interface ProductResponse {
     count: number
     productLimit: number
     productOffset: number
+}
+
+type NavigationCategory = {
+    id: string
+    handle: string
+    name: string
+}
+
+type ProductFetchOptions = {
+    limit?: number
+    view?: "default" | "card"
 }
 
 export interface CartResponse {
@@ -34,9 +45,9 @@ export const useProductStore = defineStore("product", () => {
         totalCount.value = count
     }
 
-    const categories = ref<ProductCategoryDTO[]>([])
+    const categories = ref<NavigationCategory[]>([])
 
-    const setCategories = (newCategories: ProductCategoryDTO[]) => {
+    const setCategories = (newCategories: NavigationCategory[]) => {
         if (Array.isArray(newCategories)) {
             categories.value = newCategories
         }
@@ -46,12 +57,15 @@ export const useProductStore = defineStore("product", () => {
     const pageNumber = parseInt(route.query.page as string, 10) || 1
     offset.value = (pageNumber - 1) * limit.value
 
-    const fetchData = async (regionId?: string, countryCode?: string) => {
+    const fetchData = async (regionId?: string, countryCode?: string, options: ProductFetchOptions = {}) => {
+        const requestLimit = options.limit ?? limit.value
+
         try {
             const response = await $fetch<ProductResponse>("/api/products/products", {
                 query: {
-                    limit: limit.value,
+                    limit: requestLimit,
                     offset: offset.value,
+                    ...(options.view ? { view: options.view } : {}),
                     ...(regionId ? { region_id: regionId } : {}),
                     ...(countryCode ? { country_code: countryCode } : {})
                 }
@@ -70,24 +84,27 @@ export const useProductStore = defineStore("product", () => {
 
     const fetchLinks = async () => {
         try {
-            const categoriesResponse = await $fetch<{ product_categories: ProductCategoryDTO[] }>("/api/categories/categories", {
+            const categoriesResponse = await $fetch<NavigationCategory[]>("/api/categories/navigation", {
                 credentials: "include"
             })
-            setCategories(categoriesResponse["product_categories"])
+            setCategories(categoriesResponse)
         } catch (error) {
             console.error("Failed to fetch categories:", error)
         }
     }
-    const fetchBestSellers = async (regionId?: string, countryCode?: string) => {
+    const fetchBestSellers = async (regionId?: string, countryCode?: string, options: ProductFetchOptions = {}) => {
         if (!regionId) {
             return
         }
 
+        const requestLimit = options.limit ?? limit.value
+
         try {
             const { products } = await $fetch<{ products: ProductDTO[] }>(`/api/categories/best-selling`, {
                 query: {
-                    limit: limit.value,
+                    limit: requestLimit,
                     offset: offset.value,
+                    ...(options.view ? { view: options.view } : {}),
                     ...(regionId ? { region_id: regionId } : {}),
                     ...(countryCode ? { country_code: countryCode } : {})
                 }

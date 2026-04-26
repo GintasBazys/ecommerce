@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
     const offset = query.offset != null ? String(query.offset) : "0"
     const regionId = query.region_id ? String(query.region_id) : ""
     const countryCode = query.country_code ? String(query.country_code) : ""
+    const view = query.view ? String(query.view) : "default"
 
     if (!regionId) {
         throw createError({ statusCode: 400, statusMessage: "region_id is required" })
@@ -19,6 +20,13 @@ export default defineEventHandler(async (event) => {
         limit,
         offset
     })
+
+    if (view === "card") {
+        searchParams.set(
+            "fields",
+            "id,title,handle,thumbnail,subtitle,description,*images,+metadata,*collection,*type,*categories,*variants.calculated_price,+variants.inventory_quantity"
+        )
+    }
 
     if (countryCode) {
         searchParams.set("country_code", countryCode)

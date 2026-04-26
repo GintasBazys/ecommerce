@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import AboutCta from "@/components/About/AboutCta.vue"
-import LatestPosts from "@/components/About/LatestPosts.vue"
 import MainBanner from "@/components/Banner/MainBanner.vue"
 import BestSellers from "@/components/Products/BestSellers.vue"
 import LatestProducts from "@/components/Products/LatestProducts.vue"
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
+const DeferredLatestPosts = defineAsyncComponent(() => import("@/components/About/LatestPosts.vue"))
+const showLatestPosts = ref(false)
+
+onMounted(() => {
+    window.setTimeout(() => {
+        showLatestPosts.value = true
+    }, 800)
+})
 
 useHead({
     title: "Shop | Medusa Commerce"
@@ -42,6 +49,8 @@ useStructuredData(
         <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
         <LatestProducts />
         <BestSellers />
-        <LatestPosts />
+        <ClientOnly>
+            <DeferredLatestPosts v-if="showLatestPosts" />
+        </ClientOnly>
     </section>
 </template>

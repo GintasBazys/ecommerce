@@ -5,9 +5,13 @@ import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const productStore = useProductStore()
 const { bestSellers } = storeToRefs(productStore)
+const HOMEPAGE_PRODUCT_LIMIT = 8
 
 await callOnce(async () => {
-    await productStore.fetchBestSellers(regionStoreId.value ?? "", selectedCountryCode.value ?? "")
+    await productStore.fetchBestSellers(regionStoreId.value ?? "", selectedCountryCode.value ?? "", {
+        limit: HOMEPAGE_PRODUCT_LIMIT,
+        view: "card"
+    })
 })
 
 const railRef = ref<HTMLElement | null>(null)

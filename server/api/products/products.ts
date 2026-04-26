@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
     const categoryId = query.category_id != null ? String(query.category_id) : null
     const handle = query.handle ? String(query.handle) : null
     const order = query.order ? String(query.order) : "-created_at"
+    const view = query.view ? String(query.view) : "default"
 
     const regionId = query.region_id ? String(query.region_id) : null
     const countryCode = query.country_code ? String(query.country_code) : ""
@@ -21,8 +22,13 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "region_id is required" })
     }
 
+    const fields =
+        view === "card"
+            ? "id,title,handle,thumbnail,subtitle,description,*images,+metadata,*collection,*type,*categories,*variants,*variants.calculated_price,+variants.inventory_quantity"
+            : "*variants.calculated_price,+variants.inventory_quantity,*categories,+metadata"
+
     const queryParams = new URLSearchParams({
-        fields: `*variants.calculated_price,+variants.inventory_quantity,*categories,+metadata`,
+        fields,
         region_id: regionId,
         country_code: countryCode,
         order

@@ -2,22 +2,41 @@ import type { Router } from "vue-router"
 
 import type { PostHog } from "posthog-js"
 
-import { posthog } from "posthog-js"
-
 type PostHogConfig = {
     publicKey?: string
     host?: string
 }
 
 let posthogClient: PostHog | null = null
+let posthogModulePromise: Promise<PostHog | null> | null = null
 let pageviewHookRegistered = false
+
+async function loadPostHog(): Promise<PostHog | null> {
+    if (posthogClient) {
+        return posthogClient
+    }
+
+    if (!posthogModulePromise) {
+        posthogModulePromise = import("posthog-js")
+            .then((module) => module.posthog)
+            .catch(() => null)
+    }
+
+    return posthogModulePromise
+}
 
 export function getPostHogClient(): PostHog | null {
     return posthogClient
 }
 
-export function initPostHogClient(config: PostHogConfig, router: Router): PostHog | null {
+export async function initPostHogClient(config: PostHogConfig, router: Router): Promise<PostHog | null> {
     if (!config.publicKey || !config.host) {
+        return null
+    }
+
+    const posthog = await loadPostHog()
+
+    if (!posthog) {
         return null
     }
 
@@ -60,7 +79,7 @@ export function disablePostHogClient(): void {
         return
     }
 
-    posthog.opt_out_capturing()
-    posthog.reset(true)
+    posthogClient.opt_out_capturing()
+    posthogClient.reset(true)
     posthogClient = null
 }

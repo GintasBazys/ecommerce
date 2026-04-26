@@ -86,6 +86,8 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     height="840"
                     :sizes="compact ? '(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw' : '280px md:33vw xl:22vw'"
                     densities="x1 x2"
+                    loading="lazy"
+                    decoding="async"
                     class="h-full w-full object-cover transition duration-500 group-focus-within:scale-105 group-hover:scale-105 motion-reduce:transition-none"
                 />
                 <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-slate-950/18 to-transparent"></div>

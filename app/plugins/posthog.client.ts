@@ -5,8 +5,27 @@ export default defineNuxtPlugin(() => {
     const router = useRouter()
     const { analyticsAllowed } = useCookieConsent()
 
+    async function startAnalytics(): Promise<void> {
+        if (!analyticsAllowed.value) {
+            return
+        }
+
+        const requestIdleCallback = window.requestIdleCallback
+
+        if (typeof requestIdleCallback === "function") {
+            requestIdleCallback(() => {
+                void initPostHogClient(runtimeConfig.public.posthog, router)
+            })
+            return
+        }
+
+        globalThis.setTimeout(() => {
+            void initPostHogClient(runtimeConfig.public.posthog, router)
+        }, 1)
+    }
+
     if (analyticsAllowed.value) {
-        initPostHogClient(runtimeConfig.public.posthog, router)
+        void startAnalytics()
     } else {
         disablePostHogClient()
     }
@@ -15,7 +34,7 @@ export default defineNuxtPlugin(() => {
         analyticsAllowed,
         (isAllowed) => {
             if (isAllowed) {
-                initPostHogClient(runtimeConfig.public.posthog, router)
+                void startAnalytics()
                 return
             }
 
