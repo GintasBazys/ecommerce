@@ -8,7 +8,7 @@ const props = defineProps<{
 
 <template>
     <div
-        class="rounded-panel shadow-panel overflow-hidden border border-white/80 bg-gradient-to-b from-white to-slate-50 p-5 sm:rounded-4xl sm:p-7"
+        class="rounded-panel shadow-panel overflow-hidden border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:rounded-4xl sm:p-7"
     >
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="max-w-2xl">

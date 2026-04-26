@@ -137,20 +137,29 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 </script>
 
 <template>
-    <main class="blog-post">
-        <div class="blog-post__container">
-            <section class="blog-post__hero">
-                <div class="blog-post__hero-copy">
-                    <AppBreadcrumbs :items="breadcrumbItems" class="blog-post__breadcrumbs" />
-                    <h1 class="blog-post__title">{{ currentPost?.title }}</h1>
-                    <div class="blog-post__meta">
-                        <span v-if="publishedDate" class="blog-post__meta-item">{{ publishedDate }}</span>
-                        <span v-if="currentPost?.author" class="blog-post__meta-item">{{ currentPost.author }}</span>
+    <main class="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-14 sm:py-20">
+        <div class="relative z-10 mx-auto w-full max-w-7xl">
+            <section class="mb-8 flex justify-center">
+                <div class="w-full max-w-4xl text-center">
+                    <AppBreadcrumbs :items="breadcrumbItems" class="mx-auto mb-4" />
+                    <h1
+                        class="mx-auto mb-4 max-w-3xl text-4xl leading-tight font-bold tracking-tight text-slate-950 sm:text-5xl xl:text-6xl"
+                    >
+                        {{ currentPost?.title }}
+                    </h1>
+                    <div class="flex flex-wrap justify-center gap-x-5 gap-y-2">
+                        <span v-if="publishedDate" class="inline-flex items-center text-sm text-slate-500">{{ publishedDate }}</span>
+                        <span v-if="currentPost?.author" class="inline-flex items-center text-sm text-slate-500">{{
+                            currentPost.author
+                        }}</span>
                     </div>
-                    <p v-if="currentPost?.excerpt" class="blog-post__excerpt">{{ currentPost.excerpt }}</p>
+                    <p v-if="currentPost?.excerpt" class="mx-auto mt-4 max-w-3xl text-base leading-8 text-slate-600">
+                        {{ currentPost.excerpt }}
+                    </p>
                 </div>
             </section>
-            <section class="blog-post__article">
+
+            <section class="mx-auto mb-12 max-w-5xl">
                 <NuxtImage
                     v-if="currentPost?.thumbnail"
                     :src="currentPost.thumbnail"
@@ -160,283 +169,41 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
                     height="900"
                     sizes="100vw md:960px"
                     densities="x1 x2"
-                    class="blog-post__image"
+                    class="rounded-panel mb-6 w-full object-cover"
                 />
-                <!-- eslint-disable vue/no-v-html -->
-                <!-- The Medusa blog API returns sanitized HTML for post bodies. -->
-                <div class="blog-post__content" v-html="currentPost?.html"></div>
-                <!-- eslint-enable vue/no-v-html -->
-                <div v-if="!currentPost?.html" class="blog-post__empty-copy">This article does not have content yet.</div>
-            </section>
-            <section v-if="relatedPosts.length" class="blog-post__related">
-                <div class="blog-post__related-intro">
-                    <span class="blog-post__related-kicker">More to read</span>
-                    <h2 class="blog-post__related-title">Related posts</h2>
+
+                <div class="rounded-panel shadow-panel border border-white/80 bg-white/90 p-5 text-slate-700 sm:p-8">
+                    <!-- eslint-disable vue/no-v-html -->
+                    <!-- The Medusa blog API returns sanitized HTML for post bodies. -->
+                    <div class="blog-richtext" v-html="currentPost?.html"></div>
+                    <!-- eslint-enable vue/no-v-html -->
                 </div>
-                <div class="blog-post__related-grid">
-                    <article v-for="article in relatedPosts" :key="article.id" class="blog-post__related-col">
+
+                <div v-if="!currentPost?.html" class="mt-4 text-center text-sm text-slate-600">This article does not have content yet.</div>
+            </section>
+
+            <section v-if="relatedPosts.length" class="mt-4">
+                <div class="mb-6 grid gap-2 text-center">
+                    <span class="text-label-sm tracking-label text-amber-800 uppercase">More to read</span>
+                    <h2 class="text-3xl leading-tight font-bold text-slate-950 sm:text-4xl">Related posts</h2>
+                </div>
+                <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                    <article v-for="article in relatedPosts" :key="article.id">
                         <BlogCard :article="article" compact />
                     </article>
                 </div>
             </section>
 
-            <div v-else class="blog-post__empty">No related posts found.</div>
+            <div v-else class="text-center text-sm leading-7 text-slate-600">No related posts found.</div>
 
-            <div class="blog-post__footer-link-wrap">
-                <NuxtLink :to="BLOG_HANDLE" class="blog-post__footer-link">Back to all posts</NuxtLink>
+            <div class="mt-8 flex justify-center">
+                <NuxtLink
+                    :to="BLOG_HANDLE"
+                    class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-5 text-sm font-semibold text-slate-800 no-underline transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
+                >
+                    Back to all posts
+                </NuxtLink>
             </div>
         </div>
     </main>
 </template>
-
-<style scoped>
-.blog-post {
-    min-height: 100vh;
-    padding: clamp(3.5rem, 6vw, 6rem) 1rem;
-    background:
-        radial-gradient(circle at top left, rgba(202, 138, 4, 0.08), transparent 24%), linear-gradient(180deg, #fcfdff 0%, #f6f8fc 100%);
-}
-
-.blog-post__container {
-    position: relative;
-    z-index: 1;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 80rem;
-}
-
-.blog-post__hero {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.blog-post__hero-copy,
-.blog-post__article,
-.blog-post__related-col {
-    animation: blog-post-rise 0.78s ease both;
-}
-
-.blog-post__hero-copy {
-    width: 100%;
-    max-width: 56rem;
-    text-align: center;
-}
-
-.blog-post__breadcrumbs {
-    margin: 0 auto 1rem;
-}
-
-.blog-post__title {
-    max-width: 14ch;
-    margin: 0 auto 1rem;
-    color: #08173f;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    line-height: 0.94;
-    letter-spacing: -0.07rem;
-    text-wrap: balance;
-}
-
-.blog-post__meta {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.85rem 1.15rem;
-}
-
-.blog-post__meta-item {
-    display: inline-flex;
-    align-items: center;
-    color: #6a758f;
-    font-size: 0.92rem;
-    line-height: 1.4;
-}
-
-.blog-post__excerpt {
-    max-width: 46rem;
-    margin: 1rem auto 0;
-    color: #475569;
-    font-size: 1.04rem;
-    line-height: 1.8;
-}
-
-.blog-post__article {
-    max-width: 960px;
-    margin: 0 auto 3rem;
-}
-
-.blog-post__image {
-    width: 100%;
-    height: auto;
-    margin-bottom: 1.5rem;
-    border-radius: 1.75rem;
-}
-
-.blog-post__content {
-    padding: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.82);
-    border-radius: 1.75rem;
-    background: rgba(255, 255, 255, 0.9);
-    color: #2f3c59;
-    line-height: 1.8;
-    box-shadow: 0 18px 44px rgba(8, 27, 90, 0.08);
-}
-
-.blog-post__empty-copy {
-    margin-top: 1rem;
-    color: #53607b;
-    text-align: center;
-}
-
-.blog-post__related {
-    margin-top: 1rem;
-}
-
-.blog-post__related-intro {
-    display: grid;
-    gap: 0.45rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-
-.blog-post__related-kicker {
-    color: #8a6a2f;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.blog-post__related-title {
-    margin: 0;
-    color: #08173f;
-    font-size: 2.3rem;
-    line-height: 1.1;
-}
-
-.blog-post__related-grid {
-    display: grid;
-    gap: 1.25rem;
-}
-
-.blog-post__related-col:nth-child(2) {
-    animation-delay: 0.08s;
-}
-
-.blog-post__related-col:nth-child(3) {
-    animation-delay: 0.14s;
-}
-
-.blog-post__empty {
-    color: #53607b;
-    text-align: center;
-    font-size: 0.98rem;
-    line-height: 1.6;
-}
-
-.blog-post__footer-link-wrap {
-    display: flex;
-    justify-content: center;
-    margin-top: 2rem;
-}
-
-.blog-post__footer-link {
-    display: inline-flex;
-    min-height: 2.9rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    border: 1px solid rgba(203, 213, 225, 1);
-    background: rgba(255, 255, 255, 0.92);
-    padding: 0.8rem 1.2rem;
-    color: #1e293b;
-    font-size: 0.92rem;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-:deep(.blog-post__content h2),
-:deep(.blog-post__content h3),
-:deep(.blog-post__content h4) {
-    color: #08173f;
-    margin-top: 1.7rem;
-    margin-bottom: 0.8rem;
-}
-
-:deep(.blog-post__content a) {
-    color: #8a6a2f;
-    text-decoration: none;
-}
-
-:deep(.blog-post__content a:hover) {
-    text-decoration: underline;
-}
-
-:deep(.blog-post__content p),
-:deep(.blog-post__content li) {
-    color: #42506b;
-    font-size: 1.02rem;
-    line-height: 1.85;
-}
-
-:deep(.blog-post__content img) {
-    margin: 1.25rem 0;
-    border-radius: 1rem;
-}
-
-:deep(.blog-post__content ul),
-:deep(.blog-post__content ol) {
-    margin: 1rem 0;
-    padding-left: 1.2rem;
-}
-
-:deep(.blog-post__content ul) {
-    list-style: disc;
-}
-
-:deep(.blog-post__content ol) {
-    list-style: decimal;
-}
-
-@keyframes blog-post-rise {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .blog-post__title {
-        max-width: 100%;
-    }
-
-    .blog-post__content {
-        padding: 1.25rem;
-    }
-}
-
-@media screen and (min-width: 768px) {
-    .blog-post__related-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media screen and (min-width: 1200px) {
-    .blog-post__related-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .blog-post__hero-copy,
-    .blog-post__article,
-    .blog-post__related-col {
-        animation: none;
-    }
-}
-</style>

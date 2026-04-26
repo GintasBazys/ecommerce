@@ -52,4 +52,56 @@
     .ui-input-accent {
         @apply focus:border-accent-400 focus:ring-accent-100 min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2;
     }
+
+    .blog-richtext {
+        @apply text-base leading-8 text-slate-700;
+    }
+
+    .blog-richtext h2,
+    .blog-richtext h3,
+    .blog-richtext h4 {
+        @apply mt-7 mb-3 font-semibold text-slate-950;
+    }
+
+    .blog-richtext h2 {
+        @apply text-2xl;
+    }
+
+    .blog-richtext h3 {
+        @apply text-xl;
+    }
+
+    .blog-richtext h4 {
+        @apply text-lg;
+    }
+
+    .blog-richtext a {
+        @apply text-amber-800 no-underline;
+    }
+
+    .blog-richtext a:hover {
+        @apply underline;
+    }
+
+    .blog-richtext p,
+    .blog-richtext li {
+        @apply text-base leading-8 text-slate-700;
+    }
+
+    .blog-richtext img {
+        @apply my-5 rounded-2xl;
+    }
+
+    .blog-richtext ul,
+    .blog-richtext ol {
+        @apply my-4 pl-5;
+    }
+
+    .blog-richtext ul {
+        list-style: disc;
+    }
+
+    .blog-richtext ol {
+        list-style: decimal;
+    }
 }
