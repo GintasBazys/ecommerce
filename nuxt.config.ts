@@ -38,6 +38,10 @@ export default defineNuxtConfig({
         sources: ["/api/__sitemap__/urls"]
     },
 
+    site: {
+        indexable: false
+    },
+
     runtimeConfig: {
         medusaUrl: process.env.NUXT_MEDUSA_URL || process.env.MEDUSA_URL,
         turnstileSecretKey: process.env.NUXT_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY,
