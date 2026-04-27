@@ -32,13 +32,15 @@ export default defineNuxtConfig({
         domains: [...new Set(imageDomains)]
     },
 
-    modules: ["@nuxt/eslint", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt", "@nuxt/image", "@nuxtjs/sitemap"],
+    modules: ["@nuxt/eslint", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "@nuxtjs/robots"],
 
     sitemap: {
         sources: ["/api/__sitemap__/urls"]
     },
 
     site: {
+        url: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || "",
+        name: process.env.SITE_NAME || "Medusa Commerce",
         indexable: false
     },
 
