@@ -29,15 +29,10 @@ const paymentIcons = [
 ]
 
 const currentYear = useState<number>("footer-current-year", () => new Date().getFullYear())
-const isClientHydrated = ref<boolean>(false)
 const supportEmail = "info@medusa-commerce.de"
 const supportPhone = "+370 600 00000"
 const supportPhoneHref = "tel:+37060000000"
 const { openBanner } = useCookieConsent()
-
-onMounted(() => {
-    isClientHydrated.value = true
-})
 
 const expandedMobileSections = reactive<Record<string, boolean>>({
     help: true,
@@ -93,7 +88,6 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </p>
                     <div class="mt-5 grid gap-3">
                         <NuxtLink
-                            v-if="isClientHydrated"
                             :to="`mailto:${supportEmail}`"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -101,14 +95,6 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                         >
                             <span class="text-label-xs tracking-label font-bold text-blue-100/80 uppercase">Email</span>
                             <span class="text-base font-semibold text-white">{{ supportEmail }}</span>
-                        </NuxtLink>
-                        <NuxtLink
-                            v-else
-                            to="/contact"
-                            class="flex flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 transition hover:border-amber-200/50 hover:bg-white/10"
-                        >
-                            <span class="text-label-xs tracking-label font-bold text-blue-100/80 uppercase">Contact</span>
-                            <span class="text-base font-semibold text-white">Contact support</span>
                         </NuxtLink>
                         <NuxtLink
                             :to="supportPhoneHref"

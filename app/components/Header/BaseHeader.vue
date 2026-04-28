@@ -7,7 +7,6 @@ const LazyHeaderMobileDrawer = defineAsyncComponent(() => import("~/components/H
 const drawer = ref<boolean>(false)
 const searchDialog = ref<boolean>(false)
 const selectionLoading = ref<boolean>(false)
-const isClientHydrated = ref<boolean>(false)
 const currentAnnouncementIndex = ref<number>(0)
 const announcementBarDismissed = useCookie<boolean>("announcement_bar_dismissed", {
     default: () => false,
@@ -56,6 +55,15 @@ const topOffset = computed<number>(() => (announcementBarVisible.value ? 40 : 0)
 const headerHeight = 64
 const headerOffset = computed<number>(() => (announcementBarVisible.value ? headerHeight + 40 : headerHeight))
 const regionId = computed<string>(() => regionStoreId.value ?? "")
+
+useHead(() => ({
+    style: [
+        {
+            key: "site-header-offset-css",
+            textContent: `:root{--site-header-offset:${headerOffset.value}px}`
+        }
+    ]
+}))
 
 let announcementRotationInterval: number | null = null
 
@@ -113,7 +121,6 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
-    isClientHydrated.value = true
     syncAnnouncementRotation()
 })
 
@@ -329,7 +336,6 @@ function dismissAnnouncementBar(): void {
                         </span>
                         <span class="sr-only">Choose shipping country</span>
                         <BaseSelect
-                            v-if="isClientHydrated"
                             :model-value="locationValue"
                             class="max-w-44 xl:max-w-48"
                             :options="locationItems"
@@ -337,9 +343,6 @@ function dismissAnnouncementBar(): void {
                             :disabled="selectionLoading"
                             @update:model-value="updateLocation(String($event))"
                         />
-                        <span v-else class="ui-input shadow-card inline-flex max-w-44 items-center pr-8 text-sm xl:max-w-48">
-                            Country
-                        </span>
                     </label>
 
                     <button
@@ -377,7 +380,7 @@ function dismissAnnouncementBar(): void {
                             </svg>
                         </span>
                         <span
-                            v-if="isClientHydrated && itemCount"
+                            v-if="itemCount"
                             class="bg-accent-500 text-label-xs absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1 font-semibold text-slate-950 ring-2 ring-white"
                         >
                             {{ itemCount < 99 ? itemCount : "99+" }}
@@ -385,7 +388,7 @@ function dismissAnnouncementBar(): void {
                     </NuxtLink>
 
                     <NuxtLink
-                        v-if="isClientHydrated && customer?.id"
+                        v-if="customer?.id"
                         class="shadow-card hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
                         to="/account"
                     >
@@ -422,7 +425,6 @@ function dismissAnnouncementBar(): void {
             :location-items="locationItems"
             :location-value="locationValue"
             :selection-loading="selectionLoading"
-            :is-client-hydrated="isClientHydrated"
             :is-signed-in="Boolean(customer?.id)"
             @close="closeDrawer"
             @update-location="updateLocation"

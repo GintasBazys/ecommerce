@@ -7,13 +7,6 @@ import LatestProducts from "@/components/Products/LatestProducts.vue"
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
 const DeferredLatestPosts = defineAsyncComponent(() => import("@/components/About/LatestPosts.vue"))
-const showLatestPosts = ref<boolean>(false)
-
-onMounted(() => {
-    window.setTimeout(() => {
-        showLatestPosts.value = true
-    }, 800)
-})
 
 useHead({
     title: "Shop | Medusa Commerce"
@@ -49,8 +42,6 @@ useStructuredData(
         <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
         <LatestProducts />
         <BestSellers />
-        <ClientOnly>
-            <DeferredLatestPosts v-if="showLatestPosts" />
-        </ClientOnly>
+        <DeferredLatestPosts />
     </section>
 </template>

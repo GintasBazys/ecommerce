@@ -36,10 +36,10 @@ const emit = defineEmits<{
                     <template v-else>Medusa-backed filters for categories, collections, types, tags, stock, and price.</template>
                 </p>
             </div>
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center lg:justify-end">
+            <div class="grid gap-3 sm:grid-cols-[minmax(10rem,auto)_minmax(14rem,24rem)] sm:items-end lg:justify-end">
                 <button
                     type="button"
-                    class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] xl:hidden"
+                    class="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] xl:hidden"
                     @click="emit('openFilters')"
                 >
                     <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">

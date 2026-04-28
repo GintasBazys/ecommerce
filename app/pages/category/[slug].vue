@@ -26,7 +26,7 @@ const isMobileFilterDrawerOpen = ref<boolean>(false)
 const notFoundPath = ref<string | null>(null)
 const productsStartRef = ref<HTMLElement | null>(null)
 const category = ref<ProductCategoryDTO | null>(null)
-const isAllProductsPage = computed<string>(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
+const isAllProductsPage = computed<boolean>(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
 
 const {
     products,
@@ -337,8 +337,10 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                 </Transition>
             </Teleport>
 
-            <div class="grid gap-6 xl:grid-cols-[minmax(17rem,19rem)_minmax(0,1fr)] xl:gap-8">
-                <aside class="hidden xl:sticky xl:top-10 xl:grid xl:self-start">
+            <div class="grid gap-6 xl:grid-cols-[minmax(19rem,22rem)_minmax(0,1fr)] xl:gap-8">
+                <aside
+                    class="hidden xl:sticky xl:top-[calc(var(--site-header-offset,64px)+1rem)] xl:grid xl:max-h-[calc(100vh-var(--site-header-offset,64px)-2rem)] xl:self-start xl:overflow-y-auto xl:pr-2"
+                >
                     <CategoryFiltersPanel
                         v-model:selected-child-category-ids="selectedChildCategoryIds"
                         v-model:selected-collection-ids="selectedCollectionIds"

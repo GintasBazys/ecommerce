@@ -9,10 +9,6 @@
 }
 
 @layer components {
-    .ui-icon-btn {
-        @apply hover:border-brand-300 hover:text-brand-700 focus-visible:ring-brand-300 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition focus-visible:ring-2 focus-visible:outline-hidden;
-    }
-
     .ui-btn-primary {
         @apply bg-brand-700 hover:bg-brand-900 focus-visible:ring-brand-300 inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition focus-visible:ring-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60;
     }
@@ -31,18 +27,6 @@
 
     .ui-badge-accent {
         @apply text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase;
-    }
-
-    .ui-panel-glass {
-        @apply rounded-panel shadow-panel overflow-hidden border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))];
-    }
-
-    .ui-card-soft {
-        @apply rounded-card shadow-card border border-slate-200/80 bg-white/80 p-4;
-    }
-
-    .ui-label-caps {
-        @apply text-label-xs tracking-label font-bold uppercase;
     }
 
     .ui-input {

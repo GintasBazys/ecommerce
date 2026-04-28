@@ -21,7 +21,6 @@ const props = defineProps<{
     locationItems: LocationItem[]
     locationValue: string
     selectionLoading: boolean
-    isClientHydrated: boolean
     isSignedIn: boolean
 }>()
 
@@ -85,15 +84,12 @@ function closeDrawer(): void {
                     <span class="text-label-xs tracking-label mb-2 block font-semibold text-slate-500 uppercase">Country</span>
 
                     <BaseSelect
-                        v-if="isClientHydrated"
                         v-model="locationModel"
                         class="rounded-xl"
                         :options="locationItems"
                         option-label-key="title"
                         :disabled="selectionLoading"
                     />
-
-                    <span v-else class="ui-input shadow-card inline-flex w-full items-center rounded-xl"> Country </span>
                 </label>
 
                 <nav class="mt-5 grid gap-2" aria-label="Mobile links">
@@ -124,7 +120,7 @@ function closeDrawer(): void {
                     </NuxtLink>
 
                     <NuxtLink
-                        v-if="isClientHydrated && isSignedIn"
+                        v-if="isSignedIn"
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
                         to="/account"
                         @click="closeDrawer"

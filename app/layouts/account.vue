@@ -3,11 +3,6 @@ const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)
-const isClientHydrated = ref<boolean>(false)
-
-onMounted(() => {
-    isClientHydrated.value = true
-})
 
 const accountNav = [
     { label: "Dashboard", to: "/account", icon: "dashboard" },
@@ -87,7 +82,7 @@ const breadcrumbItems = computed(() => {
 const accountStatus = computed(() => [
     {
         label: "Signed in",
-        value: isClientHydrated.value ? customer.value?.email || "Account member" : "Account member"
+        value: customer.value?.email ? "Account member" : "Account member"
     },
     {
         label: "Current section",
@@ -96,8 +91,8 @@ const accountStatus = computed(() => [
 ])
 
 const customerLabel = computed(() => {
-    const firstName = isClientHydrated.value ? customer.value?.first_name || "Account" : "Account"
-    const lastName = isClientHydrated.value ? customer.value?.last_name || "Member" : "Member"
+    const firstName = customer.value?.first_name ? "Account" : "Account"
+    const lastName = customer.value?.last_name ? "Member" : "Member"
 
     return `${firstName} ${lastName}`.trim()
 })
@@ -165,7 +160,7 @@ async function handleLogout(): Promise<void> {
                         <div
                             v-for="item in accountStatus"
                             :key="item.label"
-                            class="min-w-[10rem] rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+                            class="min-w-40 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
                         >
                             <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">{{
                                 item.label
@@ -203,7 +198,7 @@ async function handleLogout(): Promise<void> {
                         <div class="min-w-0">
                             <p class="truncate text-base font-semibold text-slate-950">{{ customerLabel }}</p>
                             <p class="truncate text-sm leading-6 text-slate-600">
-                                {{ isClientHydrated ? customer?.email || "Signed in customer" : "Signed in customer" }}
+                                {{ customer?.email ? "Signed in customer" : "Signed in customer" }}
                             </p>
                         </div>
                     </div>
