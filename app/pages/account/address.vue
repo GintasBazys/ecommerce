@@ -105,19 +105,19 @@ function changePage(nextPage: number): void {
 <template>
     <div class="grid gap-5">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 shadow-sm">
+            <div class="rounded-[1.6rem] border border-slate-200 bg-white px-5 py-5 shadow-[0_16px_45px_rgba(15,23,42,0.08)] sm:min-w-52">
                 <span class="text-label-sm tracking-label block font-semibold text-slate-500 uppercase">Saved entries</span>
-                <strong class="mt-1 block text-2xl font-semibold text-slate-950">{{ totalCount }}</strong>
+                <strong class="mt-2 block text-4xl leading-none font-bold tracking-[-0.04em] text-slate-950">{{ totalCount }}</strong>
             </div>
 
-            <button type="button" class="ui-btn-accent min-h-12 px-6 motion-reduce:transition-none" @click="showAdd = true">
+            <button type="button" class="ui-btn-accent min-h-13 px-7 text-base motion-reduce:transition-none" @click="showAdd = true">
                 Add new address
             </button>
         </div>
 
-        <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-7">
-            <div v-if="loading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
-                <div v-for="item in skeletonCards" :key="item" class="rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5">
+        <section class="rounded-[1.8rem] border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-6 lg:p-8">
+            <div v-if="loading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+                <div v-for="item in skeletonCards" :key="item" class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                     <div class="animate-pulse space-y-4">
                         <div class="flex items-start justify-between gap-3">
                             <div class="space-y-3">
@@ -139,7 +139,7 @@ function changePage(nextPage: number): void {
                 </div>
             </div>
 
-            <div v-else-if="addresses.length" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div v-else-if="addresses.length" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <AddressCard v-for="address in addresses" :key="address.id" :address="address" @edit="onEdit" @delete="deleteAddress" />
             </div>
 

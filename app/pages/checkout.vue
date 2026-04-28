@@ -2,7 +2,7 @@
 import { loadStripe } from "@stripe/stripe-js/pure"
 
 import type { Address, ShippingOption } from "@/types/interfaces"
-import type { CartDTO, CartLineItemDTO } from "@medusajs/types"
+import type { CartDTO, CartLineItemDTO, CustomerAddressDTO } from "@medusajs/types"
 import type { Stripe, StripeElements, StripeLinkAuthenticationElement, StripePaymentElement } from "@stripe/stripe-js"
 
 import { formatPrice } from "@/utils/formatPrice"
@@ -208,6 +208,11 @@ const shippingOptions = ref<ShippingOption[]>([])
 const selectedShippingOptionId = ref<string | null>(null)
 const lastPaymentSignature = ref<string>("")
 const lastAppliedShippingContext = ref<string>("")
+const savedAddresses = ref<CustomerAddressDTO[]>([])
+const isSavedAddressesLoading = ref<boolean>(false)
+const savedAddressesError = ref<string | null>(null)
+const selectedBillingSavedAddressId = ref<string>("")
+const selectedShippingSavedAddressId = ref<string>("")
 
 const emailRules = [
     (value: string) => !!value || "E-mail is required",
@@ -411,11 +416,63 @@ function applyAddress(target: Address, source?: Partial<Address> | null): void {
     target.company = source?.company ?? ""
 }
 
+async function loadSavedAddresses(): Promise<void> {
+    if (!hasAuthenticatedIdentity.value) {
+        savedAddresses.value = []
+        selectedBillingSavedAddressId.value = ""
+        selectedShippingSavedAddressId.value = ""
+        return
+    }
+
+    isSavedAddressesLoading.value = true
+    savedAddressesError.value = null
+
+    try {
+        const response = await $fetch<{ addresses: CustomerAddressDTO[]; count: number }>("/api/account/get-addresses", {
+            credentials: "include",
+            query: {
+                limit: 12,
+                offset: 0
+            }
+        })
+
+        savedAddresses.value = response.addresses.filter((address) => Boolean(address.id && address.address_1))
+    } catch (error) {
+        console.error("Failed to load saved checkout addresses:", error)
+        savedAddressesError.value = "Could not load saved addresses. You can still enter a new address."
+    } finally {
+        isSavedAddressesLoading.value = false
+    }
+}
+
+function applySavedAddress(addressId: string, target: "billing" | "shipping"): void {
+    const savedAddress = savedAddresses.value.find((address) => address.id === addressId)
+
+    if (!savedAddress) {
+        return
+    }
+
+    applyAddress(target === "billing" ? billingAddress : shippingAddress, savedAddress as Partial<Address>)
+    clearValidationErrors(target === "billing" ? billingErrors : shippingErrors)
+}
+
+function updateSelectedBillingSavedAddress(addressId: string): void {
+    selectedBillingSavedAddressId.value = addressId
+    applySavedAddress(addressId, "billing")
+}
+
+function updateSelectedShippingSavedAddress(addressId: string): void {
+    selectedShippingSavedAddressId.value = addressId
+    applySavedAddress(addressId, "shipping")
+}
+
 function updateBillingAddressField(payload: { field: EditableAddressField; value: string }): void {
+    selectedBillingSavedAddressId.value = ""
     billingAddress[payload.field] = payload.value
 }
 
 function updateShippingAddressField(payload: { field: EditableAddressField; value: string }): void {
+    selectedShippingSavedAddressId.value = ""
     shippingAddress[payload.field] = payload.value
 }
 
@@ -769,6 +826,7 @@ async function handleCheckoutLogin(): Promise<void> {
         hasExplicitGuestIdentity.value = false
         guestCheckoutEmailCookie.value = null
         await attachCustomerToCheckoutCart()
+        await loadSavedAddresses()
         await goToAddressStep()
     } finally {
         isSubmitting.value = false
@@ -809,6 +867,7 @@ async function submitRegister(): Promise<void> {
         hasExplicitGuestIdentity.value = false
         guestCheckoutEmailCookie.value = null
         await attachCustomerToCheckoutCart()
+        await loadSavedAddresses()
         await goToAddressStep()
     } finally {
         isSubmitting.value = false
@@ -971,6 +1030,7 @@ onMounted(async () => {
         hasExplicitGuestIdentity.value = guestCheckoutEmailCookie.value === checkoutEmail.value
         isEditingIdentity.value = false
         syncAddressesFromCart(checkoutCart.value)
+        await loadSavedAddresses()
         currentStep.value = deriveInitialStep()
 
         stripe = await loadStripe(String(config.public.STRIPE_PUBLIC_KEY))
@@ -1153,8 +1213,15 @@ watch(currentStep, async (step) => {
                                 :billing-errors="billingErrors"
                                 :shipping-errors="shippingErrors"
                                 :countries="regionCountries"
+                                :saved-addresses="savedAddresses"
+                                :is-saved-addresses-loading="isSavedAddressesLoading"
+                                :saved-addresses-error="savedAddressesError"
+                                :selected-billing-saved-address-id="selectedBillingSavedAddressId"
+                                :selected-shipping-saved-address-id="selectedShippingSavedAddressId"
                                 :is-submitting="isSubmitting"
                                 @update:use-separate-shipping="useSeparateShipping = $event"
+                                @update:selected-billing-saved-address-id="updateSelectedBillingSavedAddress"
+                                @update:selected-shipping-saved-address-id="updateSelectedShippingSavedAddress"
                                 @update:billing-field="updateBillingAddressField"
                                 @update:shipping-field="updateShippingAddressField"
                                 @back="currentStep = 'account'"

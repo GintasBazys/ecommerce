@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         cookie: event.node.req.headers.cookie || ""
     }
 
-    const body = await readBody(event)
+    const body = validateCustomerAddressPayload(await readBody(event))
     return $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses/${address_id}`, {
         method: "POST",
         headers,

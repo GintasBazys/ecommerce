@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { CustomerAddressDTO } from "@medusajs/types"
 
+import BaseSelect from "~/components/Shared/BaseSelect.vue"
+
 const model = defineModel<boolean>()
+const regionStore = useRegionStore()
+const { regionCountries } = storeToRefs(regionStore)
 
 const props = defineProps<{
     address: Partial<CustomerAddressDTO>
@@ -11,6 +15,31 @@ const props = defineProps<{
 const emit = defineEmits<{
     (_: "save", __: CustomerAddressDTO): void
 }>()
+
+type RequiredAddressField = "first_name" | "last_name" | "address_1" | "city" | "province" | "postal_code" | "country_code" | "phone"
+type AddressErrors = Record<RequiredAddressField, string>
+
+const requiredFields: RequiredAddressField[] = [
+    "first_name",
+    "last_name",
+    "address_1",
+    "city",
+    "province",
+    "postal_code",
+    "country_code",
+    "phone"
+]
+
+const errors = reactive<AddressErrors>({
+    first_name: "",
+    last_name: "",
+    address_1: "",
+    city: "",
+    province: "",
+    postal_code: "",
+    country_code: "",
+    phone: ""
+})
 
 const local = reactive<CustomerAddressDTO>({
     id: props.address.id || "",
@@ -53,15 +82,84 @@ watch(
             is_default_shipping: newValue.is_default_shipping ?? false,
             is_default_billing: newValue.is_default_billing ?? false
         })
+        clearErrors()
     }
 )
+
+const countryOptions = computed(() => [
+    { title: "Select a country", value: "", disabled: true },
+    ...regionCountries.value
+        .filter((country) => Boolean(country.iso_2))
+        .map((country) => ({
+            title: country.display_name || String(country.iso_2).toUpperCase(),
+            value: String(country.iso_2)
+        }))
+])
+
+const countryCodeModel = computed<string>({
+    get: () => String(local.country_code ?? ""),
+    set: (value) => {
+        local.country_code = value
+    }
+})
+
+onMounted(async () => {
+    if (!regionCountries.value.length) {
+        await regionStore.fetchRegion()
+    }
+})
 
 function close(): void {
     model.value = false
 }
 
+function clearErrors(): void {
+    for (const field of requiredFields) {
+        errors[field] = ""
+    }
+}
+
+function getFieldValue(field: RequiredAddressField): string {
+    return String(local[field] ?? "").trim()
+}
+
+function validate(): boolean {
+    clearErrors()
+
+    for (const field of requiredFields) {
+        errors[field] = getFieldValue(field) ? "" : "This field is required"
+    }
+
+    if (getFieldValue("phone") && !/^[+]?\d[\d\s-]{6,}$/.test(getFieldValue("phone"))) {
+        errors.phone = "Enter a valid phone number"
+    }
+
+    return !Object.values(errors).some(Boolean)
+}
+
+function getTrimmedAddress(): CustomerAddressDTO {
+    return {
+        ...local,
+        first_name: String(local.first_name ?? "").trim(),
+        last_name: String(local.last_name ?? "").trim(),
+        phone: String(local.phone ?? "").trim(),
+        company: String(local.company ?? "").trim(),
+        address_1: String(local.address_1 ?? "").trim(),
+        address_2: String(local.address_2 ?? "").trim(),
+        city: String(local.city ?? "").trim(),
+        province: String(local.province ?? "").trim(),
+        postal_code: String(local.postal_code ?? "").trim(),
+        country_code: String(local.country_code ?? "").trim().toLowerCase(),
+        address_name: String(local.address_name ?? "").trim()
+    }
+}
+
 function save(): void {
-    emit("save", { ...local })
+    if (!validate()) {
+        return
+    }
+
+    emit("save", getTrimmedAddress())
     model.value = false
 }
 </script>
@@ -111,8 +209,15 @@ function save(): void {
                                     id="address-first-name"
                                     v-model="local.first_name"
                                     type="text"
+                                    autocomplete="given-name"
                                     class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                    :class="errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                    :aria-invalid="Boolean(errors.first_name)"
+                                    aria-describedby="address-first-name-error"
                                 />
+                                <span v-if="errors.first_name" id="address-first-name-error" class="text-sm leading-6 text-rose-600">
+                                    {{ errors.first_name }}
+                                </span>
                             </div>
                             <div class="grid gap-2">
                                 <label for="address-last-name" class="text-sm font-medium text-slate-700">Last name</label>
@@ -120,8 +225,15 @@ function save(): void {
                                     id="address-last-name"
                                     v-model="local.last_name"
                                     type="text"
+                                    autocomplete="family-name"
                                     class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                    :class="errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                    :aria-invalid="Boolean(errors.last_name)"
+                                    aria-describedby="address-last-name-error"
                                 />
+                                <span v-if="errors.last_name" id="address-last-name-error" class="text-sm leading-6 text-rose-600">
+                                    {{ errors.last_name }}
+                                </span>
                             </div>
                             <div class="grid gap-2">
                                 <label for="address-phone" class="text-sm font-medium text-slate-700">Phone</label>
@@ -129,8 +241,13 @@ function save(): void {
                                     id="address-phone"
                                     v-model="local.phone"
                                     type="tel"
+                                    autocomplete="tel"
                                     class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                    :class="errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                    :aria-invalid="Boolean(errors.phone)"
+                                    aria-describedby="address-phone-error"
                                 />
+                                <span v-if="errors.phone" id="address-phone-error" class="text-sm leading-6 text-rose-600">{{ errors.phone }}</span>
                             </div>
                             <div class="grid gap-2">
                                 <label for="address-company" class="text-sm font-medium text-slate-700">Company</label>
@@ -149,8 +266,15 @@ function save(): void {
                                 id="address-line-1"
                                 v-model="local.address_1"
                                 type="text"
+                                autocomplete="address-line1"
                                 class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                :class="errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                :aria-invalid="Boolean(errors.address_1)"
+                                aria-describedby="address-line-1-error"
                             />
+                            <span v-if="errors.address_1" id="address-line-1-error" class="text-sm leading-6 text-rose-600">
+                                {{ errors.address_1 }}
+                            </span>
                         </div>
 
                         <div class="grid gap-2">
@@ -159,47 +283,78 @@ function save(): void {
                                 id="address-line-2"
                                 v-model="local.address_2"
                                 type="text"
+                                autocomplete="address-line2"
                                 class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                             />
                         </div>
 
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div class="grid gap-2">
-                                <label for="address-city" class="text-sm font-medium text-slate-700">City</label>
-                                <input
-                                    id="address-city"
-                                    v-model="local.city"
-                                    type="text"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                />
-                            </div>
+                        <div class="grid gap-4 lg:grid-cols-3">
                             <div class="grid gap-2">
                                 <label for="address-postal-code" class="text-sm font-medium text-slate-700">Postal code</label>
                                 <input
                                     id="address-postal-code"
                                     v-model="local.postal_code"
                                     type="text"
+                                    autocomplete="postal-code"
                                     class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                    :class="errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                    :aria-invalid="Boolean(errors.postal_code)"
+                                    aria-describedby="address-postal-code-error"
                                 />
+                                <span v-if="errors.postal_code" id="address-postal-code-error" class="text-sm leading-6 text-rose-600">
+                                    {{ errors.postal_code }}
+                                </span>
                             </div>
                             <div class="grid gap-2">
-                                <label for="address-country-code" class="text-sm font-medium text-slate-700">Country code</label>
+                                <label for="address-city" class="text-sm font-medium text-slate-700">City</label>
                                 <input
-                                    id="address-country-code"
-                                    v-model="local.country_code"
+                                    id="address-city"
+                                    v-model="local.city"
                                     type="text"
+                                    autocomplete="address-level2"
                                     class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                    :class="errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                    :aria-invalid="Boolean(errors.city)"
+                                    aria-describedby="address-city-error"
                                 />
+                                <span v-if="errors.city" id="address-city-error" class="text-sm leading-6 text-rose-600">{{ errors.city }}</span>
                             </div>
                             <div class="grid gap-2">
-                                <label for="address-province" class="text-sm font-medium text-slate-700">Province</label>
+                                <label for="address-province" class="text-sm font-medium text-slate-700">Province / State</label>
                                 <input
                                     id="address-province"
                                     v-model="local.province"
                                     type="text"
+                                    autocomplete="address-level1"
                                     class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                                    :class="errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                    :aria-invalid="Boolean(errors.province)"
+                                    aria-describedby="address-province-error"
                                 />
+                                <span v-if="errors.province" id="address-province-error" class="text-sm leading-6 text-rose-600">
+                                    {{ errors.province }}
+                                </span>
                             </div>
+                        </div>
+
+                        <div class="grid gap-2">
+                            <label for="address-country-code" class="text-sm font-medium text-slate-700">Country</label>
+                            <BaseSelect
+                                id="address-country-code"
+                                v-model="countryCodeModel"
+                                :options="countryOptions"
+                                option-label-key="title"
+                                class="min-h-12"
+                                :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                :aria-invalid="Boolean(errors.country_code)"
+                                aria-describedby="address-country-code-error"
+                            />
+                            <span v-if="errors.country_code" id="address-country-code-error" class="text-sm leading-6 text-rose-600">
+                                {{ errors.country_code }}
+                            </span>
+                            <p v-if="!regionCountries.length" class="text-sm leading-6 text-slate-500">
+                                Loading available countries...
+                            </p>
                         </div>
 
                         <div class="grid gap-2">

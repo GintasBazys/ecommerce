@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: "Not authenticated" })
     }
 
-    const body = await readBody(event)
+    const body = validateCustomerAddressPayload(await readBody(event))
 
     const headers = {
         Authorization: `Bearer ${accessToken}`,
