@@ -46,12 +46,14 @@ export default defineNuxtPlugin(async () => {
     const requestHeaders = useRequestHeaders(["cookie"])
     const cookieHeader = requestHeaders.cookie || ""
 
-    if (!regionStore.regions?.length) {
-        await regionStore.fetchRegion()
-    }
+    const regionPromise = regionStore.regions?.length ? Promise.resolve() : regionStore.fetchRegion()
 
     const categoriesState = useState<NavigationCategory[]>("categories", () => [])
-    if (!categoriesState.value.length) {
+    const categoriesPromise = (async () => {
+        if (categoriesState.value.length) {
+            return
+        }
+
         try {
             categoriesState.value = await requestFetch("/api/categories/navigation", {
                 credentials: "include",
@@ -63,13 +65,14 @@ export default defineNuxtPlugin(async () => {
         } catch {
             categoriesState.value = []
         }
-    }
-    if (!productStore.categories?.length) {
-        productStore.categories = categoriesState.value
-    }
+    })()
 
     const customerState = useState<CustomerDTO | null>("customer", () => null)
-    if (customerState.value === null && hasCustomerSessionHint(cookieHeader)) {
+    const customerPromise = (async () => {
+        if (customerState.value !== null || !hasCustomerSessionHint(cookieHeader)) {
+            return
+        }
+
         try {
             const { customer } = await requestFetch<{ customer: CustomerDTO | null }>("/api/account/me", {
                 credentials: "include"
@@ -78,8 +81,9 @@ export default defineNuxtPlugin(async () => {
         } catch {
             customerState.value = null
         }
-    }
-    customerStore.customer = customerState.value ?? null
+    })()
+
+    await regionPromise
 
     if (regionStore.regionStoreId) {
         const cartIdCookie = useCookie<string | null>("cart_id", {
@@ -92,7 +96,11 @@ export default defineNuxtPlugin(async () => {
         const cartKey = `cart:${regionStore.regionStoreId}:${cartIdCookie.value ?? ""}`
 
         const cartState = useState<CartDTO | null | undefined>(cartKey, () => null)
-        if (cartIdCookie.value && cartState.value === null) {
+        const cartPromise = (async () => {
+            if (!cartIdCookie.value || cartState.value !== null) {
+                return
+            }
+
             try {
                 const { cart } = await $fetch<{ cart: CartDTO | null | undefined }>(
                     `/api/cart/cart?region_id=${regionStore.regionStoreId}`,
@@ -108,7 +116,14 @@ export default defineNuxtPlugin(async () => {
             } catch {
                 cartState.value = null
             }
+        })()
+
+        await Promise.all([categoriesPromise, customerPromise, cartPromise])
+
+        if (!productStore.categories?.length) {
+            productStore.categories = categoriesState.value
         }
+        customerStore.customer = customerState.value ?? null
 
         if (cartState.value) {
             cartStore.cart = cartState.value
@@ -121,5 +136,14 @@ export default defineNuxtPlugin(async () => {
         if (cartStore.cart?.id) {
             cartIdCookie.value = cartStore.cart.id
         }
+
+        return
     }
+
+    await Promise.all([categoriesPromise, customerPromise])
+
+    if (!productStore.categories?.length) {
+        productStore.categories = categoriesState.value
+    }
+    customerStore.customer = customerState.value ?? null
 })
