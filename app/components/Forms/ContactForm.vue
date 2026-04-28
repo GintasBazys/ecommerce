@@ -85,7 +85,7 @@ function renderTurnstile(): void {
         sitekey: turnstileSiteKey.value,
         action: "contact",
         theme: "light",
-        size: "flexible",
+        size: widgetContainer.value.clientWidth < 300 ? "compact" : "flexible",
         callback: (token) => {
             turnstileToken.value = token
             errorMessage.value = null
@@ -238,7 +238,7 @@ onUnmounted(() => {
                     name="subject"
                     type="text"
                     placeholder="Example: Order update"
-                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                     :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': !!formErrors.subject }"
                     required
                 />
@@ -253,7 +253,7 @@ onUnmounted(() => {
                     name="email"
                     type="email"
                     placeholder="name@example.com"
-                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                     :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': !!formErrors.email }"
                     required
                 />
@@ -268,7 +268,7 @@ onUnmounted(() => {
                     name="phone"
                     type="tel"
                     placeholder="+370"
-                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                 />
             </div>
 
@@ -280,7 +280,7 @@ onUnmounted(() => {
                     name="orderNumber"
                     type="text"
                     placeholder="Optional"
-                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.05rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                 />
             </div>
 
@@ -292,7 +292,7 @@ onUnmounted(() => {
                     name="message"
                     rows="6"
                     placeholder="How can we help? Include any useful order or product details."
-                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-[1.25rem] border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
+                    class="focus:border-brand-500 focus:ring-brand-100 w-full rounded-card-sm border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2"
                     :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': !!formErrors.message }"
                     required
                 ></textarea>
@@ -300,8 +300,8 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <div class="rounded-[1.25rem] border border-slate-200 bg-slate-50/80 p-4">
-            <div ref="widgetContainer" class="min-h-17"></div>
+        <div class="rounded-card-sm border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
+            <div ref="widgetContainer" class="flex min-h-17 max-w-full justify-center overflow-hidden"></div>
             <p class="mt-3 text-sm leading-6 text-slate-600">Spam protection is required before sending this form.</p>
         </div>
 

@@ -48,9 +48,7 @@ function handleCancel(): void {
 </script>
 
 <template>
-    <div
-        class="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-white shadow-[0_24px_64px_rgba(2,6,23,0.2)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-4xl"
-    >
+    <div class="relative flex max-h-screen w-full max-w-2xl flex-col overflow-hidden rounded-panel border border-white/80 bg-white shadow-2xl sm:rounded-4xl">
         <button
             type="button"
             class="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
@@ -69,11 +67,11 @@ function handleCancel(): void {
                 </p>
                 <h2
                     id="product-review-dialog-title"
-                    class="mt-4 text-[1.85rem] leading-[1.02] font-bold tracking-[-0.04rem] text-slate-950"
+                    class="mt-4 text-3xl leading-tight font-bold tracking-tighter text-slate-950"
                 >
                     Write a review
                 </h2>
-                <p class="mt-3 max-w-136 text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
+                <p class="mt-3 max-w-136 text-sm leading-7 text-slate-600 sm:text-base">
                     Let other shoppers know how the product feels, fits into daily use, and whether it met expectations.
                 </p>
             </div>

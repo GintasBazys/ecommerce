@@ -18,18 +18,16 @@ const approachSteps = [
 </script>
 
 <template>
-    <section
-        class="overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(0,128,255,0.1),transparent_26%),linear-gradient(180deg,#ffffff_0%,#f6f9ff_100%)] py-13 sm:py-14 lg:py-22"
-    >
+    <section class="overflow-hidden bg-linear-to-b from-white to-brand-50 py-13 sm:py-14 lg:py-22">
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <div class="mx-auto mb-8 max-w-215 text-center">
                 <span
-                    class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-[2.3rem] items-center rounded-full px-4 py-2 font-bold uppercase"
+                    class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                 >
                     Our Approach
                 </span>
                 <h2
-                    class="mx-auto mt-4 max-w-full text-[clamp(1.85rem,7vw,2.75rem)] leading-none font-bold tracking-[-0.05rem] text-slate-950 md:max-w-100 md:text-[clamp(2rem,3.7vw,3.55rem)] md:leading-[0.98] lg:max-w-200"
+                    class="mx-auto mt-4 max-w-full text-3xl leading-none font-bold tracking-tighter text-slate-950 sm:text-4xl md:max-w-100 md:text-5xl lg:max-w-200 xl:text-6xl"
                 >
                     A practical framework that keeps quality high and experience simple.
                 </h2>
@@ -52,8 +50,8 @@ const approachSteps = [
                 </div>
 
                 <div class="rounded-card grid content-start gap-4 border border-slate-200 bg-white/90 p-5 sm:p-6">
-                    <h3 class="text-[1.45rem] leading-8 font-semibold text-slate-950">How we work</h3>
-                    <p class="text-[0.98rem] leading-7 text-slate-600">
+                    <h3 class="text-2xl leading-8 font-semibold text-slate-950">How we work</h3>
+                    <p class="text-base leading-7 text-slate-600">
                         We balance product quality, transparent pricing, and speed of execution. That balance is what shapes every release,
                         campaign, and customer flow in the store.
                     </p>
@@ -62,16 +60,16 @@ const approachSteps = [
                         <article
                             v-for="(step, index) in approachSteps"
                             :key="step.title"
-                            class="grid grid-cols-[auto_1fr] gap-3 rounded-2xl border border-slate-200 bg-slate-50/90 p-3.5"
+                            class="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50/90 p-3.5"
                         >
                             <span
-                                class="text-label-xs inline-flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#010c80_0%,#0056d6_100%)] font-bold tracking-[0.08em] text-white"
+                                class="text-label-xs inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-700 font-bold tracking-widest text-white"
                             >
                                 0{{ index + 1 }}
                             </span>
                             <div class="min-w-0">
                                 <h4 class="text-base leading-6 font-semibold text-slate-950">{{ step.title }}</h4>
-                                <p class="mt-1 text-[0.92rem] leading-6 text-slate-500">{{ step.text }}</p>
+                                <p class="mt-1 text-sm leading-6 text-slate-500">{{ step.text }}</p>
                             </div>
                         </article>
                     </div>

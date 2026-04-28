@@ -30,7 +30,7 @@ defineProps<{
 </script>
 
 <template>
-    <div class="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-4xl sm:p-7 xl:p-8">
+    <div class="rounded-panel border border-slate-200 bg-white p-5 shadow-sm sm:rounded-4xl sm:p-7 xl:p-8">
         <div class="flex flex-col gap-4 sm:gap-5">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -46,7 +46,7 @@ defineProps<{
                     class="inline-flex min-h-11 items-center gap-2 self-start rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900"
                     aria-label="Product rating"
                 >
-                    <span class="flex items-center gap-1 text-[0.95rem] text-amber-500" aria-hidden="true">
+                    <span class="flex items-center gap-1 text-base text-amber-500" aria-hidden="true">
                         <span v-for="star in 5" :key="star">{{ star <= Math.round(displayedReviewAverage) ? "★" : "☆" }}</span>
                     </span>
                     <span>{{ displayedReviewAverage }} / 5</span>
@@ -55,14 +55,14 @@ defineProps<{
 
             <div>
                 <h1
-                    class="max-w-[12ch] text-[2.2rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3.1rem] xl:text-[4.25rem]"
+                    class="max-w-md text-4xl leading-none font-bold tracking-tighter text-slate-950 sm:text-5xl xl:text-7xl"
                 >
                     {{ productTitle }}
                 </h1>
                 <p v-if="productSubtitle" class="mt-3 text-sm font-semibold tracking-widest text-slate-700 uppercase">
                     {{ productSubtitle }}
                 </p>
-                <p class="mt-4 max-w-2xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:leading-8">
                     {{ productDescription }}
                 </p>
             </div>
@@ -79,7 +79,7 @@ defineProps<{
 
             <div v-if="selectedVariant" class="border-t border-slate-200 pt-5">
                 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                    <span class="text-[2rem] leading-none font-bold text-slate-950 sm:text-[2.5rem]">{{ displayPrice }}</span>
+                    <span class="text-3xl leading-none font-bold text-slate-950 sm:text-4xl">{{ displayPrice }}</span>
                     <del v-if="isOnSale && originalPrice" class="text-base font-semibold text-rose-500">{{ originalPrice }}</del>
                 </div>
                 <p class="mt-3 text-sm leading-6 text-slate-500">{{ taxLabel }}</p>

@@ -9,9 +9,9 @@ useHead({
 </script>
 
 <template>
-    <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900">
+    <main class="min-h-screen bg-linear-to-b from-slate-50 via-indigo-50 to-orange-50 text-slate-900">
         <section class="mx-auto w-full max-w-5xl px-4 pt-8 pb-14 sm:px-6 lg:px-8 lg:pt-12">
-            <div class="rounded-[1.9rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7 lg:p-9">
+            <div class="rounded-panel border border-slate-200/95 bg-white/95 p-5 sm:p-7 lg:p-9">
                 <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
 
                 <div class="max-w-3xl">
@@ -20,7 +20,7 @@ useHead({
                     >
                         Privacy policy
                     </span>
-                    <h1 class="mt-4 text-3xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">Privacy Policy</h1>
+                    <h1 class="mt-4 text-3xl font-semibold tracking-tighter text-slate-950 sm:text-5xl">Privacy Policy</h1>
                     <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
                         This policy explains how Medusa Commerce collects, uses, stores, and protects personal data when you browse the
                         storefront, place an order, create an account, or contact the team.
@@ -29,16 +29,16 @@ useHead({
 
                 <div class="mt-10 space-y-10">
                     <section class="space-y-5 rounded-3xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6">
-                        <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-6">
-                            <div class="space-y-3">
-                                <p class="text-sm font-semibold tracking-[0.08em] text-slate-500 uppercase">Policy details</p>
+                        <div class="grid gap-4 sm:grid-cols-3 sm:items-start sm:gap-6">
+                            <div class="space-y-3 sm:col-span-2">
+                                <p class="text-sm font-semibold tracking-widest text-slate-500 uppercase">Policy details</p>
                                 <p class="text-base leading-7 text-slate-700">
                                     This Privacy Policy explains how Medusa Commerce collects, uses, stores, and shares personal data in
                                     connection with the storefront, customer accounts, orders, support requests, reviews, and related
                                     services.
                                 </p>
                             </div>
-                            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 sm:min-w-60">
+                            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 sm:col-span-1 sm:min-w-60">
                                 <p><span class="font-semibold text-slate-950">Effective date:</span> 25 April 2026</p>
                                 <p class="mt-1"><span class="font-semibold text-slate-950">Controller:</span> Medusa Commerce</p>
                                 <p class="mt-1"><span class="font-semibold text-slate-950">Location:</span> Vilnius, Lithuania</p>
@@ -47,7 +47,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">1. Data Controller</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">1. Data Controller</h2>
                         <p class="text-base leading-8 text-slate-700">
                             For the purposes of applicable data protection law, including the General Data Protection Regulation (GDPR), the
                             data controller for personal data processed through this storefront is
@@ -62,7 +62,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">2. Personal Data We Collect</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">2. Personal Data We Collect</h2>
                         <p class="text-base leading-8 text-slate-700">The data we collect depends on how you use the site.</p>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="rounded-card border border-slate-200 bg-white p-5">
@@ -104,7 +104,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">3. How We Use Personal Data</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">3. How We Use Personal Data</h2>
                         <ul class="grid gap-3 text-base leading-8 text-slate-700">
                             <li class="rounded-2xl border border-slate-200 bg-white px-5 py-4">
                                 <strong class="font-semibold text-slate-950">Storefront operations:</strong> To run the site, maintain
@@ -138,13 +138,13 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">
                             4. GDPR Legal Bases for Processing
                         </h2>
                         <p class="text-base leading-8 text-slate-700">
                             Where GDPR applies, we process personal data on one or more of the following legal bases:
                         </p>
-                        <div class="overflow-hidden rounded-[1.4rem] border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-card border border-slate-200 bg-white">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full border-collapse text-left text-sm text-slate-700">
                                     <thead class="bg-slate-50 text-slate-950">
@@ -205,7 +205,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">
                             5. Cookies and Similar Technologies
                         </h2>
                         <p class="text-base leading-8 text-slate-700">
@@ -213,7 +213,7 @@ useHead({
                             use it. Essential cookies are used to keep the ecommerce experience functional. Analytics cookies are only
                             enabled after you explicitly accept them through our cookie banner.
                         </p>
-                        <div class="overflow-hidden rounded-[1.4rem] border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-card border border-slate-200 bg-white">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full border-collapse text-left text-sm text-slate-700">
                                     <thead class="bg-slate-50 text-slate-950">
@@ -257,7 +257,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">
                             6. How We Share Personal Data
                         </h2>
                         <p class="text-base leading-8 text-slate-700">
@@ -278,7 +278,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">
                             7. Reviews, Forms, and Customer Communications
                         </h2>
                         <p class="text-base leading-8 text-slate-700">
@@ -292,12 +292,12 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">8. Data Retention</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">8. Data Retention</h2>
                         <p class="text-base leading-8 text-slate-700">
                             We keep personal data only for as long as necessary for the purpose for which it was collected, including
                             customer support, order fulfilment, security, and legal compliance.
                         </p>
-                        <div class="overflow-hidden rounded-[1.4rem] border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-card border border-slate-200 bg-white">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full border-collapse text-left text-sm text-slate-700">
                                     <thead class="bg-slate-50 text-slate-950">
@@ -356,7 +356,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">9. International Transfers</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">9. International Transfers</h2>
                         <p class="text-base leading-8 text-slate-700">
                             Some of our service providers may process personal data outside your country. Where this happens, we rely on
                             appropriate safeguards required by applicable law, such as contractual protections or other recognized transfer
@@ -365,7 +365,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">10. Data Security</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">10. Data Security</h2>
                         <p class="text-base leading-8 text-slate-700">
                             We use reasonable technical and organizational measures to protect personal data against unauthorized access,
                             loss, misuse, or disclosure. No online service or storage system can be guaranteed completely secure, so we
@@ -374,7 +374,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">11. Your Rights</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">11. Your Rights</h2>
                         <p class="text-base leading-8 text-slate-700">
                             Depending on your location and the laws that apply, you may have the right to request access to your personal
                             data, ask us to correct inaccurate data, request deletion, object to certain processing, restrict processing,
@@ -387,7 +387,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">
                             12. Complaints and Supervisory Authority
                         </h2>
                         <p class="text-base leading-8 text-slate-700">
@@ -399,7 +399,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">13. Third-Party Links</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">13. Third-Party Links</h2>
                         <p class="text-base leading-8 text-slate-700">
                             The site may contain links to third-party websites or services. We are not responsible for the privacy practices
                             of those third parties, and you should review their own policies before providing personal data.
@@ -407,7 +407,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">14. Changes to This Policy</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">14. Changes to This Policy</h2>
                         <p class="text-base leading-8 text-slate-700">
                             We may update this Privacy Policy from time to time to reflect changes to the storefront, our services, legal
                             requirements, or our data practices. The latest version will always be published on this page with the revised
@@ -416,7 +416,7 @@ useHead({
                     </section>
 
                     <section class="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
-                        <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem]">15. Contact Us</h2>
+                        <h2 class="text-2xl font-semibold tracking-tighter text-slate-950 sm:text-3xl">15. Contact Us</h2>
                         <p class="text-base leading-8 text-slate-700">
                             For privacy questions or data protection requests, contact Medusa Commerce at
                             <a

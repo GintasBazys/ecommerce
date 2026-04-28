@@ -31,9 +31,7 @@ useStructuredData(() => [breadcrumbSchema.value], "about-structured-data")
 </script>
 
 <template>
-    <section
-        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.08),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
-    >
+    <section class="bg-linear-to-b from-brand-50 via-white to-brand-50">
         <div class="px-0 pt-15 pb-4 sm:pt-18 md:pt-18 xl:pt-23">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 <div class="max-w-2xl">
@@ -43,9 +41,7 @@ useStructuredData(() => [breadcrumbSchema.value], "about-structured-data")
                     >
                         About the store
                     </span>
-                    <h1
-                        class="mt-4 text-[2rem] leading-none font-bold tracking-[-0.06rem] text-slate-950 sm:text-[2.75rem] sm:leading-[0.98] xl:text-[4.25rem] xl:leading-[0.96]"
-                    >
+                    <h1 class="mt-4 text-3xl leading-none font-bold tracking-tighter text-slate-950 sm:text-5xl xl:text-7xl">
                         Get the story behind the curated storefront experience.
                     </h1>
                     <p class="mt-4 text-base leading-7 text-slate-600">

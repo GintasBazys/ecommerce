@@ -36,9 +36,9 @@ const policies: PolicyItem[] = [
     <section class="bg-linear-to-b from-white to-slate-50" aria-labelledby="policies-heading">
         <div class="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:py-12">
             <div
-                class="shadow-panel grid gap-6 rounded-4xl border border-slate-200/80 bg-white/75 p-4 backdrop-blur sm:p-5 lg:grid-cols-[0.9fr_1.6fr] lg:items-center lg:p-6"
+                class="shadow-panel grid gap-6 rounded-4xl border border-slate-200/80 bg-white/75 p-4 backdrop-blur sm:p-5 lg:grid-cols-5 lg:items-center lg:p-6"
             >
-                <div class="max-w-xl">
+                <div class="max-w-xl lg:col-span-2">
                     <span
                         class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                     >
@@ -58,7 +58,7 @@ const policies: PolicyItem[] = [
                     </p>
                 </div>
 
-                <div class="grid gap-3 md:grid-cols-3">
+                <div class="grid gap-3 md:grid-cols-3 lg:col-span-3">
                     <NuxtLink
                         v-for="policy in policies"
                         :key="policy.title"

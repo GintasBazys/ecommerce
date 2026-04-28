@@ -119,24 +119,30 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
 </script>
 
 <template>
-    <main class="blog-index">
-        <div class="blog-index__container">
-            <section class="blog-index__hero">
-                <div class="blog-index__hero-copy">
-                    <AppBreadcrumbs :items="breadcrumbItems" class="blog-index__breadcrumbs" />
-                    <h1 class="blog-index__title">Product stories, store notes, and cleaner editorial reading.</h1>
-                    <p class="blog-index__description">
+    <main class="min-h-screen bg-linear-to-b from-white to-slate-100 px-4 py-14 sm:py-20 lg:py-24">
+        <div class="relative z-10 mx-auto w-full max-w-7xl">
+            <section class="mb-6 flex justify-center">
+                <div class="w-full max-w-5xl text-center">
+                    <AppBreadcrumbs :items="breadcrumbItems" class="mx-auto mb-4" />
+                    <h1 class="mx-auto mb-4 max-w-4xl text-5xl leading-none font-bold tracking-tighter text-slate-950 sm:text-6xl xl:text-7xl">
+                        Product stories, store notes, and cleaner editorial reading.
+                    </h1>
+                    <p class="mx-auto max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
                         Explore published articles, product context, and editorial notes in a calmer layout with cleaner hierarchy and
                         easier browsing on mobile.
                     </p>
                 </div>
             </section>
 
-            <section class="blog-index__filters" aria-label="Blog categories">
+            <section class="mb-6 flex gap-3 overflow-x-auto pb-2" aria-label="Blog categories">
                 <NuxtLink
                     :to="{ query: buildQuery(1, null) }"
-                    class="blog-index__chip"
-                    :class="{ 'blog-index__chip--active': !activeCategory }"
+                    class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border px-4 py-3 text-sm font-bold no-underline transition"
+                    :class="
+                        !activeCategory
+                            ? 'border-amber-300 bg-amber-50 text-amber-900'
+                            : 'border-slate-200 bg-white/90 text-slate-600 hover:border-amber-200 hover:text-slate-950'
+                    "
                 >
                     All posts
                 </NuxtLink>
@@ -144,245 +150,66 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
                     v-for="category in categories"
                     :key="category.id"
                     :to="{ query: buildQuery(1, category.slug) }"
-                    class="blog-index__chip"
-                    :class="{ 'blog-index__chip--active': activeCategory?.slug === category.slug }"
+                    class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border px-4 py-3 text-sm font-bold no-underline transition"
+                    :class="
+                        activeCategory?.slug === category.slug
+                            ? 'border-amber-300 bg-amber-50 text-amber-900'
+                            : 'border-slate-200 bg-white/90 text-slate-600 hover:border-amber-200 hover:text-slate-950'
+                    "
                 >
                     {{ category.name }}
                 </NuxtLink>
             </section>
 
-            <section v-if="articles.length" class="blog-index__grid">
-                <article v-for="article in articles" :key="article.id" class="blog-index__col">
+            <section v-if="articles.length" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                <article v-for="article in articles" :key="article.id" class="min-w-0">
                     <BlogCard :article="article" />
                 </article>
             </section>
 
-            <section v-else-if="pending" class="blog-index__state-grid" aria-label="Loading posts">
-                <div v-for="item in 3" :key="item" class="blog-index__skeleton"></div>
+            <section v-else-if="pending" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading posts">
+                <div v-for="item in 3" :key="item" class="min-h-72 animate-pulse rounded-panel border border-slate-200 bg-slate-100 shadow-card"></div>
             </section>
 
-            <div v-else-if="error" class="blog-index__state">Something went wrong while loading blog posts. Please try again.</div>
+            <div v-else-if="error" class="rounded-panel border border-slate-200 bg-white/90 p-6 text-center text-slate-600 shadow-card">
+                Something went wrong while loading blog posts. Please try again.
+            </div>
 
-            <div v-else-if="!articles" class="blog-index__state">No blog posts found. Try removing a filter or check back soon.</div>
+            <div v-else class="rounded-panel border border-slate-200 bg-white/90 p-6 text-center text-slate-600 shadow-card">
+                No blog posts found. Try removing a filter or check back soon.
+            </div>
 
-            <nav v-if="articles && totalPages > 1" class="blog-index__pagination" aria-label="Blog pagination">
-                <NuxtLink v-if="currentPage > 1" :to="{ query: buildQuery(currentPage - 1) }" class="blog-index__pagination-btn">
+            <nav v-if="articles.length && totalPages > 1" class="mt-8 flex flex-wrap items-center justify-center gap-4" aria-label="Blog pagination">
+                <NuxtLink
+                    v-if="currentPage > 1"
+                    :to="{ query: buildQuery(currentPage - 1) }"
+                    class="inline-flex min-h-12 min-w-28 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-5 text-sm font-bold text-slate-800 no-underline"
+                >
                     Previous
                 </NuxtLink>
-                <span v-else class="blog-index__pagination-btn blog-index__pagination-btn--disabled">Previous</span>
+                <span
+                    v-else
+                    class="inline-flex min-h-12 min-w-28 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-5 text-sm font-bold text-slate-800 opacity-45"
+                >
+                    Previous
+                </span>
 
-                <span class="blog-index__pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
+                <span class="text-sm leading-6 text-slate-600">Page {{ currentPage }} of {{ totalPages }}</span>
 
-                <NuxtLink v-if="currentPage < totalPages" :to="{ query: buildQuery(currentPage + 1) }" class="blog-index__pagination-btn">
+                <NuxtLink
+                    v-if="currentPage < totalPages"
+                    :to="{ query: buildQuery(currentPage + 1) }"
+                    class="inline-flex min-h-12 min-w-28 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-5 text-sm font-bold text-slate-800 no-underline"
+                >
                     Next
                 </NuxtLink>
-                <span v-else class="blog-index__pagination-btn blog-index__pagination-btn--disabled">Next</span>
+                <span
+                    v-else
+                    class="inline-flex min-h-12 min-w-28 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-5 text-sm font-bold text-slate-800 opacity-45"
+                >
+                    Next
+                </span>
             </nav>
         </div>
     </main>
 </template>
-
-<style scoped>
-.blog-index {
-    min-height: 100vh;
-    padding: clamp(3.5rem, 6vw, 6rem) 1rem;
-    background:
-        radial-gradient(circle at top left, rgba(202, 138, 4, 0.08), transparent 24%), linear-gradient(180deg, #fcfdff 0%, #f6f8fc 100%);
-}
-
-.blog-index__container {
-    position: relative;
-    z-index: 1;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 80rem;
-}
-
-.blog-index__hero {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-}
-
-.blog-index__hero-copy {
-    width: 100%;
-    max-width: 60rem;
-    text-align: center;
-}
-
-.blog-index__breadcrumbs {
-    margin: 0 auto 1rem;
-}
-
-.blog-index__breadcrumbs:deep(nav) {
-    border-color: rgba(253, 230, 138, 0.72);
-    background: rgba(255, 251, 235, 0.92);
-    color: #92400e;
-    box-shadow: 0 14px 36px rgba(202, 138, 4, 0.12);
-}
-
-.blog-index__breadcrumbs:deep(a) {
-    color: #a16207;
-}
-
-.blog-index__breadcrumbs:deep(a:hover) {
-    color: #78350f;
-}
-
-.blog-index__filters {
-    display: flex;
-    gap: 0.75rem;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
-    scrollbar-width: none;
-}
-
-.blog-index__filters::-webkit-scrollbar {
-    display: none;
-}
-
-.blog-index__chip {
-    display: inline-flex;
-    min-height: 2.75rem;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    border-radius: 999px;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    background: rgba(255, 255, 255, 0.88);
-    padding: 0.75rem 1rem;
-    color: #475569;
-    font-size: 0.92rem;
-    font-weight: 700;
-    text-decoration: none;
-    transition:
-        border-color 0.2s ease,
-        background-color 0.2s ease,
-        color 0.2s ease;
-}
-
-.blog-index__chip--active {
-    border-color: rgba(202, 138, 4, 0.24);
-    background: rgba(255, 251, 235, 0.9);
-    color: #78350f;
-}
-
-.blog-index__title {
-    max-width: 18ch;
-    margin: 0 auto 1rem;
-    color: #08173f;
-    font-size: clamp(2.6rem, 6vw, 4.5rem);
-    line-height: 0.94;
-    letter-spacing: -0.07rem;
-    text-wrap: balance;
-}
-
-.blog-index__description {
-    max-width: 48rem;
-    margin: 0 auto;
-    color: #53607b;
-    font-size: 1.04rem;
-    line-height: 1.75;
-}
-
-.blog-index__grid {
-    display: grid;
-    gap: 1.25rem;
-}
-
-.blog-index__state-grid {
-    display: grid;
-    gap: 1.25rem;
-}
-
-.blog-index__skeleton,
-.blog-index__state {
-    border-radius: 1.6rem;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow: 0 16px 42px rgba(8, 27, 90, 0.06);
-}
-
-.blog-index__skeleton {
-    min-height: 18rem;
-    background: linear-gradient(90deg, rgba(241, 245, 249, 0.9), rgba(248, 250, 252, 1), rgba(241, 245, 249, 0.9));
-}
-
-.blog-index__state {
-    padding: 1.5rem;
-    color: #475569;
-    text-align: center;
-}
-
-.blog-index__pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    animation-delay: 0.18s;
-}
-
-.blog-index__pagination-label {
-    color: #53607b;
-    font-size: 0.95rem;
-    line-height: 1.4;
-}
-
-.blog-index__pagination-btn {
-    display: inline-flex;
-    min-height: 2.9rem;
-    min-width: 6.75rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    border: 1px solid rgba(203, 213, 225, 1);
-    background: rgba(255, 255, 255, 0.92);
-    padding: 0.8rem 1.15rem;
-    color: #1e293b;
-    font-size: 0.92rem;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.blog-index__pagination-btn--disabled {
-    opacity: 0.45;
-}
-
-@keyframes blog-index-rise {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .blog-index__title {
-        max-width: 100%;
-    }
-
-    .blog-index__pagination {
-        flex-wrap: wrap;
-    }
-}
-
-@media screen and (min-width: 768px) {
-    .blog-index__grid,
-    .blog-index__state-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media screen and (min-width: 1200px) {
-    .blog-index__grid,
-    .blog-index__state-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-</style>

@@ -47,7 +47,7 @@ function onDelete(): void {
 
 <template>
     <article
-        class="group relative flex h-full min-h-72 overflow-hidden rounded-[1.5rem] border border-slate-200/90 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-[0_22px_70px_rgba(15,23,42,0.11)] motion-reduce:transition-none"
+        class="group relative flex h-full min-h-72 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-[0_22px_70px_rgba(15,23,42,0.11)] motion-reduce:transition-none"
     >
         <div class="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.9)_52%,rgba(214,169,94,0.82))]"></div>
 
@@ -112,7 +112,7 @@ function onDelete(): void {
                         </span>
                         <div class="min-w-0">
                             <p class="font-semibold text-slate-950">Delivery address</p>
-                            <p v-for="line in addressLines" :key="line" class="m-0 break-words text-slate-600">{{ line }}</p>
+                            <p v-for="line in addressLines" :key="line" class="m-0 wrap-break-word text-slate-600">{{ line }}</p>
                         </div>
                     </div>
 

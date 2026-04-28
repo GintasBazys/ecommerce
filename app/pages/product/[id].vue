@@ -393,7 +393,7 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
     <section v-if="product" class="bg-slate-50">
         <div class="px-0 pt-15 pb-10 sm:pt-18 sm:pb-12 xl:pt-23 xl:pb-16">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-                <div class="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(21rem,0.98fr)] xl:gap-8">
+                <div class="grid gap-5 xl:grid-cols-2 xl:gap-8">
                     <ProductPageGallery
                         :product-title="product.title"
                         :product-images="productImages"

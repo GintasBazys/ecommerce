@@ -271,10 +271,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
 <template>
     <NotFoundPageContent v-if="notFoundPath" :requested-path="notFoundPath" />
-    <section
-        v-else
-        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
-    >
+    <section v-else class="bg-linear-to-b from-brand-50 via-white to-brand-50">
         <CategoryHero
             :breadcrumb-items="breadcrumbItems"
             :hero-eyebrow="heroEyebrow"
@@ -297,7 +294,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                     <div v-if="isMobileFilterDrawerOpen" class="fixed inset-0 z-50 xl:hidden">
                         <button
                             type="button"
-                            class="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+                            class="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
                             @click="isMobileFilterDrawerOpen = false"
                         ></button>
                         <Transition
@@ -310,7 +307,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         >
                             <div
                                 v-if="isMobileFilterDrawerOpen"
-                                class="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[1.8rem] bg-white p-4 shadow-[0_-18px_40px_rgba(8,27,90,0.14)] will-change-transform sm:p-5"
+                                class="absolute inset-x-0 bottom-0 max-h-screen overflow-y-auto rounded-t-panel bg-white p-4 shadow-2xl will-change-transform sm:p-5"
                             >
                                 <CategoryFiltersPanel
                                     v-model:selected-child-category-ids="selectedChildCategoryIds"
@@ -337,9 +334,9 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                 </Transition>
             </Teleport>
 
-            <div class="grid gap-6 xl:grid-cols-[minmax(19rem,22rem)_minmax(0,1fr)] xl:gap-8">
+            <div class="grid gap-6 xl:flex xl:items-start xl:gap-8">
                 <aside
-                    class="hidden xl:sticky xl:top-[calc(var(--site-header-offset,64px)+1rem)] xl:grid xl:max-h-[calc(100vh-var(--site-header-offset,64px)-2rem)] xl:self-start xl:overflow-y-auto xl:pr-2"
+                    class="hidden xl:sticky xl:top-20 xl:grid xl:max-h-screen xl:w-96 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pr-2"
                 >
                     <CategoryFiltersPanel
                         v-model:selected-child-category-ids="selectedChildCategoryIds"
@@ -360,7 +357,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                     />
                 </aside>
 
-                <div ref="productsStartRef" class="min-w-0">
+                <div ref="productsStartRef" class="min-w-0 xl:flex-1">
                     <CategoryToolbar
                         v-model:sort-option="sortOption"
                         :total-count="totalCount"

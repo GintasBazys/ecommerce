@@ -31,11 +31,11 @@ const variantSku = computed(() => props.item.variant_sku || "N/A")
     <article
         class="shadow-card hover:shadow-elevated rounded-3xl border border-slate-200/80 bg-white/95 p-3 transition hover:border-amber-200/80 sm:p-4"
     >
-        <div class="grid gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)_auto] sm:items-center sm:gap-4">
-            <div class="grid grid-cols-[5.75rem_minmax(0,1fr)] gap-3 sm:contents">
+        <div class="grid gap-3 sm:flex sm:items-center sm:gap-4">
+            <div class="flex gap-3 sm:block sm:shrink-0">
                 <NuxtLink
                     :to="productUrl"
-                    class="block overflow-hidden rounded-2xl border border-slate-100 bg-slate-50"
+                    class="block h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 sm:h-30 sm:w-30"
                     :aria-label="`View ${props.item.product_title}`"
                 >
                     <NuxtImage
@@ -63,7 +63,7 @@ const variantSku = computed(() => props.item.variant_sku || "N/A")
                 </div>
             </div>
 
-            <div class="min-w-0">
+            <div class="min-w-0 sm:flex-1">
                 <div class="hidden sm:block">
                     <NuxtLink
                         :to="productUrl"

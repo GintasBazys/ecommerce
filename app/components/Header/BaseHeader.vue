@@ -215,8 +215,8 @@ function dismissAnnouncementBar(): void {
             v-if="announcementBarVisible && currentAnnouncement"
             class="fixed inset-x-0 top-0 z-50 h-10 border-b border-white/10 bg-linear-to-r from-slate-900 via-slate-800 to-slate-700 text-white"
         >
-            <div class="mx-auto grid h-full w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-2 px-3 sm:px-4">
-                <div class="flex items-center gap-1">
+            <div class="mx-auto flex h-full w-full max-w-7xl items-center gap-2 px-3 sm:px-4">
+                <div class="flex w-20 shrink-0 items-center gap-1">
                     <button
                         v-if="hasMultipleAnnouncements"
                         type="button"
@@ -237,7 +237,7 @@ function dismissAnnouncementBar(): void {
                 <component
                     :is="currentAnnouncement.link_url ? 'a' : 'div'"
                     :href="currentAnnouncement.link_url || undefined"
-                    class="min-w-0 text-center"
+                    class="min-w-0 flex-1 text-center"
                 >
                     <p
                         class="text-label-xs tracking-label-tight truncate font-semibold text-slate-100 uppercase"
@@ -248,7 +248,7 @@ function dismissAnnouncementBar(): void {
                     </p>
                 </component>
 
-                <div class="flex items-center gap-1 justify-self-end">
+                <div class="flex w-20 shrink-0 items-center justify-end gap-1">
                     <button
                         v-if="hasMultipleAnnouncements"
                         type="button"

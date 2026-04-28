@@ -160,7 +160,7 @@ function getCheckboxValue(event: Event): boolean {
 }
 
 const sectionClass =
-    "overflow-hidden rounded-[1.35rem] border border-slate-200/80 bg-white/95 shadow-[0_10px_28px_rgba(15,23,42,0.045)] transition hover:border-brand-100 hover:shadow-[0_14px_34px_rgba(15,23,42,0.07)]"
+    "overflow-hidden rounded-card border border-slate-200/80 bg-white/95 shadow-card transition hover:border-brand-100 hover:shadow-panel"
 const sectionButtonClass =
     "flex min-h-16 w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
 const sectionContentClass = "border-t border-slate-200/80 bg-linear-to-b from-white to-slate-50/80 px-5 py-4"
@@ -172,16 +172,16 @@ const checkboxClass =
 
 <template>
     <div
-        class="rounded-4xl border border-white/85 bg-[radial-gradient(circle_at_top_left,rgba(219,234,254,0.72),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 shadow-[0_24px_60px_rgba(15,23,42,0.09)] ring-1 ring-slate-900/5 sm:p-6 xl:p-7"
+        class="rounded-4xl border border-white/85 bg-linear-to-b from-white to-slate-50 p-4 shadow-panel ring-1 ring-slate-900/5 sm:p-6 xl:p-7"
     >
         <div class="mb-6 flex items-start justify-between gap-4">
             <div>
                 <span
-                    class="text-label-sm tracking-label inline-flex min-h-10 items-center rounded-full bg-brand-100 px-5 py-2 font-bold text-brand-700 uppercase shadow-[inset_0_0_0_1px_rgba(255,255,255,0.55)]"
+                    class="text-label-sm tracking-label inline-flex min-h-10 items-center rounded-full bg-brand-100 px-5 py-2 font-bold text-brand-700 uppercase shadow-inner"
                 >
                     Filters
                 </span>
-                <h2 class="mt-4 max-w-60 text-[1.55rem] leading-[1.03] font-bold tracking-[-0.04em] text-slate-950 sm:text-[1.85rem]">
+                <h2 class="mt-4 max-w-60 text-2xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-3xl">
                     {{ props.sidebarTitle }}
                 </h2>
                 <p class="mt-2 max-w-64 text-sm leading-6 text-slate-600">
@@ -227,7 +227,7 @@ const checkboxClass =
                     :aria-expanded="isSectionOpen('subcategories')"
                     @click="toggleSection('subcategories')"
                 >
-                    <span class="text-[1.05rem] font-bold text-slate-950">Subcategories</span>
+                    <span class="text-lg font-bold text-slate-950">Subcategories</span>
                     <span
                         class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
                         :style="isSectionOpen('subcategories') ? 'transform: rotate(45deg)' : ''"
@@ -259,7 +259,7 @@ const checkboxClass =
                     :aria-expanded="isSectionOpen('types')"
                     @click="toggleSection('types')"
                 >
-                    <span class="text-[1.05rem] font-bold text-slate-950">Product types</span>
+                    <span class="text-lg font-bold text-slate-950">Product types</span>
                     <span
                         class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
                         :style="isSectionOpen('types') ? 'transform: rotate(45deg)' : ''"
@@ -291,7 +291,7 @@ const checkboxClass =
                     :aria-expanded="isSectionOpen('collections')"
                     @click="toggleSection('collections')"
                 >
-                    <span class="text-[1.05rem] font-bold text-slate-950">Collections</span>
+                    <span class="text-lg font-bold text-slate-950">Collections</span>
                     <span
                         class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
                         :style="isSectionOpen('collections') ? 'transform: rotate(45deg)' : ''"
@@ -323,7 +323,7 @@ const checkboxClass =
                     :aria-expanded="isSectionOpen('tags')"
                     @click="toggleSection('tags')"
                 >
-                    <span class="text-[1.05rem] font-bold text-slate-950">Tags</span>
+                    <span class="text-lg font-bold text-slate-950">Tags</span>
                     <span
                         class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
                         :style="isSectionOpen('tags') ? 'transform: rotate(45deg)' : ''"
@@ -355,7 +355,7 @@ const checkboxClass =
                     :aria-expanded="isSectionOpen('availability')"
                     @click="toggleSection('availability')"
                 >
-                    <span class="text-[1.05rem] font-bold text-slate-950">Availability</span>
+                    <span class="text-lg font-bold text-slate-950">Availability</span>
                     <span
                         class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
                         :style="isSectionOpen('availability') ? 'transform: rotate(45deg)' : ''"
@@ -384,7 +384,7 @@ const checkboxClass =
                     :aria-expanded="isSectionOpen('price')"
                     @click="toggleSection('price')"
                 >
-                    <span class="text-[1.05rem] font-bold text-slate-950">Price</span>
+                    <span class="text-lg font-bold text-slate-950">Price</span>
                     <span
                         class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
                         :style="isSectionOpen('price') ? 'transform: rotate(45deg)' : ''"
@@ -414,11 +414,11 @@ const checkboxClass =
                                 class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
                             />
                             <div class="grid grid-cols-2 gap-3 text-sm font-semibold text-slate-700">
-                                <div class="rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-[0_6px_16px_rgba(15,23,42,0.035)]">
+                                <div class="rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
                                     <span class="block text-xs font-bold text-slate-400 uppercase">Min</span>
                                     {{ priceRange[0] }}
                                 </div>
-                                <div class="rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-[0_6px_16px_rgba(15,23,42,0.035)]">
+                                <div class="rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
                                     <span class="block text-xs font-bold text-slate-400 uppercase">Max</span>
                                     {{ priceRange[1] }}
                                 </div>
@@ -431,14 +431,14 @@ const checkboxClass =
             <div v-if="props.facets.price.max > props.facets.price.min" class="grid gap-3 pt-2 sm:grid-cols-2">
                 <button
                     type="button"
-                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-4 text-sm font-bold text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.04)] transition hover:border-slate-400 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
+                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-4 text-sm font-bold text-slate-900 shadow-card transition hover:border-slate-400 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
                     @click="emit('resetPriceRange')"
                 >
                     Reset price
                 </button>
                 <button
                     type="button"
-                    class="ui-btn-accent min-h-12 px-4 font-bold shadow-[0_12px_26px_rgba(180,132,48,0.22)]"
+                    class="ui-btn-accent min-h-12 px-4 font-bold shadow-lg"
                     @click="emit('applyPriceRange')"
                 >
                     Apply price

@@ -22,12 +22,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div
-        class="mb-4 rounded-3xl border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-4 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-5"
-    >
+    <div class="mb-4 rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4 shadow-panel sm:p-5">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div class="min-w-0">
-                <span class="block text-[1.05rem] font-bold text-slate-950">{{ props.totalCount }} products</span>
+                <span class="block text-lg font-bold text-slate-950">{{ props.totalCount }} products</span>
                 <p class="mt-1 text-sm leading-6 text-slate-600">
                     <template v-if="props.sortLoading">Updating sort order...</template>
                     <template v-else-if="props.filterLoading">Refreshing filtered results...</template>
@@ -36,10 +34,10 @@ const emit = defineEmits<{
                     <template v-else>Medusa-backed filters for categories, collections, types, tags, stock, and price.</template>
                 </p>
             </div>
-            <div class="grid gap-3 sm:grid-cols-[minmax(10rem,auto)_minmax(14rem,24rem)] sm:items-end lg:justify-end">
+            <div class="grid gap-3 sm:grid-cols-2 sm:items-end lg:justify-end">
                 <button
                     type="button"
-                    class="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] xl:hidden"
+                    class="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card xl:hidden"
                     @click="emit('openFilters')"
                 >
                     <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">

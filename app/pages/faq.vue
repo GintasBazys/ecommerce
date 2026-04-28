@@ -135,13 +135,11 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
 </script>
 
 <template>
-    <section
-        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_36%,#f6f9ff_100%)]"
-    >
-        <div class="px-0 pt-[3.75rem] pb-8 sm:pt-[4.5rem] xl:pt-[5.75rem]">
+    <section class="bg-linear-to-b from-brand-50 via-white to-brand-50">
+        <div class="px-0 pt-15 pb-8 sm:pt-18 xl:pt-23">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-                <div class="grid items-end gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.02fr)] xl:gap-10">
-                    <div class="max-w-[40rem] xl:pb-6">
+                <div class="grid items-end gap-8 xl:grid-cols-2 xl:gap-10">
+                    <div class="max-w-2xl xl:pb-6">
                         <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
@@ -149,11 +147,11 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                             Help center
                         </span>
                         <h1
-                            class="mt-4 text-[2.1rem] leading-[1] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[2.9rem] sm:leading-[0.98] xl:max-w-[11ch] xl:text-[4.1rem] xl:leading-[0.96]"
+                            class="mt-4 text-3xl leading-none font-bold tracking-tighter text-slate-950 sm:text-5xl xl:max-w-md xl:text-7xl"
                         >
                             Answers designed to feel as clear and premium as the rest of the storefront.
                         </h1>
-                        <p class="mt-4 max-w-[38rem] text-base leading-7 text-slate-600 sm:text-[1.05rem] sm:leading-8">
+                        <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
                             Start here for the questions customers ask most often. If you need something more specific, our
                             <NuxtLink to="/contact" class="text-brand-700 hover:text-brand-900 font-semibold">contact page</NuxtLink>
                             is ready for follow-up.
@@ -165,9 +163,9 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                     </div>
 
                     <div
-                        class="relative rounded-[1.75rem] border border-white/80 bg-white/90 p-3 shadow-[0_14px_34px_rgba(8,27,90,0.08)] sm:rounded-[2rem] sm:p-4"
+                        class="relative rounded-panel border border-white/80 bg-white/90 p-3 shadow-panel sm:rounded-4xl sm:p-4"
                     >
-                        <div class="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem]">
+                        <div class="relative overflow-hidden rounded-card sm:rounded-panel">
                             <NuxtImage
                                 src="/images/hero-main.jpg"
                                 alt="Support and delivery guidance visual"
@@ -178,22 +176,22 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                                 quality="68"
                                 loading="lazy"
                                 decoding="async"
-                                class="block aspect-[1.08] w-full object-cover object-center"
+                                class="block aspect-square w-full object-cover object-center"
                             />
                             <div
-                                class="absolute inset-0 bg-[linear-gradient(135deg,rgba(2,6,23,0.2),transparent_45%,rgba(255,255,255,0.08))]"
+                                class="absolute inset-0 bg-linear-to-br from-slate-950/20 via-transparent to-white/10"
                             ></div>
                         </div>
 
                         <div
-                            class="text-label-sm absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.1)] sm:top-5 sm:left-5"
+                            class="text-label-sm absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 font-semibold tracking-widest text-slate-950 shadow-card sm:top-5 sm:left-5"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Fast support paths
                         </div>
 
                         <div
-                            class="absolute inset-x-3 bottom-3 rounded-[1.25rem] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))] p-4 text-white shadow-[0_10px_26px_rgba(2,6,23,0.18)] sm:inset-x-5 sm:bottom-5 sm:p-5"
+                            class="absolute inset-x-3 bottom-3 rounded-card-sm border border-white/10 bg-slate-950/90 p-4 text-white shadow-xl sm:inset-x-5 sm:bottom-5 sm:p-5"
                         >
                             <span class="text-label-eyebrow-sm tracking-label font-bold text-amber-200 uppercase">Most common topics</span>
                             <ul class="mt-4 grid gap-3">
@@ -213,23 +211,23 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
         </div>
 
         <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.12fr)_minmax(22rem,0.88fr)] xl:gap-8">
-                <div class="grid gap-5">
+            <div class="grid gap-6 xl:grid-cols-3 xl:gap-8">
+                <div class="grid gap-5 xl:col-span-2">
                     <article
                         v-for="section in faqSections"
                         :key="section.id"
-                        class="rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-5 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-7 lg:p-8"
+                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 shadow-panel sm:p-7 lg:p-8"
                     >
-                        <div class="max-w-[38rem]">
+                        <div class="max-w-2xl">
                             <span
                                 class="bg-brand-100 text-label-sm tracking-label text-brand-700 inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                             >
                                 {{ section.eyebrow }}
                             </span>
-                            <h2 class="mt-4 text-[1.9rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.35rem]">
+                            <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-4xl">
                                 {{ section.title }}
                             </h2>
-                            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-[1.02rem] sm:leading-8">
+                            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
                                 {{ section.description }}
                             </p>
                         </div>
@@ -238,7 +236,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                             <section
                                 v-for="(item, itemIndex) in section.items"
                                 :key="item.question"
-                                class="overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white shadow-[0_8px_20px_rgba(8,27,90,0.04)]"
+                                class="overflow-hidden rounded-card border border-slate-200 bg-white shadow-card"
                             >
                                 <button
                                     type="button"
@@ -247,7 +245,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                                     :aria-expanded="isPanelOpen(section.id, itemIndex)"
                                     @click="togglePanel(section.id, itemIndex)"
                                 >
-                                    <span class="pr-3 text-[1rem] leading-7 font-semibold text-slate-950 sm:text-[1.05rem]">
+                                    <span class="pr-3 text-base leading-7 font-semibold text-slate-950">
                                         {{ item.question }}
                                     </span>
                                     <span
@@ -273,7 +271,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                                     :id="`${section.id}-panel-${itemIndex}`"
                                     class="border-t border-slate-200 px-5 py-4 sm:px-6 sm:py-5"
                                 >
-                                    <p class="text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
+                                    <p class="text-sm leading-7 text-slate-600 sm:text-base">
                                         {{ item.answer }}
                                     </p>
                                 </div>
@@ -284,17 +282,17 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
 
                 <aside class="grid gap-5 xl:sticky xl:top-6 xl:self-start">
                     <div
-                        class="rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-6 shadow-[0_14px_36px_rgba(8,27,90,0.06)] sm:p-8"
+                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-6 shadow-panel sm:p-8"
                     >
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                         >
                             Still need help?
                         </span>
-                        <h2 class="mt-4 text-[1.6rem] leading-[1.05] font-bold tracking-[-0.04rem] text-slate-950">
+                        <h2 class="mt-4 text-2xl leading-tight font-bold tracking-tighter text-slate-950">
                             Talk to the support team directly.
                         </h2>
-                        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-[0.98rem]">
+                        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
                             If your question is about a current order or a product choice, send us a message and we will point you in the
                             right direction.
                         </p>
@@ -307,7 +305,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                         <NuxtLink to="/contact" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
                     </div>
 
-                    <div class="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-[0_12px_28px_rgba(8,27,90,0.05)] sm:p-8">
+                    <div class="rounded-panel border border-slate-200 bg-white p-6 shadow-card sm:p-8">
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full bg-slate-100 px-4 py-2 font-bold text-slate-700 uppercase"
                         >
@@ -316,19 +314,19 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                         <div class="mt-5 grid gap-4">
                             <NuxtLink
                                 to="/shipping"
-                                class="hover:border-brand-200 hover:text-brand-700 rounded-[1.2rem] border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
+                                class="hover:border-brand-200 hover:text-brand-700 rounded-card-sm border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
                             >
                                 Payment and shipping details
                             </NuxtLink>
                             <NuxtLink
                                 to="/returns"
-                                class="hover:border-brand-200 hover:text-brand-700 rounded-[1.2rem] border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
+                                class="hover:border-brand-200 hover:text-brand-700 rounded-card-sm border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
                             >
                                 Returns and exchange guidance
                             </NuxtLink>
                             <NuxtLink
                                 to="/contact"
-                                class="hover:border-brand-200 hover:text-brand-700 rounded-[1.2rem] border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
+                                class="hover:border-brand-200 hover:text-brand-700 rounded-card-sm border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
                             >
                                 Contact support for a direct answer
                             </NuxtLink>

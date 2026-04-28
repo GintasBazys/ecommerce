@@ -15,7 +15,7 @@ const props = defineProps<{
         <NuxtLink
             v-if="props.currentPage > 1"
             :to="props.buildPageLink(props.currentPage - 1)"
-            class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] transition hover:border-slate-300 hover:bg-slate-50"
+            class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card transition hover:border-slate-300 hover:bg-slate-50"
         >
             Previous
         </NuxtLink>
@@ -37,14 +37,14 @@ const props = defineProps<{
             <NuxtLink
                 v-else-if="item !== props.currentPage"
                 :to="props.buildPageLink(item)"
-                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] transition hover:border-slate-300 hover:bg-slate-50"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 shadow-card transition hover:border-slate-300 hover:bg-slate-50"
             >
                 {{ item }}
             </NuxtLink>
             <span
                 v-else
                 aria-current="page"
-                class="border-brand-700 bg-brand-700 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(8,27,90,0.08)]"
+                class="border-brand-700 bg-brand-700 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-3 text-sm font-semibold text-white shadow-card"
             >
                 {{ item }}
             </span>
@@ -53,7 +53,7 @@ const props = defineProps<{
         <NuxtLink
             v-if="props.currentPage < props.totalPages"
             :to="props.buildPageLink(props.currentPage + 1)"
-            class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-[0_8px_20px_rgba(8,27,90,0.04)] transition hover:border-slate-300 hover:bg-slate-50"
+            class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card transition hover:border-slate-300 hover:bg-slate-50"
         >
             Next
         </NuxtLink>

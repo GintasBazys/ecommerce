@@ -17,9 +17,7 @@ const props = defineProps<{
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
             <AppBreadcrumbs :items="props.breadcrumbItems" class="mb-4" />
 
-            <div
-                class="rounded-panel relative overflow-hidden border border-white/80 bg-slate-950 shadow-[0_18px_44px_rgba(8,27,90,0.12)] sm:rounded-4xl"
-            >
+            <div class="rounded-panel relative overflow-hidden border border-white/80 bg-slate-950 shadow-elevated sm:rounded-4xl">
                 <NuxtImage
                     :src="props.heroImage"
                     :alt="`${props.pageHeading} category image`"
@@ -32,22 +30,18 @@ const props = defineProps<{
                     decoding="async"
                     class="absolute inset-0 h-full w-full object-cover object-center"
                 />
-                <div
-                    class="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.78)_0%,rgba(2,6,23,0.52)_38%,rgba(2,6,23,0.18)_68%,rgba(2,6,23,0.18)_100%)]"
-                ></div>
-                <div
-                    class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.14)_0%,rgba(15,23,42,0.1)_40%,rgba(15,23,42,0.5)_100%)]"
-                ></div>
+                <div class="absolute inset-0 bg-linear-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20"></div>
+                <div class="absolute inset-0 bg-linear-to-b from-slate-950/15 via-slate-950/10 to-slate-950/50"></div>
 
                 <div class="relative z-10 flex min-h-80 flex-col justify-between gap-8 p-4 sm:min-h-96 sm:p-6 lg:min-h-112">
                     <div
-                        class="text-label-sm inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-[0.08em] text-slate-950 shadow-[0_8px_20px_rgba(8,27,90,0.14)]"
+                        class="text-label-sm inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/92 px-4 py-2 font-semibold tracking-widest text-slate-950 shadow-card"
                     >
                         <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                         {{ props.isAllProductsPage ? "All products" : "Category" }}
                     </div>
                     <div
-                        class="max-w-3xl rounded-3xl border border-white/15 bg-slate-950/72 p-5 text-white shadow-[0_12px_30px_rgba(2,6,23,0.22)] backdrop-blur-[6px] sm:p-7"
+                        class="max-w-3xl rounded-3xl border border-white/15 bg-slate-950/75 p-5 text-white shadow-xl backdrop-blur-md sm:p-7"
                     >
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-300/30 bg-amber-300/12 px-4 py-2 font-bold text-amber-100 uppercase"
@@ -55,7 +49,7 @@ const props = defineProps<{
                             {{ props.heroEyebrow }}
                         </span>
                         <h1
-                            class="mt-4 text-[2rem] leading-none font-bold tracking-[-0.05rem] text-white sm:text-[2.8rem] sm:leading-[0.96] lg:text-[3.6rem]"
+                            class="mt-4 text-3xl leading-none font-bold tracking-tighter text-white sm:text-5xl lg:text-6xl"
                         >
                             {{ props.pageHeading }}
                         </h1>
