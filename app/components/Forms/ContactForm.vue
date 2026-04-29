@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { formatDateTime } from "@/utils/formatDate"
 import { usePostHog } from "~/composables/usePostHog"
 
 type ContactFormState = {
@@ -16,22 +15,26 @@ type ContactFormErrors = {
     message: string
 }
 
-type ContactResponse = {
-    success: boolean
-    message: string
-}
+const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ea50e93bb59d60512a0ab63ded1f9169"
 
 const posthog = usePostHog()
 const runtimeConfig = useRuntimeConfig()
-const turnstileSiteKey = computed(() => String(runtimeConfig.public.TURNSTILE_SITE_KEY || ""))
-const widgetContainer = ref<HTMLElement | null>(null)
-const widgetId = ref<string | null>(null)
-const turnstileToken = ref<string>("")
+const route = useRoute()
+const siteUrl = computed(() => String(runtimeConfig.public.SITE_URL || "").replace(/\/$/, ""))
+const nextUrl = computed(() => {
+    if (siteUrl.value) {
+        return `${siteUrl.value}/contact?submitted=true`
+    }
+
+    if (import.meta.client) {
+        return `${window.location.origin}/contact?submitted=true`
+    }
+
+    return "https://medusa-commerce.de/contact?submitted=true"
+})
 
 const errorMessage = ref<string | null>(null)
-const successMessage = ref<string | null>(null)
-const loading = ref<boolean>(false)
-const formSubject = useState<string>("contact-form-subject", () => "New submission")
+const successMessage = computed(() => (route.query.submitted === "true" ? "Message sent successfully." : null))
 
 const form = reactive<ContactFormState>({
     subject: "",
@@ -46,60 +49,6 @@ const formErrors = ref<ContactFormErrors>({
     email: "",
     message: ""
 })
-
-useHead(() => {
-    if (!turnstileSiteKey.value) {
-        return {}
-    }
-
-    return {
-        link: [{ rel: "preconnect", href: "https://challenges.cloudflare.com" }],
-        script: [
-            {
-                src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileContactLoad",
-                defer: true
-            }
-        ]
-    }
-})
-
-function resetTurnstile(): void {
-    turnstileToken.value = ""
-
-    if (import.meta.client && widgetId.value && window.turnstile) {
-        window.turnstile.reset(widgetId.value)
-    }
-}
-
-function renderTurnstile(): void {
-    if (!import.meta.client || !turnstileSiteKey.value || !widgetContainer.value || !window.turnstile) {
-        return
-    }
-
-    if (widgetId.value) {
-        window.turnstile.remove(widgetId.value)
-        widgetId.value = null
-    }
-
-    widgetId.value = window.turnstile.render(widgetContainer.value, {
-        sitekey: turnstileSiteKey.value,
-        action: "contact",
-        theme: "light",
-        size: widgetContainer.value.clientWidth < 300 ? "compact" : "flexible",
-        callback: (token) => {
-            turnstileToken.value = token
-            errorMessage.value = null
-        },
-        "error-callback": () => {
-            turnstileToken.value = ""
-            errorMessage.value = "Verification failed. Please try again."
-        },
-        "expired-callback": () => {
-            turnstileToken.value = ""
-            errorMessage.value = "Verification expired. Please try again."
-        }
-    })
-}
 
 function validateForm(): boolean {
     let isValid = true
@@ -126,109 +75,23 @@ function validateForm(): boolean {
     return isValid
 }
 
-function resetForm(): void {
-    form.subject = ""
-    form.email = ""
-    form.phone = ""
-    form.orderNumber = ""
-    form.message = ""
-    formErrors.value = { subject: "", email: "", message: "" }
-}
-
-function getErrorMessage(error: unknown): string {
-    if (error && typeof error === "object") {
-        const data = "data" in error ? error.data : undefined
-
-        if (data && typeof data === "object" && "statusMessage" in data && typeof data.statusMessage === "string") {
-            if (data.statusMessage === "Verification failed") {
-                return "Verification failed. Please try again."
-            }
-
-            return data.statusMessage
-        }
-    }
-
-    return "Unexpected error. Try again later."
-}
-
-async function handleSubmit(): Promise<void> {
+function handleSubmit(event: SubmitEvent): void {
     if (!validateForm()) {
+        event.preventDefault()
         errorMessage.value = "Please correct the errors below."
-        successMessage.value = null
         return
     }
 
-    if (!turnstileSiteKey.value) {
-        errorMessage.value = "Verification is currently unavailable. Please try again later."
-        successMessage.value = null
-        return
-    }
-
-    if (!turnstileToken.value) {
-        errorMessage.value = "Complete the verification before sending your message."
-        successMessage.value = null
-        return
-    }
-
-    loading.value = true
-
-    try {
-        const response = await $fetch<ContactResponse>("/api/contact", {
-            method: "POST",
-            body: {
-                ...form,
-                submissionSubject: formSubject.value,
-                turnstileToken: turnstileToken.value
-            }
-        })
-
-        successMessage.value = response.message
-        errorMessage.value = null
-        posthog?.capture("contact_form_submitted", { subject: form.subject, has_order_number: !!form.orderNumber })
-        resetForm()
-        resetTurnstile()
-    } catch (error: unknown) {
-        errorMessage.value = getErrorMessage(error)
-        successMessage.value = null
-        resetTurnstile()
-    } finally {
-        loading.value = false
-    }
+    errorMessage.value = null
+    posthog?.capture("contact_form_submitted", { subject: form.subject, has_order_number: !!form.orderNumber })
 }
-
-onMounted(() => {
-    formSubject.value = `${formatDateTime(new Date())} - New submission`
-
-    if (!import.meta.client) {
-        return
-    }
-
-    window.onTurnstileContactLoad = () => {
-        renderTurnstile()
-    }
-
-    if (window.turnstile) {
-        renderTurnstile()
-    }
-})
-
-onUnmounted(() => {
-    if (!import.meta.client) {
-        return
-    }
-
-    if (widgetId.value && window.turnstile) {
-        window.turnstile.remove(widgetId.value)
-    }
-
-    if (window.onTurnstileContactLoad) {
-        delete window.onTurnstileContactLoad
-    }
-})
 </script>
 
 <template>
-    <form class="grid gap-5" @submit.prevent="handleSubmit">
+    <form class="grid gap-5" :action="FORMSUBMIT_ENDPOINT" method="POST" @submit="handleSubmit">
+        <input type="hidden" name="_subject" value="New contact form submission" />
+        <input type="hidden" name="_next" :value="nextUrl" />
+
         <div class="grid gap-5 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label for="contact-subject" class="mb-2 block text-sm font-semibold text-slate-900">Subject</label>
@@ -300,16 +163,9 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <div class="rounded-card-sm border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
-            <div ref="widgetContainer" class="flex min-h-17 max-w-full justify-center overflow-hidden"></div>
-            <p class="mt-3 text-sm leading-6 text-slate-600">Spam protection is required before sending this form.</p>
-        </div>
-
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-sm leading-6 text-slate-600">By sending this form, you share contact details only for support follow-up.</p>
-            <button type="submit" class="ui-btn-primary px-7" :disabled="loading">
-                {{ loading ? "Sending..." : "Send message" }}
-            </button>
+            <button type="submit" class="ui-btn-primary px-7">Send message</button>
         </div>
 
         <div v-if="errorMessage" class="rounded-card-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

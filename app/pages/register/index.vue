@@ -15,9 +15,8 @@ const router = useRouter()
 const config = useRuntimeConfig()
 const posthog = usePostHog()
 const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
-const widgetContainer = ref<HTMLElement | null>(null)
-const widgetId = ref<string | null>(null)
 const turnstileToken = ref<string>("")
+const turnstileResetKey = ref<number>(0)
 
 const snackbar = ref<boolean>(false)
 const snackbarText = ref<string>("")
@@ -37,22 +36,6 @@ const formErrors = ref<{ firstName: string; lastName: string; email: string; pas
     verification: ""
 })
 
-useHead(() => {
-    if (!turnstileSiteKey.value) {
-        return {}
-    }
-
-    return {
-        link: [{ rel: "preconnect", href: "https://challenges.cloudflare.com" }],
-        script: [
-            {
-                src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileRegisterLoad",
-                defer: true
-            }
-        ]
-    }
-})
-
 function showNotification(message: string, tone: "success" | "error"): void {
     snackbarText.value = message
     snackbarTone.value = tone
@@ -69,40 +52,17 @@ function showNotification(message: string, tone: "success" | "error"): void {
 
 function resetTurnstile(): void {
     turnstileToken.value = ""
-
-    if (import.meta.client && widgetId.value && window.turnstile) {
-        window.turnstile.reset(widgetId.value)
-    }
+    turnstileResetKey.value += 1
 }
 
-function renderTurnstile(): void {
-    if (!import.meta.client || !turnstileSiteKey.value || !widgetContainer.value || !window.turnstile) {
-        return
-    }
+function handleTurnstileToken(token: string): void {
+    turnstileToken.value = token
+    formErrors.value.verification = ""
+}
 
-    if (widgetId.value) {
-        window.turnstile.remove(widgetId.value)
-        widgetId.value = null
-    }
-
-    widgetId.value = window.turnstile.render(widgetContainer.value, {
-        sitekey: turnstileSiteKey.value,
-        action: "register",
-        theme: "light",
-        size: "flexible",
-        callback: (token) => {
-            turnstileToken.value = token
-            formErrors.value.verification = ""
-        },
-        "error-callback": () => {
-            turnstileToken.value = ""
-            formErrors.value.verification = "Verification failed. Please try again."
-        },
-        "expired-callback": () => {
-            turnstileToken.value = ""
-            formErrors.value.verification = "Verification expired. Please try again."
-        }
-    })
+function handleTurnstileError(message: string): void {
+    turnstileToken.value = ""
+    formErrors.value.verification = message
 }
 
 function isValidEmail(value: string): boolean {
@@ -174,6 +134,10 @@ function getErrorMessage(error: unknown): string {
 }
 
 async function handleRegister(): Promise<void> {
+    if (isLoading.value) {
+        return
+    }
+
     if (!validateForm()) {
         return
     }
@@ -209,33 +173,7 @@ async function handleRegister(): Promise<void> {
     }
 }
 
-onMounted(() => {
-    if (!import.meta.client) {
-        return
-    }
-
-    window.onTurnstileRegisterLoad = () => {
-        renderTurnstile()
-    }
-
-    if (window.turnstile) {
-        renderTurnstile()
-    }
-})
-
 onUnmounted(() => {
-    if (!import.meta.client) {
-        return
-    }
-
-    if (widgetId.value && window.turnstile) {
-        window.turnstile.remove(widgetId.value)
-    }
-
-    if (window.onTurnstileRegisterLoad) {
-        delete window.onTurnstileRegisterLoad
-    }
-
     if (snackbarTimer.value) {
         clearTimeout(snackbarTimer.value)
     }
@@ -342,7 +280,15 @@ onUnmounted(() => {
                         </div>
 
                         <div class="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
-                            <div ref="widgetContainer" class="min-h-[4.25rem]"></div>
+                            <FormsTurnstileWidget
+                                :site-key="turnstileSiteKey"
+                                action="register"
+                                :reset-key="turnstileResetKey"
+                                :model-value="turnstileToken"
+                                @update:model-value="handleTurnstileToken"
+                                @error="handleTurnstileError"
+                                @expired="handleTurnstileError"
+                            />
                             <p class="mt-3 text-sm leading-6 text-slate-600">Verification is required before creating your account.</p>
                             <p v-if="formErrors.verification" class="mt-2 text-sm text-rose-600">{{ formErrors.verification }}</p>
                         </div>

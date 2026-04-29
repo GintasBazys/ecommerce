@@ -22,6 +22,7 @@ const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
 const loginTurnstileToken = ref<string>("")
 const loginTurnstileResetKey = ref<number>(0)
+const loginIsSubmitting = ref<boolean>(false)
 
 const resetEmail = ref<string>("")
 
@@ -48,6 +49,10 @@ function showSnackbar(message: string, tone: "success" | "error"): void {
 }
 
 async function handleLogin(): Promise<void> {
+    if (loginIsSubmitting.value) {
+        return
+    }
+
     loginErrors.value = { email: "", password: "", verification: "" }
 
     if (!loginEmail.value) {
@@ -60,31 +65,41 @@ async function handleLogin(): Promise<void> {
         loginErrors.value.password = "Password is required"
     }
 
+    if (loginErrors.value.email || loginErrors.value.password) {
+        return
+    }
+
     if (!turnstileSiteKey.value) {
         loginErrors.value.verification = "Verification is currently unavailable. Please try again later."
-    } else if (!loginTurnstileToken.value) {
+        return
+    }
+
+    if (!loginTurnstileToken.value) {
         loginErrors.value.verification = "Complete verification before logging in."
-    }
-
-    if (loginErrors.value.email || loginErrors.value.password || loginErrors.value.verification) {
         return
     }
 
-    const customer = await auth.login(loginEmail.value, loginPassword.value, {
-        loadCart: true,
-        turnstileToken: loginTurnstileToken.value
-    })
-    if (!customer) {
-        loginTurnstileToken.value = ""
-        loginTurnstileResetKey.value += 1
-        showSnackbar("Login failed", "error")
-        return
+    loginIsSubmitting.value = true
+
+    try {
+        const customer = await auth.login(loginEmail.value, loginPassword.value, {
+            loadCart: true,
+            turnstileToken: loginTurnstileToken.value
+        })
+        if (!customer) {
+            loginTurnstileToken.value = ""
+            loginTurnstileResetKey.value += 1
+            showSnackbar("Login failed", "error")
+            return
+        }
+
+        posthog?.identify(loginEmail.value, { email: loginEmail.value })
+        posthog?.capture("user_signed_in", { method: "email" })
+
+        await router.push("/")
+    } finally {
+        loginIsSubmitting.value = false
     }
-
-    posthog?.identify(loginEmail.value, { email: loginEmail.value })
-    posthog?.capture("user_signed_in", { method: "email" })
-
-    await router.push("/")
 }
 
 function handleTurnstileToken(token: string): void {
@@ -263,9 +278,10 @@ onBeforeUnmount(() => {
 
                         <button
                             type="submit"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
+                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
+                            :disabled="loginIsSubmitting"
                         >
-                            Log in
+                            {{ loginIsSubmitting ? "Logging in..." : "Log in" }}
                         </button>
                     </form>
 

@@ -14,24 +14,32 @@ const emit = defineEmits<{
 
 const widgetContainer = ref<HTMLElement | null>(null)
 const widgetId = ref<string | null>(null)
-let scriptPollTimer: ReturnType<typeof setInterval> | null = null
+const isWidgetReady = ref<boolean>(false)
+const TURNSTILE_SCRIPT_ID = "turnstile-api-script"
 
-useHead(() => {
-    if (!props.siteKey) {
-        return {}
+function loadTurnstileScript(): Promise<void> {
+    if (!import.meta.client || window.turnstile) {
+        return Promise.resolve()
     }
 
-    return {
-        link: [{ rel: "preconnect", href: "https://challenges.cloudflare.com" }],
-        script: [{ src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit", defer: true }]
-    }
-})
+    const existingScript = document.getElementById(TURNSTILE_SCRIPT_ID)
 
-function stopPolling(): void {
-    if (scriptPollTimer) {
-        clearInterval(scriptPollTimer)
-        scriptPollTimer = null
+    if (existingScript) {
+        return new Promise((resolve, reject) => {
+            existingScript.addEventListener("load", () => resolve(), { once: true })
+            existingScript.addEventListener("error", () => reject(new Error("Turnstile failed to load")), { once: true })
+        })
     }
+
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script")
+        script.id = TURNSTILE_SCRIPT_ID
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        script.defer = true
+        script.addEventListener("load", () => resolve(), { once: true })
+        script.addEventListener("error", () => reject(new Error("Turnstile failed to load")), { once: true })
+        document.head.appendChild(script)
+    })
 }
 
 function removeWidget(): void {
@@ -71,42 +79,43 @@ function renderWidget(): boolean {
     return true
 }
 
-function ensureWidgetRendered(): void {
-    stopPolling()
-
-    if (renderWidget()) {
-        return
-    }
-
+async function ensureWidgetRendered(): Promise<void> {
     if (!import.meta.client || !props.siteKey) {
         return
     }
 
-    scriptPollTimer = setInterval(() => {
-        if (renderWidget()) {
-            stopPolling()
-        }
-    }, 250)
+    try {
+        await loadTurnstileScript()
+        renderWidget()
+    } catch {
+        emit("error", "Verification failed to load. Please try again.")
+    }
 }
 
 watch(
     () => [props.siteKey, props.action, props.resetKey],
     async () => {
+        if (!isWidgetReady.value) {
+            return
+        }
+
         await nextTick()
-        ensureWidgetRendered()
+        await ensureWidgetRendered()
     }
 )
 
-onMounted(() => {
-    ensureWidgetRendered()
+onMounted(async () => {
+    await nextTick()
+    isWidgetReady.value = true
+    await nextTick()
+    await ensureWidgetRendered()
 })
 
 onUnmounted(() => {
-    stopPolling()
     removeWidget()
 })
 </script>
 
 <template>
-    <div ref="widgetContainer" class="min-h-[74px] rounded-2xl"></div>
+    <div v-if="isWidgetReady" ref="widgetContainer" class="min-h-[74px] rounded-2xl"></div>
 </template>
