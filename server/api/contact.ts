@@ -86,12 +86,17 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!verificationResponse.ok) {
+        console.error("Turnstile verification request failed", { status: verificationResponse.status })
         throw createError({ statusCode: 502, statusMessage: "Verification failed" })
     }
 
     const verificationResult = (await verificationResponse.json()) as TurnstileVerificationResponse
 
     if (!verificationResult.success || (verificationResult.action && !ALLOWED_TURNSTILE_ACTIONS.has(verificationResult.action))) {
+        console.warn("Turnstile verification rejected contact form", {
+            action: verificationResult.action,
+            errors: verificationResult["error-codes"]
+        })
         throw createError({ statusCode: 400, statusMessage: "Verification failed" })
     }
 
@@ -121,6 +126,7 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!submitResponse.ok) {
+        console.error("FormSubmit contact request failed", { status: submitResponse.status })
         throw createError({ statusCode: 502, statusMessage: "Could not send your message" })
     }
 
@@ -128,6 +134,7 @@ export default defineEventHandler(async (event) => {
     const submitSucceeded = submitResult.success === true || submitResult.success === "true"
 
     if (!submitSucceeded) {
+        console.error("FormSubmit rejected contact submission", { message: submitResult.message })
         throw createError({ statusCode: 502, statusMessage: "Could not send your message" })
     }
 
