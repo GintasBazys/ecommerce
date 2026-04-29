@@ -126,7 +126,8 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!submitResponse.ok) {
-        console.error("FormSubmit contact request failed", { status: submitResponse.status })
+        const errorBody = await submitResponse.text()
+        console.error("FormSubmit contact request failed", { status: submitResponse.status, body: errorBody.slice(0, 500) })
         throw createError({ statusCode: 502, statusMessage: "Could not send your message" })
     }
 
