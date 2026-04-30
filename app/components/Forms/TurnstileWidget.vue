@@ -15,7 +15,20 @@ const emit = defineEmits<{
 const widgetContainer = ref<HTMLElement | null>(null)
 const widgetId = ref<string | null>(null)
 const isWidgetReady = ref<boolean>(false)
+const isWidgetVisible = ref<boolean>(false)
 const TURNSTILE_SCRIPT_ID = "turnstile-api-script"
+
+function revealWidgetAfterPaint(): void {
+    if (!import.meta.client) {
+        return
+    }
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            isWidgetVisible.value = true
+        })
+    })
+}
 
 function getTurnstileErrorMessage(errorCode?: string): string {
     if (errorCode === "110200") {
@@ -63,6 +76,7 @@ function renderWidget(): boolean {
         return false
     }
 
+    isWidgetVisible.value = false
     removeWidget()
     emit("update:modelValue", "")
 
@@ -84,6 +98,8 @@ function renderWidget(): boolean {
             emit("expired", "Verification expired. Please try again.")
         }
     })
+
+    revealWidgetAfterPaint()
 
     return true
 }
@@ -126,5 +142,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div v-if="isWidgetReady" ref="widgetContainer" class="rounded-2xl"></div>
+    <div
+        v-if="isWidgetReady"
+        ref="widgetContainer"
+        class="min-h-17 overflow-hidden rounded-2xl bg-slate-50 opacity-0 transition-opacity duration-150 motion-reduce:transition-none"
+        :class="isWidgetVisible ? 'opacity-100' : ''"
+    ></div>
 </template>
