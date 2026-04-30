@@ -379,16 +379,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_42%,#fff7ed_100%)] text-slate-900">
-        <section class="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-6xl items-center px-4 pt-8 pb-14 sm:px-6 lg:px-8">
-            <div class="grid w-full items-start gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-8">
+    <main class="min-h-screen bg-linear-to-b from-slate-50 via-indigo-50 to-orange-50 text-slate-900">
+        <section class="mx-auto flex min-h-screen w-full max-w-6xl items-center px-4 pt-8 pb-14 sm:px-6 lg:px-8">
+            <div class="grid w-full items-start gap-6 lg:grid-cols-2 lg:gap-8">
                 <div class="space-y-6">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-[0.13em] text-slate-700 uppercase"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-widest text-slate-700 uppercase"
                     >
                         Social sign-in
                     </span>
-                    <h1 class="max-w-[13ch] text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                    <h1 class="max-w-sm text-4xl leading-none font-semibold tracking-tight text-slate-950 sm:text-6xl">
                         We are finishing your {{ providerLabel }} authentication.
                     </h1>
                     <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -402,7 +402,7 @@ onBeforeUnmount(() => {
                     >
                         Authentication status
                     </span>
-                    <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">{{ statusTitle }}</h2>
+                    <h2 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{{ statusTitle }}</h2>
                     <p class="mt-3 text-sm leading-7 text-slate-600">{{ statusText }}</p>
 
                     <div v-if="isLoading" class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5" aria-live="polite">

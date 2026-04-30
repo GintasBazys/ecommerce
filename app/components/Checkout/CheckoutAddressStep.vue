@@ -96,7 +96,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                 Step 2
             </span>
             <h2
-                class="mt-4 text-[1.9rem] leading-[1.03] font-semibold tracking-[-0.04rem]"
+                class="mt-4 text-3xl leading-tight font-semibold tracking-tight"
                 :class="props.currentStep === 'address' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Billing and shipping
@@ -108,21 +108,21 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
 
         <div
             v-if="!props.identityCompleted"
-            class="rounded-[1.6rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+            class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             Complete the account step first to unlock the address form.
         </div>
 
         <div
             v-else
-            class="rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6"
+            class="rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:p-6"
         >
             <form class="grid gap-6" novalidate @submit.prevent="emit('submit')">
                 <div class="rounded-card border border-slate-200/80 bg-white/90 p-4 sm:p-5">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Delivery details</p>
-                            <h3 class="mt-2 text-lg font-semibold tracking-[-0.02em] text-slate-950">
+                            <h3 class="mt-2 text-lg font-semibold tracking-tight text-slate-950">
                                 Set the billing and shipping information
                             </h3>
                         </div>
@@ -134,7 +134,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
 
                 <section
                     v-if="props.isSavedAddressesLoading || props.savedAddressesError || props.savedAddresses.length"
-                    class="rounded-card border border-amber-200/70 bg-[linear-gradient(135deg,rgba(255,251,235,0.96),rgba(255,255,255,0.98))] p-4 shadow-[0_18px_45px_rgba(15,23,42,0.06)] sm:p-5"
+                    class="rounded-card border border-amber-200/70 bg-linear-to-br from-amber-50 to-white p-4 shadow-lg sm:p-5"
                     aria-labelledby="checkout-saved-billing-title"
                 >
                     <div class="flex items-start justify-between gap-3">
@@ -150,7 +150,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     </div>
 
                     <div v-if="props.isSavedAddressesLoading" class="mt-4 grid gap-3" aria-hidden="true">
-                        <div v-for="item in 2" :key="item" class="rounded-[1.1rem] border border-amber-100 bg-white/80 p-4">
+                        <div v-for="item in 2" :key="item" class="rounded-2xl border border-amber-100 bg-white/80 p-4">
                             <div class="animate-pulse space-y-3">
                                 <div class="h-4 w-32 rounded-full bg-amber-100"></div>
                                 <div class="h-3 w-full rounded-full bg-slate-200"></div>
@@ -171,10 +171,10 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                         <label
                             v-for="address in props.savedAddresses"
                             :key="address.id"
-                            class="group relative flex min-h-32 cursor-pointer gap-3 rounded-[1.1rem] border bg-white/90 p-4 transition focus-within:ring-2 focus-within:ring-amber-200 motion-reduce:transition-none"
+                            class="group relative flex min-h-32 cursor-pointer gap-3 rounded-2xl border bg-white/90 p-4 transition focus-within:ring-2 focus-within:ring-amber-200 motion-reduce:transition-none"
                             :class="
                                 props.selectedBillingSavedAddressId === address.id
-                                    ? 'border-amber-300 shadow-[0_16px_36px_rgba(245,158,11,0.12)] ring-1 ring-amber-100'
+                                    ? 'border-amber-300 shadow-lg ring-1 ring-amber-100'
                                     : 'border-slate-200 hover:border-amber-200'
                             "
                         >
@@ -208,7 +208,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     @update:field="emit('update:billingField', $event)"
                 />
 
-                <div class="rounded-[1.3rem] border border-slate-200/80 bg-slate-950 p-4 text-white sm:p-5">
+                <div class="rounded-3xl border border-slate-200/80 bg-slate-950 p-4 text-white sm:p-5">
                     <label class="flex cursor-pointer items-start gap-3">
                         <input
                             type="checkbox"
@@ -238,7 +238,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                         <label
                             v-for="address in props.savedAddresses"
                             :key="address.id"
-                            class="flex min-h-28 cursor-pointer gap-3 rounded-[1.1rem] border bg-slate-50 p-4 transition focus-within:ring-2 focus-within:ring-amber-200 motion-reduce:transition-none"
+                            class="flex min-h-28 cursor-pointer gap-3 rounded-2xl border bg-slate-50 p-4 transition focus-within:ring-2 focus-within:ring-amber-200 motion-reduce:transition-none"
                             :class="props.selectedShippingSavedAddressId === address.id ? 'border-amber-300 bg-amber-50/70' : 'border-slate-200 hover:border-amber-200'"
                         >
                             <input

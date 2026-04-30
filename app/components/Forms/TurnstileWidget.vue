@@ -17,6 +17,14 @@ const widgetId = ref<string | null>(null)
 const isWidgetReady = ref<boolean>(false)
 const TURNSTILE_SCRIPT_ID = "turnstile-api-script"
 
+function getTurnstileErrorMessage(errorCode?: string): string {
+    if (errorCode === "110200") {
+        return "Verification is not configured for this domain. Please try again later."
+    }
+
+    return "Verification failed. Please try again."
+}
+
 function loadTurnstileScript(): Promise<void> {
     if (!import.meta.client || window.turnstile) {
         return Promise.resolve()
@@ -62,13 +70,14 @@ function renderWidget(): boolean {
         sitekey: props.siteKey,
         action: props.action,
         theme: "light",
+        appearance: "always",
         size: "flexible",
         callback: (token) => {
             emit("update:modelValue", token)
         },
-        "error-callback": () => {
+        "error-callback": (errorCode) => {
             emit("update:modelValue", "")
-            emit("error", "Verification failed. Please try again.")
+            emit("error", getTurnstileErrorMessage(errorCode))
         },
         "expired-callback": () => {
             emit("update:modelValue", "")
@@ -117,5 +126,5 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div v-if="isWidgetReady" ref="widgetContainer" class="min-h-[74px] rounded-2xl"></div>
+    <div v-if="isWidgetReady" ref="widgetContainer" class="rounded-2xl"></div>
 </template>

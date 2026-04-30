@@ -95,7 +95,7 @@ async function onSubmit(): Promise<void> {
 <template>
     <div class="grid gap-5">
         <section class="grid gap-4 lg:grid-cols-2">
-            <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <article class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <span class="text-label-sm tracking-label font-semibold text-slate-500 uppercase">Account email</span>
                 <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
                     {{ customer?.email || "Saved to your account" }}
@@ -103,7 +103,7 @@ async function onSubmit(): Promise<void> {
                 <p class="mt-2 text-sm leading-6 text-slate-600">Used for order updates, account access, and checkout communication.</p>
             </article>
 
-            <article class="rounded-[1.4rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <article class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <span class="text-label-sm tracking-label font-semibold text-slate-500 uppercase">Customer name</span>
                 <strong class="mt-2 block text-base font-semibold text-slate-950 sm:text-lg">
                     {{ customerFullName }}
@@ -114,17 +114,17 @@ async function onSubmit(): Promise<void> {
             </article>
         </section>
 
-        <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
             <div class="max-w-3xl">
                 <span
                     class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
                 >
                     Profile details
                 </span>
-                <h2 class="mt-4 text-[1.85rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
+                <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950 sm:text-4xl">
                     Keep your account details up to date.
                 </h2>
-                <p class="mt-3 text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                <p class="mt-3 text-base leading-7 text-slate-600 sm:leading-8">
                     Update the core information attached to your account so orders, support, and saved details stay consistent.
                 </p>
             </div>

@@ -85,7 +85,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                 Step 1
             </span>
             <h2
-                class="mt-4 text-[1.9rem] leading-[1.03] font-semibold tracking-[-0.04rem]"
+                class="mt-4 text-3xl leading-tight font-semibold tracking-tight"
                 :class="props.currentStep === 'account' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Account or guest
@@ -95,7 +95,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 
         <div
             v-if="props.identityCompleted"
-            class="flex flex-col gap-4 rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:flex-row sm:items-center sm:justify-between"
+            class="flex flex-col gap-4 rounded-3xl border border-slate-200/80 bg-linear-to-b from-white to-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between"
         >
             <div>
                 <span
@@ -119,19 +119,19 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 
         <div
             v-else
-            class="rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6"
+            class="rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:p-6"
         >
             <div class="rounded-card border border-slate-200/80 bg-white/90 p-4 sm:p-5">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Checkout access</p>
-                        <h3 class="mt-2 text-lg font-semibold tracking-[-0.02em] text-slate-950">Choose how you want to continue</h3>
+                        <h3 class="mt-2 text-lg font-semibold tracking-tight text-slate-950">Choose how you want to continue</h3>
                     </div>
                     <p class="text-sm leading-6 text-slate-600">Sign in faster, create an account, or finish as a guest.</p>
                 </div>
             </div>
 
-            <div class="mt-5 grid gap-2 rounded-[1.2rem] border border-slate-200/80 bg-slate-950 p-2 sm:grid-cols-3">
+            <div class="mt-5 grid gap-2 rounded-3xl border border-slate-200/80 bg-slate-950 p-2 sm:grid-cols-3">
                 <button
                     type="button"
                     :class="[
@@ -187,7 +187,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 
                     <div class="relative text-center text-sm text-slate-500">
                         <div class="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-200"></div>
-                        <span class="relative bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-3"
+                        <span class="relative bg-slate-50 px-3"
                         >Or continue with email</span
                         >
                     </div>
@@ -354,7 +354,7 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
                 </form>
 
                 <form v-else class="grid gap-4" novalidate @submit.prevent="emit('submit-guest')">
-                    <div class="rounded-[1.2rem] border border-amber-200/80 bg-amber-50/80 p-4 text-sm leading-6 text-slate-700">
+                    <div class="rounded-3xl border border-amber-200/80 bg-amber-50/80 p-4 text-sm leading-6 text-slate-700">
                         Guest checkout is faster now, and you can still create an account after the order if you want.
                     </div>
 

@@ -40,28 +40,26 @@ function backToHome() {
 </script>
 
 <template>
-    <main
-        class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_38%,#f6f9ff_100%)]"
-    >
+    <main class="min-h-screen bg-linear-to-b from-blue-50 via-white to-slate-50">
         <div class="mx-auto w-full max-w-7xl px-4 pt-15 pb-12 sm:px-6 sm:pt-18 sm:pb-16 xl:pt-23 xl:pb-18">
             <div class="mx-auto max-w-6xl">
                 <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
 
                 <div
-                    class="shadow-panel rounded-panel overflow-hidden border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] sm:rounded-4xl"
+                    class="shadow-panel rounded-panel overflow-hidden border border-white/80 bg-linear-to-b from-white to-slate-50 sm:rounded-4xl"
                 >
-                    <div class="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,24rem)] lg:gap-8 lg:p-9 xl:p-10">
-                        <div class="max-w-3xl">
+                    <div class="grid gap-6 p-5 sm:p-7 lg:grid-cols-3 lg:gap-8 lg:p-9 xl:p-10">
+                        <div class="max-w-3xl lg:col-span-2">
                             <span
                                 class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                             >
                                 Storefront error
                             </span>
-                            <p class="mt-4 text-4xl leading-none font-bold tracking-[-0.06rem] text-slate-950 sm:text-5xl lg:text-6xl">
+                            <p class="mt-4 text-4xl leading-none font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
                                 {{ statusCode }}
                             </p>
                             <h1
-                                class="mt-3 max-w-[12ch] text-[2rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[2.7rem] lg:text-[3.7rem]"
+                                class="mt-3 max-w-xl text-3xl leading-none font-bold tracking-tight text-slate-950 sm:text-4xl lg:text-6xl"
                             >
                                 Something went wrong while loading this page.
                             </h1>
@@ -82,9 +80,9 @@ function backToHome() {
                         </div>
 
                         <div class="grid gap-4 self-start">
-                            <div class="shadow-card rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-5">
+                            <div class="shadow-card rounded-3xl border border-slate-200/80 bg-white/80 p-5">
                                 <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Error status</p>
-                                <p class="mt-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">
+                                <p class="mt-3 text-lg font-semibold tracking-tight text-slate-950">
                                     {{ statusCode }}
                                 </p>
                                 <p class="mt-2 text-sm leading-6 text-slate-600">
@@ -97,7 +95,7 @@ function backToHome() {
                                     v-for="link in quickLinks"
                                     :key="link.to"
                                     :to="link.to"
-                                    class="rounded-[1.25rem] border border-slate-200/80 bg-white/85 p-4 transition hover:border-slate-300 hover:bg-white"
+                                    class="rounded-3xl border border-slate-200/80 bg-white/85 p-4 transition hover:border-slate-300 hover:bg-white"
                                 >
                                     <p class="text-sm font-semibold text-slate-950">{{ link.title }}</p>
                                     <p class="mt-1 text-sm leading-6 text-slate-600">{{ link.description }}</p>

@@ -1111,9 +1111,7 @@ watch(currentStep, async (step) => {
 </script>
 
 <template>
-    <main
-        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.08),transparent_24%),linear-gradient(180deg,#f7faff_0%,#ffffff_38%,#f6f9ff_100%)] pt-[calc(var(--site-header-offset,98px)+1rem)] pb-14 sm:pt-[calc(var(--site-header-offset,98px)+1.5rem)] sm:pb-18"
-    >
+    <main class="bg-linear-to-b from-blue-50 via-white to-slate-50 pt-28 pb-14 sm:pt-32 sm:pb-18">
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
             <div v-if="isBooting" class="grid justify-items-center gap-4 px-4 py-20 text-center">
                 <span class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"></span>
@@ -1121,10 +1119,10 @@ watch(currentStep, async (step) => {
             </div>
 
             <template v-else>
-                <section class="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)] xl:items-start xl:gap-7">
+                <section class="grid gap-5 xl:grid-cols-2 xl:items-start xl:gap-7">
                     <div class="space-y-5 sm:space-y-6">
                         <div
-                            class="rounded-panel border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:rounded-4xl sm:p-7"
+                            class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:rounded-4xl sm:p-7"
                         >
                             <span
                                 class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
@@ -1132,7 +1130,7 @@ watch(currentStep, async (step) => {
                                 Single-page checkout
                             </span>
                             <h1
-                                class="mt-4 max-w-[12ch] text-[2.2rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3rem] lg:text-[4.2rem]"
+                                class="mt-4 max-w-xl text-4xl leading-none font-bold tracking-tighter text-slate-950 sm:text-5xl lg:text-7xl"
                             >
                                 Move from cart to confirmation in one calm, guided flow.
                             </h1>
@@ -1155,7 +1153,7 @@ watch(currentStep, async (step) => {
 
                         <div
                             v-if="errorMessage"
-                            class="rounded-[1.2rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700"
+                            class="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700"
                             role="alert"
                         >
                             {{ errorMessage }}
@@ -1246,7 +1244,7 @@ watch(currentStep, async (step) => {
                         </div>
                     </div>
 
-                    <aside class="hidden xl:sticky xl:top-[calc(var(--site-header-offset,98px)+1rem)] xl:block xl:self-start">
+                    <aside class="hidden xl:sticky xl:top-28 xl:block xl:self-start">
                         <CheckoutOrderSummary
                             :item-count="itemCount"
                             :currency-code="currencyCode"

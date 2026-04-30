@@ -105,9 +105,9 @@ function changePage(nextPage: number): void {
 <template>
     <div class="grid gap-5">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="rounded-[1.6rem] border border-slate-200 bg-white px-5 py-5 shadow-[0_16px_45px_rgba(15,23,42,0.08)] sm:min-w-52">
+            <div class="rounded-3xl border border-slate-200 bg-white px-5 py-5 shadow-lg sm:min-w-52">
                 <span class="text-label-sm tracking-label block font-semibold text-slate-500 uppercase">Saved entries</span>
-                <strong class="mt-2 block text-4xl leading-none font-bold tracking-[-0.04em] text-slate-950">{{ totalCount }}</strong>
+                <strong class="mt-2 block text-4xl leading-none font-bold tracking-tight text-slate-950">{{ totalCount }}</strong>
             </div>
 
             <button type="button" class="ui-btn-accent min-h-13 px-7 text-base motion-reduce:transition-none" @click="showAdd = true">
@@ -115,7 +115,7 @@ function changePage(nextPage: number): void {
             </button>
         </div>
 
-        <section class="rounded-[1.8rem] border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-6 lg:p-8">
+        <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
             <div v-if="loading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
                 <div v-for="item in skeletonCards" :key="item" class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                     <div class="animate-pulse space-y-4">
@@ -143,7 +143,7 @@ function changePage(nextPage: number): void {
                 <AddressCard v-for="address in addresses" :key="address.id" :address="address" @edit="onEdit" @delete="deleteAddress" />
             </div>
 
-            <div v-else class="grid gap-4 rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
+            <div v-else class="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
                 <div
                     class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900"
                 >
@@ -157,8 +157,8 @@ function changePage(nextPage: number): void {
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-[1.35rem] font-semibold text-slate-950">No addresses saved yet</h2>
-                    <p class="mt-2 max-w-xl text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
+                    <h2 class="text-xl font-semibold text-slate-950">No addresses saved yet</h2>
+                    <p class="mt-2 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
                         Add your first address to make future checkout steps faster.
                     </p>
                 </div>

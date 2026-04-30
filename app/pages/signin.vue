@@ -23,6 +23,7 @@ const loginPassword = ref<string>("")
 const loginTurnstileToken = ref<string>("")
 const loginTurnstileResetKey = ref<number>(0)
 const loginIsSubmitting = ref<boolean>(false)
+const hasAttemptedLogin = ref<boolean>(false)
 
 const resetEmail = ref<string>("")
 
@@ -69,6 +70,8 @@ async function handleLogin(): Promise<void> {
         return
     }
 
+    hasAttemptedLogin.value = true
+
     if (!turnstileSiteKey.value) {
         loginErrors.value.verification = "Verification is currently unavailable. Please try again later."
         return
@@ -108,7 +111,11 @@ function handleTurnstileToken(token: string): void {
 }
 
 function handleTurnstileError(message: string): void {
-    loginErrors.value.verification = message
+    loginTurnstileToken.value = ""
+
+    if (hasAttemptedLogin.value) {
+        loginErrors.value.verification = message
+    }
 }
 
 async function handleSocialLogin(provider: "google" | "facebook") {
@@ -160,16 +167,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900">
+    <main class="min-h-screen bg-linear-to-b from-slate-50 via-indigo-50 to-orange-50 text-slate-900">
         <section class="mx-auto w-full max-w-6xl px-4 pt-6 pb-14 sm:px-6 lg:px-8 lg:pt-10">
-            <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-8">
+            <div class="grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
                 <div class="space-y-6">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-[0.13em] text-slate-700 uppercase"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-widest text-slate-700 uppercase"
                     >
                         Welcome back
                     </span>
-                    <h1 class="max-w-[13ch] text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                    <h1 class="max-w-sm text-4xl leading-none font-semibold tracking-tight text-slate-950 sm:text-6xl">
                         Sign in to pick up your order exactly where you left it.
                     </h1>
                     <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -190,7 +197,7 @@ onBeforeUnmount(() => {
                         >
                             Account login
                         </span>
-                        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                        <h2 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
                             Enter your details and continue.
                         </h2>
                         <p class="mt-3 text-sm leading-7 text-slate-600">
@@ -217,7 +224,7 @@ onBeforeUnmount(() => {
                         </button>
                     </div>
 
-                    <div class="relative my-6 text-center text-xs font-medium tracking-[0.08em] text-slate-500 uppercase">
+                    <div class="relative my-6 text-center text-xs font-medium tracking-widest text-slate-500 uppercase">
                         <span class="absolute inset-x-0 top-1/2 z-0 border-t border-slate-200" aria-hidden="true"></span>
                         <span class="relative z-10 bg-white px-3">Or continue with email</span>
                     </div>
@@ -303,7 +310,7 @@ onBeforeUnmount(() => {
                 @click.self="showResetDialog = false"
             >
                 <section
-                    class="w-full max-w-xl rounded-[1.6rem] border border-slate-200 bg-white p-5 sm:p-7"
+                    class="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-5 sm:p-7"
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="reset-password-title"
@@ -311,11 +318,11 @@ onBeforeUnmount(() => {
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <span
-                                class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-[11px] font-semibold tracking-[0.11em] text-slate-700 uppercase"
+                                class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-xs font-semibold tracking-widest text-slate-700 uppercase"
                             >
                                 Password reset
                             </span>
-                            <h2 id="reset-password-title" class="mt-3 text-2xl font-semibold tracking-[-0.02em] text-slate-950">
+                            <h2 id="reset-password-title" class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                                 Forgot your password?
                             </h2>
                         </div>

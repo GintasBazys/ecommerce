@@ -17,11 +17,11 @@ withDefaults(
 
 <template>
     <nav
-        class="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border px-4 py-2 text-sm leading-[1.35] backdrop-blur-sm"
+        class="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border px-4 py-2 text-sm leading-snug backdrop-blur-sm"
         :class="
             tone === 'inverse'
                 ? 'border-white/15 bg-white/10 text-white/75'
-                : 'border-slate-200 bg-white/80 text-slate-500 shadow-[0_14px_36px_rgba(8,27,90,0.08)]'
+                : 'border-slate-200 bg-white/80 text-slate-500 shadow-lg'
         "
         aria-label="Breadcrumb"
     >

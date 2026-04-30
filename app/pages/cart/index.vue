@@ -247,16 +247,14 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
 </script>
 
 <template>
-    <main
-        class="bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#f6f9ff_100%)] pt-[calc(var(--site-header-offset,98px)+1.25rem)] pb-14 sm:pt-[calc(var(--site-header-offset,98px)+1.75rem)] sm:pb-18"
-    >
+    <main class="bg-linear-to-b from-blue-50 via-white to-slate-50 pt-28 pb-14 sm:pt-32 sm:pb-18">
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6">
-            <section class="grid gap-5 lg:gap-7 xl:grid-cols-[minmax(0,1.15fr)_minmax(21rem,0.85fr)]">
+            <section class="grid gap-5 lg:gap-7 xl:grid-cols-2">
                 <div class="space-y-5 sm:space-y-6">
                     <CartHero :total="displayTotal" :item-count="cartItemCount" :continue-shopping-url="ALL_PRODUCTS_URL_HANDLE" />
 
                     <section
-                        class="shadow-panel rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-4 sm:p-5"
+                        class="shadow-panel rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4 sm:p-5"
                     >
                         <div
                             v-if="recoveryMessage"
@@ -320,7 +318,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
 
                         <div
                             v-else
-                            class="grid justify-items-start gap-4 rounded-[1.4rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_12px_30px_rgba(8,27,90,0.05)] sm:p-8"
+                            class="grid justify-items-start gap-4 rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg sm:p-8"
                         >
                             <div
                                 class="inline-flex h-13 w-13 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900"
@@ -346,7 +344,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-[1.55rem] leading-[1.08] font-semibold tracking-[-0.04rem] text-slate-950">
+                                <h2 class="text-2xl leading-tight font-semibold tracking-tight text-slate-950">
                                     Your cart is empty
                                 </h2>
                                 <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">

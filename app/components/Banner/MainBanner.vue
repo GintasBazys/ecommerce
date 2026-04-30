@@ -42,13 +42,13 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
             <div
                 class="w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-950/28 p-5 text-white shadow-xl sm:max-w-3xl sm:rounded-4xl sm:bg-white/10 sm:p-8 sm:shadow-2xl sm:backdrop-blur-md lg:p-10"
             >
-                <h1 class="mt-3 max-w-md text-[2.6rem] leading-[0.94] font-semibold tracking-[-0.04em] text-white sm:mt-5 sm:max-w-lg sm:text-5xl sm:leading-none sm:font-bold sm:tracking-tighter lg:text-7xl">
+                <h1 class="mt-3 max-w-md text-4xl leading-none font-semibold tracking-tight text-white sm:mt-5 sm:max-w-lg sm:text-5xl sm:font-bold sm:tracking-tighter lg:text-7xl">
                     A cleaner,
                     <span class="text-accent-300 block font-medium tracking-tight italic"> more thoughtful </span>
                     online store experience.
                 </h1>
 
-                <p class="mt-4 max-w-lg text-[0.95rem] leading-6 text-slate-100/88 sm:mt-5 sm:max-w-xl sm:text-lg sm:leading-8 sm:text-slate-100/92">
+                <p class="mt-4 max-w-lg text-base leading-6 text-slate-100/88 sm:mt-5 sm:max-w-xl sm:text-lg sm:leading-8 sm:text-slate-100/92">
                     {{ heroContent.description }}
                 </p>
 

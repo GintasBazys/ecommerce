@@ -88,36 +88,36 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <main class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_38%,#fff7ed_100%)] text-slate-900">
+    <main class="min-h-screen bg-linear-to-b from-slate-50 via-indigo-50 to-orange-50 text-slate-900">
         <section class="mx-auto w-full max-w-6xl px-4 pt-8 pb-14 sm:px-6 lg:px-8 lg:pt-12">
-            <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-8">
+            <div class="grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
                 <div class="space-y-6">
                     <span
-                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-[0.13em] text-slate-700 uppercase"
+                        class="inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-white/80 px-4 text-xs font-semibold tracking-widest text-slate-700 uppercase"
                     >
                         Secure your account
                     </span>
-                    <h1 class="max-w-[12ch] text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-slate-950 sm:text-6xl">
+                    <h1 class="max-w-sm text-4xl leading-none font-semibold tracking-tight text-slate-950 sm:text-6xl">
                         Choose a new password and get back to shopping.
                     </h1>
                     <p class="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
                         Create fresh account access here, then head back into your profile, saved details, and upcoming checkout.
                     </p>
                     <div class="rounded-3xl border border-slate-200 bg-white/85 p-4 sm:p-5">
-                        <p class="text-xs font-medium tracking-[0.1em] text-slate-500 uppercase">Next step</p>
+                        <p class="text-xs font-medium tracking-widest text-slate-500 uppercase">Next step</p>
                         <p class="mt-1 text-sm leading-6 font-semibold text-slate-900 sm:text-base">
                             Once your password is updated, you will be redirected to sign in again with the new details.
                         </p>
                     </div>
                 </div>
 
-                <div class="rounded-[1.75rem] border border-slate-200/95 bg-white/95 p-5 sm:p-7">
+                <div class="rounded-3xl border border-slate-200/95 bg-white/95 p-5 sm:p-7">
                     <span
                         class="tracking-label-tight inline-flex min-h-9 items-center rounded-full border border-slate-300/90 bg-slate-50 px-4 text-xs font-semibold text-slate-700 uppercase"
                     >
                         Reset password
                     </span>
-                    <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">Set a new password.</h2>
+                    <h2 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Set a new password.</h2>
                     <p class="mt-3 text-sm leading-7 text-slate-600">
                         Use a password you have not used before so the account feels secure from the next sign-in onward.
                     </p>

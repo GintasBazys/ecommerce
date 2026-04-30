@@ -176,22 +176,20 @@ async function handleLogout(): Promise<void> {
                     >
                         {{ pageContent.eyebrow }}
                     </span>
-                    <h1
-                        class="mt-4 max-w-[14ch] text-[2.4rem] leading-[0.96] font-bold tracking-[-0.06rem] text-slate-950 sm:text-[3rem] xl:text-[3.6rem]"
-                    >
+                    <h1 class="mt-4 max-w-2xl text-4xl leading-none font-bold tracking-tight text-slate-950 sm:text-5xl xl:text-6xl">
                         {{ pageContent.title }}
                     </h1>
-                    <p class="mt-4 max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                    <p class="mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:leading-8">
                         {{ pageContent.description }}
                     </p>
                 </div>
             </header>
 
-            <div class="mt-8 grid gap-5 xl:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)] xl:items-start">
-                <aside class="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 xl:sticky xl:top-6">
-                    <div class="flex items-center gap-4 rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4">
+            <div class="mt-8 grid gap-5 xl:grid-cols-4 xl:items-start">
+                <aside class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 xl:sticky xl:top-6">
+                    <div class="flex items-center gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-4">
                         <div
-                            class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-sm font-bold tracking-[0.08em] text-amber-900 uppercase ring-1 ring-amber-100"
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-sm font-bold tracking-widest text-amber-900 uppercase ring-1 ring-amber-100"
                         >
                             {{ customerLabel.slice(0, 2) }}
                         </div>
@@ -253,7 +251,7 @@ async function handleLogout(): Promise<void> {
                     </button>
                 </aside>
 
-                <section class="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
+                <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6 xl:col-span-3">
                     <slot></slot>
                 </section>
             </div>

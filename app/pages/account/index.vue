@@ -58,16 +58,16 @@ function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
 
 <template>
     <div class="grid gap-5">
-        <section class="rounded-[1.6rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
+        <section class="rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
             <span
                 class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
             >
                 Welcome back
             </span>
-            <h2 class="mt-4 max-w-[13ch] text-[1.95rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.35rem]">
+            <h2 class="mt-4 max-w-md text-3xl leading-tight font-bold tracking-tight text-slate-950 sm:text-4xl">
                 {{ customer?.first_name || "Account" }}, here is your quick account overview.
             </h2>
-            <p class="mt-3 max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+            <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600 sm:leading-8">
                 Open the section you need and manage it from the shared account workspace.
             </p>
 
@@ -75,7 +75,7 @@ function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
                 <div
                     v-for="item in accountHighlights"
                     :key="item.label"
-                    class="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-4 shadow-sm"
+                    class="rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm"
                 >
                     <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">{{ item.label }}</span>
                     <strong class="mt-1 block text-sm font-semibold text-slate-950 sm:text-base">{{ item.value }}</strong>
@@ -88,7 +88,7 @@ function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
                 v-for="link in accountLinks"
                 :key="link.to"
                 :to="link.to"
-                class="group rounded-[1.4rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:border-amber-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
+                class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-amber-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
             >
                 <article class="grid h-full gap-4">
                     <div
@@ -106,7 +106,7 @@ function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
                     </div>
 
                     <div>
-                        <h3 class="text-[1.1rem] font-semibold text-slate-950">{{ link.title }}</h3>
+                        <h3 class="text-lg font-semibold text-slate-950">{{ link.title }}</h3>
                         <p class="mt-2 text-sm leading-7 text-slate-600">{{ link.description }}</p>
                     </div>
 

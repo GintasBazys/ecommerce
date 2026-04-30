@@ -30,7 +30,7 @@ const emit = defineEmits<{
                 Step 3
             </span>
             <h2
-                class="mt-4 text-[1.9rem] leading-[1.03] font-semibold tracking-[-0.04rem]"
+                class="mt-4 text-3xl leading-tight font-semibold tracking-tight"
                 :class="props.currentStep === 'payment' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Shipping and payment
@@ -42,21 +42,21 @@ const emit = defineEmits<{
 
         <div
             v-if="!props.addressCompleted"
-            class="rounded-[1.6rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+            class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             Save your address details first to unlock shipping options and payment.
         </div>
 
         <div
             v-else-if="props.currentStep !== 'payment'"
-            class="rounded-[1.6rem] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
+            class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             Shipping options and payment will appear after the address step is saved.
         </div>
 
         <div
             v-else
-            class="grid gap-5 rounded-[1.6rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6 xl:grid-cols-2 xl:items-start"
+            class="grid gap-5 rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:p-6 xl:grid-cols-2 xl:items-start"
         >
             <div class="grid content-start gap-4">
                 <div>
@@ -65,15 +65,15 @@ const emit = defineEmits<{
                 </div>
 
                 <template v-if="props.isShippingLoading">
-                    <div class="h-[4.2rem] animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
-                    <div class="h-[4.2rem] animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
+                    <div class="h-16 animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
+                    <div class="h-16 animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
                 </template>
 
                 <div v-else-if="props.shippingOptions.length" class="grid gap-3" role="radiogroup" aria-label="Shipping method">
                     <label
                         v-for="option in props.shippingOptions"
                         :key="option.id"
-                        class="flex items-center gap-3 self-start rounded-[1.2rem] border px-4 py-4 transition"
+                        class="flex items-center gap-3 self-start rounded-3xl border px-4 py-4 transition"
                         :class="
                             props.selectedShippingOptionId === option.id
                                 ? 'border-amber-300 bg-amber-50/70'
@@ -108,7 +108,7 @@ const emit = defineEmits<{
                     <p class="mt-1 text-sm leading-6 text-slate-600">Your payment is confirmed securely before the order is completed.</p>
                 </div>
 
-                <div class="rounded-[1.2rem] border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+                <div class="rounded-3xl border border-slate-200/80 bg-white/90 p-4 sm:p-5">
                     <div id="link-authentication-element"></div>
                     <div id="payment-element" class="mt-4"></div>
                 </div>

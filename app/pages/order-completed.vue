@@ -88,33 +88,27 @@ function formatAddressLines(address: OrderAddress): string[] {
 </script>
 
 <template>
-    <main
-        class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(1,12,128,0.07),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#f6f9ff_100%)] pt-[calc(var(--site-header-offset,98px)+1rem)] pb-14 sm:pt-[calc(var(--site-header-offset,98px)+1.5rem)] sm:pb-18"
-    >
+    <main class="min-h-screen bg-linear-to-b from-blue-50 via-white to-slate-50 pt-28 pb-14 sm:pt-32 sm:pb-18">
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-            <section
-                class="shadow-panel rounded-[1.9rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-7 lg:p-8"
-            >
+            <section class="shadow-panel rounded-4xl border border-white/80 bg-white/95 p-5 sm:p-7 lg:p-8">
                 <div v-if="pending" class="grid justify-items-center gap-4 px-4 py-14 text-center">
                     <span class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"></span>
                     <p class="text-sm leading-6 text-slate-600">Loading your order details...</p>
                 </div>
 
-                <div v-else-if="error" class="rounded-[1.4rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700">
+                <div v-else-if="error" class="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-6 text-rose-700">
                     Error loading order: {{ error.message }}
                 </div>
 
                 <template v-else-if="order">
-                    <div class="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-end">
+                    <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
                         <div>
                             <span
                                 class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 font-bold text-emerald-700 uppercase"
                             >
                                 Order confirmed
                             </span>
-                            <h1
-                                class="mt-4 max-w-[12ch] text-[2.3rem] leading-[0.95] font-semibold tracking-[-0.04rem] text-slate-950 sm:text-[3.4rem]"
-                            >
+                            <h1 class="mt-4 max-w-sm text-4xl leading-none font-semibold tracking-tight text-slate-950 sm:text-6xl">
                                 Thank you. Your order is in and already moving forward.
                             </h1>
                             <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -138,9 +132,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                             </div>
                         </div>
 
-                        <div
-                            class="grid gap-3 rounded-[1.6rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]"
-                        >
+                        <div class="grid gap-3 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-lg">
                             <div
                                 v-for="item in supportFacts"
                                 :key="item.label"
@@ -152,22 +144,20 @@ function formatAddressLines(address: OrderAddress): string[] {
                         </div>
                     </div>
 
-                    <div class="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(21rem,0.88fr)] xl:items-start">
+                    <div class="mt-7 grid gap-5 xl:grid-cols-2 xl:items-start">
                         <div class="space-y-5">
-                            <section
-                                class="rounded-[1.6rem] border border-slate-200 bg-white/95 p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)] sm:p-6"
-                            >
+                            <section class="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-lg sm:p-6">
                                 <span
                                     class="text-label-xs tracking-label inline-flex min-h-8 items-center rounded-full border border-slate-200 bg-slate-50 px-3 font-bold text-slate-600 uppercase"
                                 >
                                     Customer details
                                 </span>
-                                <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                                <h2 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
                                     Who and where this order is going.
                                 </h2>
 
                                 <div class="mt-5 grid gap-4 lg:grid-cols-2">
-                                    <article class="rounded-[1.3rem] border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                                    <article class="rounded-3xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
                                         <h3 class="text-base font-semibold text-slate-950">Shipping address</h3>
                                         <div class="mt-3 space-y-1 text-sm leading-6 text-slate-600">
                                             <p v-for="line in formatAddressLines(order.shipping_address)" :key="`shipping-${line}`">
@@ -176,7 +166,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                                         </div>
                                     </article>
 
-                                    <article class="rounded-[1.3rem] border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                                    <article class="rounded-3xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
                                         <h3 class="text-base font-semibold text-slate-950">Billing address</h3>
                                         <div class="mt-3 space-y-1 text-sm leading-6 text-slate-600">
                                             <p v-for="line in formatAddressLines(order.billing_address)" :key="`billing-${line}`">
@@ -187,11 +177,11 @@ function formatAddressLines(address: OrderAddress): string[] {
                                 </div>
 
                                 <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                                    <div class="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-3">
+                                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
                                         <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Contact email</p>
                                         <p class="mt-2 text-sm font-semibold text-slate-950">{{ orderEmail }}</p>
                                     </div>
-                                    <div class="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-3">
+                                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
                                         <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Shipping method</p>
                                         <p class="mt-2 text-sm font-semibold text-slate-950">
                                             {{ shippingMethod?.name || "Shipping method unavailable" }}
@@ -200,15 +190,13 @@ function formatAddressLines(address: OrderAddress): string[] {
                                 </div>
                             </section>
 
-                            <section
-                                class="rounded-[1.6rem] border border-slate-200 bg-white/95 p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)] sm:p-6"
-                            >
+                            <section class="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-lg sm:p-6">
                                 <span
                                     class="text-label-xs tracking-label inline-flex min-h-8 items-center rounded-full border border-slate-200 bg-slate-50 px-3 font-bold text-slate-600 uppercase"
                                 >
                                     Order items
                                 </span>
-                                <h2 class="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2rem]">
+                                <h2 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
                                     Everything included in this order.
                                 </h2>
 
@@ -216,7 +204,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                                     <article
                                         v-for="item in orderItems"
                                         :key="item.id"
-                                        class="flex flex-col gap-4 rounded-[1.3rem] border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-start sm:p-5"
+                                        class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-start sm:p-5"
                                     >
                                         <img
                                             :src="item.thumbnail || '/images/placeholder.png'"
@@ -245,29 +233,25 @@ function formatAddressLines(address: OrderAddress): string[] {
 
                         <aside class="xl:sticky xl:top-6 xl:self-start">
                             <div
-                                class="rounded-panel shadow-panel border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 sm:p-6"
+                                class="rounded-panel shadow-panel border border-white/80 bg-white/95 p-5 sm:p-6"
                             >
                                 <span
                                     class="border-brand-100 bg-brand-50 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border px-4 py-2 font-bold uppercase"
                                 >
                                     Order summary
                                 </span>
-                                <h2
-                                    class="mt-4 text-[1.8rem] leading-[1.05] font-semibold tracking-[-0.04rem] text-slate-950 sm:text-[2.2rem]"
-                                >
+                                <h2 class="mt-4 text-3xl leading-tight font-semibold tracking-tight text-slate-950 sm:text-4xl">
                                     A clear breakdown of what was charged.
                                 </h2>
 
-                                <div class="shadow-card mt-5 rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4">
+                                <div class="shadow-card mt-5 rounded-3xl border border-slate-200/80 bg-white/85 p-4">
                                     <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Payment snapshot</p>
                                     <p class="mt-2 text-sm font-semibold text-slate-950">
                                         {{ orderItems.length }} line item{{ orderItems.length === 1 ? "" : "s" }} in this order
                                     </p>
                                 </div>
 
-                                <div
-                                    class="my-5 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.38),rgba(148,163,184,0))]"
-                                ></div>
+                                <div class="my-5 h-px w-full bg-amber-200/70"></div>
 
                                 <div class="grid gap-3">
                                     <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
@@ -295,10 +279,10 @@ function formatAddressLines(address: OrderAddress): string[] {
                                         >
                                     </div>
                                     <div
-                                        class="flex items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3"
+                                        class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3"
                                     >
                                         <span class="text-sm font-semibold text-slate-900">Total</span>
-                                        <strong class="text-lg font-semibold tracking-[-0.02em] text-slate-950">
+                                        <strong class="text-lg font-semibold tracking-tight text-slate-950">
                                             {{ formatPrice(Number(order.total || 0), currencyCode) }}
                                         </strong>
                                     </div>

@@ -95,7 +95,7 @@ function changePage(nextPage: number): void {
 
 <template>
     <div class="grid gap-5">
-        <section class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-7">
+        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-7">
             <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <span
@@ -103,16 +103,16 @@ function changePage(nextPage: number): void {
                     >
                         Order history
                     </span>
-                    <h2 class="mt-4 text-[1.85rem] leading-[1.02] font-bold tracking-[-0.05rem] text-slate-950 sm:text-[2.2rem]">
+                    <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950 sm:text-4xl">
                         Review every purchase in one place.
                     </h2>
-                    <p class="mt-3 max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600 sm:leading-8">
                         Track recent orders, reopen details, and keep a quick view of fulfillment status without leaving your account.
                     </p>
                 </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <div class="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
                         <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Total orders</span>
                         <strong class="mt-1 block text-base font-semibold text-slate-950">{{ totalOrders }}</strong>
                     </div>
@@ -122,7 +122,7 @@ function changePage(nextPage: number): void {
                         <BaseSelect
                             v-model="perPage"
                             :options="perPageSelectOptions"
-                            class="min-w-[8.5rem] rounded-full shadow-none focus:border-amber-300 focus:ring-amber-200"
+                            class="min-w-36 rounded-full shadow-none focus:border-amber-300 focus:ring-amber-200"
                         />
                     </label>
                 </div>
@@ -131,7 +131,7 @@ function changePage(nextPage: number): void {
             <div ref="ordersStartRef"></div>
 
             <div v-if="pending" class="mt-6 grid gap-3" aria-hidden="true">
-                <div v-for="row in skeletonRows" :key="row" class="rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4">
+                <div v-for="row in skeletonRows" :key="row" class="rounded-3xl border border-slate-200 bg-slate-50 p-4">
                     <div class="animate-pulse space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div class="h-5 w-28 rounded-full bg-slate-200"></div>
@@ -148,7 +148,7 @@ function changePage(nextPage: number): void {
             </div>
 
             <div v-else-if="orders.length" class="mt-6 grid gap-3">
-                <article v-for="order in orders" :key="order.id" class="rounded-[1.2rem] border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                <article v-for="order in orders" :key="order.id" class="rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div class="grid flex-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                             <div>
@@ -190,7 +190,7 @@ function changePage(nextPage: number): void {
                 </article>
             </div>
 
-            <div v-else class="mt-6 grid gap-4 rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
+            <div v-else class="mt-6 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
                 <div
                     class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-900"
                 >
@@ -203,8 +203,8 @@ function changePage(nextPage: number): void {
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-[1.35rem] font-semibold text-slate-950">No orders yet</h2>
-                    <p class="mt-2 max-w-xl text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
+                    <h2 class="text-xl font-semibold text-slate-950">No orders yet</h2>
+                    <p class="mt-2 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
                         Your recent purchases will appear here once you place an order.
                     </p>
                 </div>

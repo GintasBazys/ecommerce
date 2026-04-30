@@ -175,7 +175,7 @@ function save(): void {
             @click.self="close"
         >
             <div
-                class="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl flex-col overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-xl sm:max-h-[calc(100dvh-2rem)]"
+                class="relative flex max-h-screen w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl sm:max-h-screen"
             >
                 <button
                     type="button"
@@ -193,10 +193,10 @@ function save(): void {
                         >
                             Address details
                         </span>
-                        <h2 class="mt-4 text-[1.75rem] leading-[1.02] font-bold tracking-[-0.04rem] text-slate-950 sm:text-[2rem]">
+                        <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950">
                             {{ props.title }}
                         </h2>
-                        <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-[0.95rem]">
+                        <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
                             Add or update the address details you want available during future checkout and support flows.
                         </p>
                     </div>

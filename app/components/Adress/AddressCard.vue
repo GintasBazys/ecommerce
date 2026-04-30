@@ -47,9 +47,9 @@ function onDelete(): void {
 
 <template>
     <article
-        class="group relative flex h-full min-h-72 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-[0_22px_70px_rgba(15,23,42,0.11)] motion-reduce:transition-none"
+        class="group relative flex h-full min-h-72 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-lg transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-xl motion-reduce:transition-none"
     >
-        <div class="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.9)_52%,rgba(214,169,94,0.82))]"></div>
+        <div class="absolute inset-x-0 top-0 h-24 bg-linear-to-br from-slate-950 via-slate-800 to-amber-300"></div>
 
         <div class="relative flex w-full flex-col p-4 sm:p-5">
             <div class="flex items-start justify-between gap-3 text-white">
@@ -57,7 +57,7 @@ function onDelete(): void {
                     <span class="text-label-xs tracking-label inline-flex max-w-full rounded-full border border-white/15 bg-white/10 px-3 py-1 font-bold uppercase text-amber-100 backdrop-blur">
                         <span class="truncate">{{ addressLabel }}</span>
                     </span>
-                    <h3 class="mt-3 truncate text-xl font-semibold tracking-[-0.03em] text-white">
+                    <h3 class="mt-3 truncate text-xl font-semibold tracking-tight text-white">
                         {{ recipientName }}
                     </h3>
                 </div>
@@ -91,7 +91,7 @@ function onDelete(): void {
                 </div>
             </div>
 
-            <div class="mt-7 flex flex-1 flex-col rounded-[1.25rem] border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+            <div class="mt-7 flex flex-1 flex-col rounded-3xl border border-slate-200 bg-white p-4 shadow-lg">
                 <div v-if="defaultBadges.length" class="mb-4 flex flex-wrap gap-2">
                     <span
                         v-for="badge in defaultBadges"

@@ -27,7 +27,7 @@ const emit = defineEmits<{
     <section v-if="props.collapsible" aria-label="Order summary" class="lg:hidden">
         <button
             type="button"
-            class="flex w-full items-center justify-between gap-4 rounded-[1.35rem] border border-amber-200/80 bg-white/95 px-4 py-4 text-left"
+            class="flex w-full items-center justify-between gap-4 rounded-3xl border border-amber-200/80 bg-white/95 px-4 py-4 text-left"
             :aria-expanded="props.isOpen ? 'true' : 'false'"
             aria-controls="checkout-mobile-summary-panel"
             @click="emit('toggle')"
@@ -51,23 +51,23 @@ const emit = defineEmits<{
         <div
             v-show="props.isOpen"
             id="checkout-mobile-summary-panel"
-            class="mt-3 rounded-[1.35rem] border border-slate-200/80 bg-white/95 p-4"
+            class="mt-3 rounded-3xl border border-slate-200/80 bg-white/95 p-4"
         >
             <div class="grid gap-4">
                 <article
                     v-for="item in props.lineItems"
                     :key="item.id"
-                    class="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-3 border-b border-slate-200/80 pb-4 last:border-b-0 last:pb-0"
+                    class="flex items-start gap-3 border-b border-slate-200/80 pb-4 last:border-b-0 last:pb-0"
                 >
                     <img
                         :src="item.thumbnail || '/images/placeholder.png'"
                         :alt="item.product_title || 'Product image'"
                         width="72"
                         height="88"
-                        class="h-[88px] w-[72px] rounded-[1rem] bg-slate-100 object-cover"
+                        class="h-24 w-20 rounded-2xl bg-slate-100 object-cover"
                         loading="lazy"
                     />
-                    <div class="grid gap-1">
+                    <div class="grid min-w-0 flex-1 gap-1">
                         <strong class="text-sm font-semibold text-slate-950">{{ item.product_title }}</strong>
                         <span class="text-sm leading-6 text-slate-600">{{ item.variant_title || "Standard option" }}</span>
                         <span class="text-sm leading-6 text-slate-600">Qty {{ item.quantity }}</span>
@@ -96,7 +96,7 @@ const emit = defineEmits<{
                 </div>
                 <div class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                     <span class="text-sm font-semibold text-slate-900">Total</span>
-                    <strong class="text-base font-semibold tracking-[-0.02em] text-slate-950">
+                    <strong class="text-base font-semibold tracking-tight text-slate-950">
                         {{ formatPrice(props.total, props.currencyCode) }}
                     </strong>
                 </div>
@@ -106,14 +106,14 @@ const emit = defineEmits<{
 
     <div
         v-else
-        class="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] p-5 shadow-[0_12px_30px_rgba(8,27,90,0.06)]"
+        class="rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 shadow-lg"
     >
         <span
             class="border-brand-100 bg-brand-50 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border px-4 py-2 font-bold uppercase"
         >
             Order summary
         </span>
-        <h2 class="mt-4 max-w-[11ch] text-[1.85rem] leading-[1.02] font-semibold tracking-[-0.04rem] text-slate-950 sm:text-[2.2rem]">
+        <h2 class="mt-4 max-w-xs text-3xl leading-tight font-semibold tracking-tight text-slate-950 sm:text-4xl">
             Everything included in this checkout.
         </h2>
         <p class="mt-3 text-sm leading-7 text-slate-600">Review items, totals, and delivery costs before payment.</p>
@@ -122,17 +122,17 @@ const emit = defineEmits<{
             <article
                 v-for="item in props.lineItems"
                 :key="item.id"
-                class="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-3 rounded-[1.25rem] border border-slate-200/80 bg-white/90 p-3"
+                class="flex items-start gap-3 rounded-3xl border border-slate-200/80 bg-white/90 p-3"
             >
                 <img
                     :src="item.thumbnail || '/images/placeholder.png'"
                     :alt="item.product_title || 'Product image'"
                     width="72"
                     height="88"
-                    class="h-[88px] w-[72px] rounded-[1rem] bg-slate-100 object-cover"
+                    class="h-24 w-20 rounded-2xl bg-slate-100 object-cover"
                     loading="lazy"
                 />
-                <div class="grid gap-1">
+                <div class="grid min-w-0 flex-1 gap-1">
                     <strong class="text-sm font-semibold text-slate-950">{{ item.product_title }}</strong>
                     <span class="text-sm leading-6 text-slate-600">{{ item.variant_title || "Standard option" }}</span>
                     <span class="text-sm leading-6 text-slate-600">Qty {{ item.quantity }}</span>
@@ -143,7 +143,7 @@ const emit = defineEmits<{
             </article>
         </div>
 
-        <div class="my-5 h-px w-full bg-[linear-gradient(90deg,rgba(148,163,184,0),rgba(202,138,4,0.32),rgba(148,163,184,0))]"></div>
+        <div class="my-5 border-t border-slate-200/80"></div>
 
         <div class="grid gap-3">
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
@@ -162,9 +162,9 @@ const emit = defineEmits<{
                 <span>Tax</span>
                 <span class="font-semibold text-slate-950">{{ formatPrice(props.taxTotal, props.currencyCode) }}</span>
             </div>
-            <div class="flex items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+            <div class="flex items-center justify-between gap-3 rounded-3xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                 <span class="text-sm font-semibold text-slate-900">Total</span>
-                <strong class="text-lg font-semibold tracking-[-0.02em] text-slate-950">
+                <strong class="text-lg font-semibold tracking-tight text-slate-950">
                     {{ formatPrice(props.total, props.currencyCode) }}
                 </strong>
             </div>
