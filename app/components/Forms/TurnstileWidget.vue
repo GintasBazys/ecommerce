@@ -70,7 +70,7 @@ function renderWidget(): boolean {
         sitekey: props.siteKey,
         action: props.action,
         theme: "light",
-        appearance: "interaction-only",
+        appearance: "always",
         size: "flexible",
         callback: (token) => {
             emit("update:modelValue", token)
