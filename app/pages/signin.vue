@@ -24,6 +24,13 @@ const loginTurnstileToken = ref<string>("")
 const loginTurnstileResetKey = ref<number>(0)
 const loginIsSubmitting = ref<boolean>(false)
 const hasAttemptedLogin = ref<boolean>(false)
+const showLoginVerification = ref<boolean>(false)
+
+type TurnstileWidgetInstance = {
+    execute: () => Promise<string>
+}
+
+const loginTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 
 const resetEmail = ref<string>("")
 
@@ -77,20 +84,33 @@ async function handleLogin(): Promise<void> {
         return
     }
 
-    if (!loginTurnstileToken.value) {
-        loginErrors.value.verification = "Complete verification before logging in."
-        return
-    }
-
     loginIsSubmitting.value = true
 
     try {
+        if (!loginTurnstileToken.value) {
+            showLoginVerification.value = true
+            await nextTick()
+
+            try {
+                loginTurnstileToken.value = await loginTurnstileWidget.value?.execute() || ""
+            } catch (error) {
+                loginErrors.value.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                return
+            }
+
+            if (!loginTurnstileToken.value) {
+                loginErrors.value.verification = "Verification failed. Please try again."
+                return
+            }
+        }
+
         const customer = await auth.login(loginEmail.value, loginPassword.value, {
             loadCart: true,
             turnstileToken: loginTurnstileToken.value
         })
         if (!customer) {
             loginTurnstileToken.value = ""
+            showLoginVerification.value = true
             loginTurnstileResetKey.value += 1
             showSnackbar("Login failed", "error")
             return
@@ -272,8 +292,12 @@ onBeforeUnmount(() => {
 
                         <div>
                             <FormsTurnstileWidget
+                                v-if="showLoginVerification"
+                                ref="loginTurnstileWidget"
                                 :site-key="turnstileSiteKey"
                                 action="login"
+                                appearance="execute"
+                                execution="execute"
                                 :reset-key="loginTurnstileResetKey"
                                 :model-value="loginTurnstileToken"
                                 @update:model-value="handleTurnstileToken"

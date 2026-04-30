@@ -17,6 +17,13 @@ const posthog = usePostHog()
 const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const turnstileToken = ref<string>("")
 const turnstileResetKey = ref<number>(0)
+const showTurnstileVerification = ref<boolean>(false)
+
+type TurnstileWidgetInstance = {
+    execute: () => Promise<string>
+}
+
+const turnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 
 const snackbar = ref<boolean>(false)
 const snackbarText = ref<string>("")
@@ -109,9 +116,6 @@ function validateForm(): boolean {
     if (!turnstileSiteKey.value) {
         formErrors.value.verification = "Verification is currently unavailable. Please try again later."
         isValid = false
-    } else if (!turnstileToken.value) {
-        formErrors.value.verification = "Complete verification before creating your account."
-        isValid = false
     }
 
     return isValid
@@ -145,6 +149,23 @@ async function handleRegister(): Promise<void> {
     isLoading.value = true
 
     try {
+        if (!turnstileToken.value) {
+            showTurnstileVerification.value = true
+            await nextTick()
+
+            try {
+                turnstileToken.value = await turnstileWidget.value?.execute() || ""
+            } catch (error) {
+                formErrors.value.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                return
+            }
+
+            if (!turnstileToken.value) {
+                formErrors.value.verification = "Verification failed. Please try again."
+                return
+            }
+        }
+
         const response = await $fetch<CustomerResponseInterface>("/api/account/register", {
             method: "POST",
             body: {
@@ -279,18 +300,21 @@ onUnmounted(() => {
                             <p v-if="formErrors.password" class="mt-1 text-sm text-rose-600">{{ formErrors.password }}</p>
                         </div>
 
-                        <div class="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
+                        <div>
                             <FormsTurnstileWidget
+                                v-if="showTurnstileVerification"
+                                ref="turnstileWidget"
                                 :site-key="turnstileSiteKey"
                                 action="register"
+                                appearance="execute"
+                                execution="execute"
                                 :reset-key="turnstileResetKey"
                                 :model-value="turnstileToken"
                                 @update:model-value="handleTurnstileToken"
                                 @error="handleTurnstileError"
                                 @expired="handleTurnstileError"
                             />
-                            <p class="mt-3 text-sm leading-6 text-slate-600">Verification is required before creating your account.</p>
-                            <p v-if="formErrors.verification" class="mt-2 text-sm text-rose-600">{{ formErrors.verification }}</p>
+                            <p v-if="formErrors.verification" class="text-sm text-rose-600">{{ formErrors.verification }}</p>
                         </div>
 
                         <button

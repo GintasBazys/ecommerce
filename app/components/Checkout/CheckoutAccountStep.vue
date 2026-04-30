@@ -63,6 +63,15 @@ const emit = defineEmits<{
     "change-identity": []
 }>()
 
+type TurnstileWidgetInstance = {
+    execute: () => Promise<string>
+}
+
+const loginTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)
+const registerTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)
+const showLoginTurnstileVerification = ref<boolean>(false)
+const showRegisterTurnstileVerification = ref<boolean>(false)
+
 function getInputValue(event: Event): string {
     return event.target instanceof HTMLInputElement ? event.target.value : ""
 }
@@ -74,6 +83,30 @@ const requestUrl = useRequestURL()
 const socialIconBaseUrl = computed<string>(() => (import.meta.client ? window.location.origin : requestUrl.origin))
 const googleIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/images/google_login_icon.svg`)
 const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/images/facebook_login_icon.svg`)
+
+async function executeLoginTurnstile(): Promise<string> {
+    if (props.loginTurnstileToken) {
+        return props.loginTurnstileToken
+    }
+
+    showLoginTurnstileVerification.value = true
+    await nextTick()
+
+    return await loginTurnstileWidget.value?.execute() || ""
+}
+
+async function executeRegisterTurnstile(): Promise<string> {
+    if (props.registerTurnstileToken) {
+        return props.registerTurnstileToken
+    }
+
+    showRegisterTurnstileVerification.value = true
+    await nextTick()
+
+    return await registerTurnstileWidget.value?.execute() || ""
+}
+
+defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
 </script>
 
 <template>
@@ -232,8 +265,12 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 
                         <div>
                             <FormsTurnstileWidget
+                                v-if="showLoginTurnstileVerification"
+                                ref="loginTurnstileWidget"
                                 :site-key="props.turnstileSiteKey"
                                 action="login"
+                                appearance="execute"
+                                execution="execute"
                                 :reset-key="props.loginTurnstileResetKey"
                                 :model-value="props.loginTurnstileToken"
                                 @update:model-value="emit('update:loginTurnstileToken', $event)"
@@ -331,8 +368,12 @@ const facebookIconUrl = computed<string>(() => `${socialIconBaseUrl.value}/image
 
                     <div>
                         <FormsTurnstileWidget
+                            v-if="showRegisterTurnstileVerification"
+                            ref="registerTurnstileWidget"
                             :site-key="props.turnstileSiteKey"
                             action="register"
+                            appearance="execute"
+                            execution="execute"
                             :reset-key="props.registerTurnstileResetKey"
                             :model-value="props.registerTurnstileToken"
                             @update:model-value="emit('update:registerTurnstileToken', $event)"

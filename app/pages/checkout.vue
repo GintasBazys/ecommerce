@@ -48,6 +48,10 @@ type CreatePaymentIntentPayload = {
 type CompleteCartPayload = { order?: { id?: string } }
 type ShippingOptionsPayload = ShippingOption[] | { shipping_options?: ShippingOption[] }
 type ErrorWithMessage = { data?: { statusMessage?: string }; statusMessage?: string; message?: string }
+type CheckoutAccountStepInstance = {
+    executeLoginTurnstile: () => Promise<string>
+    executeRegisterTurnstile: () => Promise<string>
+}
 
 const cartStore = useCartStore()
 const customerStore = useCustomerStore()
@@ -64,6 +68,7 @@ const posthog = usePostHog()
 
 const currentStep = ref<CheckoutStep>("account")
 const authTab = ref<AuthTab>("login")
+const checkoutAccountStep = ref<CheckoutAccountStepInstance | null>(null)
 const isBooting = ref<boolean>(true)
 const isSubmitting = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
@@ -331,8 +336,6 @@ function validateLoginForm(): boolean {
 
     if (!turnstileSiteKey.value) {
         loginErrors.verification = "Verification is currently unavailable. Please try again later."
-    } else if (!loginTurnstileToken.value) {
-        loginErrors.verification = "Complete verification before logging in."
     }
 
     return !loginErrors.email && !loginErrors.password && !loginErrors.verification
@@ -347,8 +350,6 @@ function validateRegisterForm(): boolean {
 
     if (!turnstileSiteKey.value) {
         registerErrors.verification = "Verification is currently unavailable. Please try again later."
-    } else if (!registerTurnstileToken.value) {
-        registerErrors.verification = "Complete verification before creating your account."
     }
 
     return (
@@ -812,6 +813,20 @@ async function handleCheckoutLogin(): Promise<void> {
     isSubmitting.value = true
 
     try {
+        if (!loginTurnstileToken.value) {
+            try {
+                loginTurnstileToken.value = await checkoutAccountStep.value?.executeLoginTurnstile() || ""
+            } catch (error) {
+                loginErrors.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                return
+            }
+
+            if (!loginTurnstileToken.value) {
+                loginErrors.verification = "Verification failed. Please try again."
+                return
+            }
+        }
+
         const loggedInCustomer = await auth.login(loginEmail.value, loginPassword.value, {
             loadCart: false,
             turnstileToken: loginTurnstileToken.value
@@ -846,6 +861,20 @@ async function submitRegister(): Promise<void> {
     isSubmitting.value = true
 
     try {
+        if (!registerTurnstileToken.value) {
+            try {
+                registerTurnstileToken.value = await checkoutAccountStep.value?.executeRegisterTurnstile() || ""
+            } catch (error) {
+                registerErrors.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                return
+            }
+
+            if (!registerTurnstileToken.value) {
+                registerErrors.verification = "Verification failed. Please try again."
+                return
+            }
+        }
+
         const registeredCustomer = await auth.register(
             {
                 email: regEmail.value,
@@ -886,10 +915,12 @@ function updateRegisterTurnstileToken(value: string): void {
 
 function handleTurnstileError(target: "login" | "register", message: string): void {
     if (target === "login") {
+        loginTurnstileToken.value = ""
         loginErrors.verification = message
         return
     }
 
+    registerTurnstileToken.value = ""
     registerErrors.verification = message
 }
 
@@ -1161,6 +1192,7 @@ watch(currentStep, async (step) => {
 
                         <div class="grid gap-5">
                             <CheckoutAccountStep
+                                ref="checkoutAccountStep"
                                 :current-step="currentStep"
                                 :auth-tab="authTab"
                                 :identity-completed="shouldShowIdentityReady"
