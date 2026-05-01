@@ -98,6 +98,7 @@ async function handleSubscribe(e: Event): Promise<void> {
                         id="footer-newsletter-email"
                         name="email"
                         type="email"
+                        autocomplete="email"
                         placeholder="Enter your email"
                         required
                         class="min-h-12 w-full rounded-2xl border border-white/15 bg-white px-4 text-base text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden sm:flex-1"

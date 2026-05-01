@@ -30,7 +30,6 @@ useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global
 </script>
 
 <template>
-    <NuxtLoadingIndicator />
     <BaseHeader />
     <NuxtLayout>
         <NuxtPage />

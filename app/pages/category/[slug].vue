@@ -336,7 +336,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
             <div class="grid gap-6 xl:flex xl:items-start xl:gap-8">
                 <aside
-                    class="hidden xl:sticky xl:top-20 xl:grid xl:max-h-screen xl:w-96 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pr-2"
+                    class="hidden xl:sticky xl:top-20 xl:grid xl:max-h-screen-sticky-header xl:w-96 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pr-2 xl:pb-2"
                 >
                     <CategoryFiltersPanel
                         v-model:selected-child-category-ids="selectedChildCategoryIds"

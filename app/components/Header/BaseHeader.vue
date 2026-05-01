@@ -8,6 +8,11 @@ const drawer = ref<boolean>(false)
 const searchDialog = ref<boolean>(false)
 const selectionLoading = ref<boolean>(false)
 const currentAnnouncementIndex = ref<number>(0)
+const announcementTextWrap = ref<HTMLElement | null>(null)
+const announcementText = ref<HTMLElement | null>(null)
+const announcementTextOverflows = ref<boolean>(false)
+const announcementMarqueeDistance = ref<number>(0)
+const announcementMarqueeDuration = ref<number>(0)
 const announcementBarDismissed = useCookie<boolean>("announcement_bar_dismissed", {
     default: () => false,
     maxAge: 60 * 60 * 24 * 30,
@@ -66,6 +71,7 @@ useHead(() => ({
 }))
 
 let announcementRotationInterval: number | null = null
+let announcementResizeObserver: ResizeObserver | null = null
 
 const locationItems = computed(() =>
     availableCountries.value.map((country) => ({
@@ -117,11 +123,19 @@ onBeforeUnmount(() => {
     }
 
     stopAnnouncementRotation()
+    announcementResizeObserver?.disconnect()
     document.documentElement.style.removeProperty("--site-header-offset")
 })
 
 onMounted(() => {
     syncAnnouncementRotation()
+    syncAnnouncementTextOverflow()
+
+    announcementResizeObserver = new ResizeObserver(() => {
+        syncAnnouncementTextOverflow()
+    })
+
+    observeAnnouncementTextElements()
 })
 
 watch([announcementBarVisible, hasMultipleAnnouncements], () => {
@@ -130,6 +144,12 @@ watch([announcementBarVisible, hasMultipleAnnouncements], () => {
     }
 
     syncAnnouncementRotation()
+})
+
+watch(currentAnnouncement, async () => {
+    await nextTick()
+    observeAnnouncementTextElements()
+    syncAnnouncementTextOverflow()
 })
 
 function openSearchDialog(): void {
@@ -203,6 +223,38 @@ function syncAnnouncementRotation(): void {
     }, 5000)
 }
 
+function syncAnnouncementTextOverflow(): void {
+    if (!import.meta.client || !announcementTextWrap.value || !announcementText.value) {
+        announcementTextOverflows.value = false
+        announcementMarqueeDistance.value = 0
+        announcementMarqueeDuration.value = 0
+        return
+    }
+
+    const overflowDistance = announcementText.value.scrollWidth - announcementTextWrap.value.clientWidth
+    const marqueeDistance = Math.max(overflowDistance, 0)
+
+    announcementTextOverflows.value = overflowDistance > 1
+    announcementMarqueeDistance.value = marqueeDistance
+    announcementMarqueeDuration.value = Math.min(Math.max(marqueeDistance / 30, 3), 18)
+}
+
+function observeAnnouncementTextElements(): void {
+    if (!import.meta.client || !announcementResizeObserver) {
+        return
+    }
+
+    announcementResizeObserver.disconnect()
+
+    if (announcementTextWrap.value) {
+        announcementResizeObserver.observe(announcementTextWrap.value)
+    }
+
+    if (announcementText.value) {
+        announcementResizeObserver.observe(announcementText.value)
+    }
+}
+
 function dismissAnnouncementBar(): void {
     announcementBarDismissed.value = true
     stopAnnouncementRotation()
@@ -237,14 +289,23 @@ function dismissAnnouncementBar(): void {
                 <component
                     :is="currentAnnouncement.link_url ? 'a' : 'div'"
                     :href="currentAnnouncement.link_url || undefined"
-                    class="min-w-0 flex-1 text-center"
+                    class="min-w-0 flex-1 overflow-hidden text-center"
                 >
-                    <p
-                        class="text-label-xs tracking-label-tight truncate font-semibold text-slate-100 uppercase"
-                        :class="currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : ''"
-                        aria-live="polite"
-                    >
-                        {{ currentAnnouncement.message }}
+                    <p ref="announcementTextWrap" class="overflow-hidden" aria-live="polite">
+                        <span
+                            ref="announcementText"
+                            class="announcement-message-text text-label-xs tracking-label-tight inline-block font-semibold whitespace-nowrap text-slate-100 uppercase"
+                            :class="[
+                                currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : '',
+                                announcementTextOverflows ? 'announcement-message-text--marquee' : ''
+                            ]"
+                            :style="{
+                                '--announcement-marquee-distance': `${announcementMarqueeDistance}px`,
+                                '--announcement-marquee-duration': `${announcementMarqueeDuration}s`
+                            }"
+                        >
+                            {{ currentAnnouncement.message }}
+                        </span>
                     </p>
                 </component>
 
@@ -336,6 +397,7 @@ function dismissAnnouncementBar(): void {
                         </span>
                         <span class="sr-only">Choose shipping country</span>
                         <BaseSelect
+                            id="country-select"
                             :model-value="locationValue"
                             class="max-w-44 xl:max-w-48"
                             :options="locationItems"
@@ -439,3 +501,32 @@ function dismissAnnouncementBar(): void {
         />
     </header>
 </template>
+
+<style scoped>
+.announcement-message-text {
+    --announcement-marquee-distance: 0px;
+    --announcement-marquee-duration: 6s;
+}
+
+.announcement-message-text--marquee {
+    animation: announcement-message-swing var(--announcement-marquee-duration, 6s) ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+@keyframes announcement-message-swing {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(var(--announcement-marquee-distance, 0px) * -1));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .announcement-message-text--marquee {
+        animation: none;
+        transform: translateX(0);
+    }
+}
+</style>

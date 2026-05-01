@@ -58,6 +58,9 @@ export default <Partial<Config>>{
                 card: "0 10px 26px rgba(8, 27, 90, 0.05)",
                 panel: "0 18px 48px rgba(8, 27, 90, 0.08)",
                 elevated: "0 22px 54px rgba(8, 27, 90, 0.12)"
+            },
+            maxHeight: {
+                "screen-sticky-header": "calc(100vh - 6rem)"
             }
         }
     }
