@@ -24,3 +24,5 @@ logs
 .env.*
 !.env.example
 dump.rdb
+# Sentry Config File
+.env.sentry-build-plugin

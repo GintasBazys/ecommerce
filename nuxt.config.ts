@@ -32,7 +32,15 @@ export default defineNuxtConfig({
         domains: [...new Set(imageDomains)]
     },
 
-    modules: ["@nuxt/eslint", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt", "@nuxt/image", "@nuxtjs/sitemap", "@nuxtjs/robots"],
+    modules: [
+        "@nuxt/eslint",
+        "@pinia/nuxt",
+        "pinia-plugin-persistedstate/nuxt",
+        "@nuxt/image",
+        "@nuxtjs/sitemap",
+        "@nuxtjs/robots",
+        "@sentry/nuxt/module"
+    ],
 
     sitemap: {
         sources: ["/api/__sitemap__/urls"]
@@ -52,6 +60,9 @@ export default defineNuxtConfig({
                 publicKey: posthogPublicKey,
                 host: posthogHost,
                 captureExceptions: true
+            },
+            sentry: {
+                dsn: process.env.NUXT_PUBLIC_SENTRY_DSN || ""
             },
             MEDUSA_URL: process.env.NUXT_PUBLIC_MEDUSA_URL || process.env.MEDUSA_URL,
             PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY || process.env.PUBLISHABLE_KEY,
@@ -81,5 +92,14 @@ export default defineNuxtConfig({
         optimizeDeps: {
             include: ["@stripe/stripe-js", "posthog-js", "lodash-es/debounce"]
         }
+    },
+
+    sentry: {
+        org: "medusa-test",
+        project: "javascript-nuxt"
+    },
+
+    sourcemap: {
+        client: "hidden"
     }
 })
