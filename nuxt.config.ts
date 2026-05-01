@@ -49,7 +49,11 @@ export default defineNuxtConfig({
     site: {
         url: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || "",
         name: process.env.SITE_NAME || "Medusa Commerce",
-        indexable: false
+        indexable: true
+    },
+
+    robots: {
+        disallow: ["/account", "/account/**", "/register/**"]
     },
 
     runtimeConfig: {
