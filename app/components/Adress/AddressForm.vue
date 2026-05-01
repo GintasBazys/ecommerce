@@ -6,6 +6,7 @@ import BaseSelect from "~/components/Shared/BaseSelect.vue"
 const model = defineModel<boolean>()
 const regionStore = useRegionStore()
 const { regionCountries } = storeToRefs(regionStore)
+const backdropPointerStarted = ref<boolean>(false)
 
 const props = defineProps<{
     address: Partial<CustomerAddressDTO>
@@ -62,29 +63,42 @@ const local = reactive<CustomerAddressDTO>({
     updated_at: ""
 })
 
+function assignLocalAddress(address: Partial<CustomerAddressDTO>): void {
+    Object.assign(local, {
+        id: address.id || "",
+        first_name: address.first_name || "",
+        last_name: address.last_name || "",
+        phone: address.phone || "",
+        company: address.company || "",
+        address_1: address.address_1 || "",
+        address_2: address.address_2 || "",
+        city: address.city || "",
+        province: address.province || "",
+        postal_code: address.postal_code || "",
+        country_code: address.country_code || "",
+        address_name: address.address_name || "",
+        metadata: address.metadata || {},
+        is_default_shipping: address.is_default_shipping ?? false,
+        is_default_billing: address.is_default_billing ?? false
+    })
+}
+
 watch(
     () => props.address,
     (newValue) => {
-        Object.assign(local, {
-            id: newValue.id || "",
-            first_name: newValue.first_name || "",
-            last_name: newValue.last_name || "",
-            phone: newValue.phone || "",
-            company: newValue.company || "",
-            address_1: newValue.address_1 || "",
-            address_2: newValue.address_2 || "",
-            city: newValue.city || "",
-            province: newValue.province || "",
-            postal_code: newValue.postal_code || "",
-            country_code: newValue.country_code || "",
-            address_name: newValue.address_name || "",
-            metadata: newValue.metadata || {},
-            is_default_shipping: newValue.is_default_shipping ?? false,
-            is_default_billing: newValue.is_default_billing ?? false
-        })
+        assignLocalAddress(newValue)
         clearErrors()
     }
 )
+
+watch(model, (isOpen) => {
+    if (!isOpen) {
+        return
+    }
+
+    assignLocalAddress(props.address)
+    clearErrors()
+})
 
 const countryOptions = computed(() => [
     { title: "Select a country", value: "", disabled: true },
@@ -111,6 +125,18 @@ onMounted(async () => {
 
 function close(): void {
     model.value = false
+}
+
+function onBackdropPointerDown(event: PointerEvent): void {
+    backdropPointerStarted.value = event.target === event.currentTarget
+}
+
+function onBackdropPointerUp(event: PointerEvent): void {
+    if (backdropPointerStarted.value && event.target === event.currentTarget) {
+        close()
+    }
+
+    backdropPointerStarted.value = false
 }
 
 function clearErrors(): void {
@@ -160,7 +186,6 @@ function save(): void {
     }
 
     emit("save", getTrimmedAddress())
-    model.value = false
 }
 </script>
 
@@ -172,10 +197,12 @@ function save(): void {
             role="dialog"
             aria-modal="true"
             :aria-label="props.title"
-            @click.self="close"
+            @pointerdown="onBackdropPointerDown"
+            @pointerup="onBackdropPointerUp"
         >
             <div
                 class="relative flex max-h-screen w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl sm:max-h-screen"
+                @click.stop
             >
                 <button
                     type="button"
@@ -366,6 +393,32 @@ function save(): void {
                                 class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
                             />
                         </div>
+
+                        <fieldset class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <legend class="px-1 text-sm font-semibold text-slate-950">Use this address for</legend>
+                            <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm">
+                                <input
+                                    v-model="local.is_default_shipping"
+                                    type="checkbox"
+                                    class="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 text-brand-700 accent-brand-700 focus:ring-2 focus:ring-brand-100 focus:ring-offset-1"
+                                />
+                                <span>
+                                    <span class="block font-semibold text-slate-950">Default shipping address</span>
+                                    <span class="block leading-6 text-slate-500">Use this delivery address first during checkout.</span>
+                                </span>
+                            </label>
+                            <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm">
+                                <input
+                                    v-model="local.is_default_billing"
+                                    type="checkbox"
+                                    class="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 text-brand-700 accent-brand-700 focus:ring-2 focus:ring-brand-100 focus:ring-offset-1"
+                                />
+                                <span>
+                                    <span class="block font-semibold text-slate-950">Default billing address</span>
+                                    <span class="block leading-6 text-slate-500">Use this billing address first during checkout.</span>
+                                </span>
+                            </label>
+                        </fieldset>
 
                         <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-end">
                             <button

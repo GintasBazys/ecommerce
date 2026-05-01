@@ -54,9 +54,11 @@ watch(page, fetchPage)
 
 async function createAddress(payload: Partial<CustomerAddressDTO>): Promise<void> {
     try {
+        error.value = null
         const { id: _id, customer_id: _customerId, created_at: _createdAt, updated_at: _updatedAt, ...body } = payload
         await $fetch("/api/account/create-address", { method: "POST", credentials: "include", body })
         await fetchPage()
+        showAdd.value = false
     } catch {
         error.value = "Could not create address."
     }
@@ -66,8 +68,10 @@ async function updateAddress(payload: CustomerAddressDTO): Promise<void> {
     const { id, customer_id: _customerId, created_at: _createdAt, updated_at: _updatedAt, ...body } = payload
 
     try {
+        error.value = null
         await $fetch(`/api/account/update-address/${id}`, { method: "POST", credentials: "include", body })
         await fetchPage()
+        showEdit.value = false
     } catch {
         error.value = "Could not update address."
     }
