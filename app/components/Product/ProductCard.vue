@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import debounce from "lodash-es/debounce"
-
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
@@ -52,19 +50,19 @@ const variantLabel = computed<string>(() => selectedVariant.value?.title || "Sel
 const stockLabel = computed<string>(() => (selectedVariant.value?.inventory_quantity ? "Ready to ship" : "Currently unavailable"))
 
 async function addToCart(): Promise<void> {
-    if (!selectedVariant.value) {
+    if (!selectedVariant.value || loading.value) {
         return
     }
 
     loading.value = true
 
-    await cartStore.updateLineItem(selectedVariant.value)
-
-    openCartDrawer.value = true
-    loading.value = false
+    try {
+        await cartStore.updateLineItem(selectedVariant.value)
+        openCartDrawer.value = true
+    } finally {
+        loading.value = false
+    }
 }
-
-const debouncedAddToCart = debounce(addToCart, 300)
 </script>
 
 <template>
@@ -172,7 +170,7 @@ const debouncedAddToCart = debounce(addToCart, 300)
                     class="ui-btn-accent w-full px-4 disabled:bg-slate-200 disabled:text-slate-500"
                     :class="compact ? 'min-h-9 px-3 text-sm' : ''"
                     :disabled="loading || !selectedVariant?.inventory_quantity"
-                    @click="debouncedAddToCart"
+                    @click="addToCart"
                 >
                     <span
                         v-if="loading"

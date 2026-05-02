@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AboutCta from "@/components/About/AboutCta.vue"
 import MainBanner from "@/components/Banner/MainBanner.vue"
-import BestSellers from "@/components/Products/BestSellers.vue"
-import LatestProducts from "@/components/Products/LatestProducts.vue"
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
 const DeferredLatestPosts = defineAsyncComponent(() => import("@/components/About/LatestPosts.vue"))
+const DeferredLatestProducts = defineAsyncComponent(() => import("@/components/Products/LatestProducts.vue"))
+const DeferredBestSellers = defineAsyncComponent(() => import("@/components/Products/BestSellers.vue"))
 
 useHead({
     title: "Shop | Medusa Commerce"
@@ -40,8 +40,8 @@ useStructuredData(
     <section>
         <MainBanner />
         <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
-        <LatestProducts />
-        <BestSellers />
+        <DeferredLatestProducts />
+        <DeferredBestSellers />
         <DeferredLatestPosts />
     </section>
 </template>

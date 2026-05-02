@@ -75,6 +75,7 @@ useHead(() => ({
 
 let announcementRotationInterval: number | null = null
 let announcementResizeObserver: ResizeObserver | null = null
+let announcementMeasureFrame: number | null = null
 
 const locationItems = computed(() =>
     availableCountries.value.map((country) => ({
@@ -127,6 +128,7 @@ onBeforeUnmount(() => {
     }
 
     stopAnnouncementRotation()
+    cancelAnnouncementTextMeasure()
     announcementResizeObserver?.disconnect()
     document.removeEventListener("pointerdown", onDocumentPointerDown)
     document.documentElement.style.removeProperty("--site-header-offset")
@@ -134,10 +136,10 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
     syncAnnouncementRotation()
-    syncAnnouncementTextOverflow()
+    scheduleAnnouncementTextMeasure()
 
     announcementResizeObserver = new ResizeObserver(() => {
-        syncAnnouncementTextOverflow()
+        scheduleAnnouncementTextMeasure()
     })
 
     observeAnnouncementTextElements()
@@ -150,12 +152,20 @@ watch([announcementBarVisible, hasMultipleAnnouncements], () => {
     }
 
     syncAnnouncementRotation()
+
+    if (announcementBarVisible.value) {
+        scheduleAnnouncementTextMeasure()
+        return
+    }
+
+    cancelAnnouncementTextMeasure()
+    resetAnnouncementTextOverflow()
 })
 
 watch(currentAnnouncement, async () => {
     await nextTick()
     observeAnnouncementTextElements()
-    syncAnnouncementTextOverflow()
+    scheduleAnnouncementTextMeasure()
 })
 
 function openSearchDialog(): void {
@@ -241,6 +251,32 @@ function stopAnnouncementRotation(): void {
     }
 }
 
+function cancelAnnouncementTextMeasure(): void {
+    if (announcementMeasureFrame !== null) {
+        window.cancelAnimationFrame(announcementMeasureFrame)
+        announcementMeasureFrame = null
+    }
+}
+
+function resetAnnouncementTextOverflow(): void {
+    announcementTextOverflows.value = false
+    announcementMarqueeDistance.value = 0
+    announcementMarqueeDuration.value = 0
+}
+
+function scheduleAnnouncementTextMeasure(): void {
+    if (!import.meta.client) {
+        return
+    }
+
+    cancelAnnouncementTextMeasure()
+
+    announcementMeasureFrame = window.requestAnimationFrame(() => {
+        announcementMeasureFrame = null
+        syncAnnouncementTextOverflow()
+    })
+}
+
 function syncAnnouncementRotation(): void {
     stopAnnouncementRotation()
 
@@ -254,10 +290,8 @@ function syncAnnouncementRotation(): void {
 }
 
 function syncAnnouncementTextOverflow(): void {
-    if (!import.meta.client || !announcementTextWrap.value || !announcementText.value) {
-        announcementTextOverflows.value = false
-        announcementMarqueeDistance.value = 0
-        announcementMarqueeDuration.value = 0
+    if (!import.meta.client || !announcementBarVisible.value || !announcementTextWrap.value || !announcementText.value) {
+        resetAnnouncementTextOverflow()
         return
     }
 

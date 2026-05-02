@@ -30,6 +30,7 @@ const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real p
             format="webp"
             quality="50"
             loading="eager"
+            fetchpriority="high"
             :preload="{ fetchPriority: 'high' }"
             decoding="async"
             class="absolute inset-0 h-full w-full object-cover object-center"
