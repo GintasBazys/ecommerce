@@ -1150,7 +1150,7 @@ watch(currentStep, async (step) => {
             </div>
 
             <template v-else>
-                <section class="grid gap-5 xl:grid-cols-2 xl:items-start xl:gap-7">
+                <section class="grid gap-5 xl:grid-cols-checkout xl:items-start xl:gap-7">
                     <div class="space-y-5 sm:space-y-6">
                         <div
                             class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:rounded-4xl sm:p-7"

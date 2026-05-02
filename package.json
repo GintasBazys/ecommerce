@@ -11,6 +11,9 @@
         "postinstall": "nuxt prepare",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
+        "test": "vitest",
+        "test:unit": "vitest --project unit",
+        "test:nuxt": "vitest --project nuxt",
         "type-check": "npx nuxt typecheck"
     },
     "dependencies": {

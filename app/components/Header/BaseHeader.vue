@@ -349,7 +349,7 @@ function dismissAnnouncementBar(): void {
             <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
                 <NuxtLink to="/" class="inline-flex shrink-0 items-center">
                     <img
-                        src="/images/logo.svg"
+                        :src="'/images/logo.svg'"
                         alt="Medusa Commerce"
                         width="640"
                         height="144"
