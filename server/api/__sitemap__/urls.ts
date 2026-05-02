@@ -63,19 +63,14 @@ export default defineSitemapEventHandler(async (event) => {
     ])
 
     const productEntries: SitemapEntry[] = products
-        .filter(
-            (product): product is SitemapProduct & { handle: string } => typeof product.handle === "string" && product.handle.length > 0
-        )
+        .filter((product): product is SitemapProduct & { handle: string } => product.handle.length > 0)
         .map((product) => ({
             loc: `/product/${product.handle}`,
             lastmod: toLastmod(product.updated_at)
         }))
 
     const categoryEntries: SitemapEntry[] = (product_categories || [])
-        .filter(
-            (category): category is SitemapCategory & { handle: string } =>
-                typeof category.handle === "string" && category.handle.length > 0
-        )
+        .filter((category): category is SitemapCategory & { handle: string } => category.handle.length > 0)
         .map((category) => ({
             loc: `/category/${category.handle}`,
             lastmod: toLastmod(category.updated_at)

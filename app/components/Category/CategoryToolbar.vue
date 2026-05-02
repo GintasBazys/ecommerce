@@ -34,7 +34,7 @@ const emit = defineEmits<{
                     <template v-else>Medusa-backed filters for categories, collections, types, tags, stock, and price.</template>
                 </p>
             </div>
-            <div class="grid gap-3 sm:grid-cols-2 sm:items-end lg:justify-end">
+            <div class="grid xl:flex gap-3 sm:grid-cols-2 sm:items-end lg:justify-end">
                 <button
                     type="button"
                     class="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card xl:hidden"

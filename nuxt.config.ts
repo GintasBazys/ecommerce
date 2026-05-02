@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url"
 
 import tailwindcss from "@tailwindcss/vite"
 
-const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com"]
+const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com", "localhost"]
 const posthogPublicKey = process.env.NUXT_PUBLIC_POSTHOG_PUBLIC_KEY || process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || ""
 const posthogHost = process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com"
 

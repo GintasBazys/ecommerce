@@ -24,11 +24,8 @@ const medusaBaseUrl = String(config.public.MEDUSA_URL || "").replace(/\/+$/, "")
 const loadingMessage = ref<string>("Initializing authentication...")
 const errorMessage = ref<string>("")
 const stage = ref<SocialStage>("authenticating")
-const snackbar = ref<boolean>(false)
-const snackbarText = ref<string>("")
-const snackbarTone = ref<"success" | "error">("success")
-const snackbarTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const isRetrying = ref<boolean>(false)
+const { showSnackbar } = useSnackbar()
 
 function getStoredProvider(): SocialProvider | null {
     if (import.meta.server) {
@@ -92,17 +89,7 @@ function getMedusaUrl(path: string): string {
 }
 
 function showNotification(message: string, color: "success" | "error"): void {
-    snackbarText.value = message
-    snackbarTone.value = color
-    snackbar.value = true
-
-    if (snackbarTimer.value) {
-        clearTimeout(snackbarTimer.value)
-    }
-
-    snackbarTimer.value = setTimeout(() => {
-        snackbar.value = false
-    }, 4500)
+    showSnackbar(message, color)
 }
 
 function toText(value: unknown): string | null {
@@ -371,11 +358,6 @@ onMounted(() => {
     void validateAndAuthenticate()
 })
 
-onBeforeUnmount(() => {
-    if (snackbarTimer.value) {
-        clearTimeout(snackbarTimer.value)
-    }
-})
 </script>
 
 <template>
@@ -432,19 +414,5 @@ onBeforeUnmount(() => {
             </div>
         </section>
 
-        <div v-if="snackbar" class="pointer-events-none fixed inset-x-0 top-5 z-50 flex justify-center px-4">
-            <p
-                class="pointer-events-auto rounded-full border px-5 py-2 text-sm font-medium"
-                :class="
-                    snackbarTone === 'success'
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                        : 'border-rose-200 bg-rose-50 text-rose-700'
-                "
-                role="status"
-                aria-live="polite"
-            >
-                {{ snackbarText }}
-            </p>
-        </div>
     </main>
 </template>

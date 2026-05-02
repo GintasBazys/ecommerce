@@ -42,7 +42,8 @@ function seedHeaderStores(options: HeaderStoreOptions = {}): void {
         {
             id: 'cat_new_arrivals',
             handle: 'new-arrivals',
-            name: 'New arrivals'
+            name: 'New arrivals',
+            imageUrl: 'https://example.com/new-arrivals.jpg'
         },
         {
             id: 'cat_accessories',
@@ -129,10 +130,17 @@ describe('BaseHeader', () => {
         expect(wrapper.get('a[href="/special-offers"]').text()).toContain('Special offers')
     })
 
-    it('renders category links from the product store', async () => {
+    it('renders category links inside the catalog dropdown', async () => {
         const wrapper = await mountHeader()
 
+        expect(wrapper.find('a[href="/category/new-arrivals"]').exists()).toBe(false)
+
+        await wrapper.get('button[aria-controls="catalog-menu"]').trigger('click')
+        await flushAsyncUpdates()
+
+        expect(wrapper.get('#catalog-menu').text()).toContain('Shop by category')
         expect(wrapper.get('a[href="/category/new-arrivals"]').text()).toContain('New arrivals')
+        expect(wrapper.find('img[alt="New arrivals category image"]').exists()).toBe(true)
         expect(wrapper.get('a[href="/category/accessories"]').text()).toContain('Accessories')
     })
 

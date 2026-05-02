@@ -13,6 +13,7 @@ type NavigationCategory = {
     id: string
     handle: string
     name: string
+    imageUrl?: string | null
 }
 
 type ProductFetchOptions = {

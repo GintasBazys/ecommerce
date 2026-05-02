@@ -25,11 +25,8 @@ type TurnstileWidgetInstance = {
 
 const turnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 
-const snackbar = ref<boolean>(false)
-const snackbarText = ref<string>("")
-const snackbarTone = ref<"success" | "error">("success")
-const snackbarTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const isLoading = ref<boolean>(false)
+const { showSnackbar } = useSnackbar()
 
 const firstName = ref<string>("")
 const lastName = ref<string>("")
@@ -44,17 +41,7 @@ const formErrors = ref<{ firstName: string; lastName: string; email: string; pas
 })
 
 function showNotification(message: string, tone: "success" | "error"): void {
-    snackbarText.value = message
-    snackbarTone.value = tone
-    snackbar.value = true
-
-    if (snackbarTimer.value) {
-        clearTimeout(snackbarTimer.value)
-    }
-
-    snackbarTimer.value = setTimeout(() => {
-        snackbar.value = false
-    }, 4000)
+    showSnackbar(message, tone)
 }
 
 function resetTurnstile(): void {
@@ -114,7 +101,7 @@ function validateForm(): boolean {
     }
 
     if (!turnstileSiteKey.value) {
-        formErrors.value.verification = "Verification is currently unavailable. Please try again later."
+        formErrors.value.verification = "Security verification is currently unavailable. Please try again later."
         isValid = false
     }
 
@@ -126,8 +113,8 @@ function getErrorMessage(error: unknown): string {
         const data = "data" in error ? error.data : undefined
 
         if (data && typeof data === "object" && "statusMessage" in data && typeof data.statusMessage === "string") {
-            if (data.statusMessage === "Verification failed") {
-                return "Verification failed. Please try again."
+            if (data.statusMessage === "Verification failed" || data.statusMessage === "Security verification failed") {
+                return "Security verification failed. Please complete the challenge and try again."
             }
 
             return data.statusMessage
@@ -156,12 +143,13 @@ async function handleRegister(): Promise<void> {
             try {
                 turnstileToken.value = await turnstileWidget.value?.execute() || ""
             } catch (error) {
-                formErrors.value.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                formErrors.value.verification =
+                    error instanceof Error ? error.message : "Security verification failed. Please complete the challenge and try again."
                 return
             }
 
             if (!turnstileToken.value) {
-                formErrors.value.verification = "Verification failed. Please try again."
+                formErrors.value.verification = "Security verification failed. Please complete the challenge and try again."
                 return
             }
         }
@@ -194,11 +182,6 @@ async function handleRegister(): Promise<void> {
     }
 }
 
-onUnmounted(() => {
-    if (snackbarTimer.value) {
-        clearTimeout(snackbarTimer.value)
-    }
-})
 </script>
 
 <template>
@@ -336,19 +319,5 @@ onUnmounted(() => {
             </div>
         </section>
 
-        <div v-if="snackbar" class="pointer-events-none fixed inset-x-0 top-5 z-50 flex justify-center px-4">
-            <p
-                class="pointer-events-auto rounded-full border px-5 py-2 text-sm font-medium"
-                :class="
-                    snackbarTone === 'success'
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                        : 'border-rose-200 bg-rose-50 text-rose-700'
-                "
-                role="status"
-                aria-live="polite"
-            >
-                {{ snackbarText }}
-            </p>
-        </div>
     </main>
 </template>

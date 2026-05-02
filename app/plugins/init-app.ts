@@ -4,6 +4,7 @@ type NavigationCategory = {
     id: string
     handle: string
     name: string
+    imageUrl?: string | null
 }
 
 const NON_AUTH_COOKIE_KEYS = new Set([

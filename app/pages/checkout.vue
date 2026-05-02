@@ -335,7 +335,7 @@ function validateLoginForm(): boolean {
     loginErrors.password = runValidationRules(loginPassword.value, passwordRules)
 
     if (!turnstileSiteKey.value) {
-        loginErrors.verification = "Verification is currently unavailable. Please try again later."
+        loginErrors.verification = "Security verification is currently unavailable. Please try again later."
     }
 
     return !loginErrors.email && !loginErrors.password && !loginErrors.verification
@@ -349,7 +349,7 @@ function validateRegisterForm(): boolean {
     registerErrors.password = runValidationRules(regPassword.value, passwordRules)
 
     if (!turnstileSiteKey.value) {
-        registerErrors.verification = "Verification is currently unavailable. Please try again later."
+        registerErrors.verification = "Security verification is currently unavailable. Please try again later."
     }
 
     return (
@@ -817,12 +817,13 @@ async function handleCheckoutLogin(): Promise<void> {
             try {
                 loginTurnstileToken.value = await checkoutAccountStep.value?.executeLoginTurnstile() || ""
             } catch (error) {
-                loginErrors.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                loginErrors.verification =
+                    error instanceof Error ? error.message : "Security verification failed. Please complete the challenge and try again."
                 return
             }
 
             if (!loginTurnstileToken.value) {
-                loginErrors.verification = "Verification failed. Please try again."
+                loginErrors.verification = "Security verification failed. Please complete the challenge and try again."
                 return
             }
         }
@@ -832,9 +833,23 @@ async function handleCheckoutLogin(): Promise<void> {
             turnstileToken: loginTurnstileToken.value
         })
         if (!loggedInCustomer) {
-            errorMessage.value = auth.error.value ?? "Login failed"
+            const message = auth.error.value ?? "Could not sign in. Check your email and password, then try again."
+
             loginTurnstileToken.value = ""
             loginTurnstileResetKey.value += 1
+
+            if (isVerificationError(message)) {
+                loginErrors.verification = message
+                return
+            }
+
+            if (isCredentialError(message)) {
+                loginErrors.email = "Email or password is incorrect. Please check your details and try again."
+                loginErrors.password = "Email or password is incorrect. Please check your details and try again."
+                return
+            }
+
+            errorMessage.value = message
             return
         }
 
@@ -865,12 +880,13 @@ async function submitRegister(): Promise<void> {
             try {
                 registerTurnstileToken.value = await checkoutAccountStep.value?.executeRegisterTurnstile() || ""
             } catch (error) {
-                registerErrors.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                registerErrors.verification =
+                    error instanceof Error ? error.message : "Security verification failed. Please complete the challenge and try again."
                 return
             }
 
             if (!registerTurnstileToken.value) {
-                registerErrors.verification = "Verification failed. Please try again."
+                registerErrors.verification = "Security verification failed. Please complete the challenge and try again."
                 return
             }
         }
@@ -922,6 +938,14 @@ function handleTurnstileError(target: "login" | "register", message: string): vo
 
     registerTurnstileToken.value = ""
     registerErrors.verification = message
+}
+
+function isVerificationError(message: string): boolean {
+    return /verification|turnstile/i.test(message)
+}
+
+function isCredentialError(message: string): boolean {
+    return /email or password|invalid credentials|incorrect/i.test(message)
 }
 
 async function submitGuest(): Promise<void> {

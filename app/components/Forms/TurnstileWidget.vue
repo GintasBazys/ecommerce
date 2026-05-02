@@ -44,10 +44,10 @@ function revealWidgetAfterPaint(): void {
 
 function getTurnstileErrorMessage(errorCode?: string): string {
     if (errorCode === "110200") {
-        return "Verification is not configured for this domain. Please try again later."
+        return "Security verification is not configured for this domain. Please try again later."
     }
 
-    return "Verification failed. Please try again."
+    return "Security verification failed. Please complete the challenge and try again."
 }
 
 function loadTurnstileScript(): Promise<void> {
@@ -137,7 +137,7 @@ function renderWidget(): boolean {
             rejectPendingExecution(message)
         },
         "expired-callback": () => {
-            const message = "Verification expired. Please try again."
+        const message = "Security verification expired. Please complete the challenge again."
 
             emit("update:modelValue", "")
             emit("expired", message)
@@ -170,7 +170,7 @@ async function ensureWidgetRendered(): Promise<void> {
             throw new Error("Turnstile failed to render")
         }
     } catch {
-        emit("error", "Verification failed to load. Please try again.")
+        emit("error", "Security verification failed to load. Please try again.")
     }
 }
 
@@ -182,7 +182,7 @@ async function execute(): Promise<string> {
     await ensureWidgetRendered()
 
     if (!import.meta.client || !window.turnstile || !widgetId.value) {
-        const message = "Verification failed to load. Please try again."
+        const message = "Security verification failed to load. Please try again."
         emit("error", message)
         throw new Error(message)
     }

@@ -18,12 +18,7 @@ const slug = computed<string>(() => {
         return routeSlug[routeSlug.length - 1] || ""
     }
 
-    if (typeof routeSlug === "string") {
-        return routeSlug
-    }
-
-    const parts = route.path.split("/").filter(Boolean)
-    return parts[parts.length - 1] || ""
+    return routeSlug || route.path.split("/").filter(Boolean).at(-1) || ""
 })
 
 const { data: postResponse } = await useAsyncData(`blog-post-${slug.value}`, () =>

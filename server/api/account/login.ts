@@ -31,10 +31,30 @@ type TurnstileVerificationResponse = {
     action?: string
 }
 
+type HandledError = {
+    statusCode?: number
+    status?: number
+    statusMessage?: string
+    message?: string
+}
+
 const ALLOWED_TURNSTILE_ACTIONS = new Set(["login", "test"])
+const INVALID_CREDENTIALS_MESSAGE = "Email or password is incorrect. Please check your details and try again."
 
 function toTrimmedString(value: unknown): string {
     return typeof value === "string" ? value.trim() : ""
+}
+
+function isInvalidCredentialsError(error: unknown): boolean {
+    if (!error || typeof error !== "object") {
+        return false
+    }
+
+    const handledError = error as HandledError
+    const statusCode = handledError.statusCode ?? handledError.status
+    const message = `${handledError.statusMessage || ""} ${handledError.message || ""}`.toLowerCase()
+
+    return statusCode === 401 || message.includes("invalid credentials") || message.includes("unauthorized")
 }
 
 export default defineEventHandler(async (event) => {
@@ -49,7 +69,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (!turnstileToken) {
-        throw createError({ statusCode: 400, statusMessage: "Verification is required" })
+        throw createError({ statusCode: 400, statusMessage: "Security verification is required" })
     }
 
     try {
@@ -88,13 +108,13 @@ export default defineEventHandler(async (event) => {
         })
 
         if (!verificationResponse.ok) {
-            throw createError({ statusCode: 502, statusMessage: "Verification failed" })
+            throw createError({ statusCode: 502, statusMessage: "Security verification failed" })
         }
 
         const verificationResult = (await verificationResponse.json()) as TurnstileVerificationResponse
 
         if (!verificationResult.success || (verificationResult.action && !ALLOWED_TURNSTILE_ACTIONS.has(verificationResult.action))) {
-            throw createError({ statusCode: 400, statusMessage: "Verification failed" })
+            throw createError({ statusCode: 400, statusMessage: "Security verification failed" })
         }
 
         const tokenData = await fetchMedusaJson<AuthTokenResponse>(event, "/auth/customer/emailpass", {
@@ -104,7 +124,7 @@ export default defineEventHandler(async (event) => {
         })
 
         if (!tokenData.token) {
-            throw createError({ statusCode: 401, statusMessage: "Invalid credentials" })
+            throw createError({ statusCode: 401, statusMessage: INVALID_CREDENTIALS_MESSAGE })
         }
 
         const incomingCookie = getIncomingCookie(event)
@@ -146,6 +166,10 @@ export default defineEventHandler(async (event) => {
             customer: customerData.customer ?? null
         }
     } catch (error: unknown) {
+        if (isInvalidCredentialsError(error)) {
+            throw createError({ statusCode: 401, statusMessage: INVALID_CREDENTIALS_MESSAGE })
+        }
+
         throw toUpstreamError(error, "Login failed")
     }
 })

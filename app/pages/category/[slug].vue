@@ -69,14 +69,14 @@ const {
     selectedCountryCode
 })
 
-const categoryThumbnail = computed(() => {
+const categoryThumbnail = computed<string | null>(() => {
     if (isAllProductsPage.value) {
         return null
     }
 
     const images = ((category.value as ProductCategoryDTO & { product_category_image?: CategoryImage[] })?.product_category_image ??
         []) as CategoryImage[]
-    return images.find((image) => image.type === "thumbnail")?.url || null
+    return images.find((image) => image.type === "thumbnail")?.url || images.find((image) => image.url)?.url || null
 })
 
 const heroFallbackImage = computed(() => (isAllProductsPage.value ? "/images/hero-premium.jpg" : "/images/hero-main.jpg"))

@@ -43,7 +43,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
         <div class="mt-9">
             <div
                 ref="relatedRailRef"
-                class="flex cursor-grab gap-4 overflow-x-auto overscroll-x-contain pt-1 pr-6 pb-4 sm:gap-5 sm:pr-8"
+                class="flex cursor-grab gap-4 overflow-x-auto overscroll-x-contain pt-1 pr-6 pb-4 sm:gap-5 sm:pr-8 [&.is-pointer-down]:cursor-grabbing"
                 aria-label="Related products"
                 tabindex="0"
                 @pointerdown="onPointerDown"

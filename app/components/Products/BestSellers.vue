@@ -56,7 +56,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 
                 <div
                     ref="railRef"
-                    class="flex gap-4 overflow-x-auto overflow-y-visible pt-1 pr-6 pb-4 pl-0 sm:gap-5 sm:pr-8"
+                    class="flex cursor-grab gap-4 overflow-x-auto overflow-y-visible pt-1 pr-6 pb-4 pl-0 sm:gap-5 sm:pr-8 [&.is-pointer-down]:cursor-grabbing"
                     aria-label="Bestselling products"
                     tabindex="0"
                     @pointerdown="onPointerDown"

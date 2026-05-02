@@ -13,11 +13,6 @@ const successMessage = ref<string | null>(null)
 const loginErrors = ref<{ email: string; password: string; verification: string }>({ email: "", password: "", verification: "" })
 const resetEmailError = ref<string>("")
 
-const snackbar = ref<boolean>(false)
-const snackbarText = ref<string>("")
-const snackbarTone = ref<"success" | "error">("success")
-const snackbarTimer = ref<ReturnType<typeof setTimeout> | null>(null)
-
 const loginEmail = ref<string>("")
 const loginPassword = ref<string>("")
 const loginTurnstileToken = ref<string>("")
@@ -36,24 +31,20 @@ const resetEmail = ref<string>("")
 
 const auth = useCustomerAuth()
 const posthog = usePostHog()
+const { showSnackbar } = useSnackbar()
 const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
+const INVALID_CREDENTIALS_MESSAGE = "Email or password is incorrect. Please check your details and try again."
 
 function isValidEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
-function showSnackbar(message: string, tone: "success" | "error"): void {
-    snackbarText.value = message
-    snackbarTone.value = tone
-    snackbar.value = true
+function isVerificationError(message: string): boolean {
+    return /verification|turnstile/i.test(message)
+}
 
-    if (snackbarTimer.value) {
-        clearTimeout(snackbarTimer.value)
-    }
-
-    snackbarTimer.value = setTimeout(() => {
-        snackbar.value = false
-    }, 4000)
+function isCredentialError(message: string): boolean {
+    return /email or password|invalid credentials|incorrect/i.test(message)
 }
 
 async function handleLogin(): Promise<void> {
@@ -80,7 +71,7 @@ async function handleLogin(): Promise<void> {
     hasAttemptedLogin.value = true
 
     if (!turnstileSiteKey.value) {
-        loginErrors.value.verification = "Verification is currently unavailable. Please try again later."
+        loginErrors.value.verification = "Security verification is currently unavailable. Please try again later."
         return
     }
 
@@ -94,12 +85,13 @@ async function handleLogin(): Promise<void> {
             try {
                 loginTurnstileToken.value = await loginTurnstileWidget.value?.execute() || ""
             } catch (error) {
-                loginErrors.value.verification = error instanceof Error ? error.message : "Verification failed. Please try again."
+                loginErrors.value.verification =
+                    error instanceof Error ? error.message : "Security verification failed. Please complete the challenge and try again."
                 return
             }
 
             if (!loginTurnstileToken.value) {
-                loginErrors.value.verification = "Verification failed. Please try again."
+                loginErrors.value.verification = "Security verification failed. Please complete the challenge and try again."
                 return
             }
         }
@@ -109,10 +101,20 @@ async function handleLogin(): Promise<void> {
             turnstileToken: loginTurnstileToken.value
         })
         if (!customer) {
+            const message = auth.error.value ?? "Could not sign in. Check your email and password, then try again."
+
             loginTurnstileToken.value = ""
             showLoginVerification.value = true
             loginTurnstileResetKey.value += 1
-            showSnackbar("Login failed", "error")
+
+            if (isVerificationError(message)) {
+                loginErrors.value.verification = message
+            } else if (isCredentialError(message)) {
+                loginErrors.value.email = INVALID_CREDENTIALS_MESSAGE
+                loginErrors.value.password = INVALID_CREDENTIALS_MESSAGE
+            }
+
+            showSnackbar(message, "error")
             return
         }
 
@@ -179,11 +181,6 @@ async function handleReset(): Promise<void> {
     }
 }
 
-onBeforeUnmount(() => {
-    if (snackbarTimer.value) {
-        clearTimeout(snackbarTimer.value)
-    }
-})
 </script>
 
 <template>
@@ -390,19 +387,5 @@ onBeforeUnmount(() => {
             </div>
         </Teleport>
 
-        <div v-if="snackbar" class="pointer-events-none fixed inset-x-0 top-5 z-50 flex justify-center px-4">
-            <p
-                class="pointer-events-auto rounded-full border px-5 py-2 text-sm font-medium"
-                :class="
-                    snackbarTone === 'success'
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                        : 'border-rose-200 bg-rose-50 text-rose-700'
-                "
-                role="status"
-                aria-live="polite"
-            >
-                {{ snackbarText }}
-            </p>
-        </div>
     </main>
 </template>
