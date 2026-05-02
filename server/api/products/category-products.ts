@@ -270,7 +270,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         const { products } = await fetchAllStoreProducts<ProductWithRelations>(event, searchParams, {
-            endpoint: "/store/products/category-products"
+            endpoint: "/store/category-products"
         })
         const filteredProducts = filterProducts(products, filters)
         const sortedProducts = [...filteredProducts].sort((leftProduct, rightProduct) => compareProducts(leftProduct, rightProduct, order))
