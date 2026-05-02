@@ -32,6 +32,7 @@ type ProductVariantPricing = {
 type ProductFetchOptions = {
     pageSize?: number
     maxFetch?: number
+    endpoint?: string
 }
 
 type ProductPriceField = keyof Pick<ProductPrice, "calculated_amount" | "original_amount">
@@ -73,7 +74,8 @@ export async function fetchAllStoreProducts<Product>(event: H3Event, searchParam
     const pageSize = options.pageSize ?? DEFAULT_PAGE_SIZE
     const maxFetch = options.maxFetch ?? DEFAULT_MAX_FETCH
 
-    const firstPage = await fetchStoreProductsPage<Product>(event, searchParams, pageSize, 0)
+    const endpoint = options.endpoint ?? "/store/products"
+    const firstPage = await fetchStoreProductsPage<Product>(event, searchParams, pageSize, 0, endpoint)
     const firstProducts = firstPage.products
     const reportedCount = Number(firstPage.count ?? firstProducts.length)
     const totalCount = Number.isFinite(reportedCount) ? Math.max(reportedCount, firstProducts.length) : firstProducts.length
@@ -92,7 +94,13 @@ export async function fetchAllStoreProducts<Product>(event: H3Event, searchParam
 
         while (products.length < maxFetch) {
             const remainingCount = maxFetch - products.length
-            const nextPage = await fetchStoreProductsPage<Product>(event, searchParams, Math.min(pageSize, remainingCount), nextOffset)
+            const nextPage = await fetchStoreProductsPage<Product>(
+                event,
+                searchParams,
+                Math.min(pageSize, remainingCount),
+                nextOffset,
+                endpoint
+            )
 
             if (!nextPage.products.length) {
                 break
@@ -118,7 +126,9 @@ export async function fetchAllStoreProducts<Product>(event: H3Event, searchParam
     }
 
     const remainingPages = await Promise.all(
-        offsets.map((offset) => fetchStoreProductsPage<Product>(event, searchParams, Math.min(pageSize, targetCount - offset), offset))
+        offsets.map((offset) =>
+            fetchStoreProductsPage<Product>(event, searchParams, Math.min(pageSize, targetCount - offset), offset, endpoint)
+        )
     )
 
     const products = [...firstProducts]
@@ -132,16 +142,22 @@ export async function fetchAllStoreProducts<Product>(event: H3Event, searchParam
     }
 }
 
-export async function fetchStoreProducts<Product>(event: H3Event, searchParams: URLSearchParams) {
-    return await fetchMedusaJson<StoreProductsResponse<Product>>(event, `/store/products?${searchParams.toString()}`)
+export async function fetchStoreProducts<Product>(event: H3Event, searchParams: URLSearchParams, endpoint = "/store/products") {
+    return await fetchMedusaJson<StoreProductsResponse<Product>>(event, `${endpoint}?${searchParams.toString()}`)
 }
 
-async function fetchStoreProductsPage<Product>(event: H3Event, searchParams: URLSearchParams, limit: number, offset: number) {
+async function fetchStoreProductsPage<Product>(
+    event: H3Event,
+    searchParams: URLSearchParams,
+    limit: number,
+    offset: number,
+    endpoint: string
+) {
     const pageSearchParams = new URLSearchParams(searchParams)
     pageSearchParams.set("limit", String(limit))
     pageSearchParams.set("offset", String(offset))
 
-    const response = await fetchStoreProducts<Product>(event, pageSearchParams)
+    const response = await fetchStoreProducts<Product>(event, pageSearchParams, endpoint)
 
     return {
         products: Array.isArray(response.products) ? response.products : [],
