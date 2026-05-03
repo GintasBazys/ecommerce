@@ -200,7 +200,9 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
                         </div>
                     </div>
 
-                    <a :href="invoiceDownloadUrl" class="ui-btn-accent mt-5 w-full motion-reduce:transition-none"> Download invoice PDF </a>
+                    <NuxtLink :to="invoiceDownloadUrl" class="ui-btn-accent mt-5 w-full motion-reduce:transition-none">
+                        Download invoice PDF
+                    </NuxtLink>
                 </section>
             </aside>
         </div>

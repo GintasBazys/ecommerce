@@ -87,7 +87,7 @@ useSeoMeta({
                         </p>
                         <div class="mt-7 flex flex-wrap items-center gap-3">
                             <NuxtLink to="/faq" class="ui-btn-primary px-7">Browse FAQ</NuxtLink>
-                            <a href="mailto:info@medusa-commerce.de" class="ui-btn-secondary px-6">Email support</a>
+                            <NuxtLink to="mailto:info@medusa-commerce.de" class="ui-btn-secondary px-6">Email support</NuxtLink>
                         </div>
                         <ul class="mt-6 flex flex-wrap gap-2.5" aria-label="Contact support highlights">
                             <li
@@ -180,9 +180,9 @@ useSeoMeta({
                     >
                         {{ channel.cta }}
                     </NuxtLink>
-                    <a v-else :href="channel.href" class="text-brand-700 hover:text-brand-900 mt-4 inline-flex text-sm font-semibold">
+                    <NuxtLink v-else :to="channel.href" class="text-brand-700 hover:text-brand-900 mt-4 inline-flex text-sm font-semibold">
                         {{ channel.cta }}
-                    </a>
+                    </NuxtLink>
                 </article>
             </div>
         </div>

@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import type { APIError, Customer } from "@/types/interfaces"
+import type { OrderDTO } from "@medusajs/types"
+
+import { formatDate } from "@/utils/formatDate"
+import { formatPrice } from "@/utils/formatPrice"
+
+type ProfileOrdersResponse = {
+    orders: OrderDTO[]
+    total: number
+}
 
 definePageMeta({
     layout: "account",
@@ -10,6 +19,7 @@ useHead({ title: "Profile | Medusa Commerce" })
 
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)
+const runtimeConfig = useRuntimeConfig()
 
 const customerData = reactive<Customer>({
     first_name: customer.value?.first_name ?? "",
@@ -29,11 +39,23 @@ const fieldErrors = reactive<Record<string, string>>({
     last_name: ""
 })
 
+const { data: invoiceOrdersData, pending: invoiceOrdersPending } = await useFetch<ProfileOrdersResponse>(
+    "/api/orders/orders?page=1&limit=5",
+    {
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-publishable-api-key": runtimeConfig.public.PUBLISHABLE_KEY
+        }
+    }
+)
+
 const customerFullName = computed<string>(() => {
     const firstName = customerData.first_name.trim()
     const lastName = customerData.last_name.trim()
     return `${firstName} ${lastName}`.trim() || "Saved to your account"
 })
+const invoiceOrders = computed<OrderDTO[]>(() => invoiceOrdersData.value?.orders || [])
 
 function validateForm(): boolean {
     fieldErrors.first_name = customerData.first_name.trim() ? "" : "First name is required"
@@ -206,6 +228,67 @@ async function onSubmit(): Promise<void> {
                     </button>
                 </div>
             </form>
+        </section>
+
+        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <span
+                        class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+                    >
+                        Invoices
+                    </span>
+                    <h2 class="mt-4 text-2xl leading-tight font-bold tracking-tight text-slate-950 sm:text-3xl">
+                        Download recent order invoices.
+                    </h2>
+                    <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
+                        Keep PDF copies of recent purchases directly from your profile.
+                    </p>
+                </div>
+                <NuxtLink
+                    to="/account/orders"
+                    class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
+                >
+                    View all orders
+                </NuxtLink>
+            </div>
+
+            <div v-if="invoiceOrdersPending" class="mt-5 grid gap-3" aria-hidden="true">
+                <div v-for="row in 3" :key="row" class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="animate-pulse space-y-3">
+                        <div class="h-4 w-28 rounded-full bg-slate-200"></div>
+                        <div class="h-4 w-48 rounded-full bg-slate-200"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="invoiceOrders.length" class="mt-5 grid gap-3">
+                <article
+                    v-for="order in invoiceOrders"
+                    :key="order.id"
+                    class="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                >
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="grid gap-1">
+                            <strong class="text-sm font-semibold text-slate-950">Order #{{ order.display_id || order.id }}</strong>
+                            <p class="text-sm leading-6 text-slate-600">
+                                {{ formatDate(order.created_at) || "Date unavailable" }} ·
+                                {{ formatPrice(Number(order.total || 0), order.currency_code) }}
+                            </p>
+                        </div>
+                        <NuxtLink
+                            :to="`/api/orders/${order.id}/invoice`"
+                            class="inline-flex min-h-10 items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-4 text-sm font-semibold text-slate-950 transition hover:border-amber-300 hover:bg-amber-100 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
+                        >
+                            Download invoice
+                        </NuxtLink>
+                    </div>
+                </article>
+            </div>
+
+            <div v-else class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm leading-6 text-slate-600">Invoices will appear here after you place an order.</p>
+            </div>
         </section>
     </div>
 </template>

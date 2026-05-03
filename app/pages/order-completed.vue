@@ -34,6 +34,7 @@ const {
 
 const order = computed<OrderDTO | null>(() => orderRes.value?.order ?? null)
 const currencyCode = computed<string>(() => order.value?.currency_code ?? DEFAULT_CURENCY)
+const invoiceDownloadUrl = computed<string>(() => (order.value?.id ? `/api/orders/${order.value.id}/invoice` : ""))
 const orderDate = computed<string>(() => formatDate(order.value?.created_at))
 const shippingMethod = computed(() => order.value?.shipping_methods?.[0] ?? null)
 const orderItems = computed(() => order.value?.items ?? [])
@@ -124,6 +125,9 @@ function formatAddressLines(address: OrderAddress): string[] {
                                     class="border-brand-100 bg-brand-50 text-brand-700 hover:border-brand-200 hover:text-brand-900 focus-visible:ring-brand-100 inline-flex min-h-12 items-center justify-center rounded-full border px-6 text-sm font-semibold transition focus-visible:ring-2 focus-visible:outline-hidden"
                                 >
                                     Track this order
+                                </NuxtLink>
+                                <NuxtLink v-if="invoiceDownloadUrl" :to="invoiceDownloadUrl" class="ui-btn-accent min-h-12 px-6">
+                                    Download invoice PDF
                                 </NuxtLink>
                                 <NuxtLink
                                     to="/account/orders"
@@ -313,6 +317,13 @@ function formatAddressLines(address: OrderAddress): string[] {
                                         class="border-brand-100 bg-brand-50 text-brand-700 hover:border-brand-200 hover:text-brand-900 focus-visible:ring-brand-100 inline-flex min-h-12 items-center justify-center rounded-full border px-5 text-sm font-semibold transition focus-visible:ring-2 focus-visible:outline-hidden"
                                     >
                                         Track this order
+                                    </NuxtLink>
+                                    <NuxtLink
+                                        v-if="invoiceDownloadUrl"
+                                        :to="invoiceDownloadUrl"
+                                        class="ui-btn-accent inline-flex min-h-12 items-center justify-center px-5"
+                                    >
+                                        Download invoice PDF
                                     </NuxtLink>
                                     <NuxtLink
                                         to="/account/orders"
