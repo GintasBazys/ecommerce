@@ -67,16 +67,7 @@ async function onSubmit(): Promise<void> {
             credentials: "include"
         })
 
-        customerStore.$patch((state) => {
-            if (!state.customer) {
-                return
-            }
-
-            state.customer.first_name = customerData.first_name
-            state.customer.last_name = customerData.last_name
-            state.customer.phone = customerData.phone
-            state.customer.company_name = customerData.company_name
-        })
+        customerStore.updateCustomerProfile(customerData)
 
         feedback.text = "Profile updated!"
         feedback.tone = "success"

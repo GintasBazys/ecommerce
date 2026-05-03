@@ -14,6 +14,7 @@ definePageMeta({
 const router = useRouter()
 const config = useRuntimeConfig()
 const posthog = usePostHog()
+const customerStore = useCustomerStore()
 const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const turnstileToken = ref<string>("")
 const turnstileResetKey = ref<number>(0)
@@ -165,7 +166,7 @@ async function handleRegister(): Promise<void> {
             }
         })
 
-        useCustomerStore().customer = response.customer
+        customerStore.setCustomer(response.customer)
         posthog?.identify(email.value, {
             email: email.value,
             first_name: firstName.value,

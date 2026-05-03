@@ -314,7 +314,7 @@ async function validateAndAuthenticate(): Promise<void> {
             throw new Error("Authentication finished, but customer details were not returned.")
         }
 
-        customerStore.customer = customer
+        customerStore.setCustomer(customer)
 
         try {
             await assignCustomerToCart(cartStore)

@@ -2,7 +2,7 @@
 const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
-const { customer } = storeToRefs(customerStore)
+const { customerEmail, customerFullName } = storeToRefs(customerStore)
 
 const accountNav = [
     { label: "Dashboard", to: "/account", icon: "dashboard" },
@@ -82,7 +82,7 @@ const breadcrumbItems = computed(() => {
 const accountStatus = computed(() => [
     {
         label: "Signed in",
-        value: customer.value?.email ? "Account member" : "Account member"
+        value: customerEmail.value || "Account member"
     },
     {
         label: "Current section",
@@ -90,12 +90,7 @@ const accountStatus = computed(() => [
     }
 ])
 
-const customerLabel = computed(() => {
-    const firstName = customer.value?.first_name ? "Account" : "Account"
-    const lastName = customer.value?.last_name ? "Member" : "Member"
-
-    return `${firstName} ${lastName}`.trim()
-})
+const customerLabel = computed(() => customerFullName.value)
 
 function isActivePath(path: string): boolean {
     if (path === "/account") {
@@ -126,7 +121,7 @@ async function handleLogout(): Promise<void> {
         const response = await $fetch<{ success: boolean }>("/api/account/logout", { method: "POST" })
 
         if (response.success) {
-            customerStore.$patch({ customer: null })
+            customerStore.clearCustomer()
             await router.push("/")
         }
     } catch (error) {
@@ -196,7 +191,7 @@ async function handleLogout(): Promise<void> {
                         <div class="min-w-0">
                             <p class="truncate text-base font-semibold text-slate-950">{{ customerLabel }}</p>
                             <p class="truncate text-sm leading-6 text-slate-600">
-                                {{ customer?.email ? "Signed in customer" : "Signed in customer" }}
+                                {{ customerEmail || "Signed in customer" }}
                             </p>
                         </div>
                     </div>

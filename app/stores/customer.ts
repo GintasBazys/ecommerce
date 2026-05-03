@@ -1,34 +1,47 @@
-import type { CustomerAuthResponseInterface } from "@/types/interfaces"
 import type { CustomerDTO } from "@medusajs/types"
 
-export const useCustomerStore = defineStore(
-    "customer",
-    () => {
-        const customer = ref<CustomerDTO | null>(null)
-        const config = useRuntimeConfig()
+type CustomerProfileUpdate = Pick<CustomerDTO, "first_name" | "last_name" | "phone" | "company_name">
 
-        async function fetchCustomer() {
-            try {
-                const data = await $fetch<CustomerAuthResponseInterface>("/api/account/me", {
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-publishable-api-key": config.public.PUBLISHABLE_KEY
-                    }
-                })
-                customer.value = data.customer
-            } catch (error) {
-                console.error("Error fetching customer data:", error)
-                customer.value = null
-            }
-        }
+export const useCustomerStore = defineStore("customer", () => {
+    const customer = ref<CustomerDTO | null>(null)
 
-        return {
-            fetchCustomer,
-            customer
-        }
-    },
-    {
-        persist: true
+    const isAuthenticated = computed<boolean>(() => Boolean(customer.value?.id))
+    const customerId = computed<string | null>(() => customer.value?.id ?? null)
+    const customerEmail = computed<string | null>(() => customer.value?.email ?? null)
+    const customerFullName = computed<string>(() => {
+        const firstName = customer.value?.first_name?.trim() ?? ""
+        const lastName = customer.value?.last_name?.trim() ?? ""
+
+        return `${firstName} ${lastName}`.trim() || "Account member"
+    })
+
+    function setCustomer(nextCustomer: CustomerDTO | null): void {
+        customer.value = nextCustomer
     }
-)
+
+    function clearCustomer(): void {
+        customer.value = null
+    }
+
+    function updateCustomerProfile(profile: CustomerProfileUpdate): void {
+        if (!customer.value) {
+            return
+        }
+
+        customer.value = {
+            ...customer.value,
+            ...profile
+        }
+    }
+
+    return {
+        customer,
+        isAuthenticated,
+        customerId,
+        customerEmail,
+        customerFullName,
+        setCustomer,
+        clearCustomer,
+        updateCustomerProfile
+    }
+})

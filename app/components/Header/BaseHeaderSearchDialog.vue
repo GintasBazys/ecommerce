@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import debounce from "lodash-es/debounce"
-
 import type { SearchResponse } from "@/types/interfaces"
 import type { ProductDTO } from "@medusajs/types"
 
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { debounce } from "~/utils/debounce"
 
 const props = defineProps<{
     open: boolean

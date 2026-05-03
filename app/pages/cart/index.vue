@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import debounce from "lodash-es/debounce"
-
 import type { CartLineItemDTO } from "@medusajs/types"
 
 import CartHero from "~/components/Cart/CartHero.vue"
 import CartLineItem from "~/components/Cart/CartLineItem.vue"
 import CartSummary from "~/components/Cart/CartSummary.vue"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
+import { debounce } from "~/utils/debounce"
 import { formatPrice } from "~/utils/formatPrice"
 
 definePageMeta({ layout: "checkout" })

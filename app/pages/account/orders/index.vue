@@ -2,7 +2,7 @@
 import type { OrdersResponse } from "@/types/interfaces"
 import type { OrderDTO } from "@medusajs/types"
 
-import { ORDER_STATUS } from "@/enumerators/order"
+import { formatFulfillmentStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
@@ -75,14 +75,6 @@ watch(page, async (currentPage, previousPage) => {
 const orders = computed<OrdersListItem[]>(() => (ordersData.value?.orders || []) as OrdersListItem[])
 const totalOrders = computed(() => ordersData.value?.total || 0)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalOrders.value / perPage.value)))
-
-function orderStatusLabel(status: string | null | undefined): string {
-    if (!status) {
-        return "Pending"
-    }
-
-    return ORDER_STATUS[status as keyof typeof ORDER_STATUS] || status
-}
 
 function changePage(nextPage: number): void {
     if (nextPage < 1 || nextPage > totalPages.value || nextPage === page.value) {
@@ -177,7 +169,7 @@ function changePage(nextPage: number): void {
                             <span
                                 class="border-brand-100 bg-brand-50 inline-flex min-h-10 items-center rounded-full border px-4 py-2 text-sm font-semibold text-slate-900"
                             >
-                                {{ orderStatusLabel(order.fulfillment_status) }}
+                                {{ formatFulfillmentStatus(order.fulfillment_status) }}
                             </span>
                             <NuxtLink
                                 :to="`/account/orders/${order.id}`"

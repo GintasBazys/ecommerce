@@ -6,7 +6,7 @@ definePageMeta({
 
 useHead({ title: "Account | Medusa Commerce" })
 
-const { customer } = storeToRefs(useCustomerStore())
+const { customer, customerEmail, customerFullName } = storeToRefs(useCustomerStore())
 
 const accountLinks = [
     {
@@ -35,11 +35,11 @@ const accountLinks = [
 const accountHighlights = computed(() => [
     {
         label: "Signed in as",
-        value: customer.value?.email || "Account member"
+        value: customerEmail.value || "Account member"
     },
     {
         label: "Primary name",
-        value: `${customer.value?.first_name || "Account"} ${customer.value?.last_name || "Member"}`.trim()
+        value: customerFullName.value
     }
 ])
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
 
-import { ORDER_STATUS } from "@/enumerators/order"
+import { formatFulfillmentStatus, formatPaymentStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
@@ -31,13 +31,6 @@ const {
 const order = computed<InvoiceOrderDTO | undefined>(() => orderRes.value?.order)
 const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoice`)
 
-function statusLabel(status: string | null | undefined): string {
-    if (!status) {
-        return "Pending"
-    }
-
-    return ORDER_STATUS[status as keyof typeof ORDER_STATUS] || status
-}
 </script>
 
 <template>
@@ -117,7 +110,7 @@ function statusLabel(status: string | null | undefined): string {
                         <div class="rounded-2xl border border-slate-200 bg-white p-4">
                             <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Status</span>
                             <strong class="mt-1 block text-sm font-semibold text-slate-950">
-                                {{ statusLabel(order.fulfillment_status) }}
+                                {{ formatFulfillmentStatus(order.fulfillment_status) }}
                             </strong>
                         </div>
                     </div>
@@ -169,7 +162,9 @@ function statusLabel(status: string | null | undefined): string {
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Payment status</span>
-                            <strong class="mt-1 block text-sm font-semibold text-slate-950">{{ order.payment_status }}</strong>
+                            <strong class="mt-1 block text-sm font-semibold text-slate-950">
+                                {{ formatPaymentStatus(order.payment_status) }}
+                            </strong>
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Shipping method</span>

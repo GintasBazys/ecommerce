@@ -124,13 +124,13 @@ export default defineNuxtPlugin(async () => {
         if (!productStore.categories?.length) {
             productStore.categories = categoriesState.value
         }
-        customerStore.customer = customerState.value ?? null
+        customerStore.setCustomer(customerState.value ?? null)
 
         if (cartState.value) {
             cartStore.cart = cartState.value
         }
 
-        if (customerStore.customer && !cartStore.cart?.customer_id) {
+        if (customerStore.isAuthenticated && !cartStore.cart?.customer_id) {
             await assignCustomerToCart(cartStore)
         }
 
@@ -146,5 +146,5 @@ export default defineNuxtPlugin(async () => {
     if (!productStore.categories?.length) {
         productStore.categories = categoriesState.value
     }
-    customerStore.customer = customerState.value ?? null
+    customerStore.setCustomer(customerState.value ?? null)
 })

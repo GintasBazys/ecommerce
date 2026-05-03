@@ -7,8 +7,6 @@ const posthogPublicKey = process.env.NUXT_PUBLIC_POSTHOG_PUBLIC_KEY || process.e
 const posthogHost = process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com"
 
 export default defineNuxtConfig({
-    compatibilityDate: "2026-01-26",
-
     features: {
         inlineStyles: true
     },
@@ -36,7 +34,6 @@ export default defineNuxtConfig({
         "@nuxt/eslint",
         "@nuxt/test-utils/module",
         "@pinia/nuxt",
-        "pinia-plugin-persistedstate/nuxt",
         "@nuxt/image",
         "@nuxtjs/sitemap",
         "@nuxtjs/robots",
@@ -106,5 +103,5 @@ export default defineNuxtConfig({
 
     sourcemap: {
         client: "hidden"
-    }
+    },
 })

@@ -58,7 +58,7 @@ const customerStore = useCustomerStore()
 const regionStore = useRegionStore()
 
 const { cart } = storeToRefs(cartStore)
-const { customer } = storeToRefs(customerStore)
+const { customer, isAuthenticated } = storeToRefs(customerStore)
 const { regionCountries } = storeToRefs(regionStore)
 
 const auth = useCustomerAuth()
@@ -236,13 +236,13 @@ const checkoutEmail = computed<string>(() => checkoutCart.value?.email ?? "")
 const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ?? DEFAULT_CURENCY)
 const lineItems = computed(() => checkoutCart.value?.items ?? [])
 const itemCount = computed<number>(() => lineItems.value.reduce((sum, item) => sum + Number(item.quantity), 0))
-const hasAuthenticatedIdentity = computed<boolean>(() => Boolean(customer.value?.id))
+const hasAuthenticatedIdentity = computed<boolean>(() => isAuthenticated.value)
 const hasPersistedGuestIdentity = computed<boolean>(() =>
     Boolean(checkoutEmail.value && guestCheckoutEmailCookie.value === checkoutEmail.value)
 )
 const isGuestIdentity = computed<boolean>(
     () =>
-        !customer.value?.id &&
+        !isAuthenticated.value &&
         (hasExplicitGuestIdentity.value || hasPersistedGuestIdentity.value || (!checkoutCart.value?.customer_id && !!checkoutEmail.value))
 )
 const identityCompleted = computed<boolean>(() => hasAuthenticatedIdentity.value || isGuestIdentity.value)
@@ -417,6 +417,61 @@ function applyAddress(target: Address, source?: Partial<Address> | null): void {
     target.company = source?.company ?? ""
 }
 
+function hasAddressDetails(address?: Partial<Address> | null): boolean {
+    return Boolean(address?.address_1 || address?.city || address?.postal_code || address?.country_code)
+}
+
+function getAddressComparisonSignature(address?: Partial<Address> | null): string {
+    return JSON.stringify({
+        first_name: address?.first_name ?? "",
+        last_name: address?.last_name ?? "",
+        address_1: address?.address_1 ?? "",
+        address_2: address?.address_2 ?? "",
+        city: address?.city ?? "",
+        province: address?.province ?? "",
+        postal_code: address?.postal_code ?? "",
+        country_code: address?.country_code?.toLowerCase() ?? "",
+        phone: address?.phone ?? "",
+        company: address?.company ?? ""
+    })
+}
+
+function getMatchingSavedAddressId(address: Address): string {
+    if (!hasAddressDetails(address)) {
+        return ""
+    }
+
+    const signature = getAddressComparisonSignature(address)
+    return savedAddresses.value.find((savedAddress) => getAddressComparisonSignature(savedAddress as Partial<Address>) === signature)?.id ?? ""
+}
+
+function syncSelectedSavedAddressIds(): void {
+    selectedBillingSavedAddressId.value = getMatchingSavedAddressId(billingAddress)
+    selectedShippingSavedAddressId.value = useSeparateShipping.value ? getMatchingSavedAddressId(shippingAddress) : ""
+}
+
+function applyDefaultSavedAddresses(): void {
+    syncSelectedSavedAddressIds()
+
+    const defaultBillingAddress = savedAddresses.value.find((address) => address.is_default_billing)
+    const defaultShippingAddress = savedAddresses.value.find((address) => address.is_default_shipping)
+
+    if (defaultBillingAddress?.id && !selectedBillingSavedAddressId.value && !hasAddressDetails(billingAddress)) {
+        updateSelectedBillingSavedAddress(defaultBillingAddress.id)
+    }
+
+    if (!defaultShippingAddress?.id || selectedShippingSavedAddressId.value || hasAddressDetails(shippingAddress)) {
+        return
+    }
+
+    if (defaultShippingAddress.id === selectedBillingSavedAddressId.value) {
+        return
+    }
+
+    useSeparateShipping.value = true
+    updateSelectedShippingSavedAddress(defaultShippingAddress.id)
+}
+
 async function loadSavedAddresses(): Promise<void> {
     if (!hasAuthenticatedIdentity.value) {
         savedAddresses.value = []
@@ -438,6 +493,7 @@ async function loadSavedAddresses(): Promise<void> {
         })
 
         savedAddresses.value = response.addresses.filter((address) => Boolean(address.id && address.address_1))
+        applyDefaultSavedAddresses()
     } catch (error) {
         console.error("Failed to load saved checkout addresses:", error)
         savedAddressesError.value = "Could not load saved addresses. You can still enter a new address."
@@ -475,21 +531,6 @@ function updateBillingAddressField(payload: { field: EditableAddressField; value
 function updateShippingAddressField(payload: { field: EditableAddressField; value: string }): void {
     selectedShippingSavedAddressId.value = ""
     shippingAddress[payload.field] = payload.value
-}
-
-function getAddressComparisonSignature(address?: Partial<Address> | null): string {
-    return JSON.stringify({
-        first_name: address?.first_name ?? "",
-        last_name: address?.last_name ?? "",
-        address_1: address?.address_1 ?? "",
-        address_2: address?.address_2 ?? "",
-        city: address?.city ?? "",
-        province: address?.province ?? "",
-        postal_code: address?.postal_code ?? "",
-        country_code: address?.country_code?.toLowerCase() ?? "",
-        phone: address?.phone ?? "",
-        company: address?.company ?? ""
-    })
 }
 
 function syncAddressesFromCart(currentCart: CheckoutCart | null): void {
@@ -1078,7 +1119,7 @@ onMounted(async () => {
             return
         }
 
-        if (customer.value?.id || !checkoutEmail.value || guestCheckoutEmailCookie.value !== checkoutEmail.value) {
+        if (isAuthenticated.value || !checkoutEmail.value || guestCheckoutEmailCookie.value !== checkoutEmail.value) {
             guestCheckoutEmailCookie.value = null
         }
 

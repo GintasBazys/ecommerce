@@ -1,9 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to) => {
     const customerStore = useCustomerStore()
 
-    const isLoggedIn = !!customerStore.customer
-
-    if (typeof to.name === "string" && to.name.startsWith("account") && !isLoggedIn) {
+    if (typeof to.name === "string" && to.name.startsWith("account") && !customerStore.isAuthenticated) {
         return navigateTo("/signin")
     }
 })

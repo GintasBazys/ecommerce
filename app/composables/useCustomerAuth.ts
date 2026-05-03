@@ -26,7 +26,7 @@ export function useCustomerAuth() {
             const res = await $fetch<{ success: boolean; customer: CustomerDTO | null }>("/api/account/me", {
                 credentials: "include"
             })
-            customerStore.customer = res.customer
+            customerStore.setCustomer(res.customer)
             return res.customer
         } catch (e) {
             error.value = normalizeError(e)
@@ -55,7 +55,7 @@ export function useCustomerAuth() {
                 return null
             }
 
-            customerStore.customer = res.customer
+            customerStore.setCustomer(res.customer)
 
             if (opts?.loadCart) {
                 await cartStore.loadCart()
@@ -94,7 +94,7 @@ export function useCustomerAuth() {
                 return null
             }
 
-            customerStore.customer = res.customer
+            customerStore.setCustomer(res.customer)
 
             if (opts?.loadCart) {
                 await cartStore.loadCart()

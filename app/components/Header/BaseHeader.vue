@@ -50,7 +50,7 @@ const { data: announcementBarData } = await useAsyncData<AnnouncementBarResponse
 )
 
 const regionStore = useRegionStore()
-const { customer } = storeToRefs(useCustomerStore())
+const { isAuthenticated } = storeToRefs(useCustomerStore())
 const { itemCount } = storeToRefs(useCartStore())
 const { categories } = storeToRefs(useProductStore())
 const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
@@ -594,7 +594,7 @@ function dismissAnnouncementBar(): void {
                     </NuxtLink>
 
                     <NuxtLink
-                        v-if="customer?.id"
+                        v-if="isAuthenticated"
                         class="shadow-card hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
                         to="/account"
                     >
@@ -631,7 +631,7 @@ function dismissAnnouncementBar(): void {
             :location-items="locationItems"
             :location-value="locationValue"
             :selection-loading="selectionLoading"
-            :is-signed-in="Boolean(customer?.id)"
+            :is-signed-in="isAuthenticated"
             @close="closeDrawer"
             @update-location="updateLocation"
         />

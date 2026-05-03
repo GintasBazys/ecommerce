@@ -83,7 +83,7 @@ function seedHeaderStores(options: HeaderStoreOptions = {}): void {
     } as CartDTO
 
     const customerStore = useCustomerStore()
-    customerStore.customer = options.signedIn ? ({ id: 'cus_1' } as CustomerDTO) : null
+    customerStore.setCustomer(options.signedIn ? ({ id: 'cus_1' } as CustomerDTO) : null)
 }
 
 async function mountHeader() {

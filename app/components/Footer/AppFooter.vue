@@ -10,6 +10,7 @@ const LazyNewsletterComponent = defineAsyncComponent(() => import("@/components/
 
 const helpLinks: NavLink[] = [
     { label: "FAQ", to: "/faq" },
+    { label: "Order Status", to: "/order-status" },
     { label: "Returns", to: "/returns" },
     { label: "Payment & Shipping", to: "/shipping" },
     { label: "Contact Us", to: "/contact" }

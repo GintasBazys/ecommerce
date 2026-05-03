@@ -55,7 +55,7 @@ function syncActiveImageFromScroll(): void {
 </script>
 
 <template>
-    <div class="relative rounded-panel border border-slate-200 bg-white p-3 shadow-sm sm:rounded-4xl sm:p-4 lg:sticky lg:top-6">
+    <div class="rounded-panel relative border border-slate-200 bg-white p-3 shadow-sm sm:rounded-4xl sm:p-4 lg:sticky lg:top-6">
         <div
             v-if="isOnSale"
             class="text-label-sm tracking-label absolute top-5 left-5 z-10 inline-flex rounded-full bg-rose-500 px-4 py-2 font-bold text-white uppercase"
@@ -69,27 +69,27 @@ function syncActiveImageFromScroll(): void {
             @scroll.passive="syncActiveImageFromScroll"
         >
             <div v-for="(image, index) in productImages" :key="image.id" class="min-w-full snap-center px-0.5">
-                <div class="relative overflow-hidden rounded-card bg-slate-100">
+                <div class="rounded-card relative aspect-square overflow-hidden bg-slate-100">
                     <NuxtImage
                         :src="image.src"
                         :alt="`${productTitle} image ${index + 1}`"
-                        width="1200"
-                        height="1411"
-                        sizes="100vw"
+                        width="566"
+                        height="566"
+                        sizes="100vw sm:100vw md:100vw"
                         loading="eager"
-                        class="block aspect-square w-full object-cover object-center"
+                        class="h-full w-full object-cover object-center"
                     />
                 </div>
             </div>
         </div>
 
         <div class="hidden lg:block lg:space-y-4">
-            <div class="relative overflow-hidden rounded-panel bg-slate-100">
+            <div class="rounded-panel relative overflow-hidden bg-slate-100">
                 <NuxtImage
                     :src="activeImage?.src || '/images/placeholder.png'"
                     :alt="activeImage?.src ? `${productTitle} image` : productTitle"
                     width="1200"
-                    height="1411"
+                    height="1200"
                     sizes="(max-width: 1279px) 100vw, 48vw"
                     loading="eager"
                     class="block aspect-square w-full object-cover object-center"

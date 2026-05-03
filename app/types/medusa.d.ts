@@ -1,9 +1,10 @@
 import type { StoreCartPromotion } from "@medusajs/types"
+import type { StoreFulfillmentStatus, StorePaymentStatus } from "@/enumerators/order"
 
 declare module "@medusajs/types" {
     interface OrderDTO {
-        payment_status: string
-        fulfillment_status: string
+        payment_status: StorePaymentStatus
+        fulfillment_status: StoreFulfillmentStatus
     }
     interface OrderAddressDTO {
         country: {
