@@ -177,12 +177,12 @@ function changePage(nextPage: number): void {
                             >
                                 View order
                             </NuxtLink>
-                            <NuxtLink
-                                :to="`/api/orders/${order.id}/invoice`"
+                            <a
+                                :href="`/api/orders/${order.id}/invoice`"
                                 class="inline-flex min-h-10 items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-4 text-sm font-semibold text-slate-950 transition hover:border-amber-300 hover:bg-amber-100 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                             >
                                 Download invoice
-                            </NuxtLink>
+                            </a>
                         </div>
                     </div>
                 </article>

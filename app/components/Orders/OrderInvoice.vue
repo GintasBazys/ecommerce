@@ -158,7 +158,7 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
                     <div class="mt-4 grid gap-4 md:grid-cols-3">
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Email</span>
-                            <strong class="mt-1 block text-sm font-semibold break-words text-slate-950">{{ order.email }}</strong>
+                            <strong class="mt-1 block text-sm font-semibold wrap-break-word text-slate-950">{{ order.email }}</strong>
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <span class="text-label-xs tracking-label-tight block font-bold text-slate-500 uppercase">Payment status</span>
@@ -200,9 +200,9 @@ const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoic
                         </div>
                     </div>
 
-                    <NuxtLink :to="invoiceDownloadUrl" class="ui-btn-accent mt-5 w-full motion-reduce:transition-none">
+                    <a :href="invoiceDownloadUrl" class="ui-btn-accent mt-5 w-full motion-reduce:transition-none">
                         Download invoice PDF
-                    </NuxtLink>
+                    </a>
                 </section>
             </aside>
         </div>

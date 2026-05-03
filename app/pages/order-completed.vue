@@ -126,9 +126,9 @@ function formatAddressLines(address: OrderAddress): string[] {
                                 >
                                     Track this order
                                 </NuxtLink>
-                                <NuxtLink v-if="invoiceDownloadUrl" :to="invoiceDownloadUrl" class="ui-btn-accent min-h-12 px-6">
+                                <a v-if="invoiceDownloadUrl" :href="invoiceDownloadUrl" class="ui-btn-accent min-h-12 px-6">
                                     Download invoice PDF
-                                </NuxtLink>
+                                </a>
                                 <NuxtLink
                                     to="/account/orders"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-hidden"
@@ -318,13 +318,13 @@ function formatAddressLines(address: OrderAddress): string[] {
                                     >
                                         Track this order
                                     </NuxtLink>
-                                    <NuxtLink
+                                    <a
                                         v-if="invoiceDownloadUrl"
-                                        :to="invoiceDownloadUrl"
+                                        :href="invoiceDownloadUrl"
                                         class="ui-btn-accent inline-flex min-h-12 items-center justify-center px-5"
                                     >
                                         Download invoice PDF
-                                    </NuxtLink>
+                                    </a>
                                     <NuxtLink
                                         to="/account/orders"
                                         class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-hidden"
