@@ -16,12 +16,6 @@ const announcementText = ref<HTMLElement | null>(null)
 const announcementTextOverflows = ref<boolean>(false)
 const announcementMarqueeDistance = ref<number>(0)
 const announcementMarqueeDuration = ref<number>(0)
-const announcementBarDismissed = useCookie<boolean>("announcement_bar_dismissed", {
-    default: () => false,
-    maxAge: 60 * 60 * 24 * 30,
-    sameSite: "lax",
-    path: "/"
-})
 
 type AnnouncementMessage = {
     id: string
@@ -58,7 +52,7 @@ const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(r
 const announcementMessages = computed<AnnouncementMessage[]>(() => announcementBarData.value?.announcement_messages || [])
 const currentAnnouncement = computed<AnnouncementMessage | null>(() => announcementMessages.value[currentAnnouncementIndex.value] || null)
 const hasMultipleAnnouncements = computed<boolean>(() => announcementMessages.value.length > 1)
-const announcementBarVisible = computed<boolean>(() => announcementMessages.value.length > 0 && !announcementBarDismissed.value)
+const announcementBarVisible = computed<boolean>(() => announcementMessages.value.length > 0)
 const topOffset = computed<number>(() => (announcementBarVisible.value ? 40 : 0))
 const headerHeight = 64
 const headerOffset = computed<number>(() => (announcementBarVisible.value ? headerHeight + 40 : headerHeight))
@@ -76,6 +70,7 @@ useHead(() => ({
 let announcementRotationInterval: number | null = null
 let announcementResizeObserver: ResizeObserver | null = null
 let announcementMeasureFrame: number | null = null
+const announcementMarqueeGap = 48
 
 const locationItems = computed(() =>
     availableCountries.value.map((country) => ({
@@ -227,15 +222,6 @@ function closeDrawer(): void {
     drawer.value = false
 }
 
-function showPreviousAnnouncement(): void {
-    if (!announcementMessages.value.length) {
-        return
-    }
-
-    currentAnnouncementIndex.value =
-        (currentAnnouncementIndex.value - 1 + announcementMessages.value.length) % announcementMessages.value.length
-}
-
 function showNextAnnouncement(): void {
     if (!announcementMessages.value.length) {
         return
@@ -296,11 +282,11 @@ function syncAnnouncementTextOverflow(): void {
     }
 
     const overflowDistance = announcementText.value.scrollWidth - announcementTextWrap.value.clientWidth
-    const marqueeDistance = Math.max(overflowDistance, 0)
+    const marqueeDistance = Math.max(announcementText.value.scrollWidth + announcementMarqueeGap, 0)
 
     announcementTextOverflows.value = overflowDistance > 1
     announcementMarqueeDistance.value = marqueeDistance
-    announcementMarqueeDuration.value = Math.min(Math.max(marqueeDistance / 30, 3), 18)
+    announcementMarqueeDuration.value = Math.min(Math.max(marqueeDistance / 80, 3), 12)
 }
 
 function observeAnnouncementTextElements(): void {
@@ -319,10 +305,6 @@ function observeAnnouncementTextElements(): void {
     }
 }
 
-function dismissAnnouncementBar(): void {
-    announcementBarDismissed.value = true
-    stopAnnouncementRotation()
-}
 </script>
 
 <template>
@@ -331,77 +313,45 @@ function dismissAnnouncementBar(): void {
             v-if="announcementBarVisible && currentAnnouncement"
             class="fixed inset-x-0 top-0 z-50 h-10 border-b border-white/10 bg-linear-to-r from-slate-900 via-slate-800 to-slate-700 text-white"
         >
-            <div class="mx-auto flex h-full w-full max-w-7xl items-center gap-2 px-3 sm:px-4">
-                <div class="flex w-20 shrink-0 items-center gap-1">
-                    <button
-                        v-if="hasMultipleAnnouncements"
-                        type="button"
-                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
-                        @click="showPreviousAnnouncement"
-                    >
-                        <span class="sr-only">Previous announcement</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-                            <path
-                                fill-rule="evenodd"
-                                d="M12.78 4.47a.75.75 0 0 1 0 1.06L8.31 10l4.47 4.47a.75.75 0 0 1-1.06 1.06l-5-5a.75.75 0 0 1 0-1.06l5-5a.75.75 0 0 1 1.06 0Z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                    </button>
-                </div>
-
-                <component
-                    :is="currentAnnouncement.link_url ? 'a' : 'div'"
-                    :href="currentAnnouncement.link_url || undefined"
-                    class="min-w-0 flex-1 overflow-hidden text-center"
-                >
-                    <p ref="announcementTextWrap" class="overflow-hidden" aria-live="polite">
-                        <span
-                            ref="announcementText"
-                            class="announcement-message-text text-label-xs tracking-label-tight inline-block font-semibold whitespace-nowrap text-slate-100 uppercase"
-                            :class="[
-                                currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : '',
-                                announcementTextOverflows ? 'announcement-message-text--marquee' : ''
-                            ]"
-                            :style="{
-                                '--announcement-marquee-distance': `${announcementMarqueeDistance}px`,
-                                '--announcement-marquee-duration': `${announcementMarqueeDuration}s`
-                            }"
+            <div class="mx-auto flex h-full w-full max-w-7xl items-center px-3 sm:px-4">
+                <div class="relative h-full min-w-0 flex-1 overflow-hidden text-center">
+                    <Transition name="announcement-slide">
+                        <component
+                            :is="currentAnnouncement.link_url ? 'a' : 'div'"
+                            :key="currentAnnouncement.id"
+                            :href="currentAnnouncement.link_url || undefined"
+                            class="absolute inset-0 flex min-w-0 items-center justify-center overflow-hidden"
                         >
-                            {{ currentAnnouncement.message }}
-                        </span>
-                    </p>
-                </component>
-
-                <div class="flex w-20 shrink-0 items-center justify-end gap-1">
-                    <button
-                        v-if="hasMultipleAnnouncements"
-                        type="button"
-                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
-                        @click="showNextAnnouncement"
-                    >
-                        <span class="sr-only">Next announcement</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-                            <path
-                                fill-rule="evenodd"
-                                d="M7.22 15.53a.75.75 0 0 1 0-1.06L11.69 10 7.22 5.53a.75.75 0 1 1 1.06-1.06l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 0 1-1.06 0Z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                    </button>
-
-                    <button
-                        type="button"
-                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/8 text-slate-100 transition hover:bg-white/14 hover:text-white focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:outline-hidden"
-                        @click="dismissAnnouncementBar"
-                    >
-                        <span class="sr-only">Dismiss announcement bar</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-                            <path
-                                d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
-                            />
-                        </svg>
-                    </button>
+                            <p ref="announcementTextWrap" class="max-w-full overflow-hidden" aria-live="polite">
+                                <span
+                                    class="announcement-message-track inline-flex whitespace-nowrap"
+                                    :class="[
+                                        announcementTextOverflows ? 'announcement-message-text--marquee' : ''
+                                    ]"
+                                    :style="{
+                                        '--announcement-marquee-distance': `${announcementMarqueeDistance}px`,
+                                        '--announcement-marquee-duration': `${announcementMarqueeDuration}s`
+                                    }"
+                                >
+                                    <span
+                                        ref="announcementText"
+                                        class="announcement-message-text text-label-xs tracking-label-tight inline-block font-semibold whitespace-nowrap text-slate-100 uppercase"
+                                        :class="currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : ''"
+                                    >
+                                        {{ currentAnnouncement.message }}
+                                    </span>
+                                    <span
+                                        v-if="announcementTextOverflows"
+                                        class="announcement-message-text text-label-xs tracking-label-tight ml-12 inline-block font-semibold whitespace-nowrap text-slate-100 uppercase"
+                                        :class="currentAnnouncement.link_url ? 'transition hover:text-white hover:underline' : ''"
+                                        aria-hidden="true"
+                                    >
+                                        {{ currentAnnouncement.message }}
+                                    </span>
+                                </span>
+                            </p>
+                        </component>
+                    </Transition>
                 </div>
             </div>
         </div>
@@ -653,11 +603,28 @@ function dismissAnnouncementBar(): void {
 }
 
 .announcement-message-text--marquee {
-    animation: announcement-message-swing var(--announcement-marquee-duration, 6s) ease-in-out infinite alternate;
+    animation: announcement-message-scroll var(--announcement-marquee-duration, 4s) linear infinite;
     will-change: transform;
 }
 
-@keyframes announcement-message-swing {
+.announcement-slide-enter-active,
+.announcement-slide-leave-active {
+    transition:
+        opacity 220ms ease,
+        transform 220ms ease;
+}
+
+.announcement-slide-enter-from {
+    opacity: 0;
+    transform: translateX(1.25rem);
+}
+
+.announcement-slide-leave-to {
+    opacity: 0;
+    transform: translateX(-1.25rem);
+}
+
+@keyframes announcement-message-scroll {
     from {
         transform: translateX(0);
     }
@@ -671,6 +638,11 @@ function dismissAnnouncementBar(): void {
     .announcement-message-text--marquee {
         animation: none;
         transform: translateX(0);
+    }
+
+    .announcement-slide-enter-active,
+    .announcement-slide-leave-active {
+        transition: none;
     }
 }
 </style>

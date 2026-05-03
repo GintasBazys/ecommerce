@@ -1,7 +1,7 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import type { CartDTO, CustomerDTO, RegionDTO } from '@medusajs/types'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { clearNuxtData } from '#app'
 
@@ -101,18 +101,6 @@ async function flushAsyncUpdates(): Promise<void> {
     await flushPromises()
 }
 
-function findButtonByText(wrapper: Awaited<ReturnType<typeof mountHeader>>, text: string) {
-    const label = wrapper.findAll('span.sr-only').find((element) => element.text() === text)
-    const buttonElement = label?.element.closest('button')
-    const button = wrapper.findAll('button').find((element) => element.element === buttonElement)
-
-    if (!button) {
-        throw new Error(`Button with text "${text}" was not found`)
-    }
-
-    return button
-}
-
 describe('BaseHeader', () => {
     beforeEach(() => {
         announcementResponse = {
@@ -161,7 +149,7 @@ describe('BaseHeader', () => {
         expect(wrapper.find('a[href="/signin"]').exists()).toBe(false)
     })
 
-    it('renders and dismisses announcement messages from the API', async () => {
+    it('renders announcement messages from the API without dismiss controls', async () => {
         announcementResponse = {
             announcement_messages: [
                 {
@@ -177,10 +165,48 @@ describe('BaseHeader', () => {
         const wrapper = await mountHeader()
 
         expect(wrapper.text()).toContain('Free delivery on orders over 50 EUR')
+        expect(wrapper.find('a[href="/special-offers"]').text()).toContain('Free delivery on orders over 50 EUR')
+        expect(wrapper.text()).not.toContain('Dismiss announcement bar')
+        expect(wrapper.text()).not.toContain('Previous announcement')
+        expect(wrapper.text()).not.toContain('Next announcement')
+    })
 
-        findButtonByText(wrapper, 'Dismiss announcement bar').element.click()
-        await flushAsyncUpdates()
+    it('automatically loops through multiple announcement messages', async () => {
+        vi.useFakeTimers()
 
-        expect(wrapper.text()).not.toContain('Free delivery on orders over 50 EUR')
+        announcementResponse = {
+            announcement_messages: [
+                {
+                    id: 'ann_1',
+                    message: 'Free delivery on orders over 50 EUR',
+                    is_active: true,
+                    sort_order: 1
+                },
+                {
+                    id: 'ann_2',
+                    message: 'Members save more this week',
+                    is_active: true,
+                    sort_order: 2
+                }
+            ]
+        }
+
+        try {
+            const wrapper = await mountHeader()
+
+            expect(wrapper.text()).toContain('Free delivery on orders over 50 EUR')
+
+            vi.advanceTimersByTime(5000)
+            await flushAsyncUpdates()
+
+            expect(wrapper.text()).toContain('Members save more this week')
+
+            vi.advanceTimersByTime(5000)
+            await flushAsyncUpdates()
+
+            expect(wrapper.text()).toContain('Free delivery on orders over 50 EUR')
+        } finally {
+            vi.useRealTimers()
+        }
     })
 })

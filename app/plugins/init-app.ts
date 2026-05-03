@@ -8,7 +8,6 @@ type NavigationCategory = {
 }
 
 const NON_AUTH_COOKIE_KEYS = new Set([
-    "announcement_bar_dismissed",
     "cart_id",
     "cookie_consent",
     "country_code",
