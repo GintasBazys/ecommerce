@@ -92,7 +92,7 @@ export default defineNuxtConfig({
             ]
         },
         optimizeDeps: {
-            include: ["@stripe/stripe-js", "posthog-js"]
+            include: ["@stripe/stripe-js"]
         }
     },
 
@@ -103,5 +103,5 @@ export default defineNuxtConfig({
 
     sourcemap: {
         client: "hidden"
-    },
+    }
 })

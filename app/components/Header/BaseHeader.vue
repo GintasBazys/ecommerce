@@ -304,7 +304,6 @@ function observeAnnouncementTextElements(): void {
         announcementResizeObserver.observe(announcementText.value)
     }
 }
-
 </script>
 
 <template>
@@ -325,9 +324,7 @@ function observeAnnouncementTextElements(): void {
                             <p ref="announcementTextWrap" class="max-w-full overflow-hidden" aria-live="polite">
                                 <span
                                     class="announcement-message-track inline-flex whitespace-nowrap"
-                                    :class="[
-                                        announcementTextOverflows ? 'announcement-message-text--marquee' : ''
-                                    ]"
+                                    :class="[announcementTextOverflows ? 'announcement-message-text--marquee' : '']"
                                     :style="{
                                         '--announcement-marquee-distance': `${announcementMarqueeDistance}px`,
                                         '--announcement-marquee-duration': `${announcementMarqueeDuration}s`
@@ -362,14 +359,7 @@ function observeAnnouncementTextElements(): void {
         >
             <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
                 <NuxtLink to="/" class="inline-flex shrink-0 items-center">
-                    <img
-                        :src="'/images/logo.svg'"
-                        alt="Medusa Commerce"
-                        width="640"
-                        height="144"
-                        fetchpriority="high"
-                        class="block h-8 w-auto sm:h-9"
-                    />
+                    <img :src="'/images/logo.svg'" alt="Medusa Commerce" width="640" height="144" class="block h-8 w-auto sm:h-9" />
                 </NuxtLink>
 
                 <nav class="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
@@ -430,7 +420,10 @@ function observeAnnouncementTextElements(): void {
                                     </NuxtLink>
                                 </div>
 
-                                <div class="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto pr-1 lg:grid-cols-3 xl:grid-cols-4" aria-label="Product categories">
+                                <div
+                                    class="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto pr-1 lg:grid-cols-3 xl:grid-cols-4"
+                                    aria-label="Product categories"
+                                >
                                     <NuxtLink
                                         v-for="(cat, index) in categories"
                                         :key="cat.id"
@@ -438,7 +431,9 @@ function observeAnnouncementTextElements(): void {
                                         :to="`/category/${cat.handle}`"
                                         @click="closeCatalogMenu"
                                     >
-                                        <span class="relative flex aspect-4/3 items-end overflow-hidden rounded-2xl bg-linear-to-br from-slate-100 via-amber-50 to-slate-200 p-3">
+                                        <span
+                                            class="relative flex aspect-4/3 items-end overflow-hidden rounded-2xl bg-linear-to-br from-slate-100 via-amber-50 to-slate-200 p-3"
+                                        >
                                             <NuxtImage
                                                 v-if="cat.imageUrl"
                                                 :src="cat.imageUrl"
@@ -448,7 +443,9 @@ function observeAnnouncementTextElements(): void {
                                                 loading="lazy"
                                                 class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                                             />
-                                            <span class="absolute inset-0 bg-linear-to-t from-slate-950/28 via-transparent to-white/8"></span>
+                                            <span
+                                                class="absolute inset-0 bg-linear-to-t from-slate-950/28 via-transparent to-white/8"
+                                            ></span>
                                             <span
                                                 class="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-sm font-bold text-amber-900 shadow-lg"
                                                 aria-hidden="true"
@@ -459,7 +456,9 @@ function observeAnnouncementTextElements(): void {
                                         <span class="mt-3 block truncate text-base font-semibold tracking-tight text-slate-950">
                                             {{ cat.name }}
                                         </span>
-                                        <span class="mt-1 block text-xs font-semibold tracking-widest text-slate-500 uppercase group-hover:text-amber-900">
+                                        <span
+                                            class="mt-1 block text-xs font-semibold tracking-widest text-slate-500 uppercase group-hover:text-amber-900"
+                                        >
                                             Open category
                                         </span>
                                     </NuxtLink>

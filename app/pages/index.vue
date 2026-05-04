@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AboutCta from "@/components/About/AboutCta.vue"
 import MainBanner from "@/components/Banner/MainBanner.vue"
+import RenderOnVisible from "@/components/Shared/RenderOnVisible.vue"
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
@@ -40,8 +41,14 @@ useStructuredData(
     <section>
         <MainBanner />
         <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
-        <DeferredLatestProducts />
-        <DeferredBestSellers />
-        <DeferredLatestPosts />
+        <RenderOnVisible contain-intrinsic-size="1px 620px">
+            <DeferredLatestProducts />
+        </RenderOnVisible>
+        <RenderOnVisible contain-intrinsic-size="1px 620px">
+            <DeferredBestSellers />
+        </RenderOnVisible>
+        <RenderOnVisible contain-intrinsic-size="1px 560px">
+            <DeferredLatestPosts />
+        </RenderOnVisible>
     </section>
 </template>

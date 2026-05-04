@@ -13,15 +13,18 @@ export default defineNuxtPlugin(() => {
         const requestIdleCallback = window.requestIdleCallback
 
         if (typeof requestIdleCallback === "function") {
-            requestIdleCallback(() => {
-                void initPostHogClient(runtimeConfig.public.posthog, router)
-            })
+            requestIdleCallback(
+                () => {
+                    void initPostHogClient(runtimeConfig.public.posthog, router)
+                },
+                { timeout: 5000 }
+            )
             return
         }
 
         globalThis.setTimeout(() => {
             void initPostHogClient(runtimeConfig.public.posthog, router)
-        }, 1)
+        }, 3500)
     }
 
     if (analyticsAllowed.value) {
