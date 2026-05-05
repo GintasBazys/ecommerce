@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import type { OrdersResponse } from "@/types/interfaces"
-import type { OrderDTO } from "@medusajs/types"
+import type { OrdersListItem } from "~/types/orders"
 
 import { formatFulfillmentStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
-
-type OrdersListItem = OrderDTO & {
-    fulfillment_status?: string | null
-}
 
 definePageMeta({
     layout: "account",
@@ -73,8 +69,8 @@ watch(page, async (currentPage, previousPage) => {
 })
 
 const orders = computed<OrdersListItem[]>(() => (ordersData.value?.orders || []) as OrdersListItem[])
-const totalOrders = computed(() => ordersData.value?.total || 0)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalOrders.value / perPage.value)))
+const totalOrders = computed<number>(() => ordersData.value?.total || 0)
+const totalPages = computed<number>(() => Math.max(1, Math.ceil(totalOrders.value / perPage.value)))
 
 function changePage(nextPage: number): void {
     if (nextPage < 1 || nextPage > totalPages.value || nextPage === page.value) {

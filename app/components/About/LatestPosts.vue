@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BlogPostsResponse } from "~/types/blog"
+import type { BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 
 import BlogCard from "~/components/Blog/BlogCard.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
@@ -13,7 +13,7 @@ const { data: latestPostsData, error: latestPostsError } = await useAsyncData("l
     })
 )
 
-const latestPosts = computed(() => latestPostsData.value?.posts || [])
+const latestPosts = computed<BlogPostSummary[]>(() => latestPostsData.value?.posts || [])
 </script>
 
 <template>

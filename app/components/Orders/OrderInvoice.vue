@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import type { OrderDTO } from "@medusajs/types"
+import type { InvoiceOrderDTO } from "~/types/orders"
 
 import { formatFulfillmentStatus, formatPaymentStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
-
-type InvoiceOrderDTO = OrderDTO & {
-    payment_status?: string | null
-    fulfillment_status?: string | null
-}
 
 const route = useRoute()
 const orderId = route.params.id
@@ -30,7 +25,6 @@ const {
 
 const order = computed<InvoiceOrderDTO | undefined>(() => orderRes.value?.order)
 const invoiceDownloadUrl = computed<string>(() => `/api/orders/${orderId}/invoice`)
-
 </script>
 
 <template>

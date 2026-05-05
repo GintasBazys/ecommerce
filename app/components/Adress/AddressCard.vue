@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { CustomerDTO } from "@medusajs/types"
-
-type CustomerAddress = CustomerDTO["addresses"][number]
+import type { CustomerAddress } from "~/types/checkout"
 
 const props = defineProps<{ address: CustomerAddress }>()
 const emit = defineEmits<{

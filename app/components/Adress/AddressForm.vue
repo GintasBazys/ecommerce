@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CustomerAddressDTO } from "@medusajs/types"
+import type { AddressErrors, RequiredAddressField } from "~/types/checkout"
 
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
@@ -16,9 +17,6 @@ const props = defineProps<{
 const emit = defineEmits<{
     (_: "save", __: CustomerAddressDTO): void
 }>()
-
-type RequiredAddressField = "first_name" | "last_name" | "address_1" | "city" | "province" | "postal_code" | "country_code" | "phone"
-type AddressErrors = Record<RequiredAddressField, string>
 
 const requiredFields: RequiredAddressField[] = [
     "first_name",
@@ -100,7 +98,7 @@ watch(model, (isOpen) => {
     clearErrors()
 })
 
-const countryOptions = computed(() => [
+const countryOptions = computed<{ title: string; value: string; disabled?: boolean }[]>(() => [
     { title: "Select a country", value: "", disabled: true },
     ...regionCountries.value
         .filter((country) => Boolean(country.iso_2))

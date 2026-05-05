@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 
-type OptionValue = string | number
-
-type SelectOption = {
-    value?: OptionValue
-    label?: string
-    text?: string
-    title?: string
-    disabled?: boolean
-}
+import type { NormalizedSelectOption, OptionValue, SelectOption } from "~/types/forms"
 
 defineOptions({
     inheritAttrs: false
@@ -32,7 +24,7 @@ const emit = defineEmits<{
     "update:modelValue": [value: OptionValue]
 }>()
 
-const normalizedOptions = computed(() =>
+const normalizedOptions = computed<NormalizedSelectOption[]>(() =>
     props.options.map((option, index) => ({
         key: `${String(option[props.optionValueKey] ?? index)}-${index}`,
         value: option[props.optionValueKey] ?? "",

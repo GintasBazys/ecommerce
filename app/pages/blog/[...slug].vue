@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SchemaNode } from "~/composables/useStructuredData"
-import type { BlogPost, BlogPostResponse, BlogPostsResponse } from "~/types/blog"
+import type { BlogPost, BlogPostResponse, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import BlogCard from "~/components/Blog/BlogCard.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
@@ -67,7 +68,7 @@ const { data: relatedPostsData } = await useAsyncData(`related-${slug.value}`, a
     return combinedPosts.slice(0, 3)
 })
 
-const relatedPosts = computed(() => relatedPostsData.value || [])
+const relatedPosts = computed<BlogPostSummary[]>(() => relatedPostsData.value || [])
 
 useHead(() => ({
     title: `${currentPost.value?.title ?? "Shop"} | Medusa Commerce`,
@@ -80,7 +81,7 @@ useHead(() => ({
 }))
 
 const articleUrl = computed<string>(() => absoluteUrl(route.path))
-const breadcrumbItems = computed(() => [
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
     { label: "Home", to: "/" },
     { label: "Blog", to: "/blog" },
     { label: currentPost.value?.title || "Article" }

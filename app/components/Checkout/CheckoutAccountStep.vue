@@ -1,23 +1,6 @@
 <script setup lang="ts">
-type LoginErrors = {
-    email: string
-    password: string
-    verification: string
-}
-
-type RegisterErrors = {
-    first_name: string
-    last_name: string
-    email: string
-    password: string
-    verification: string
-}
-
-type GuestErrors = {
-    email: string
-}
-
-type AuthTab = "login" | "register" | "guest"
+import type { AuthTab, GuestErrors, LoginErrors, RegisterErrors } from "~/types/checkout"
+import type { TurnstileWidgetInstance } from "~/types/forms"
 
 const props = defineProps<{
     currentStep: string
@@ -62,10 +45,6 @@ const emit = defineEmits<{
     "social-login": [provider: "google" | "facebook"]
     "change-identity": []
 }>()
-
-type TurnstileWidgetInstance = {
-    execute: () => Promise<string>
-}
 
 const loginTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 const registerTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)

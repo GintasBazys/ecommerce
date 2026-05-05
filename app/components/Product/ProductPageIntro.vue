@@ -1,17 +1,9 @@
 <script setup lang="ts">
 import type { ProductVariantDTO } from "@medusajs/types"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { ProductTag } from "~/types/product"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
-
-type BreadcrumbItem = {
-    label: string
-    to?: string
-}
-
-type ProductTag = {
-    id?: string | null
-    value?: string | null
-}
 
 defineProps<{
     breadcrumbItems: BreadcrumbItem[]

@@ -1,25 +1,14 @@
 <script setup lang="ts">
 import type { SchemaNode } from "~/composables/useStructuredData"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { FaqSection } from "~/types/content-pages"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-type FaqItem = {
-    question: string
-    answer: string
-}
-
-type FaqSection = {
-    id: string
-    eyebrow: string
-    title: string
-    description: string
-    items: FaqItem[]
-}
-
 const route = useRoute()
 const { absoluteUrl } = useSiteIdentity()
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "FAQ" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "FAQ" }])
 
 const faqSections: FaqSection[] = [
     {

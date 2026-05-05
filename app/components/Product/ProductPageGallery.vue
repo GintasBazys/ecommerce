@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import type { ProductGalleryImage } from "~/types/product"
 
-type GalleryImage = {
-    id: string
-    src: string
-}
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 const props = defineProps<{
     productTitle: string
-    productImages: GalleryImage[]
-    activeImage: GalleryImage | null
+    productImages: ProductGalleryImage[]
+    activeImage: ProductGalleryImage | null
     activeImageIndex: number
     isOnSale: boolean
 }>()

@@ -3,16 +3,9 @@ import { jwtDecode } from "jwt-decode"
 
 import type { CustomJwtPayload } from "@/types/interfaces"
 import type { CustomerDTO } from "@medusajs/types"
+import type { IdentityResponse, SocialProvider, SocialStage } from "~/types/auth"
 
 import { SOCIAL_AUTH_REDIRECT_KEY, SOCIAL_AUTH_PROVIDER_KEY } from "~/composables/useCustomerAuth"
-
-type SocialProvider = "google" | "facebook"
-type SocialStage = "authenticating" | "error" | "success"
-type IdentityResponse = {
-    authIdentity?: {
-        user_metadata?: Record<string, unknown>
-    }
-}
 
 const config = useRuntimeConfig()
 const router = useRouter()

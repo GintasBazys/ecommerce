@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { OrderDTO } from "@medusajs/types"
+import type { OrderAddress, OrderSupportFact } from "~/types/orders"
 
 import { formatPaymentStatus, formatStorefrontOrderStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
@@ -10,8 +11,6 @@ import { DEFAULT_CURENCY } from "~/utils/consts"
 definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Order Completed | Medusa Commerce" })
-
-type OrderAddress = OrderDTO["shipping_address"] | OrderDTO["billing_address"]
 
 const route = useRoute()
 const orderId = route.query.orderId
@@ -36,10 +35,10 @@ const order = computed<OrderDTO | null>(() => orderRes.value?.order ?? null)
 const currencyCode = computed<string>(() => order.value?.currency_code ?? DEFAULT_CURENCY)
 const invoiceDownloadUrl = computed<string>(() => (order.value?.id ? `/api/orders/${order.value.id}/invoice` : ""))
 const orderDate = computed<string>(() => formatDate(order.value?.created_at))
-const shippingMethod = computed(() => order.value?.shipping_methods?.[0] ?? null)
-const orderItems = computed(() => order.value?.items ?? [])
-const orderEmail = computed(() => order.value?.email || customerEmail.value || "your email")
-const supportFacts = computed(() => [
+const shippingMethod = computed<NonNullable<OrderDTO["shipping_methods"]>[number] | null>(() => order.value?.shipping_methods?.[0] ?? null)
+const orderItems = computed<NonNullable<OrderDTO["items"]>>(() => order.value?.items ?? [])
+const orderEmail = computed<string>(() => order.value?.email || customerEmail.value || "your email")
+const supportFacts = computed<OrderSupportFact[]>(() => [
     {
         label: "Order status",
         value: formatStorefrontOrderStatus(order.value)

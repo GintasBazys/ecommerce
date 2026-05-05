@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 
 defineProps<{
     requestedPath: string
 }>()
 
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "404" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "404" }])
 
 const quickLinks = [
     {

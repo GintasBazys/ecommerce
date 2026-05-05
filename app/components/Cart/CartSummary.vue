@@ -1,11 +1,5 @@
 <script setup lang="ts">
-type PromotionSummary = {
-    id: string
-    code?: string | null
-    application_method?: {
-        value?: number | string | null
-    } | null
-}
+import type { PromotionSummary } from "~/types/checkout"
 
 const props = defineProps<{
     itemCount: number

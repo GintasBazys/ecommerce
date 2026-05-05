@@ -1,24 +1,11 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { PolicyBlock, ShippingFaqItem, ShippingOption } from "~/types/content-pages"
+
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-type ShippingOption = {
-    title: string
-    detail: string
-}
-
-type PolicyBlock = {
-    eyebrow: string
-    title: string
-    text: string
-}
-
-type ShippingFaqItem = {
-    question: string
-    answer: string
-}
-
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Payment & Shipping" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Payment & Shipping" }])
 
 const shippingOptions: ShippingOption[] = [
     {

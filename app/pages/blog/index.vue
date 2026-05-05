@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogCategoriesResponse, BlogCategory, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import BlogCard from "~/components/Blog/BlogCard.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
@@ -66,7 +67,7 @@ const activeCategory = computed<BlogCategory | null>(() => {
 
     return categories.value.find((category) => category.slug === currentCategory.value) || null
 })
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Blog" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Blog" }])
 const pageTitle = computed<string>(() =>
     activeCategory.value ? `${activeCategory.value.name} Blog | Medusa Commerce` : "Blog | Medusa Commerce"
 )

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ProductCategoryDTO } from "@medusajs/types"
 import type { SchemaNode } from "~/composables/useStructuredData"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { CategoryImage } from "~/types/category-listing"
 
 import CategoryFiltersPanel from "~/components/Category/CategoryFiltersPanel.vue"
@@ -79,8 +80,8 @@ const categoryThumbnail = computed<string | null>(() => {
     return images.find((image) => image.type === "thumbnail")?.url || images.find((image) => image.url)?.url || null
 })
 
-const heroFallbackImage = computed(() => (isAllProductsPage.value ? "/images/hero-premium.jpg" : "/images/hero-main.jpg"))
-const heroImage = computed(() => categoryThumbnail.value || heroFallbackImage.value)
+const heroFallbackImage = computed<string>(() => (isAllProductsPage.value ? "/images/hero-premium.jpg" : "/images/hero-main.jpg"))
+const heroImage = computed<string>(() => categoryThumbnail.value || heroFallbackImage.value)
 const categoryPath = computed<string>(() =>
     isAllProductsPage.value ? ALL_PRODUCTS_URL_HANDLE : `${CATEGORY_HANDLE}/${String(route.params.slug || "")}`
 )
@@ -113,7 +114,7 @@ const metaDescription = computed<string>(() => {
 
     return `${baseDescription} Page ${currentPage.value} of ${totalPages.value}.`
 })
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: pageHeading.value }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: pageHeading.value }])
 
 const collectionSchema = computed<SchemaNode | null>(() => {
     if (notFoundPath.value || !pageHeading.value) {

@@ -40,7 +40,7 @@ const checkoutCart = computed<CheckoutCart | null>(() => cart.value ?? null)
 const turnstileSiteKey = computed<string>(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const checkoutEmail = computed<string>(() => checkoutCart.value?.email ?? "")
 const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ?? DEFAULT_CURENCY)
-const lineItems = computed(() => checkoutCart.value?.items ?? [])
+const lineItems = computed<CartLineItemDTO[]>(() => checkoutCart.value?.items ?? [])
 const itemCount = computed<number>(() => lineItems.value.reduce((sum, item) => sum + Number(item.quantity), 0))
 const hasAuthenticatedIdentity = computed<boolean>(() => isAuthenticated.value)
 const addressCompleted = computed<boolean>(() => {

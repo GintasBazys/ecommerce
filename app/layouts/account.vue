@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { AccountHighlight, AccountPageContent } from "~/types/content-pages"
+
 const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
@@ -11,7 +14,7 @@ const accountNav = [
     { label: "Orders", to: "/account/orders", icon: "orders" }
 ] as const
 
-const pageContent = computed(() => {
+const pageContent = computed<AccountPageContent>(() => {
     if (route.path === "/account") {
         return {
             eyebrow: "Account dashboard",
@@ -52,8 +55,8 @@ const pageContent = computed(() => {
     }
 })
 
-const breadcrumbItems = computed(() => {
-    const items = [{ label: "Account", to: "/account" }]
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+    const items: BreadcrumbItem[] = [{ label: "Account", to: "/account" }]
 
     if (route.path === "/account") {
         return items
@@ -79,7 +82,7 @@ const breadcrumbItems = computed(() => {
     return items
 })
 
-const accountStatus = computed(() => [
+const accountStatus = computed<AccountHighlight[]>(() => [
     {
         label: "Signed in",
         value: customerEmail.value || "Account member"
@@ -90,7 +93,7 @@ const accountStatus = computed(() => [
     }
 ])
 
-const customerLabel = computed(() => customerFullName.value)
+const customerLabel = computed<string>(() => customerFullName.value)
 
 function isActivePath(path: string): boolean {
     if (path === "/account") {

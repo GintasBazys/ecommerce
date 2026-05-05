@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AccountHighlight } from "~/types/content-pages"
+
 definePageMeta({
     layout: "account",
     middleware: ["auth"]
@@ -32,7 +34,7 @@ const accountLinks = [
     }
 ] as const
 
-const accountHighlights = computed(() => [
+const accountHighlights = computed<AccountHighlight[]>(() => [
     {
         label: "Signed in as",
         value: customerEmail.value || "Account member"

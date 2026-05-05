@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import type { APIError, Customer } from "@/types/interfaces"
 import type { OrderDTO } from "@medusajs/types"
+import type { ProfileOrdersResponse } from "~/types/orders"
 
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
-
-type ProfileOrdersResponse = {
-    orders: OrderDTO[]
-    total: number
-}
 
 definePageMeta({
     layout: "account",

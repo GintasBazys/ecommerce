@@ -1,27 +1,15 @@
 <script setup lang="ts">
+import type { ContactFormErrors, ContactFormState } from "~/types/contact"
+
 import { usePostHog } from "~/composables/usePostHog"
-
-type ContactFormState = {
-    subject: string
-    email: string
-    phone: string
-    orderNumber: string
-    message: string
-}
-
-type ContactFormErrors = {
-    subject: string
-    email: string
-    message: string
-}
 
 const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ea50e93bb59d60512a0ab63ded1f9169"
 
 const posthog = usePostHog()
 const runtimeConfig = useRuntimeConfig()
 const route = useRoute()
-const siteUrl = computed(() => String(runtimeConfig.public.SITE_URL || "").replace(/\/$/, ""))
-const nextUrl = computed(() => {
+const siteUrl = computed<string>(() => String(runtimeConfig.public.SITE_URL || "").replace(/\/$/, ""))
+const nextUrl = computed<string>(() => {
     if (siteUrl.value) {
         return `${siteUrl.value}/contact?submitted=true`
     }
@@ -34,7 +22,7 @@ const nextUrl = computed(() => {
 })
 
 const errorMessage = ref<string | null>(null)
-const successMessage = computed(() => (route.query.submitted === "true" ? "Message sent successfully." : null))
+const successMessage = computed<string | null>(() => (route.query.submitted === "true" ? "Message sent successfully." : null))
 
 const form = reactive<ContactFormState>({
     subject: "",

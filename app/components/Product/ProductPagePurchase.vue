@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { ProductVariantDTO } from "@medusajs/types"
-
-type ProductFact = {
-    label: string
-    value: string
-}
+import type { ProductFact } from "~/types/product"
 
 defineProps<{
     variants: ProductVariantDTO[]

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CartLineItemDTO } from "@medusajs/types"
+import type { PricedCartLineItem } from "~/types/checkout"
 
 import CartHero from "~/components/Cart/CartHero.vue"
 import CartLineItem from "~/components/Cart/CartLineItem.vue"
@@ -11,13 +12,6 @@ import { formatPrice } from "~/utils/formatPrice"
 definePageMeta({ layout: "checkout" })
 
 useHead({ title: "Cart | Medusa Commerce" })
-
-type PricedCartLineItem = CartLineItemDTO & {
-    subtotal?: number | null
-    total?: number | null
-    tax_total?: number | null
-    unit_price?: number | null
-}
 
 const cartStore = useCartStore()
 const { cart, recoveryMessage } = storeToRefs(cartStore)

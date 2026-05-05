@@ -2,24 +2,12 @@
 import type { Review, ReviewApiResponse } from "@/types/interfaces"
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 import type { SchemaNode } from "~/composables/useStructuredData"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { ProductCategorySummary, ProductFact, ProductGalleryImage, ProductListResponse, ProductTag } from "~/types/product"
 
 import { usePostHog } from "~/composables/usePostHog"
 import { useProductPrice } from "~/composables/useProductPrice"
 import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
-
-interface ProductListResponse {
-    products?: ProductDTO[]
-}
-
-interface ProductCategory {
-    id: string
-    name?: string | null
-}
-
-interface GalleryImage {
-    id: string
-    src: string
-}
 
 const route = useRoute()
 const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
@@ -44,7 +32,7 @@ if (!product.value) {
     await navigateTo({ path: "/" })
 }
 
-const primaryCategory = computed<ProductCategory | null>(() => {
+const primaryCategory = computed<ProductCategorySummary | null>(() => {
     const category = product.value?.categories?.[0]
 
     if (!category?.id) {
@@ -110,9 +98,9 @@ const productPath = computed<string>(() => {
 })
 
 const productUrl = computed<string>(() => absoluteUrl(productPath.value))
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: product.value?.title || "Product" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: product.value?.title || "Product" }])
 
-const productImages = computed<GalleryImage[]>(() => {
+const productImages = computed<ProductGalleryImage[]>(() => {
     const fallbackImage = product.value?.thumbnail || "/images/placeholder.png"
     const gallery = (product.value?.images ?? [])
         .map((image, index) => {
@@ -127,7 +115,7 @@ const productImages = computed<GalleryImage[]>(() => {
                 src
             }
         })
-        .filter((image): image is GalleryImage => Boolean(image))
+        .filter((image): image is ProductGalleryImage => Boolean(image))
 
     if (!gallery.length) {
         return [{ id: `${product.value?.id || "product"}-fallback`, src: fallbackImage }]
@@ -140,14 +128,14 @@ const productImages = computed<GalleryImage[]>(() => {
     return gallery
 })
 
-const productTags = computed(() => product.value?.tags ?? [])
+const productTags = computed<ProductTag[]>(() => product.value?.tags ?? [])
 const productMetadata = computed<Record<string, unknown>>(() => {
     const metadata = product.value?.metadata
 
     return metadata && typeof metadata === "object" ? (metadata as Record<string, unknown>) : {}
 })
 
-const activeImage = computed(() => {
+const activeImage = computed<ProductGalleryImage | null>(() => {
     if (!productImages.value.length) {
         return null
     }
@@ -274,7 +262,7 @@ const breadcrumbSchema = computed<SchemaNode | null>(() => {
     )
 })
 
-const productFacts = computed(() => [
+const productFacts = computed<ProductFact[]>(() => [
     {
         label: "Availability",
         value: inStock.value ? "In stock" : "Out of stock"

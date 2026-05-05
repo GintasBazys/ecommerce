@@ -1,13 +1,13 @@
 import type { ProductVariantDTO } from "@medusajs/types"
 
 export function useProductPrice(selectedVariant: Ref<ProductVariantDTO | null>) {
-    const amountWithTax = computed(() => selectedVariant.value?.calculated_price?.calculated_amount_with_tax ?? null)
+    const amountWithTax = computed<number | null>(() => selectedVariant.value?.calculated_price?.calculated_amount_with_tax ?? null)
 
-    const amountWithoutTax = computed(() => selectedVariant.value?.calculated_price?.calculated_amount_without_tax ?? null)
+    const amountWithoutTax = computed<number | null>(() => selectedVariant.value?.calculated_price?.calculated_amount_without_tax ?? null)
 
-    const calculatedAmount = computed(() => selectedVariant.value?.calculated_price?.calculated_amount ?? null)
+    const calculatedAmount = computed<number | null>(() => selectedVariant.value?.calculated_price?.calculated_amount ?? null)
 
-    const amountToShow = computed(() => {
+    const amountToShow = computed<number | null>(() => {
         const price = selectedVariant.value?.calculated_price
         if (!price) return null
 
@@ -18,9 +18,9 @@ export function useProductPrice(selectedVariant: Ref<ProductVariantDTO | null>) 
         return amountWithTax.value ?? calculatedAmount.value
     })
 
-    const displayPrice = computed(() => (amountToShow.value != null ? formatPrice(amountToShow.value, "EUR") : ""))
+    const displayPrice = computed<string>(() => (amountToShow.value != null ? formatPrice(amountToShow.value, "EUR") : ""))
 
-    const taxLabel = computed(() => {
+    const taxLabel = computed<string>(() => {
         if (amountWithTax.value != null && amountWithoutTax.value != null) {
             const tax = amountWithTax.value - amountWithoutTax.value
 
@@ -36,7 +36,7 @@ export function useProductPrice(selectedVariant: Ref<ProductVariantDTO | null>) 
 
     return {
         displayPrice,
-        originalPrice: computed(() => ""),
+        originalPrice: computed<string>(() => ""),
         taxLabel
     }
 }

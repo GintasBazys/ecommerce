@@ -31,7 +31,7 @@ const selectedVariant = computed<ProductVariantDTO | null>(
 )
 
 const { displayPrice, taxLabel } = useProductPrice(selectedVariant)
-const hasTax = computed(() => props.amountWithTax > props.amountWithoutTax)
+const hasTax = computed<boolean>(() => props.amountWithTax > props.amountWithoutTax)
 </script>
 
 <template>

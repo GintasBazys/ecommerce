@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TurnstileWidgetInstance } from "~/types/forms"
+
 import { usePostHog } from "~/composables/usePostHog"
 
 useHead({ title: "Signin | Medusa Commerce" })
@@ -21,10 +23,6 @@ const loginIsSubmitting = ref<boolean>(false)
 const hasAttemptedLogin = ref<boolean>(false)
 const showLoginVerification = ref<boolean>(false)
 
-type TurnstileWidgetInstance = {
-    execute: () => Promise<string>
-}
-
 const loginTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 
 const resetEmail = ref<string>("")
@@ -32,7 +30,7 @@ const resetEmail = ref<string>("")
 const auth = useCustomerAuth()
 const posthog = usePostHog()
 const { showSnackbar } = useSnackbar()
-const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
+const turnstileSiteKey = computed<string>(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const INVALID_CREDENTIALS_MESSAGE = "Email or password is incorrect. Please check your details and try again."
 
 function isValidEmail(value: string): boolean {

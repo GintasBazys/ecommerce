@@ -14,8 +14,8 @@ useHead({ title: "Addresses | Medusa Commerce" })
 const LIMIT = 3
 const page = ref<number>(1)
 const limit = ref<number>(LIMIT)
-const offset = computed(() => (page.value - 1) * limit.value)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / limit.value)))
+const offset = computed<number>(() => (page.value - 1) * limit.value)
+const totalPages = computed<number>(() => Math.max(1, Math.ceil(totalCount.value / limit.value)))
 const skeletonCards = Array.from({ length: LIMIT }, (_, index) => index)
 
 const loading = ref<boolean>(false)

@@ -1,4 +1,4 @@
-import type { CartDTO, CartLineItemDTO } from "@medusajs/types"
+import type { CartDTO, CartLineItemDTO, CustomerDTO } from "@medusajs/types"
 
 export type CheckoutStep = "account" | "address" | "payment"
 export type EditableAddressField =
@@ -11,6 +11,15 @@ export type EditableAddressField =
     | "postal_code"
     | "country_code"
     | "phone"
+
+export type RequiredAddressField = Exclude<EditableAddressField, "address_2">
+
+export type CountryOption = {
+    iso_2: string
+    display_name?: string
+}
+
+export type CustomerAddress = CustomerDTO["addresses"][number]
 
 export type CheckoutCartShippingMethod = {
     shipping_option_id?: string | null
@@ -26,6 +35,14 @@ export type PricedCartLineItem = CartLineItemDTO & {
     total?: number | null
     tax_total?: number | null
     unit_price?: number | null
+}
+
+export type PromotionSummary = {
+    id: string
+    code?: string | null
+    application_method?: {
+        value?: number | string | null
+    } | null
 }
 
 export type LoginErrors = {
@@ -45,6 +62,8 @@ export type RegisterErrors = {
 export type GuestErrors = {
     email: string
 }
+
+export type AuthTab = "login" | "register" | "guest"
 
 export type AddressErrors = {
     first_name: string

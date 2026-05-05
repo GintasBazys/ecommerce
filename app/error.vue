@@ -2,15 +2,17 @@
 import { type NuxtError, clearError } from "nuxt/app"
 import { computed } from "vue"
 
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 
 const props = defineProps<{
     error: NuxtError
 }>()
 
-const statusCode = computed(() => props.error?.status || 500)
-const message = computed(() => props.error?.statusText || "Internal error")
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Error" }])
+const statusCode = computed<number>(() => props.error?.status || 500)
+const message = computed<string>(() => props.error?.statusText || "Internal error")
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Error" }])
 const quickLinks = [
     {
         title: "Back to homepage",

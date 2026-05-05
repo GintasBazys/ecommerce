@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { PendingTurnstileExecution } from "~/types/forms"
+
 const props = defineProps<{
     siteKey: string
     action: string
@@ -20,15 +22,10 @@ const isWidgetReady = ref<boolean>(false)
 const isWidgetVisible = ref<boolean>(false)
 const TURNSTILE_SCRIPT_ID = "turnstile-api-script"
 
-type PendingExecution = {
-    resolve: (_token: string) => void
-    reject: (_error: Error) => void
-}
+const pendingExecution = ref<PendingTurnstileExecution | null>(null)
 
-const pendingExecution = ref<PendingExecution | null>(null)
-
-const widgetAppearance = computed(() => props.appearance || "always")
-const widgetExecution = computed(() => props.execution || "render")
+const widgetAppearance = computed<"always" | "execute" | "interaction-only">(() => props.appearance || "always")
+const widgetExecution = computed<"render" | "execute">(() => props.execution || "render")
 
 function revealWidgetAfterPaint(): void {
     if (!import.meta.client) {

@@ -4,7 +4,7 @@ import NotFoundPageContent from "~/components/Shared/NotFoundPageContent.vue"
 const route = useRoute()
 const event = useRequestEvent()
 
-const requestedPath = computed(() => {
+const requestedPath = computed<string>(() => {
     const source = route.query.from
     return typeof source === "string" && source.trim() ? source : route.path
 })

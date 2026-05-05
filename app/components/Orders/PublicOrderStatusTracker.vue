@@ -1,15 +1,9 @@
 <script setup lang="ts">
 import type { PublicOrderStatus } from "@/types/order-status"
+import type { TrackingStep } from "~/types/orders"
 
 import { formatFulfillmentStatus, formatPaymentStatus, formatStorefrontOrderStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
-
-type TrackingStep = {
-    key: string
-    label: string
-    description: string
-    icon: "receipt" | "card" | "box" | "truck" | "home"
-}
 
 const props = defineProps<{
     order: PublicOrderStatus

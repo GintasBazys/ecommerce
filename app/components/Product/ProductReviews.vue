@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Review } from "@/types/interfaces"
+import type { SafeProductReview } from "~/types/product"
 
 import { formatDate } from "@/utils/formatDate"
 
@@ -9,16 +10,7 @@ const props = defineProps<{
     reviewCount?: number | null
 }>()
 
-type SafeReview = {
-    id: string
-    rating: number
-    title: string
-    author: string
-    content: string
-    createdAt: string
-}
-
-const safeReviews = computed<SafeReview[]>(() =>
+const safeReviews = computed<SafeProductReview[]>(() =>
     (Array.isArray(props.reviews) ? props.reviews : []).map((review, index) => {
         const rating = Number(review?.rating || 0)
         const firstName = typeof review?.first_name === "string" ? review.first_name.trim() : ""

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
-const token = computed(() => String(route.query.token || "").trim())
-const email = computed(() => String(route.query.email || "").trim())
+const token = computed<string>(() => String(route.query.token || "").trim())
+const email = computed<string>(() => String(route.query.email || "").trim())
 const password = ref<string>("")
 const passwordError = ref<string>("")
 const errorMessage = ref<string>("")

@@ -1,30 +1,11 @@
 <script setup lang="ts">
-type FacetItem = {
-    id: string
-    label: string
-    count: number
-}
-
-type PriceRange = [number, number]
-
-type CategoryProductsFacets = {
-    categories: FacetItem[]
-    collections: FacetItem[]
-    types: FacetItem[]
-    tags: FacetItem[]
-    price: {
-        min: number
-        max: number
-        currencyCode: string | null
-    }
-}
-
-type FilterSection = {
-    id: string
-    title: string
-}
-
-type SelectionGroup = "child" | "collection" | "type" | "tag"
+import type {
+    CategoryFilterSection,
+    CategoryProductsFacets,
+    CategorySelectionGroup,
+    FacetItem,
+    PriceRange
+} from "~/types/category-listing"
 
 const props = defineProps<{
     sidebarTitle: string
@@ -50,8 +31,8 @@ const emit = defineEmits<{
     close: []
 }>()
 
-const sectionIds = computed<FilterSection[]>(() => {
-    const sections: FilterSection[] = []
+const sectionIds = computed<CategoryFilterSection[]>(() => {
+    const sections: CategoryFilterSection[] = []
 
     if (props.childCategoryFacets.length) {
         sections.push({ id: "subcategories", title: "Subcategories" })
@@ -125,7 +106,7 @@ function toggleSection(sectionId: string): void {
     openSectionIds.value = [...openSectionIds.value, sectionId]
 }
 
-function getSelectionModel(group: SelectionGroup): typeof selectedChildCategoryIds {
+function getSelectionModel(group: CategorySelectionGroup): typeof selectedChildCategoryIds {
     if (group === "child") {
         return selectedChildCategoryIds
     }
@@ -141,7 +122,7 @@ function getSelectionModel(group: SelectionGroup): typeof selectedChildCategoryI
     return selectedTagIds
 }
 
-function toggleSelection(group: SelectionGroup, itemId: string, checked: boolean): void {
+function toggleSelection(group: CategorySelectionGroup, itemId: string, checked: boolean): void {
     const model = getSelectionModel(group)
     const current = Array.isArray(model.value) ? model.value : []
 

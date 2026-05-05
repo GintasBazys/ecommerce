@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { PublicOrderStatus } from "@/types/order-status"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import PublicOrderStatusTracker from "@/components/Orders/PublicOrderStatusTracker.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 
 const route = useRoute()
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Order status" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Order status" }])
 const orderId = ref<string>(String(route.query.orderId || ""))
 const order = ref<PublicOrderStatus | null>(null)
 const isLoading = ref<boolean>(false)

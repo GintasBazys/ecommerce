@@ -1,35 +1,9 @@
 <script setup lang="ts">
 import type { CustomerAddressDTO } from "@medusajs/types"
+import type { AddressErrors, CountryOption, EditableAddressField } from "~/types/checkout"
 import type { Address } from "~/types/interfaces"
 
 import CheckoutAddressFields from "~/components/Checkout/CheckoutAddressFields.vue"
-
-type AddressErrors = {
-    first_name: string
-    last_name: string
-    address_1: string
-    city: string
-    province: string
-    postal_code: string
-    country_code: string
-    phone: string
-}
-
-type EditableAddressField =
-    | "first_name"
-    | "last_name"
-    | "address_1"
-    | "address_2"
-    | "city"
-    | "province"
-    | "postal_code"
-    | "country_code"
-    | "phone"
-
-type CountryOption = {
-    iso_2: string
-    display_name?: string
-}
 
 const props = defineProps<{
     currentStep: string

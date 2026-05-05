@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CustomerResponseInterface } from "@/types/interfaces"
+import type { TurnstileWidgetInstance } from "~/types/forms"
 
 import { usePostHog } from "~/composables/usePostHog"
 
@@ -15,14 +16,10 @@ const router = useRouter()
 const config = useRuntimeConfig()
 const posthog = usePostHog()
 const customerStore = useCustomerStore()
-const turnstileSiteKey = computed(() => String(config.public.TURNSTILE_SITE_KEY || ""))
+const turnstileSiteKey = computed<string>(() => String(config.public.TURNSTILE_SITE_KEY || ""))
 const turnstileToken = ref<string>("")
 const turnstileResetKey = ref<number>(0)
 const showTurnstileVerification = ref<boolean>(false)
-
-type TurnstileWidgetInstance = {
-    execute: () => Promise<string>
-}
 
 const turnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 

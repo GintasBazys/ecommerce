@@ -1,34 +1,8 @@
 <script setup lang="ts">
+import type { AddressErrors, CountryOption, EditableAddressField } from "~/types/checkout"
 import type { Address } from "~/types/interfaces"
 
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
-
-type AddressErrors = {
-    first_name: string
-    last_name: string
-    address_1: string
-    city: string
-    province: string
-    postal_code: string
-    country_code: string
-    phone: string
-}
-
-type EditableAddressField =
-    | "first_name"
-    | "last_name"
-    | "address_1"
-    | "address_2"
-    | "city"
-    | "province"
-    | "postal_code"
-    | "country_code"
-    | "phone"
-
-type CountryOption = {
-    iso_2: string
-    display_name?: string
-}
 
 const props = defineProps<{
     title: string
@@ -45,7 +19,7 @@ const emit = defineEmits<{
     "update:field": [payload: { field: EditableAddressField; value: string }]
 }>()
 
-const countryOptions = computed(() => [
+const countryOptions = computed<{ title: string; value: string }[]>(() => [
     { title: "Select a country", value: "" },
     ...props.countries.map((country) => ({
         title: country.display_name || country.iso_2.toUpperCase(),

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CartLineItemDTO } from "@medusajs/types"
+import type { PricedCartLineItem } from "~/types/checkout"
 
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { usePostHog } from "~/composables/usePostHog"
@@ -100,11 +101,6 @@ const isCartDirty = computed<boolean>(() =>
 )
 
 const isAnyUpdating = computed<boolean>(() => Object.values(updating).some(Boolean))
-
-type PricedCartLineItem = CartLineItemDTO & {
-    total?: number | null
-    unit_price?: number | null
-}
 
 function getItemDisplayTotalAmount(item: CartLineItemDTO): number {
     const pricedItem = item as PricedCartLineItem

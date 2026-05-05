@@ -1,19 +1,12 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { ContactChannel } from "~/types/contact"
+
 import ContactForm from "~/components/Forms/ContactForm.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-type ContactChannel = {
-    icon: string
-    title: string
-    detail: string
-    meta: string
-    cta: string
-    href?: string
-    to?: string
-}
-
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Contact" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Contact" }])
 
 const contactChannels: ContactChannel[] = [
     {

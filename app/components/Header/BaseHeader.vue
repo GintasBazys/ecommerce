@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AnnouncementBarResponse, AnnouncementMessage, LocationItem } from "~/types/navigation"
+
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
@@ -16,20 +18,6 @@ const announcementText = ref<HTMLElement | null>(null)
 const announcementTextOverflows = ref<boolean>(false)
 const announcementMarqueeDistance = ref<number>(0)
 const announcementMarqueeDuration = ref<number>(0)
-
-type AnnouncementMessage = {
-    id: string
-    message: string
-    link_url?: string | null
-    is_active: boolean
-    starts_at?: string | null
-    ends_at?: string | null
-    sort_order: number
-}
-
-type AnnouncementBarResponse = {
-    announcement_messages: AnnouncementMessage[]
-}
 
 const route = useRoute()
 
@@ -72,7 +60,7 @@ let announcementResizeObserver: ResizeObserver | null = null
 let announcementMeasureFrame: number | null = null
 const announcementMarqueeGap = 48
 
-const locationItems = computed(() =>
+const locationItems = computed<LocationItem[]>(() =>
     availableCountries.value.map((country) => ({
         title: country.display_name || country.iso_2.toUpperCase(),
         value: country.iso_2

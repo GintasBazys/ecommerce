@@ -1,17 +1,8 @@
 <script setup lang="ts">
+import type { LocationItem, NavigationCategory } from "~/types/navigation"
+
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
-
-type NavigationCategory = {
-    id: string
-    handle: string
-    name: string
-}
-
-type LocationItem = {
-    title: string
-    value: string
-}
 
 const props = defineProps<{
     open: boolean

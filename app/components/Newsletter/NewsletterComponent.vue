@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FetchError } from "ofetch"
+import type { SubscribeErrorPayload } from "~/types/newsletter"
 
 import { usePostHog } from "~/composables/usePostHog"
 
@@ -7,12 +8,6 @@ const posthog = usePostHog()
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const loading = ref<boolean>(false)
-
-interface SubscribeErrorPayload {
-    statusCode?: number
-    statusMessage?: string
-    message?: string
-}
 
 function mapSubscribeError(message: string | null | undefined): string {
     if (!message) {

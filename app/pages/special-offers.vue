@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import type { ProductDTO } from "@medusajs/types"
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { ProductListResponse } from "~/types/product"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-interface ProductListResponse {
-    products?: ProductDTO[]
-}
-
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Special Offers" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Special Offers" }])
 
 const browsingNotes = ["Newer offers appear first", "Live sale pricing updates automatically", "Two-up mobile browsing for faster scanning"]
 

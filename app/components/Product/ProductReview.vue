@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from "vue"
 
-type Props = {
-    title: string
-    content: string
-    rating: number
-    firstName: string
-    lastName: string
-    productId: string
-}
+import type { ProductReviewForm } from "~/types/product"
 
-const props = defineProps<Props>()
+const props = defineProps<ProductReviewForm>()
 const emit = defineEmits<{
-    (_: "submit", __: Props): void
+    (_: "submit", __: ProductReviewForm): void
     (___: "close"): void
 }>()
 
-const form = ref<Props>({
+const form = ref<ProductReviewForm>({
     title: props.title,
     content: props.content,
     rating: props.rating,

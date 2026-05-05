@@ -1,5 +1,3 @@
-import { fileURLToPath } from "node:url"
-
 import tailwindcss from "@tailwindcss/vite"
 
 const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com", "localhost"]
@@ -83,14 +81,6 @@ export default defineNuxtConfig({
 
     vite: {
         plugins: [tailwindcss()],
-        resolve: {
-            alias: [
-                {
-                    find: /^vue$/,
-                    replacement: fileURLToPath(new URL("./app/shims/vue.ts", import.meta.url))
-                }
-            ]
-        },
         optimizeDeps: {
             include: ["@stripe/stripe-js"]
         }

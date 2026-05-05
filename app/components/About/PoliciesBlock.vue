@@ -1,11 +1,5 @@
 <script setup lang="ts">
-interface PolicyItem {
-    icon: string
-    title: string
-    description: string
-    to: string
-    action: string
-}
+import type { PolicyItem } from "~/types/content-pages"
 
 const policies: PolicyItem[] = [
     {

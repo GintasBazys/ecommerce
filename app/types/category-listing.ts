@@ -42,3 +42,10 @@ export type CategorySortOption = {
     text: string
     value: string
 }
+
+export type CategoryFilterSection = {
+    id: string
+    title: string
+}
+
+export type CategorySelectionGroup = "child" | "collection" | "type" | "tag"

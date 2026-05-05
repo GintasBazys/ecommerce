@@ -1,24 +1,11 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { PolicyHighlight, ReturnFaqItem, ReturnStep } from "~/types/content-pages"
+
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-type ReturnStep = {
-    number: string
-    title: string
-    detail: string
-}
-
-type PolicyHighlight = {
-    title: string
-    text: string
-}
-
-type ReturnFaqItem = {
-    question: string
-    answer: string
-}
-
-const breadcrumbItems = computed(() => [{ label: "Home", to: "/" }, { label: "Returns" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Returns" }])
 
 const returnSteps: ReturnStep[] = [
     {

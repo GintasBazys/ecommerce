@@ -110,7 +110,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const totalPages = computed<number>(() => Math.max(1, Math.ceil(totalCount.value / limit)))
     const offset = computed<number>(() => (currentPage.value - 1) * limit)
 
-    const activeFilterCount = computed(() => {
+    const activeFilterCount = computed<number>(() => {
         let count = 0
 
         count += selectedChildCategoryIds.value.length
@@ -129,7 +129,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         return count
     })
 
-    const directChildCategoryIds = computed(() =>
+    const directChildCategoryIds = computed<string[]>(() =>
         isAllProductsPage.value
             ? []
             : (
@@ -145,7 +145,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
 
     const hasFacetedQuery = computed<boolean>(() => activeFilterCount.value > 0 || sortOption.value !== categorySortOptions[0]!.value)
 
-    const priceSummary = computed(() => {
+    const priceSummary = computed<string>(() => {
         if (!facets.value.price.currencyCode) {
             return `${appliedPriceRange.value[0]} - ${appliedPriceRange.value[1]}`
         }
@@ -153,7 +153,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         return `${formatPrice(appliedPriceRange.value[0], facets.value.price.currencyCode)} - ${formatPrice(appliedPriceRange.value[1], facets.value.price.currencyCode)}`
     })
 
-    const priceStep = computed(() => {
+    const priceStep = computed<number>(() => {
         const difference = Math.max(facets.value.price.max - facets.value.price.min, 1)
 
         if (difference > 50000) {
@@ -167,7 +167,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         return 100
     })
 
-    const gridIsInitialLoading = computed(() => loadingRef.value && products.value.length === 0)
+    const gridIsInitialLoading = computed<boolean>(() => loadingRef.value && products.value.length === 0)
     const paginationLabel = computed<string>(() => `Page ${currentPage.value} of ${totalPages.value}`)
     const paginationItems = computed<(number | string)[]>(() => {
         if (totalPages.value <= 7) {
