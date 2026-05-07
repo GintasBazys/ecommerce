@@ -5,6 +5,7 @@ import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { ProductCategorySummary, ProductFact, ProductGalleryImage, ProductListResponse, ProductTag } from "~/types/product"
 
+import BaseModal from "~/components/Shared/BaseModal.vue"
 import { usePostHog } from "~/composables/usePostHog"
 import { useProductPrice } from "~/composables/useProductPrice"
 import { DEFAULT_CURENCY, PRODUCT_URL_HANDLE } from "~/utils/consts"
@@ -75,6 +76,7 @@ const activeImageIndex = ref<number>(0)
 const quantity = ref<number>(1)
 const adding = ref<boolean>(false)
 const showReviewForm = ref<boolean>(false)
+const productReviewTitleId = "product-review-dialog-title"
 
 watch(
     () => product.value?.id,
@@ -449,26 +451,26 @@ useStructuredData(() => [productSchema.value, breadcrumbSchema.value], "product-
             </div>
         </div>
 
-        <Teleport to="body">
-            <div
-                v-if="customer && showReviewForm"
-                class="fixed inset-0 z-90 flex items-end bg-slate-950/55 p-3 sm:items-center sm:justify-center sm:p-4"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="product-review-dialog-title"
-                @click.self="showReviewForm = false"
-            >
-                <ProductReview
-                    :title="''"
-                    :content="''"
-                    :rating="0"
-                    :first-name="customer?.first_name || ''"
-                    :last-name="customer?.last_name || ''"
-                    :product-id="product.id"
-                    @close="showReviewForm = false"
-                    @submit="handleReviewSubmit"
-                />
-            </div>
-        </Teleport>
+        <BaseModal
+            v-if="customer"
+            v-model="showReviewForm"
+            :title-id="productReviewTitleId"
+            close-label="Close review form"
+            mobile-mode="sheet"
+            size="md"
+            content-class="px-5 pt-5 pb-5 sm:px-7 sm:pt-7 sm:pb-7"
+        >
+            <ProductReview
+                :title="''"
+                :content="''"
+                :rating="0"
+                :first-name="customer?.first_name || ''"
+                :last-name="customer?.last_name || ''"
+                :product-id="product.id"
+                :title-id="productReviewTitleId"
+                @close="showReviewForm = false"
+                @submit="handleReviewSubmit"
+            />
+        </BaseModal>
     </section>
 </template>

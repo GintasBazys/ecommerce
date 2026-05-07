@@ -2,12 +2,14 @@
 import type { CustomerAddressDTO } from "@medusajs/types"
 import type { AddressErrors, RequiredAddressField } from "~/types/checkout"
 
+import BaseModal from "~/components/Shared/BaseModal.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
 const model = defineModel<boolean>()
 const regionStore = useRegionStore()
 const { regionCountries } = storeToRefs(regionStore)
-const backdropPointerStarted = ref<boolean>(false)
+const addressTitleId = useId()
+const addressDescriptionId = useId()
 
 const props = defineProps<{
     address: Partial<CustomerAddressDTO>
@@ -125,18 +127,6 @@ function close(): void {
     model.value = false
 }
 
-function onBackdropPointerDown(event: PointerEvent): void {
-    backdropPointerStarted.value = event.target === event.currentTarget
-}
-
-function onBackdropPointerUp(event: PointerEvent): void {
-    if (backdropPointerStarted.value && event.target === event.currentTarget) {
-        close()
-    }
-
-    backdropPointerStarted.value = false
-}
-
 function clearErrors(): void {
     for (const field of requiredFields) {
         errors[field] = ""
@@ -188,249 +178,231 @@ function save(): void {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="model"
-            class="fixed inset-0 z-90 flex items-end bg-slate-950/55 p-3 sm:items-center sm:justify-center sm:p-4"
-            role="dialog"
-            aria-modal="true"
-            :aria-label="props.title"
-            @pointerdown="onBackdropPointerDown"
-            @pointerup="onBackdropPointerUp"
-        >
-            <div
-                class="relative flex max-h-screen w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl sm:max-h-screen"
-                @click.stop
+    <BaseModal
+        v-model="model"
+        :title-id="addressTitleId"
+        :description-id="addressDescriptionId"
+        close-label="Close address form"
+        mobile-mode="sheet"
+        size="lg"
+        content-class="px-5 pt-5 pb-5 sm:px-7 sm:pt-7 sm:pb-7"
+    >
+        <div class="pr-12">
+            <span
+                class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
             >
-                <button
-                    type="button"
-                    class="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
-                    aria-label="Close address form"
-                    @click="close"
-                >
-                    <span aria-hidden="true" class="text-lg leading-none">×</span>
-                </button>
+                Address details
+            </span>
+            <h2 :id="addressTitleId" class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950">
+                {{ props.title }}
+            </h2>
+            <p :id="addressDescriptionId" class="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                Add or update the address details you want available during future checkout and support flows.
+            </p>
+        </div>
 
-                <div class="overflow-y-auto px-5 pt-5 pb-5 sm:px-7 sm:pt-7 sm:pb-7">
-                    <div class="pr-12">
-                        <span
-                            class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
-                        >
-                            Address details
-                        </span>
-                        <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950">
-                            {{ props.title }}
-                        </h2>
-                        <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                            Add or update the address details you want available during future checkout and support flows.
-                        </p>
-                    </div>
-
-                    <form class="mt-6 grid gap-4" @submit.prevent="save">
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div class="grid gap-2">
-                                <label for="address-first-name" class="text-sm font-medium text-slate-700">First name</label>
-                                <input
-                                    id="address-first-name"
-                                    v-model="local.first_name"
-                                    type="text"
-                                    autocomplete="given-name"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                    :class="errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                    :aria-invalid="Boolean(errors.first_name)"
-                                    aria-describedby="address-first-name-error"
-                                />
-                                <span v-if="errors.first_name" id="address-first-name-error" class="text-sm leading-6 text-rose-600">
-                                    {{ errors.first_name }}
-                                </span>
-                            </div>
-                            <div class="grid gap-2">
-                                <label for="address-last-name" class="text-sm font-medium text-slate-700">Last name</label>
-                                <input
-                                    id="address-last-name"
-                                    v-model="local.last_name"
-                                    type="text"
-                                    autocomplete="family-name"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                    :class="errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                    :aria-invalid="Boolean(errors.last_name)"
-                                    aria-describedby="address-last-name-error"
-                                />
-                                <span v-if="errors.last_name" id="address-last-name-error" class="text-sm leading-6 text-rose-600">
-                                    {{ errors.last_name }}
-                                </span>
-                            </div>
-                            <div class="grid gap-2">
-                                <label for="address-phone" class="text-sm font-medium text-slate-700">Phone</label>
-                                <input
-                                    id="address-phone"
-                                    v-model="local.phone"
-                                    type="tel"
-                                    autocomplete="tel"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                    :class="errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                    :aria-invalid="Boolean(errors.phone)"
-                                    aria-describedby="address-phone-error"
-                                />
-                                <span v-if="errors.phone" id="address-phone-error" class="text-sm leading-6 text-rose-600">{{ errors.phone }}</span>
-                            </div>
-                            <div class="grid gap-2">
-                                <label for="address-company" class="text-sm font-medium text-slate-700">Company</label>
-                                <input
-                                    id="address-company"
-                                    v-model="local.company"
-                                    type="text"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid gap-2">
-                            <label for="address-line-1" class="text-sm font-medium text-slate-700">Address line 1</label>
-                            <input
-                                id="address-line-1"
-                                v-model="local.address_1"
-                                type="text"
-                                autocomplete="address-line1"
-                                class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                :class="errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                :aria-invalid="Boolean(errors.address_1)"
-                                aria-describedby="address-line-1-error"
-                            />
-                            <span v-if="errors.address_1" id="address-line-1-error" class="text-sm leading-6 text-rose-600">
-                                {{ errors.address_1 }}
-                            </span>
-                        </div>
-
-                        <div class="grid gap-2">
-                            <label for="address-line-2" class="text-sm font-medium text-slate-700">Address line 2</label>
-                            <input
-                                id="address-line-2"
-                                v-model="local.address_2"
-                                type="text"
-                                autocomplete="address-line2"
-                                class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                            />
-                        </div>
-
-                        <div class="grid gap-4 lg:grid-cols-3">
-                            <div class="grid gap-2">
-                                <label for="address-postal-code" class="text-sm font-medium text-slate-700">Postal code</label>
-                                <input
-                                    id="address-postal-code"
-                                    v-model="local.postal_code"
-                                    type="text"
-                                    autocomplete="postal-code"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                    :class="errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                    :aria-invalid="Boolean(errors.postal_code)"
-                                    aria-describedby="address-postal-code-error"
-                                />
-                                <span v-if="errors.postal_code" id="address-postal-code-error" class="text-sm leading-6 text-rose-600">
-                                    {{ errors.postal_code }}
-                                </span>
-                            </div>
-                            <div class="grid gap-2">
-                                <label for="address-city" class="text-sm font-medium text-slate-700">City</label>
-                                <input
-                                    id="address-city"
-                                    v-model="local.city"
-                                    type="text"
-                                    autocomplete="address-level2"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                    :class="errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                    :aria-invalid="Boolean(errors.city)"
-                                    aria-describedby="address-city-error"
-                                />
-                                <span v-if="errors.city" id="address-city-error" class="text-sm leading-6 text-rose-600">{{ errors.city }}</span>
-                            </div>
-                            <div class="grid gap-2">
-                                <label for="address-province" class="text-sm font-medium text-slate-700">Province / State</label>
-                                <input
-                                    id="address-province"
-                                    v-model="local.province"
-                                    type="text"
-                                    autocomplete="address-level1"
-                                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                                    :class="errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                    :aria-invalid="Boolean(errors.province)"
-                                    aria-describedby="address-province-error"
-                                />
-                                <span v-if="errors.province" id="address-province-error" class="text-sm leading-6 text-rose-600">
-                                    {{ errors.province }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="grid gap-2">
-                            <label for="address-country-code" class="text-sm font-medium text-slate-700">Country</label>
-                            <BaseSelect
-                                id="address-country-code"
-                                v-model="countryCodeModel"
-                                :options="countryOptions"
-                                option-label-key="title"
-                                class="min-h-12"
-                                :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                :aria-invalid="Boolean(errors.country_code)"
-                                aria-describedby="address-country-code-error"
-                            />
-                            <span v-if="errors.country_code" id="address-country-code-error" class="text-sm leading-6 text-rose-600">
-                                {{ errors.country_code }}
-                            </span>
-                            <p v-if="!regionCountries.length" class="text-sm leading-6 text-slate-500">
-                                Loading available countries...
-                            </p>
-                        </div>
-
-                        <div class="grid gap-2">
-                            <label for="address-label" class="text-sm font-medium text-slate-700">Label (Home, Work, etc.)</label>
-                            <input
-                                id="address-label"
-                                v-model="local.address_name"
-                                type="text"
-                                class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
-                            />
-                        </div>
-
-                        <fieldset class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <legend class="px-1 text-sm font-semibold text-slate-950">Use this address for</legend>
-                            <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm">
-                                <input
-                                    v-model="local.is_default_shipping"
-                                    type="checkbox"
-                                    class="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 text-brand-700 accent-brand-700 focus:ring-2 focus:ring-brand-100 focus:ring-offset-1"
-                                />
-                                <span>
-                                    <span class="block font-semibold text-slate-950">Default shipping address</span>
-                                    <span class="block leading-6 text-slate-500">Use this delivery address first during checkout.</span>
-                                </span>
-                            </label>
-                            <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm">
-                                <input
-                                    v-model="local.is_default_billing"
-                                    type="checkbox"
-                                    class="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 text-brand-700 accent-brand-700 focus:ring-2 focus:ring-brand-100 focus:ring-offset-1"
-                                />
-                                <span>
-                                    <span class="block font-semibold text-slate-950">Default billing address</span>
-                                    <span class="block leading-6 text-slate-500">Use this billing address first during checkout.</span>
-                                </span>
-                            </label>
-                        </fieldset>
-
-                        <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-end">
-                            <button
-                                type="button"
-                                class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
-                                @click="close"
-                            >
-                                Cancel
-                            </button>
-                            <button type="submit" class="ui-btn-accent px-6 motion-reduce:transition-none">Save</button>
-                        </div>
-                    </form>
+        <form class="mt-6 grid gap-4" @submit.prevent="save">
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-2">
+                    <label for="address-first-name" class="text-sm font-medium text-slate-700">First name</label>
+                    <input
+                        id="address-first-name"
+                        v-model="local.first_name"
+                        type="text"
+                        autocomplete="given-name"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                        :class="errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(errors.first_name)"
+                        aria-describedby="address-first-name-error"
+                    />
+                    <span v-if="errors.first_name" id="address-first-name-error" class="text-sm leading-6 text-rose-600">
+                        {{ errors.first_name }}
+                    </span>
+                </div>
+                <div class="grid gap-2">
+                    <label for="address-last-name" class="text-sm font-medium text-slate-700">Last name</label>
+                    <input
+                        id="address-last-name"
+                        v-model="local.last_name"
+                        type="text"
+                        autocomplete="family-name"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                        :class="errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(errors.last_name)"
+                        aria-describedby="address-last-name-error"
+                    />
+                    <span v-if="errors.last_name" id="address-last-name-error" class="text-sm leading-6 text-rose-600">
+                        {{ errors.last_name }}
+                    </span>
+                </div>
+                <div class="grid gap-2">
+                    <label for="address-phone" class="text-sm font-medium text-slate-700">Phone</label>
+                    <input
+                        id="address-phone"
+                        v-model="local.phone"
+                        type="tel"
+                        autocomplete="tel"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                        :class="errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(errors.phone)"
+                        aria-describedby="address-phone-error"
+                    />
+                    <span v-if="errors.phone" id="address-phone-error" class="text-sm leading-6 text-rose-600">{{ errors.phone }}</span>
+                </div>
+                <div class="grid gap-2">
+                    <label for="address-company" class="text-sm font-medium text-slate-700">Company</label>
+                    <input
+                        id="address-company"
+                        v-model="local.company"
+                        type="text"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                    />
                 </div>
             </div>
-        </div>
-    </Teleport>
+
+            <div class="grid gap-2">
+                <label for="address-line-1" class="text-sm font-medium text-slate-700">Address line 1</label>
+                <input
+                    id="address-line-1"
+                    v-model="local.address_1"
+                    type="text"
+                    autocomplete="address-line1"
+                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                    :class="errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="Boolean(errors.address_1)"
+                    aria-describedby="address-line-1-error"
+                />
+                <span v-if="errors.address_1" id="address-line-1-error" class="text-sm leading-6 text-rose-600">
+                    {{ errors.address_1 }}
+                </span>
+            </div>
+
+            <div class="grid gap-2">
+                <label for="address-line-2" class="text-sm font-medium text-slate-700">Address line 2</label>
+                <input
+                    id="address-line-2"
+                    v-model="local.address_2"
+                    type="text"
+                    autocomplete="address-line2"
+                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                />
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-3">
+                <div class="grid gap-2">
+                    <label for="address-postal-code" class="text-sm font-medium text-slate-700">Postal code</label>
+                    <input
+                        id="address-postal-code"
+                        v-model="local.postal_code"
+                        type="text"
+                        autocomplete="postal-code"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                        :class="errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(errors.postal_code)"
+                        aria-describedby="address-postal-code-error"
+                    />
+                    <span v-if="errors.postal_code" id="address-postal-code-error" class="text-sm leading-6 text-rose-600">
+                        {{ errors.postal_code }}
+                    </span>
+                </div>
+                <div class="grid gap-2">
+                    <label for="address-city" class="text-sm font-medium text-slate-700">City</label>
+                    <input
+                        id="address-city"
+                        v-model="local.city"
+                        type="text"
+                        autocomplete="address-level2"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                        :class="errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(errors.city)"
+                        aria-describedby="address-city-error"
+                    />
+                    <span v-if="errors.city" id="address-city-error" class="text-sm leading-6 text-rose-600">{{ errors.city }}</span>
+                </div>
+                <div class="grid gap-2">
+                    <label for="address-province" class="text-sm font-medium text-slate-700">Province / State</label>
+                    <input
+                        id="address-province"
+                        v-model="local.province"
+                        type="text"
+                        autocomplete="address-level1"
+                        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                        :class="errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(errors.province)"
+                        aria-describedby="address-province-error"
+                    />
+                    <span v-if="errors.province" id="address-province-error" class="text-sm leading-6 text-rose-600">
+                        {{ errors.province }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid gap-2">
+                <label for="address-country-code" class="text-sm font-medium text-slate-700">Country</label>
+                <BaseSelect
+                    id="address-country-code"
+                    v-model="countryCodeModel"
+                    :options="countryOptions"
+                    option-label-key="title"
+                    class="min-h-12"
+                    :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="Boolean(errors.country_code)"
+                    aria-describedby="address-country-code-error"
+                />
+                <span v-if="errors.country_code" id="address-country-code-error" class="text-sm leading-6 text-rose-600">
+                    {{ errors.country_code }}
+                </span>
+                <p v-if="!regionCountries.length" class="text-sm leading-6 text-slate-500">
+                    Loading available countries...
+                </p>
+            </div>
+
+            <div class="grid gap-2">
+                <label for="address-label" class="text-sm font-medium text-slate-700">Label (Home, Work, etc.)</label>
+                <input
+                    id="address-label"
+                    v-model="local.address_name"
+                    type="text"
+                    class="min-h-12 rounded-2xl border border-slate-300 bg-white px-4 text-slate-950 placeholder:text-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-hidden"
+                />
+            </div>
+
+            <fieldset class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <legend class="px-1 text-sm font-semibold text-slate-950">Use this address for</legend>
+                <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm">
+                    <input
+                        v-model="local.is_default_shipping"
+                        type="checkbox"
+                        class="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 text-brand-700 accent-brand-700 focus:ring-2 focus:ring-brand-100 focus:ring-offset-1"
+                    />
+                    <span>
+                        <span class="block font-semibold text-slate-950">Default shipping address</span>
+                        <span class="block leading-6 text-slate-500">Use this delivery address first during checkout.</span>
+                    </span>
+                </label>
+                <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm">
+                    <input
+                        v-model="local.is_default_billing"
+                        type="checkbox"
+                        class="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 text-brand-700 accent-brand-700 focus:ring-2 focus:ring-brand-100 focus:ring-offset-1"
+                    />
+                    <span>
+                        <span class="block font-semibold text-slate-950">Default billing address</span>
+                        <span class="block leading-6 text-slate-500">Use this billing address first during checkout.</span>
+                    </span>
+                </label>
+            </fieldset>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-end">
+                <button
+                    type="button"
+                    class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
+                    @click="close"
+                >
+                    Cancel
+                </button>
+                <button type="submit" class="ui-btn-accent px-6 motion-reduce:transition-none">Save</button>
+            </div>
+        </form>
+    </BaseModal>
 </template>

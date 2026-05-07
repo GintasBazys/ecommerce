@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TurnstileWidgetInstance } from "~/types/forms"
 
+import BaseModal from "~/components/Shared/BaseModal.vue"
 import { usePostHog } from "~/composables/usePostHog"
 
 useHead({ title: "Signin | Medusa Commerce" })
@@ -26,6 +27,8 @@ const showLoginVerification = ref<boolean>(false)
 const loginTurnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 
 const resetEmail = ref<string>("")
+const resetPasswordTitleId = useId()
+const resetPasswordDescriptionId = useId()
 
 const auth = useCustomerAuth()
 const posthog = usePostHog()
@@ -321,69 +324,57 @@ async function handleReset(): Promise<void> {
             </div>
         </section>
 
-        <Teleport to="body">
-            <div
-                v-if="showResetDialog"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4"
-                role="presentation"
-                @click.self="showResetDialog = false"
-            >
-                <section
-                    class="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-5 sm:p-7"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="reset-password-title"
-                >
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <span
-                                class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-xs font-semibold tracking-widest text-slate-700 uppercase"
-                            >
-                                Password reset
-                            </span>
-                            <h2 id="reset-password-title" class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                                Forgot your password?
-                            </h2>
-                        </div>
-                        <button
-                            type="button"
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
-                            @click="showResetDialog = false"
-                        >
-                            <span aria-hidden="true">×</span>
-                            <span class="sr-only">Close password reset dialog</span>
-                        </button>
-                    </div>
-
-                    <p class="mt-4 text-sm leading-7 text-slate-600">
-                        Enter your email and we will send a reset link so you can get back into your account.
-                    </p>
-
-                    <form class="mt-5 grid gap-4" @submit.prevent="handleReset">
-                        <div>
-                            <label for="reset-email" class="mb-1.5 block text-sm font-medium text-slate-700">E-mail address</label>
-                            <input
-                                id="reset-email"
-                                v-model.trim="resetEmail"
-                                type="email"
-                                autocomplete="email"
-                                class="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                                :class="resetEmailError ? 'border-rose-400 focus:border-rose-400 focus:ring-rose-100' : ''"
-                                required
-                            />
-                            <p v-if="resetEmailError" class="mt-1 text-sm text-rose-600">{{ resetEmailError }}</p>
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
-                        >
-                            Send reset link
-                        </button>
-                    </form>
-                </section>
+        <BaseModal
+            v-model="showResetDialog"
+            :title-id="resetPasswordTitleId"
+            :description-id="resetPasswordDescriptionId"
+            close-label="Close password reset dialog"
+            size="sm"
+            content-class="p-5 sm:p-7"
+        >
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <span
+                        class="inline-flex min-h-8 items-center rounded-full border border-slate-300 bg-slate-50 px-3 text-xs font-semibold tracking-widest text-slate-700 uppercase"
+                    >
+                        Password reset
+                    </span>
+                    <h2 :id="resetPasswordTitleId" class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+                        Forgot your password?
+                    </h2>
+                </div>
             </div>
-        </Teleport>
+
+            <p :id="resetPasswordDescriptionId" class="mt-4 text-sm leading-7 text-slate-600">
+                Enter your email and we will send a reset link so you can get back into your account.
+            </p>
+
+            <form class="mt-5 grid gap-4" @submit.prevent="handleReset">
+                <div>
+                    <label for="reset-email" class="mb-1.5 block text-sm font-medium text-slate-700">E-mail address</label>
+                    <input
+                        id="reset-email"
+                        v-model.trim="resetEmail"
+                        type="email"
+                        autocomplete="email"
+                        data-autofocus
+                        class="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        :class="resetEmailError ? 'border-rose-400 focus:border-rose-400 focus:ring-rose-100' : ''"
+                        :aria-invalid="Boolean(resetEmailError)"
+                        aria-describedby="reset-email-error"
+                        required
+                    />
+                    <p v-if="resetEmailError" id="reset-email-error" class="mt-1 text-sm text-rose-600">{{ resetEmailError }}</p>
+                </div>
+
+                <button
+                    type="submit"
+                    class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
+                >
+                    Send reset link
+                </button>
+            </form>
+        </BaseModal>
 
     </main>
 </template>
