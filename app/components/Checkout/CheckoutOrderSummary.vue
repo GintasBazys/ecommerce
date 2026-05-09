@@ -5,7 +5,7 @@ import TaxedLinePrice from "~/components/Cart/TaxedLinePrice.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import { formatPrice } from "~/utils/formatPrice"
 
-const props = defineProps<{
+defineProps<{
     collapsible?: boolean
     isOpen?: boolean
     itemCount: number
@@ -25,23 +25,23 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <section v-if="props.collapsible" aria-label="Order summary" class="lg:hidden">
+    <section v-if="collapsible" aria-label="Order summary" class="lg:hidden">
         <BaseButton
             type="button"
             class="flex w-full items-center justify-between gap-4 rounded-3xl border border-amber-200/80 bg-white/95 px-4 py-4 text-left"
-            :aria-expanded="props.isOpen ? 'true' : 'false'"
+            :aria-expanded="isOpen ? 'true' : 'false'"
             aria-controls="checkout-mobile-summary-panel"
             @click="emit('toggle')"
         >
             <span class="grid gap-1">
                 <span class="text-sm font-semibold text-slate-950">Order summary</span>
                 <span class="tracking-label text-xs text-slate-500 uppercase">
-                    {{ props.itemCount }} item{{ props.itemCount === 1 ? "" : "s" }}
+                    {{ itemCount }} item{{ itemCount === 1 ? "" : "s" }}
                 </span>
             </span>
             <span class="flex items-center gap-3">
-                <strong class="text-base font-semibold text-slate-950">{{ formatPrice(props.total, props.currencyCode) }}</strong>
-                <span class="text-slate-500 transition-transform" :class="props.isOpen ? 'rotate-180' : ''" aria-hidden="true">
+                <strong class="text-base font-semibold text-slate-950">{{ formatPrice(total, currencyCode) }}</strong>
+                <span class="text-slate-500 transition-transform" :class="isOpen ? 'rotate-180' : ''" aria-hidden="true">
                     <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8">
                         <path d="m5 7.5 5 5 5-5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
@@ -50,13 +50,13 @@ const emit = defineEmits<{
         </BaseButton>
 
         <div
-            v-show="props.isOpen"
+            v-show="isOpen"
             id="checkout-mobile-summary-panel"
             class="mt-3 rounded-3xl border border-slate-200/80 bg-white/95 p-4"
         >
             <div class="grid gap-4">
                 <article
-                    v-for="item in props.lineItems"
+                    v-for="item in lineItems"
                     :key="item.id"
                     class="flex items-start gap-3 border-b border-slate-200/80 pb-4 last:border-b-0 last:pb-0"
                 >
@@ -75,8 +75,8 @@ const emit = defineEmits<{
                     </div>
                     <div class="text-right text-slate-950">
                         <TaxedLinePrice
-                            :amount-with-tax="props.getAmountWithTax(item)"
-                            :amount-without-tax="props.getAmountWithoutTax(item)"
+                            :amount-with-tax="getAmountWithTax(item)"
+                            :amount-without-tax="getAmountWithoutTax(item)"
                         />
                     </div>
                 </article>
@@ -85,20 +85,20 @@ const emit = defineEmits<{
             <div class="mt-4 grid gap-3 border-t border-slate-200/80 pt-4">
                 <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                     <span>Subtotal</span>
-                    <span class="font-semibold text-slate-950">{{ formatPrice(props.subtotal, props.currencyCode) }}</span>
+                    <span class="font-semibold text-slate-950">{{ formatPrice(subtotal, currencyCode) }}</span>
                 </div>
                 <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                     <span>Shipping</span>
-                    <span class="font-semibold text-slate-950">{{ formatPrice(props.shippingTotal, props.currencyCode) }}</span>
+                    <span class="font-semibold text-slate-950">{{ formatPrice(shippingTotal, currencyCode) }}</span>
                 </div>
                 <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                     <span>Tax</span>
-                    <span class="font-semibold text-slate-950">{{ formatPrice(props.taxTotal, props.currencyCode) }}</span>
+                    <span class="font-semibold text-slate-950">{{ formatPrice(taxTotal, currencyCode) }}</span>
                 </div>
                 <div class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                     <span class="text-sm font-semibold text-slate-900">Total</span>
                     <strong class="text-base font-semibold tracking-tight text-slate-950">
-                        {{ formatPrice(props.total, props.currencyCode) }}
+                        {{ formatPrice(total, currencyCode) }}
                     </strong>
                 </div>
             </div>
@@ -121,7 +121,7 @@ const emit = defineEmits<{
 
         <div class="mt-5 grid gap-4">
             <article
-                v-for="item in props.lineItems"
+                v-for="item in lineItems"
                 :key="item.id"
                 class="flex items-start gap-3 rounded-3xl border border-slate-200/80 bg-white/90 p-3"
             >
@@ -139,7 +139,7 @@ const emit = defineEmits<{
                     <span class="text-sm leading-6 text-slate-600">Qty {{ item.quantity }}</span>
                 </div>
                 <div class="text-right text-slate-950">
-                    <TaxedLinePrice :amount-with-tax="props.getAmountWithTax(item)" :amount-without-tax="props.getAmountWithoutTax(item)" />
+                    <TaxedLinePrice :amount-with-tax="getAmountWithTax(item)" :amount-without-tax="getAmountWithoutTax(item)" />
                 </div>
             </article>
         </div>
@@ -149,24 +149,24 @@ const emit = defineEmits<{
         <div class="grid gap-3">
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                 <span>Items</span>
-                <span class="font-semibold text-slate-950">{{ props.itemCount }}</span>
+                <span class="font-semibold text-slate-950">{{ itemCount }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                 <span>Subtotal</span>
-                <span class="font-semibold text-slate-950">{{ formatPrice(props.subtotal, props.currencyCode) }}</span>
+                <span class="font-semibold text-slate-950">{{ formatPrice(subtotal, currencyCode) }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                 <span>Shipping</span>
-                <span class="font-semibold text-slate-950">{{ formatPrice(props.shippingTotal, props.currencyCode) }}</span>
+                <span class="font-semibold text-slate-950">{{ formatPrice(shippingTotal, currencyCode) }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                 <span>Tax</span>
-                <span class="font-semibold text-slate-950">{{ formatPrice(props.taxTotal, props.currencyCode) }}</span>
+                <span class="font-semibold text-slate-950">{{ formatPrice(taxTotal, currencyCode) }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 rounded-3xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                 <span class="text-sm font-semibold text-slate-900">Total</span>
                 <strong class="text-lg font-semibold tracking-tight text-slate-950">
-                    {{ formatPrice(props.total, props.currencyCode) }}
+                    {{ formatPrice(total, currencyCode) }}
                 </strong>
             </div>
         </div>

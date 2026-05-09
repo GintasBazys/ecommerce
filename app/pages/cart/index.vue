@@ -22,6 +22,8 @@ const updating = reactive<Record<string, boolean>>({})
 const isApplyingCoupon = ref<boolean>(false)
 const isCartLoading = ref<boolean>(true)
 const couponCode = ref<string>("")
+const cartActionError = ref<string | null>(null)
+const couponError = ref<string | null>(null)
 
 watch(
     cart,
@@ -108,10 +110,13 @@ async function removeItem(lineItemId: string): Promise<void> {
         throw new Error("No active cart found")
     }
 
+    cartActionError.value = null
+
     try {
         await removeLineItem(lineItemId)
     } catch (err) {
         console.error("Failed to remove item:", err)
+        cartActionError.value = "Could not remove this item. Please try again."
     }
 }
 
@@ -140,6 +145,8 @@ async function updateCount(item: CartLineItemDTO): Promise<void> {
     }
 
     updating[item.id] = true
+    cartActionError.value = null
+
     try {
         const variant = {
             inventory_quantity: item.stocked_quantity ?? desiredQty,
@@ -150,6 +157,7 @@ async function updateCount(item: CartLineItemDTO): Promise<void> {
         await updateLineItem(variant, desiredQty, true)
     } catch (err) {
         console.error("Failed to update count:", err)
+        cartActionError.value = "Could not update your cart quantity. Please try again."
     } finally {
         updating[item.id] = false
     }
@@ -168,6 +176,7 @@ async function applyCoupon(): Promise<void> {
     }
 
     isApplyingCoupon.value = true
+    couponError.value = null
     try {
         await $fetch("/api/cart/apply-promotion", {
             method: "POST",
@@ -180,6 +189,7 @@ async function applyCoupon(): Promise<void> {
         couponCode.value = ""
     } catch (err) {
         console.error("Coupon application error:", err)
+        couponError.value = "Could not apply this promo code. Check the code and try again."
     } finally {
         isApplyingCoupon.value = false
     }
@@ -221,8 +231,10 @@ async function removePromotion(promoCode: string | undefined): Promise<void> {
         })
 
         await loadCart()
+        couponError.value = null
     } catch (err) {
         console.error("Failed to remove promotion:", err)
+        couponError.value = "Could not remove this promotion. Please try again."
     }
 }
 
@@ -231,6 +243,7 @@ async function updateCart(): Promise<void> {
         return
     }
 
+    cartActionError.value = null
     await Promise.all(cart.value.items.map((item) => updateCount(item)))
 }
 
@@ -264,6 +277,14 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                             >
                                 <span aria-hidden="true">x</span>
                             </BaseButton>
+                        </div>
+
+                        <div
+                            v-if="cartActionError"
+                            class="rounded-card-sm mb-4 border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700"
+                            role="alert"
+                        >
+                            {{ cartActionError }}
                         </div>
 
                         <div v-if="isCartLoading" class="grid justify-items-center gap-4 px-4 py-14 text-center">
@@ -361,6 +382,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                         :is-coupon-disabled="isCouponDisabled"
                         :is-checkout-disabled="isCheckoutDisabled"
                         :coupon-hint="couponHint"
+                        :coupon-error="couponError"
                         :subtotal="displaySubtotal"
                         :tax="displayTax"
                         :total="displayTotal"

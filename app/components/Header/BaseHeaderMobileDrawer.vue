@@ -25,6 +25,35 @@ const locationModel = computed<string>({
     get: () => props.locationValue,
     set: (value) => emit("update-location", value)
 })
+const drawerRef = ref<HTMLElement | null>(null)
+const previousBodyOverflow = ref<string>("")
+
+const drawerTitleId = "mobile-navigation-title"
+const drawerDescriptionId = "mobile-navigation-description"
+
+const isOpen = computed<boolean>(() => props.open)
+
+useFocusTrap(drawerRef, isOpen, { onEscape: closeDrawer })
+
+watch(isOpen, (open) => {
+    if (!import.meta.client) {
+        return
+    }
+
+    if (open) {
+        previousBodyOverflow.value = document.body.style.overflow
+        document.body.style.overflow = "hidden"
+        return
+    }
+
+    document.body.style.overflow = previousBodyOverflow.value
+}, { immediate: true })
+
+onBeforeUnmount(() => {
+    if (import.meta.client && props.open) {
+        document.body.style.overflow = previousBodyOverflow.value
+    }
+})
 
 function closeDrawer(): void {
     emit("close")
@@ -33,14 +62,25 @@ function closeDrawer(): void {
 
 <template>
     <transition name="fade">
-        <div v-if="open" class="fixed inset-0 z-60 bg-slate-950/55 backdrop-blur-sm" @click="closeDrawer"></div>
+        <BaseButton
+            v-if="open"
+            type="button"
+            class="fixed inset-0 z-60 bg-slate-950/55 backdrop-blur-sm"
+            aria-label="Close mobile navigation"
+            @click="closeDrawer"
+        />
     </transition>
 
     <aside
+        ref="drawerRef"
         class="fixed right-0 bottom-0 z-65 w-72 overflow-hidden border-l border-white/60 bg-linear-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out sm:w-80"
         :class="open ? 'translate-x-0' : 'translate-x-full'"
         :style="{ top: `${topOffset + headerHeight}px` }"
-        aria-label="Mobile navigation"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="drawerTitleId"
+        :aria-describedby="drawerDescriptionId"
+        tabindex="-1"
     >
         <div class="flex h-full min-h-0 flex-col">
             <div class="shrink-0 px-4 pt-4 pb-4">
@@ -53,7 +93,8 @@ function closeDrawer(): void {
                         >
                             Navigation
                         </p>
-                        <h2 class="mt-3 text-lg font-semibold tracking-tight text-slate-950">Menu</h2>
+                        <h2 :id="drawerTitleId" class="mt-3 text-lg font-semibold tracking-tight text-slate-950">Menu</h2>
+                        <p :id="drawerDescriptionId" class="sr-only">Choose a category, account link, or shipping country.</p>
                     </div>
 
                     <BaseButton

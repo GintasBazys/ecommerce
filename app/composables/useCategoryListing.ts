@@ -88,6 +88,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const products = ref<CategoryProductsResponse["products"]>([])
     const totalCount = ref<number>(0)
     const loadingRef = ref<boolean>(false)
+    const errorRef = ref<string | null>(null)
     const sortLoading = ref<boolean>(false)
     const filterLoading = ref<boolean>(false)
     const facets = ref<CategoryProductsFacets>(createEmptyFacets())
@@ -357,6 +358,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         }
 
         loadingRef.value = true
+        errorRef.value = null
         sortLoading.value = source === "sort"
         filterLoading.value = source === "filters"
 
@@ -380,6 +382,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             syncPriceRange(source === "initial")
         } catch (error) {
             console.error("Error fetching category products", error)
+            errorRef.value = "We could not load products right now. Please try again."
         } finally {
             loadingRef.value = false
             sortLoading.value = false
@@ -468,6 +471,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         products,
         totalCount,
         loadingRef,
+        errorRef,
         sortLoading,
         filterLoading,
         facets,

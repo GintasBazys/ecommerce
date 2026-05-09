@@ -22,6 +22,10 @@ const emit = defineEmits<{
     (_e: "increment"): void
     (_e: "add-to-cart"): void
 }>()
+
+function isVariantAvailable(variant: ProductVariantDTO): boolean {
+    return Number(variant.inventory_quantity || 0) > 0
+}
 </script>
 
 <template>
@@ -31,21 +35,27 @@ const emit = defineEmits<{
                 <span class="text-sm font-medium text-slate-500">Select option</span>
                 <span class="text-sm font-semibold text-slate-900">{{ selectedVariantTitle }}</span>
             </div>
-            <div class="flex flex-wrap gap-2.5">
+            <div class="flex flex-wrap gap-2.5" role="radiogroup" aria-label="Product options">
                 <BaseButton
                     v-for="variant in variants"
                     :key="variant.id"
                     type="button"
+                    role="radio"
                     class="inline-flex min-h-11 items-center justify-center rounded-full border px-4 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none sm:w-auto"
                     :class="
                         variant.id === selectedVariantId
                             ? 'border-amber-300 bg-amber-50 text-slate-950 ring-1 ring-amber-100'
-                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-amber-200 hover:text-slate-950'
+                            : isVariantAvailable(variant)
+                                ? 'border-slate-200 bg-slate-50 text-slate-700 hover:border-amber-200 hover:text-slate-950'
+                                : 'border-slate-200 bg-slate-100 text-slate-400 line-through'
                     "
-                    :aria-pressed="variant.id === selectedVariantId"
+                    :disabled="!isVariantAvailable(variant)"
+                    :aria-checked="variant.id === selectedVariantId"
+                    :aria-label="`${variant.title}${isVariantAvailable(variant) ? '' : ', unavailable'}`"
                     @click="emit('select-variant', variant.id)"
                 >
                     {{ variant.title }}
+                    <span v-if="!isVariantAvailable(variant)" class="sr-only"> unavailable</span>
                 </BaseButton>
             </div>
         </div>

@@ -2,6 +2,7 @@
 import type { SearchResponse } from "@/types/interfaces"
 import type { ProductDTO } from "@medusajs/types"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseModal from "~/components/Shared/BaseModal.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const searchQuery = ref<string>("")
 const searchLoading = ref<boolean>(false)
+const searchError = ref<string | null>(null)
 const searchResults = ref<ProductDTO[]>([])
 const searchHasSearched = ref<boolean>(false)
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
@@ -42,6 +44,7 @@ const runSearch = debounce(async (value: string) => {
     }
 
     searchLoading.value = true
+    searchError.value = null
 
     try {
         const response = await $fetch<SearchResponse>("/api/search", {
@@ -62,6 +65,7 @@ const runSearch = debounce(async (value: string) => {
         searchResults.value = response.products.slice(0, 8)
     } catch {
         searchResults.value = []
+        searchError.value = "Search could not be loaded. Please try again."
     } finally {
         searchHasSearched.value = true
         searchLoading.value = false
@@ -81,8 +85,9 @@ watch(
     async (opened) => {
         if (!opened) {
             searchQuery.value = ""
-            searchLoading.value = false
-            searchHasSearched.value = false
+        searchLoading.value = false
+        searchError.value = null
+        searchHasSearched.value = false
             searchResults.value = []
             runSearch.cancel()
             return
@@ -100,6 +105,17 @@ onBeforeUnmount(() => {
 
 function closeSearchDialog(): void {
     emit("close")
+}
+
+async function submitSearch(): Promise<void> {
+    const query = normalizedSearchQuery.value
+
+    if (query.length < 3) {
+        return
+    }
+
+    closeSearchDialog()
+    await navigateTo({ path: "/search", query: { q: query } })
 }
 
 function getProductPath(handle?: string | null): string {
@@ -148,19 +164,28 @@ function getProductMeta(product: ProductDTO): string {
         </div>
 
         <div class="border-b border-slate-200/80 px-4 py-4 md:px-6">
-            <label>
-                <span class="sr-only">Search by product name</span>
-                <input
-                    ref="searchInputRef"
-                    v-model="searchQuery"
-                    data-autofocus
-                    class="ui-input shadow-card rounded-2xl border-slate-300 bg-linear-to-b from-white to-slate-50 text-slate-900"
-                    placeholder="Search by product name (min 3 chars)..."
-                />
-            </label>
-            <p class="mt-2 text-sm text-slate-600">
+            <form class="grid gap-3 sm:grid-cols-[1fr_auto]" @submit.prevent="submitSearch">
+                <label>
+                    <span class="sr-only">Search by product name</span>
+                    <input
+                        ref="searchInputRef"
+                        v-model="searchQuery"
+                        data-autofocus
+                        name="q"
+                        type="search"
+                        autocomplete="off"
+                        class="ui-input shadow-card rounded-2xl border-slate-300 bg-linear-to-b from-white to-slate-50 text-slate-900"
+                        placeholder="Search by product name…"
+                    />
+                </label>
+                <BaseButton type="submit" variant="accent" class="min-h-12 px-5" :disabled="normalizedSearchQuery.length < 3">
+                    View results
+                </BaseButton>
+            </form>
+            <p class="mt-2 text-sm text-slate-600" aria-live="polite">
                 <span v-if="normalizedSearchQuery.length < 3">Type at least 3 characters</span>
-                <span v-else-if="searchLoading">Searching...</span>
+                <span v-else-if="searchLoading">Searching…</span>
+                <span v-else-if="searchError">{{ searchError }}</span>
                 <span v-else-if="searchHasSearched">
                     {{ searchResults.length }} result{{ searchResults.length === 1 ? "" : "s" }}
                 </span>
@@ -179,26 +204,28 @@ function getProductMeta(product: ProductDTO): string {
                 No products found.
             </div>
 
-            <NuxtLink
-                v-for="product in searchResults"
-                :key="product.id"
-                class="shadow-card flex items-center gap-3 rounded-2xl border border-transparent bg-white/72 px-3 py-3 transition hover:border-amber-200 hover:bg-white"
-                :to="getProductPath(product.handle)"
-                @click="closeSearchDialog"
-            >
-                <NuxtImage
-                    :src="product.thumbnail || product.images?.[0]?.url || '/images/about/about-premium.jpg'"
-                    :alt="product.title || 'Product image'"
-                    width="80"
-                    height="80"
-                    class="h-20 w-20 rounded-xl bg-slate-100 object-cover"
-                />
-                <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-semibold text-slate-950">{{ product.title }}</p>
-                    <p class="truncate text-xs font-medium tracking-wide text-slate-600">{{ getProductMeta(product) }}</p>
-                </div>
-                <span class="text-xs font-semibold tracking-widest text-amber-900">Open</span>
-            </NuxtLink>
+            <ul v-if="searchResults.length" class="grid gap-2">
+                <li v-for="product in searchResults" :key="product.id">
+                    <NuxtLink
+                        class="shadow-card flex items-center gap-3 rounded-2xl border border-transparent bg-white/72 px-3 py-3 transition hover:border-amber-200 hover:bg-white"
+                        :to="getProductPath(product.handle)"
+                        @click="closeSearchDialog"
+                    >
+                        <NuxtImage
+                            :src="product.thumbnail || product.images?.[0]?.url || '/images/about/about-premium.jpg'"
+                            :alt="product.title || 'Product image'"
+                            width="80"
+                            height="80"
+                            class="h-20 w-20 rounded-xl bg-slate-100 object-cover"
+                        />
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-semibold text-slate-950">{{ product.title }}</p>
+                            <p class="truncate text-xs font-medium tracking-wide text-slate-600">{{ getProductMeta(product) }}</p>
+                        </div>
+                        <span class="text-xs font-semibold tracking-widest text-amber-900">Open</span>
+                    </NuxtLink>
+                </li>
+            </ul>
         </div>
     </BaseModal>
 </template>

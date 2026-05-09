@@ -69,7 +69,7 @@ defineExpose({
 </script>
 
 <template>
-    <button ref="buttonRef" :type="props.type" :disabled="isDisabled" :aria-busy="props.loading || undefined" :class="buttonClasses" v-bind="buttonAttrs">
+    <button ref="buttonRef" :type="type" :disabled="isDisabled" :aria-busy="loading || undefined" :class="buttonClasses" v-bind="buttonAttrs">
         <slot></slot>
     </button>
 </template>

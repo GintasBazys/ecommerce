@@ -100,7 +100,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
             </span>
             <h2
                 class="mt-4 text-3xl leading-tight font-semibold tracking-tight"
-                :class="props.currentStep === 'account' ? 'text-slate-950' : 'text-slate-900'"
+                :class="currentStep === 'account' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Account or guest
             </h2>
@@ -108,7 +108,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
         </div>
 
         <div
-            v-if="props.identityCompleted"
+            v-if="identityCompleted"
             class="flex flex-col gap-4 rounded-3xl border border-slate-200/80 bg-linear-to-b from-white to-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between"
         >
             <div>
@@ -118,9 +118,9 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     Ready for checkout
                 </span>
                 <strong class="mt-3 block text-base font-semibold text-slate-950">Checkout identity ready</strong>
-                <p class="mt-1 text-sm leading-6 text-slate-600">{{ props.checkoutIdentity }}</p>
+                <p class="mt-1 text-sm leading-6 text-slate-600">{{ checkoutIdentity }}</p>
             </div>
-            <div v-if="props.isGuestIdentity" class="flex flex-col gap-3 sm:flex-row">
+            <div v-if="isGuestIdentity" class="flex flex-col gap-3 sm:flex-row">
                 <BaseButton
                     type="button"
                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
@@ -150,7 +150,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     type="button"
                     :class="[
                         tabBaseClass,
-                        props.authTab === 'login' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
+                        authTab === 'login' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
                     ]"
                     @click="emit('update:authTab', 'login')"
                 >
@@ -160,7 +160,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     type="button"
                     :class="[
                         tabBaseClass,
-                        props.authTab === 'register' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
+                        authTab === 'register' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
                     ]"
                     @click="emit('update:authTab', 'register')"
                 >
@@ -170,7 +170,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     type="button"
                     :class="[
                         tabBaseClass,
-                        props.authTab === 'guest' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
+                        authTab === 'guest' ? 'bg-accent-500 text-slate-950' : 'text-amber-100 hover:bg-white/8 hover:text-white'
                     ]"
                     @click="emit('update:authTab', 'guest')"
                 >
@@ -179,7 +179,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
             </div>
 
             <div class="mt-5">
-                <div v-if="props.authTab === 'login'" class="grid gap-5">
+                <div v-if="authTab === 'login'" class="grid gap-5">
                     <div class="grid gap-3">
                         <BaseButton
                             type="button"
@@ -212,18 +212,18 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                             <input
                                 id="checkout-login-email"
                                 name="email"
-                                :value="props.loginEmail"
+                                :value="loginEmail"
                                 type="email"
                                 autocomplete="email"
                                 inputmode="email"
                                 autocapitalize="none"
                                 spellcheck="false"
                                 class="ui-input rounded-2xl"
-                                :class="props.loginErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                :class="loginErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:loginEmail', getInputValue($event))"
                             />
-                            <span v-if="props.loginErrors.email" class="block text-sm leading-6 text-rose-600">{{
-                                props.loginErrors.email
+                            <span v-if="loginErrors.email" class="block text-sm leading-6 text-rose-600">{{
+                                loginErrors.email
                             }}</span>
                         </label>
 
@@ -232,15 +232,15 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                             <input
                                 id="checkout-login-password"
                                 name="password"
-                                :value="props.loginPassword"
+                                :value="loginPassword"
                                 type="password"
                                 autocomplete="current-password"
                                 class="ui-input rounded-2xl"
-                                :class="props.loginErrors.password ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                :class="loginErrors.password ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:loginPassword', getInputValue($event))"
                             />
-                            <span v-if="props.loginErrors.password" class="block text-sm leading-6 text-rose-600">
-                                {{ props.loginErrors.password }}
+                            <span v-if="loginErrors.password" class="block text-sm leading-6 text-rose-600">
+                                {{ loginErrors.password }}
                             </span>
                         </label>
 
@@ -248,47 +248,47 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                             <FormsTurnstileWidget
                                 v-if="showLoginTurnstileVerification"
                                 ref="loginTurnstileWidget"
-                                :site-key="props.turnstileSiteKey"
+                                :site-key="turnstileSiteKey"
                                 action="login"
                                 appearance="execute"
                                 execution="execute"
-                                :reset-key="props.loginTurnstileResetKey"
-                                :model-value="props.loginTurnstileToken"
+                                :reset-key="loginTurnstileResetKey"
+                                :model-value="loginTurnstileToken"
                                 @update:model-value="emit('update:loginTurnstileToken', $event)"
                                 @error="emit('turnstile-error', 'login', $event)"
                                 @expired="emit('turnstile-error', 'login', $event)"
                             />
-                            <p v-if="props.loginErrors.verification" class="text-sm leading-6 text-rose-600">
-                                {{ props.loginErrors.verification }}
+                            <p v-if="loginErrors.verification" class="text-sm leading-6 text-rose-600">
+                                {{ loginErrors.verification }}
                             </p>
                         </div>
 
                         <BaseButton
                             type="submit"
                             class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
-                            :disabled="props.isSubmitting || props.isAuthLoading"
+                            :disabled="isSubmitting || isAuthLoading"
                         >
-                            {{ props.isSubmitting || props.isAuthLoading ? "Logging in..." : "Log in and continue" }}
+                            {{ isSubmitting || isAuthLoading ? "Logging in..." : "Log in and continue" }}
                         </BaseButton>
                     </form>
                 </div>
 
-                <form v-else-if="props.authTab === 'register'" class="grid gap-4" novalidate @submit.prevent="emit('submit-register')">
+                <form v-else-if="authTab === 'register'" class="grid gap-4" novalidate @submit.prevent="emit('submit-register')">
                     <div class="grid gap-4 sm:grid-cols-2">
                         <label class="grid gap-2">
                             <span class="text-sm font-semibold text-slate-900">First name</span>
                             <input
                                 id="checkout-first-name"
                                 name="given-name"
-                                :value="props.regFirstName"
+                                :value="regFirstName"
                                 type="text"
                                 autocomplete="given-name"
                                 class="ui-input rounded-2xl"
-                                :class="props.registerErrors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                :class="registerErrors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:regFirstName', getInputValue($event))"
                             />
-                            <span v-if="props.registerErrors.first_name" class="block text-sm leading-6 text-rose-600">
-                                {{ props.registerErrors.first_name }}
+                            <span v-if="registerErrors.first_name" class="block text-sm leading-6 text-rose-600">
+                                {{ registerErrors.first_name }}
                             </span>
                         </label>
 
@@ -297,15 +297,15 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                             <input
                                 id="checkout-last-name"
                                 name="family-name"
-                                :value="props.regLastName"
+                                :value="regLastName"
                                 type="text"
                                 autocomplete="family-name"
                                 class="ui-input rounded-2xl"
-                                :class="props.registerErrors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                                :class="registerErrors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                                 @input="emit('update:regLastName', getInputValue($event))"
                             />
-                            <span v-if="props.registerErrors.last_name" class="block text-sm leading-6 text-rose-600">
-                                {{ props.registerErrors.last_name }}
+                            <span v-if="registerErrors.last_name" class="block text-sm leading-6 text-rose-600">
+                                {{ registerErrors.last_name }}
                             </span>
                         </label>
                     </div>
@@ -315,18 +315,18 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                         <input
                             id="checkout-register-email"
                             name="email"
-                            :value="props.regEmail"
+                            :value="regEmail"
                             type="email"
                             autocomplete="email"
                             inputmode="email"
                             autocapitalize="none"
                             spellcheck="false"
                             class="ui-input rounded-2xl"
-                            :class="props.registerErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                            :class="registerErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:regEmail', getInputValue($event))"
                         />
-                        <span v-if="props.registerErrors.email" class="block text-sm leading-6 text-rose-600">{{
-                            props.registerErrors.email
+                        <span v-if="registerErrors.email" class="block text-sm leading-6 text-rose-600">{{
+                            registerErrors.email
                         }}</span>
                     </label>
 
@@ -335,15 +335,15 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                         <input
                             id="checkout-register-password"
                             name="new-password"
-                            :value="props.regPassword"
+                            :value="regPassword"
                             type="password"
                             autocomplete="new-password"
                             class="ui-input rounded-2xl"
-                            :class="props.registerErrors.password ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                            :class="registerErrors.password ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:regPassword', getInputValue($event))"
                         />
-                        <span v-if="props.registerErrors.password" class="block text-sm leading-6 text-rose-600">
-                            {{ props.registerErrors.password }}
+                        <span v-if="registerErrors.password" class="block text-sm leading-6 text-rose-600">
+                            {{ registerErrors.password }}
                         </span>
                     </label>
 
@@ -351,27 +351,27 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                         <FormsTurnstileWidget
                             v-if="showRegisterTurnstileVerification"
                             ref="registerTurnstileWidget"
-                            :site-key="props.turnstileSiteKey"
+                            :site-key="turnstileSiteKey"
                             action="register"
                             appearance="execute"
                             execution="execute"
-                            :reset-key="props.registerTurnstileResetKey"
-                            :model-value="props.registerTurnstileToken"
+                            :reset-key="registerTurnstileResetKey"
+                            :model-value="registerTurnstileToken"
                             @update:model-value="emit('update:registerTurnstileToken', $event)"
                             @error="emit('turnstile-error', 'register', $event)"
                             @expired="emit('turnstile-error', 'register', $event)"
                         />
-                        <p v-if="props.registerErrors.verification" class="text-sm leading-6 text-rose-600">
-                            {{ props.registerErrors.verification }}
+                        <p v-if="registerErrors.verification" class="text-sm leading-6 text-rose-600">
+                            {{ registerErrors.verification }}
                         </p>
                     </div>
 
                     <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
-                        :disabled="props.isSubmitting || props.isAuthLoading"
+                        :disabled="isSubmitting || isAuthLoading"
                     >
-                        {{ props.isSubmitting || props.isAuthLoading ? "Creating account..." : "Create account and continue" }}
+                        {{ isSubmitting || isAuthLoading ? "Creating account..." : "Create account and continue" }}
                     </BaseButton>
                 </form>
 
@@ -385,27 +385,27 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                         <input
                             id="checkout-guest-email"
                             name="email"
-                            :value="props.guestEmail"
+                            :value="guestEmail"
                             type="email"
                             autocomplete="email"
                             inputmode="email"
                             autocapitalize="none"
                             spellcheck="false"
                             class="ui-input rounded-2xl"
-                            :class="props.guestErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                            :class="guestErrors.email ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                             @input="emit('update:guestEmail', getInputValue($event))"
                         />
-                        <span v-if="props.guestErrors.email" class="block text-sm leading-6 text-rose-600">{{
-                            props.guestErrors.email
+                        <span v-if="guestErrors.email" class="block text-sm leading-6 text-rose-600">{{
+                            guestErrors.email
                         }}</span>
                     </label>
 
                     <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
-                        :disabled="props.isSubmitting"
+                        :disabled="isSubmitting"
                     >
-                        {{ props.isSubmitting ? "Continuing..." : "Continue as guest" }}
+                        {{ isSubmitting ? "Continuing..." : "Continue as guest" }}
                     </BaseButton>
                 </form>
             </div>

@@ -34,9 +34,9 @@ const safeReviews = computed<SafeProductReview[]>(() =>
             v-if="safeReviews.length === 0"
             class="rounded-card border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
-            <template v-if="props.averageRating && props.averageRating > 0">
-                Rated {{ props.averageRating.toFixed(1) }} out of 5
-                <template v-if="props.reviewCount && props.reviewCount > 0"> across {{ props.reviewCount }} shopper responses </template>
+            <template v-if="averageRating && averageRating > 0">
+                Rated {{ averageRating.toFixed(1) }} out of 5
+                <template v-if="reviewCount && reviewCount > 0"> across {{ reviewCount }} shopper responses </template>
                 . Written reviews are not available to show for this product yet.
             </template>
             <template v-else> No reviews yet. Be the first to write one. </template>

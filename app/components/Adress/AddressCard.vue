@@ -116,14 +116,14 @@ function onDelete(): void {
                         </div>
                     </div>
 
-                    <div v-if="props.address.phone || props.address.company" class="grid gap-2 border-t border-slate-100 pt-3">
-                        <p v-if="props.address.phone" class="flex items-center gap-2 font-medium text-slate-700">
+                    <div v-if="address.phone || address.company" class="grid gap-2 border-t border-slate-100 pt-3">
+                        <p v-if="address.phone" class="flex items-center gap-2 font-medium text-slate-700">
                             <span class="text-slate-400" aria-hidden="true">Phone</span>
-                            <span class="truncate text-slate-950">{{ props.address.phone }}</span>
+                            <span class="truncate text-slate-950">{{ address.phone }}</span>
                         </p>
-                        <p v-if="props.address.company" class="flex items-center gap-2 font-medium text-slate-700">
+                        <p v-if="address.company" class="flex items-center gap-2 font-medium text-slate-700">
                             <span class="text-slate-400" aria-hidden="true">Company</span>
-                            <span class="truncate text-slate-950">{{ props.address.company }}</span>
+                            <span class="truncate text-slate-950">{{ address.company }}</span>
                         </p>
                     </div>
                 </div>

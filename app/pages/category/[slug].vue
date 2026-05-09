@@ -28,13 +28,19 @@ const isMobileFilterDrawerOpen = ref<boolean>(false)
 const mobileFilterViewportHeight = ref<number>(0)
 const notFoundPath = ref<string | null>(null)
 const productsStartRef = ref<HTMLElement | null>(null)
+const mobileFilterDrawerRef = ref<HTMLElement | null>(null)
 const category = ref<ProductCategoryDTO | null>(null)
 const isAllProductsPage = computed<boolean>(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
+const mobileFilterTitleId = "mobile-filter-title"
+const mobileFilterDescriptionId = "mobile-filter-description"
+
+useFocusTrap(mobileFilterDrawerRef, isMobileFilterDrawerOpen, { onEscape: closeMobileFilters })
 
 const {
     products,
     totalCount,
     loadingRef,
+    errorRef,
     sortLoading,
     filterLoading,
     facets,
@@ -166,6 +172,10 @@ function markNotFound() {
     if (event) {
         setResponseStatus(event, 404)
     }
+}
+
+function closeMobileFilters(): void {
+    isMobileFilterDrawerOpen.value = false
 }
 
 async function loadCategoryPage() {
@@ -318,6 +328,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         <BaseButton
                             type="button"
                             class="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
+                            aria-label="Close filters"
                             @click="isMobileFilterDrawerOpen = false"
                         />
                         <Transition
@@ -330,9 +341,17 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         >
                             <div
                                 v-if="isMobileFilterDrawerOpen"
+                                ref="mobileFilterDrawerRef"
                                 class="mobile-filter-drawer absolute inset-x-0 bottom-0 overflow-y-auto overscroll-contain rounded-t-panel bg-white p-4 shadow-2xl will-change-transform sm:p-5"
                                 :style="mobileFilterDrawerStyle"
+                                role="dialog"
+                                aria-modal="true"
+                                :aria-labelledby="mobileFilterTitleId"
+                                :aria-describedby="mobileFilterDescriptionId"
+                                tabindex="-1"
                             >
+                                <h2 :id="mobileFilterTitleId" class="sr-only">Filter products</h2>
+                                <p :id="mobileFilterDescriptionId" class="sr-only">Refine the current product listing by category, availability, and price.</p>
                                 <CategoryFiltersPanel
                                     v-model:selected-child-category-ids="selectedChildCategoryIds"
                                     v-model:selected-collection-ids="selectedCollectionIds"
@@ -350,7 +369,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                     @clear-all="clearAllFilters"
                                     @reset-price-range="resetPriceRange"
                                     @apply-price-range="applyPriceRange"
-                                    @close="isMobileFilterDrawerOpen = false"
+                                    @close="closeMobileFilters"
                                 />
                             </div>
                         </Transition>
@@ -397,9 +416,11 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
                     <CategoryResultsGrid
                         :loading="loadingRef"
+                        :error-message="errorRef"
                         :grid-is-initial-loading="gridIsInitialLoading"
                         :products="products"
                         :empty-state-text="emptyStateText"
+                        @retry="fetchProducts('initial')"
                         @clear-all="clearAllFilters"
                     />
 

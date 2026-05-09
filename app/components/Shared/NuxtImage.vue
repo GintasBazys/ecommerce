@@ -3,12 +3,14 @@ import type { NuxtImageProps } from "../../types/media"
 
 const props = defineProps<NuxtImageProps>()
 
+const normalizedSrc = computed<string>(() => (typeof props.src === "string" ? props.src.trim() || "/images/placeholder.png" : "/images/placeholder.png"))
+
 const resolvedFormat = computed<string | undefined>(() => {
     if (props.format) {
         return props.format
     }
 
-    if (props.src.endsWith(".svg")) {
+    if (normalizedSrc.value.endsWith(".svg")) {
         return undefined
     }
 
@@ -18,7 +20,7 @@ const resolvedFormat = computed<string | undefined>(() => {
 
 <template>
     <NuxtImg
-        :src="src"
+        :src="normalizedSrc"
         :alt="alt"
         :width="width"
         :height="height"

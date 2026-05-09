@@ -32,66 +32,66 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
     <section class="rounded-card grid gap-5 border border-slate-200/80 bg-white/90 p-4 sm:p-5">
         <div>
             <span
-                v-if="props.eyebrow"
+                v-if="eyebrow"
                 class="text-label-xs tracking-label inline-flex min-h-8 items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 font-bold text-amber-900 uppercase"
             >
-                {{ props.eyebrow }}
+                {{ eyebrow }}
             </span>
-            <h3 class="mt-3 text-base font-semibold text-slate-950">{{ props.title }}</h3>
-            <p v-if="props.description" class="mt-1 text-sm leading-6 text-slate-600">{{ props.description }}</p>
+            <h3 class="mt-3 text-base font-semibold text-slate-950">{{ title }}</h3>
+            <p v-if="description" class="mt-1 text-sm leading-6 text-slate-600">{{ description }}</p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">First name</span>
                 <input
-                    :id="`${props.prefix}-first-name`"
-                    :value="props.address.first_name"
+                    :id="`${prefix}-first-name`"
+                    :value="address.first_name"
                     type="text"
-                    :autocomplete="`${props.autocompletePrefix} given-name`"
+                    :autocomplete="`${autocompletePrefix} given-name`"
                     class="ui-input min-h-12 rounded-2xl"
-                    :class="props.errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'first_name', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="props.errors.first_name" class="block text-sm leading-6 text-rose-600">{{ props.errors.first_name }}</span>
+                <span v-if="errors.first_name" class="block text-sm leading-6 text-rose-600">{{ errors.first_name }}</span>
             </label>
 
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">Last name</span>
                 <input
-                    :id="`${props.prefix}-last-name`"
-                    :value="props.address.last_name"
+                    :id="`${prefix}-last-name`"
+                    :value="address.last_name"
                     type="text"
-                    :autocomplete="`${props.autocompletePrefix} family-name`"
+                    :autocomplete="`${autocompletePrefix} family-name`"
                     class="ui-input min-h-12 rounded-2xl"
-                    :class="props.errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'last_name', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="props.errors.last_name" class="block text-sm leading-6 text-rose-600">{{ props.errors.last_name }}</span>
+                <span v-if="errors.last_name" class="block text-sm leading-6 text-rose-600">{{ errors.last_name }}</span>
             </label>
         </div>
 
         <label class="grid gap-2">
             <span class="text-sm font-semibold text-slate-900">Address line 1</span>
             <input
-                :id="`${props.prefix}-address-1`"
-                :value="props.address.address_1"
+                :id="`${prefix}-address-1`"
+                :value="address.address_1"
                 type="text"
-                :autocomplete="`${props.autocompletePrefix} address-line1`"
+                :autocomplete="`${autocompletePrefix} address-line1`"
                 class="ui-input min-h-12 rounded-2xl"
-                :class="props.errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                :class="errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                 @input="emit('update:field', { field: 'address_1', value: ($event.target as HTMLInputElement).value })"
             />
-            <span v-if="props.errors.address_1" class="block text-sm leading-6 text-rose-600">{{ props.errors.address_1 }}</span>
+            <span v-if="errors.address_1" class="block text-sm leading-6 text-rose-600">{{ errors.address_1 }}</span>
         </label>
 
         <label class="grid gap-2">
             <span class="text-sm font-semibold text-slate-900">Address line 2</span>
             <input
-                :id="`${props.prefix}-address-2`"
-                :value="props.address.address_2"
+                :id="`${prefix}-address-2`"
+                :value="address.address_2"
                 type="text"
-                :autocomplete="`${props.autocompletePrefix} address-line2`"
+                :autocomplete="`${autocompletePrefix} address-line2`"
                 class="ui-input min-h-12 rounded-2xl"
                 @input="emit('update:field', { field: 'address_2', value: ($event.target as HTMLInputElement).value })"
             />
@@ -101,43 +101,43 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">Postal code</span>
                 <input
-                    :id="`${props.prefix}-postal-code`"
-                    :value="props.address.postal_code"
+                    :id="`${prefix}-postal-code`"
+                    :value="address.postal_code"
                     type="text"
-                    :autocomplete="`${props.autocompletePrefix} postal-code`"
+                    :autocomplete="`${autocompletePrefix} postal-code`"
                     class="ui-input min-h-12 rounded-2xl"
-                    :class="props.errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'postal_code', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="props.errors.postal_code" class="block text-sm leading-6 text-rose-600">{{ props.errors.postal_code }}</span>
+                <span v-if="errors.postal_code" class="block text-sm leading-6 text-rose-600">{{ errors.postal_code }}</span>
             </label>
 
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">City</span>
                 <input
-                    :id="`${props.prefix}-city`"
-                    :value="props.address.city"
+                    :id="`${prefix}-city`"
+                    :value="address.city"
                     type="text"
-                    :autocomplete="`${props.autocompletePrefix} address-level2`"
+                    :autocomplete="`${autocompletePrefix} address-level2`"
                     class="ui-input min-h-12 rounded-2xl"
-                    :class="props.errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'city', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="props.errors.city" class="block text-sm leading-6 text-rose-600">{{ props.errors.city }}</span>
+                <span v-if="errors.city" class="block text-sm leading-6 text-rose-600">{{ errors.city }}</span>
             </label>
 
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">Province / State</span>
                 <input
-                    :id="`${props.prefix}-province`"
-                    :value="props.address.province"
+                    :id="`${prefix}-province`"
+                    :value="address.province"
                     type="text"
-                    :autocomplete="`${props.autocompletePrefix} address-level1`"
+                    :autocomplete="`${autocompletePrefix} address-level1`"
                     class="ui-input min-h-12 rounded-2xl"
-                    :class="props.errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'province', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="props.errors.province" class="block text-sm leading-6 text-rose-600">{{ props.errors.province }}</span>
+                <span v-if="errors.province" class="block text-sm leading-6 text-rose-600">{{ errors.province }}</span>
             </label>
         </div>
 
@@ -145,28 +145,28 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">Country</span>
                 <BaseSelect
-                    :id="`${props.prefix}-country`"
-                    :model-value="props.address.country_code"
+                    :id="`${prefix}-country`"
+                    :model-value="address.country_code"
                     :options="countryOptions"
                     option-label-key="title"
-                    :class="props.errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @update:model-value="emit('update:field', { field: 'country_code', value: String($event) })"
                 />
-                <span v-if="props.errors.country_code" class="block text-sm leading-6 text-rose-600">{{ props.errors.country_code }}</span>
+                <span v-if="errors.country_code" class="block text-sm leading-6 text-rose-600">{{ errors.country_code }}</span>
             </label>
 
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">Phone</span>
                 <input
-                    :id="`${props.prefix}-phone`"
-                    :value="props.address.phone"
+                    :id="`${prefix}-phone`"
+                    :value="address.phone"
                     type="tel"
-                    :autocomplete="`${props.autocompletePrefix} tel`"
+                    :autocomplete="`${autocompletePrefix} tel`"
                     class="ui-input min-h-12 rounded-2xl"
-                    :class="props.errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :class="errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     @input="emit('update:field', { field: 'phone', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="props.errors.phone" class="block text-sm leading-6 text-rose-600">{{ props.errors.phone }}</span>
+                <span v-if="errors.phone" class="block text-sm leading-6 text-rose-600">{{ errors.phone }}</span>
             </label>
         </div>
     </section>

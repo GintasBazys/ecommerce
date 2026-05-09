@@ -3,7 +3,7 @@ import type { PromotionSummary } from "~/types/checkout"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
-const props = defineProps<{
+defineProps<{
     itemCount: number
     promotionCount: number
     couponCode: string
@@ -13,6 +13,7 @@ const props = defineProps<{
     isCouponDisabled: boolean
     isCheckoutDisabled: boolean
     couponHint: string
+    couponError: string | null
     subtotal: string
     tax: string
     total: string
@@ -47,11 +48,11 @@ function onCouponInput(event: Event): void {
                 <div>
                     <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Cart snapshot</p>
                     <p class="mt-2 text-sm font-semibold text-slate-950">
-                        {{ props.itemCount }} item{{ props.itemCount === 1 ? "" : "s" }} selected
+                        {{ itemCount }} item{{ itemCount === 1 ? "" : "s" }} selected
                     </p>
                 </div>
                 <div class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">
-                    {{ props.promotionCount }} promo{{ props.promotionCount === 1 ? "" : "s" }}
+                    {{ promotionCount }} promo{{ promotionCount === 1 ? "" : "s" }}
                 </div>
             </div>
         </div>
@@ -60,37 +61,38 @@ function onCouponInput(event: Event): void {
             <label class="grid gap-2">
                 <span class="text-sm font-semibold text-slate-900">Promo code</span>
                 <input
-                    :value="props.couponCode"
+                    :value="couponCode"
                     name="couponTextInput"
                     type="text"
                     placeholder="Enter coupon code"
                     class="ui-input-accent border-slate-200 placeholder:text-slate-400 focus:ring-amber-100 disabled:cursor-not-allowed disabled:bg-slate-50"
-                    :disabled="!props.hasCartItems || props.isCartDirty"
+                    :disabled="!hasCartItems || isCartDirty"
                     @input="onCouponInput"
                 />
             </label>
-            <BaseButton type="submit" variant="accent" class="min-h-12" :disabled="props.isCouponDisabled">
+            <BaseButton type="submit" variant="accent" class="min-h-12" :disabled="isCouponDisabled">
                 <span
-                    v-if="props.isApplyingCoupon"
+                    v-if="isApplyingCoupon"
                     class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950"
                 ></span>
                 Apply code
             </BaseButton>
         </form>
 
-        <p class="mt-3 text-sm leading-6 text-slate-600">{{ props.couponHint }}</p>
+        <p v-if="couponError" class="mt-3 text-sm leading-6 text-rose-700" role="alert">{{ couponError }}</p>
+        <p v-else class="mt-3 text-sm leading-6 text-slate-600">{{ couponHint }}</p>
 
-        <div v-if="props.promotions.length" class="mt-5 grid gap-3">
+        <div v-if="promotions.length" class="mt-5 grid gap-3">
             <h3 class="text-sm font-semibold text-slate-950">Applied promotions</h3>
             <div
-                v-for="promo in props.promotions"
+                v-for="promo in promotions"
                 :key="promo.id"
                 class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 p-4"
             >
                 <div>
                     <p class="font-semibold text-slate-950">{{ promo.code }}</p>
                     <p class="mt-1 text-sm text-slate-600">
-                        {{ props.promotionValue(promo) }}
+                        {{ promotionValue(promo) }}
                     </p>
                 </div>
                 <BaseButton
@@ -113,16 +115,16 @@ function onCouponInput(event: Event): void {
         <div class="grid gap-3">
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                 <span>Subtotal</span>
-                <span class="font-semibold text-slate-950">{{ props.subtotal }}</span>
+                <span class="font-semibold text-slate-950">{{ subtotal }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 text-sm text-slate-600">
                 <span>Tax</span>
-                <span class="font-semibold text-slate-950">{{ props.tax }}</span>
+                <span class="font-semibold text-slate-950">{{ tax }}</span>
             </div>
             <div class="rounded-card-sm flex items-center justify-between gap-3 border border-slate-200/80 bg-slate-50/80 px-4 py-3">
                 <span class="text-sm font-semibold text-slate-900">Total</span>
                 <strong class="text-lg font-semibold tracking-tight text-slate-950">
-                    {{ props.total }}
+                    {{ total }}
                 </strong>
             </div>
         </div>
@@ -131,15 +133,15 @@ function onCouponInput(event: Event): void {
 
         <div class="mt-5 grid gap-3">
             <NuxtLink
-                :to="props.isCheckoutDisabled ? undefined : '/checkout'"
+                :to="isCheckoutDisabled ? undefined : '/checkout'"
                 class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
-                :class="props.isCheckoutDisabled ? 'pointer-events-none opacity-50' : ''"
+                :class="isCheckoutDisabled ? 'pointer-events-none opacity-50' : ''"
             >
                 Checkout
             </NuxtLink>
-            <p v-if="props.isCheckoutDisabled" class="text-sm leading-6 text-slate-600">
-                <span v-if="!props.hasCartItems">Add items to continue to checkout.</span>
-                <span v-else-if="props.isCartDirty">Update your cart before continuing.</span>
+            <p v-if="isCheckoutDisabled" class="text-sm leading-6 text-slate-600">
+                <span v-if="!hasCartItems">Add items to continue to checkout.</span>
+                <span v-else-if="isCartDirty">Update your cart before continuing.</span>
                 <span v-else>Your cart total must be greater than zero.</span>
             </p>
         </div>

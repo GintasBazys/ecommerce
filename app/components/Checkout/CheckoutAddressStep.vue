@@ -6,7 +6,7 @@ import type { Address } from "~/types/interfaces"
 import CheckoutAddressFields from "~/components/Checkout/CheckoutAddressFields.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
-const props = defineProps<{
+defineProps<{
     currentStep: string
     identityCompleted: boolean
     addressCompleted: boolean
@@ -72,7 +72,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
             </span>
             <h2
                 class="mt-4 text-3xl leading-tight font-semibold tracking-tight"
-                :class="props.currentStep === 'address' ? 'text-slate-950' : 'text-slate-900'"
+                :class="currentStep === 'address' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Billing and shipping
             </h2>
@@ -82,7 +82,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
         </div>
 
         <div
-            v-if="!props.identityCompleted"
+            v-if="!identityCompleted"
             class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             Complete the account step first to unlock the address form.
@@ -108,7 +108,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                 </div>
 
                 <section
-                    v-if="props.isSavedAddressesLoading || props.savedAddressesError || props.savedAddresses.length"
+                    v-if="isSavedAddressesLoading || savedAddressesError || savedAddresses.length"
                     class="rounded-card border border-amber-200/70 bg-linear-to-br from-amber-50 to-white p-4 shadow-lg sm:p-5"
                     aria-labelledby="checkout-saved-billing-title"
                 >
@@ -124,7 +124,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                         </div>
                     </div>
 
-                    <div v-if="props.isSavedAddressesLoading" class="mt-4 grid gap-3" aria-hidden="true">
+                    <div v-if="isSavedAddressesLoading" class="mt-4 grid gap-3" aria-hidden="true">
                         <div v-for="item in 2" :key="item" class="rounded-2xl border border-amber-100 bg-white/80 p-4">
                             <div class="animate-pulse space-y-3">
                                 <div class="h-4 w-32 rounded-full bg-amber-100"></div>
@@ -135,20 +135,20 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     </div>
 
                     <p
-                        v-else-if="props.savedAddressesError"
+                        v-else-if="savedAddressesError"
                         class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700"
                         role="alert"
                     >
-                        {{ props.savedAddressesError }}
+                        {{ savedAddressesError }}
                     </p>
 
                     <div v-else class="mt-4 grid gap-3 sm:grid-cols-2">
                         <label
-                            v-for="address in props.savedAddresses"
+                            v-for="address in savedAddresses"
                             :key="address.id"
                             class="group relative flex min-h-32 cursor-pointer gap-3 rounded-2xl border bg-white/90 p-4 transition focus-within:ring-2 focus-within:ring-amber-200 motion-reduce:transition-none"
                             :class="
-                                props.selectedBillingSavedAddressId === address.id
+                                selectedBillingSavedAddressId === address.id
                                     ? 'border-amber-300 shadow-lg ring-1 ring-amber-100'
                                     : 'border-slate-200 hover:border-amber-200'
                             "
@@ -158,7 +158,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                                 name="checkout-saved-billing-address"
                                 class="accent-accent-500 mt-1 h-4 w-4 shrink-0"
                                 :value="address.id"
-                                :checked="props.selectedBillingSavedAddressId === address.id"
+                                :checked="selectedBillingSavedAddressId === address.id"
                                 @change="onSavedAddressChange($event, 'billing')"
                             />
                             <span class="grid gap-2 text-sm leading-6">
@@ -177,9 +177,9 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     description="The primary address for this order and payment record."
                     prefix="checkout-billing"
                     autocomplete-prefix="billing"
-                    :address="props.billingAddress"
-                    :errors="props.billingErrors"
-                    :countries="props.countries"
+                    :address="billingAddress"
+                    :errors="billingErrors"
+                    :countries="countries"
                     @update:field="emit('update:billingField', $event)"
                 />
 
@@ -188,7 +188,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                         <input
                             type="checkbox"
                             class="accent-accent-500 mt-1 h-4 w-4 shrink-0"
-                            :checked="props.useSeparateShipping"
+                            :checked="useSeparateShipping"
                             @change="onSeparateShippingChange"
                         />
                         <span class="grid gap-1">
@@ -201,7 +201,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                 </div>
 
                 <section
-                    v-if="props.useSeparateShipping && props.savedAddresses.length"
+                    v-if="useSeparateShipping && savedAddresses.length"
                     class="rounded-card border border-slate-200/80 bg-white/90 p-4 sm:p-5"
                     aria-labelledby="checkout-saved-shipping-title"
                 >
@@ -211,17 +211,17 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     </h3>
                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
                         <label
-                            v-for="address in props.savedAddresses"
+                            v-for="address in savedAddresses"
                             :key="address.id"
                             class="flex min-h-28 cursor-pointer gap-3 rounded-2xl border bg-slate-50 p-4 transition focus-within:ring-2 focus-within:ring-amber-200 motion-reduce:transition-none"
-                            :class="props.selectedShippingSavedAddressId === address.id ? 'border-amber-300 bg-amber-50/70' : 'border-slate-200 hover:border-amber-200'"
+                            :class="selectedShippingSavedAddressId === address.id ? 'border-amber-300 bg-amber-50/70' : 'border-slate-200 hover:border-amber-200'"
                         >
                             <input
                                 type="radio"
                                 name="checkout-saved-shipping-address"
                                 class="accent-accent-500 mt-1 h-4 w-4 shrink-0"
                                 :value="address.id"
-                                :checked="props.selectedShippingSavedAddressId === address.id"
+                                :checked="selectedShippingSavedAddressId === address.id"
                                 @change="onSavedAddressChange($event, 'shipping')"
                             />
                             <span class="grid gap-2 text-sm leading-6">
@@ -235,20 +235,20 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                 </section>
 
                 <CheckoutAddressFields
-                    v-if="props.useSeparateShipping"
+                    v-if="useSeparateShipping"
                     title="Shipping address"
                     eyebrow="Shipping"
                     description="Where the order should arrive if it differs from billing."
                     prefix="checkout-shipping"
                     autocomplete-prefix="shipping"
-                    :address="props.shippingAddress"
-                    :errors="props.shippingErrors"
-                    :countries="props.countries"
+                    :address="shippingAddress"
+                    :errors="shippingErrors"
+                    :countries="countries"
                     @update:field="emit('update:shippingField', $event)"
                 />
 
                 <div
-                    v-if="!props.addressCompleted || props.currentStep === 'address'"
+                    v-if="!addressCompleted || currentStep === 'address'"
                     class="flex flex-col gap-3 sm:flex-row sm:justify-between"
                 >
                     <BaseButton
@@ -261,9 +261,9 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
-                        :disabled="props.isSubmitting"
+                        :disabled="isSubmitting"
                     >
-                        {{ props.isSubmitting ? "Saving..." : "Save and continue" }}
+                        {{ isSubmitting ? "Saving..." : "Save and continue" }}
                     </BaseButton>
                 </div>
             </form>

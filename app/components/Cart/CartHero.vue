@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
     total: string
     itemCount: number
     continueShoppingUrl: string
@@ -23,14 +23,14 @@ const props = defineProps<{
             </div>
 
             <div class="grid w-full gap-3 sm:w-auto sm:min-w-72">
-                <NuxtLink :to="props.continueShoppingUrl" class="ui-btn-accent min-h-12"> Continue shopping </NuxtLink>
+                <NuxtLink :to="continueShoppingUrl" class="ui-btn-accent min-h-12"> Continue shopping </NuxtLink>
                 <div class="rounded-card shadow-card border border-slate-200/80 bg-white/80 p-4">
                     <p class="text-label-eyebrow tracking-label font-bold text-slate-500 uppercase">Current total</p>
                     <p class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
-                        {{ props.total }}
+                        {{ total }}
                     </p>
                     <p class="mt-2 text-sm leading-6 text-slate-600">
-                        {{ props.itemCount }} item{{ props.itemCount === 1 ? "" : "s" }} in your cart
+                        {{ itemCount }} item{{ itemCount === 1 ? "" : "s" }} in your cart
                     </p>
                 </div>
             </div>

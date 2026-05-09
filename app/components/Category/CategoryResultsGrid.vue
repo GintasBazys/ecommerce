@@ -3,8 +3,9 @@ import type { CategoryProduct } from "~/types/category-listing"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
-const props = defineProps<{
+defineProps<{
     loading: boolean
+    errorMessage: string | null
     gridIsInitialLoading: boolean
     products: CategoryProduct[]
     emptyStateText: string
@@ -12,15 +13,26 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     clearAll: []
+    retry: []
 }>()
 </script>
 
 <template>
-    <div v-if="props.loading" class="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+    <div v-if="loading" class="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
         <div class="bg-brand-700 h-full w-1/3 animate-pulse rounded-full"></div>
     </div>
 
-    <div v-if="props.gridIsInitialLoading" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+    <div
+        v-if="errorMessage"
+        class="grid justify-items-center gap-3 rounded-3xl border border-rose-200 bg-rose-50 px-6 py-8 text-center shadow-panel"
+        role="alert"
+    >
+        <h2 class="text-2xl leading-tight font-semibold text-slate-950">Products could not be loaded.</h2>
+        <p class="max-w-120 text-sm leading-6 text-rose-700">{{ errorMessage }}</p>
+        <BaseButton type="button" variant="accent" @click="emit('retry')">Try again</BaseButton>
+    </div>
+
+    <div v-else-if="gridIsInitialLoading" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         <div
             v-for="n in 6"
             :key="n"
@@ -33,8 +45,8 @@ const emit = defineEmits<{
         </div>
     </div>
 
-    <div v-else-if="props.products.length" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-        <div v-for="product in props.products" :key="product.id" class="min-w-0">
+    <div v-else-if="products.length" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+        <div v-for="product in products" :key="product.id" class="min-w-0">
             <ProductCard :product="product" compact />
         </div>
     </div>
@@ -44,7 +56,7 @@ const emit = defineEmits<{
         class="grid justify-items-center gap-3 rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 px-6 py-8 text-center shadow-panel"
     >
         <h2 class="text-2xl leading-tight font-semibold text-slate-950">No products match these filters.</h2>
-        <p class="max-w-120 text-sm leading-6 text-slate-600">{{ props.emptyStateText }}</p>
+        <p class="max-w-120 text-sm leading-6 text-slate-600">{{ emptyStateText }}</p>
         <BaseButton type="button" variant="accent" @click="emit('clearAll')">Reset filters</BaseButton>
     </div>
 </template>

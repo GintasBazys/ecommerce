@@ -74,7 +74,8 @@ function syncActiveImageFromScroll(): void {
                         width="566"
                         height="566"
                         sizes="100vw sm:100vw md:100vw"
-                        loading="eager"
+                        :loading="index === 0 ? 'eager' : 'lazy'"
+                        :fetchpriority="index === 0 ? 'high' : 'auto'"
                         class="h-full w-full object-cover object-center"
                     />
                 </div>

@@ -4,7 +4,7 @@ import type { CategorySortOption } from "~/types/category-listing"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
-const props = defineProps<{
+defineProps<{
     totalCount: number
     sortLoading: boolean
     filterLoading: boolean
@@ -26,12 +26,12 @@ const emit = defineEmits<{
     <div class="mb-4 rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4 shadow-panel sm:p-5">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div class="min-w-0">
-                <span class="block text-lg font-bold text-slate-950">{{ props.totalCount }} products</span>
+                <span class="block text-lg font-bold text-slate-950">{{ totalCount }} products</span>
                 <p class="mt-1 text-sm leading-6 text-slate-600">
-                    <template v-if="props.sortLoading">Updating sort order...</template>
-                    <template v-else-if="props.filterLoading">Refreshing filtered results...</template>
-                    <template v-else-if="props.loading && !props.gridIsInitialLoading">Loading page {{ props.currentPage }}...</template>
-                    <template v-else-if="props.activeFilterCount">{{ props.activeFilterCount }} active filters</template>
+                    <template v-if="sortLoading">Updating sort order...</template>
+                    <template v-else-if="filterLoading">Refreshing filtered results...</template>
+                    <template v-else-if="loading && !gridIsInitialLoading">Loading page {{ currentPage }}...</template>
+                    <template v-else-if="activeFilterCount">{{ activeFilterCount }} active filters</template>
                     <template v-else>Medusa-backed filters for categories, collections, types, tags, stock, and price.</template>
                 </p>
             </div>
@@ -46,12 +46,12 @@ const emit = defineEmits<{
                         <path d="M6 10H14" stroke-linecap="round" />
                         <path d="M8 15H12" stroke-linecap="round" />
                     </svg>
-                    <span>{{ props.activeFilterCount ? `Filters (${props.activeFilterCount})` : "Filters" }}</span>
+                    <span>{{ activeFilterCount ? `Filters (${activeFilterCount})` : "Filters" }}</span>
                 </BaseButton>
                 <label class="grid gap-1 text-sm font-semibold text-slate-700">
                     <span>Sort by</span>
                     <span class="w-full sm:min-w-60 lg:max-w-68">
-                        <BaseSelect v-model="sortOption" :options="props.sortOptions" option-label-key="text" :disabled="props.loading" />
+                        <BaseSelect v-model="sortOption" :options="sortOptions" option-label-key="text" :disabled="loading" />
                     </span>
                 </label>
             </div>

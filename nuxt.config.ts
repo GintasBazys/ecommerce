@@ -17,7 +17,12 @@ export default defineNuxtConfig({
             htmlAttrs: {
                 lang: "en"
             },
-            meta: [{ name: "description", content: "..." }]
+            meta: [
+                {
+                    name: "description",
+                    content: "Shop curated products with clear pricing, availability, secure checkout, and regional delivery."
+                }
+            ]
         }
     },
 

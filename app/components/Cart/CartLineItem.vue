@@ -37,11 +37,11 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                 <NuxtLink
                     :to="productUrl"
                     class="block h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 sm:h-30 sm:w-30"
-                    :aria-label="`View ${props.item.product_title}`"
+                    :aria-label="`View ${item.product_title}`"
                 >
                     <NuxtImage
-                        :src="props.item.thumbnail || '/images/placeholder.png'"
-                        :alt="props.item.product_title ?? ''"
+                        :src="item.thumbnail || '/images/placeholder.png'"
+                        :alt="item.product_title ?? ''"
                         :width="240"
                         :height="240"
                         sizes="92px sm:120px"
@@ -55,7 +55,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                         :to="productUrl"
                         class="line-clamp-2 text-base leading-6 font-semibold text-slate-950 transition hover:text-amber-900"
                     >
-                        {{ props.item.product_title }}
+                        {{ item.product_title }}
                     </NuxtLink>
 
                     <p class="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">
@@ -70,7 +70,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                         :to="productUrl"
                         class="line-clamp-1 text-base leading-6 font-semibold text-slate-950 transition hover:text-amber-900"
                     >
-                        {{ props.item.product_title }}
+                        {{ item.product_title }}
                     </NuxtLink>
 
                     <p class="mt-1 line-clamp-2 max-w-xl text-sm leading-6 text-slate-600">
@@ -93,29 +93,29 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                             <BaseButton
                                 type="button"
                                 class="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-slate-700 transition hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
-                                :disabled="props.quantity <= 1"
-                                :aria-label="`Decrease quantity for ${props.item.product_title}`"
+                                :disabled="quantity <= 1"
+                                :aria-label="`Decrease quantity for ${item.product_title}`"
                                 @click="emit('decrement')"
                             >
                                 −
                             </BaseButton>
 
                             <input
-                                :value="props.quantity"
+                                :value="quantity"
                                 type="number"
                                 min="1"
-                                :max="props.maxQuantity"
+                                :max="maxQuantity"
                                 inputmode="numeric"
                                 class="h-9 w-10 border-0 bg-transparent px-1 text-center text-sm font-semibold text-slate-950 outline-hidden"
-                                :aria-label="`Quantity for ${props.item.product_title}`"
+                                :aria-label="`Quantity for ${item.product_title}`"
                                 @input="emit('quantityInput', $event)"
                             />
 
                             <BaseButton
                                 type="button"
                                 class="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-slate-700 transition hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
-                                :disabled="props.quantity >= props.maxQuantity"
-                                :aria-label="`Increase quantity for ${props.item.product_title}`"
+                                :disabled="quantity >= maxQuantity"
+                                :aria-label="`Increase quantity for ${item.product_title}`"
                                 @click="emit('increment')"
                             >
                                 +
@@ -124,7 +124,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                     </div>
 
                     <div class="sm:hidden">
-                        <TaxedLinePrice :amount-with-tax="props.amountWithTax" :amount-without-tax="props.amountWithoutTax" />
+                        <TaxedLinePrice :amount-with-tax="amountWithTax" :amount-without-tax="amountWithoutTax" />
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                 <BaseButton
                     type="button"
                     class="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
-                    :aria-label="`Remove ${props.item.product_title} from cart`"
+                    :aria-label="`Remove ${item.product_title} from cart`"
                     @click="emit('remove')"
                 >
                     <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -144,7 +144,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                 <div>
                     <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Line total</p>
                     <div class="mt-1 flex justify-end text-slate-950">
-                        <TaxedLinePrice :amount-with-tax="props.amountWithTax" :amount-without-tax="props.amountWithoutTax" />
+                        <TaxedLinePrice :amount-with-tax="amountWithTax" :amount-without-tax="amountWithoutTax" />
                     </div>
                 </div>
             </div>
@@ -153,7 +153,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                 <BaseButton
                     type="button"
                     class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
-                    :aria-label="`Remove ${props.item.product_title} from cart`"
+                    :aria-label="`Remove ${item.product_title} from cart`"
                     @click="emit('remove')"
                 >
                     Remove

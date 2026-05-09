@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from "vue-router"
 
-const props = defineProps<{
+defineProps<{
     currentPage: number
     totalPages: number
     paginationItems: (number | string)[]
@@ -11,10 +11,10 @@ const props = defineProps<{
 </script>
 
 <template>
-    <nav v-if="props.totalPages > 1" class="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Category pagination">
+    <nav v-if="totalPages > 1" class="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Category pagination">
         <NuxtLink
-            v-if="props.currentPage > 1"
-            :to="props.buildPageLink(props.currentPage - 1)"
+            v-if="currentPage > 1"
+            :to="buildPageLink(currentPage - 1)"
             class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card transition hover:border-slate-300 hover:bg-slate-50"
         >
             Previous
@@ -26,7 +26,7 @@ const props = defineProps<{
             Previous
         </span>
 
-        <template v-for="item in props.paginationItems" :key="String(item)">
+        <template v-for="item in paginationItems" :key="String(item)">
             <span
                 v-if="typeof item === 'string'"
                 class="inline-flex min-h-11 min-w-11 items-center justify-center px-1 text-sm font-semibold text-slate-500"
@@ -35,8 +35,8 @@ const props = defineProps<{
                 ...
             </span>
             <NuxtLink
-                v-else-if="item !== props.currentPage"
-                :to="props.buildPageLink(item)"
+                v-else-if="item !== currentPage"
+                :to="buildPageLink(item)"
                 class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 shadow-card transition hover:border-slate-300 hover:bg-slate-50"
             >
                 {{ item }}
@@ -51,8 +51,8 @@ const props = defineProps<{
         </template>
 
         <NuxtLink
-            v-if="props.currentPage < props.totalPages"
-            :to="props.buildPageLink(props.currentPage + 1)"
+            v-if="currentPage < totalPages"
+            :to="buildPageLink(currentPage + 1)"
             class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card transition hover:border-slate-300 hover:bg-slate-50"
         >
             Next
@@ -64,6 +64,6 @@ const props = defineProps<{
             Next
         </span>
 
-        <span class="w-full text-center text-sm text-slate-600">{{ props.paginationLabel }}</span>
+        <span class="w-full text-center text-sm text-slate-600">{{ paginationLabel }}</span>
     </nav>
 </template>

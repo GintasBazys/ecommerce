@@ -51,7 +51,7 @@ function handleCancel(): void {
                 Share feedback
             </p>
             <h2
-                :id="props.titleId"
+                :id="titleId"
                 class="mt-4 text-3xl leading-tight font-bold tracking-tighter text-slate-950"
             >
                 Write a review

@@ -21,6 +21,22 @@ const emit = defineEmits<{
     back: []
     submit: []
 }>()
+
+const needsShippingSelection = computed<boolean>(() =>
+    props.currentStep === "payment" && props.addressCompleted && props.shippingOptions.length > 0 && !props.selectedShippingOptionId
+)
+
+const paymentDisabledReason = computed<string | null>(() => {
+    if (needsShippingSelection.value) {
+        return "Select a shipping method to continue."
+    }
+
+    if (props.isPaymentInitializing) {
+        return "Payment details are still loading."
+    }
+
+    return null
+})
 </script>
 
 <template>
@@ -33,7 +49,7 @@ const emit = defineEmits<{
             </span>
             <h2
                 class="mt-4 text-3xl leading-tight font-semibold tracking-tight"
-                :class="props.currentStep === 'payment' ? 'text-slate-950' : 'text-slate-900'"
+                :class="currentStep === 'payment' ? 'text-slate-950' : 'text-slate-900'"
             >
                 Shipping and payment
             </h2>
@@ -43,14 +59,14 @@ const emit = defineEmits<{
         </div>
 
         <div
-            v-if="!props.addressCompleted"
+            v-if="!addressCompleted"
             class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             Save your address details first to unlock shipping options and payment.
         </div>
 
         <div
-            v-else-if="props.currentStep !== 'payment'"
+            v-else-if="currentStep !== 'payment'"
             class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600"
         >
             Shipping options and payment will appear after the address step is saved.
@@ -66,34 +82,34 @@ const emit = defineEmits<{
                     <p class="mt-1 text-sm leading-6 text-slate-600">Select the option that best fits this order.</p>
                 </div>
 
-                <template v-if="props.isShippingLoading">
+                <template v-if="isShippingLoading">
                     <div class="h-16 animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
                     <div class="h-16 animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"></div>
                 </template>
 
-                <div v-else-if="props.shippingOptions.length" class="grid gap-3" role="radiogroup" aria-label="Shipping method">
+                <div v-else-if="shippingOptions.length" class="grid gap-3" role="radiogroup" aria-label="Shipping method">
                     <label
-                        v-for="option in props.shippingOptions"
+                        v-for="option in shippingOptions"
                         :key="option.id"
                         class="flex items-center gap-3 self-start rounded-3xl border px-4 py-4 transition"
                         :class="
-                            props.selectedShippingOptionId === option.id
+                            selectedShippingOptionId === option.id
                                 ? 'border-amber-300 bg-amber-50/70'
                                 : 'border-slate-200/80 bg-white/90 hover:border-amber-200'
                         "
                     >
                         <input
-                            :checked="props.selectedShippingOptionId === option.id"
+                            :checked="selectedShippingOptionId === option.id"
                             type="radio"
                             :value="option.id"
                             class="accent-accent-500 mt-1 h-4 w-4"
                             @change="emit('update:selectedShippingOptionId', option.id)"
                         />
                         <span class="min-w-0 flex-1 text-sm leading-6 font-semibold text-slate-900">{{
-                            props.getShippingOptionLabel(option)
+                            getShippingOptionLabel(option)
                         }}</span>
                         <span
-                            v-if="props.selectedShippingOptionId === option.id"
+                            v-if="selectedShippingOptionId === option.id"
                             class="text-label-2xs tracking-label inline-flex min-h-7 items-center rounded-full border border-amber-200 bg-amber-100 px-3 font-bold text-amber-900 uppercase"
                         >
                             Selected
@@ -115,11 +131,15 @@ const emit = defineEmits<{
                     <div id="payment-element" class="mt-4"></div>
                 </div>
 
+                <p v-if="paymentDisabledReason" id="payment-disabled-reason" class="text-sm leading-6 text-amber-900" role="status">
+                    {{ paymentDisabledReason }}
+                </p>
+
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
                     <BaseButton
                         type="button"
                         class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
-                        :disabled="props.isRedirectingToOrder"
+                        :disabled="isRedirectingToOrder"
                         @click="emit('back')"
                     >
                         Back
@@ -128,18 +148,20 @@ const emit = defineEmits<{
                         type="button"
                         class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="
-                            !props.clientSecretValue ||
-                                props.isShippingLoading ||
-                                props.isPaymentInitializing ||
-                                props.isLoading ||
-                                props.isRedirectingToOrder
+                            !clientSecretValue ||
+                                needsShippingSelection ||
+                                isShippingLoading ||
+                                isPaymentInitializing ||
+                                isLoading ||
+                                isRedirectingToOrder
                         "
+                        :aria-describedby="paymentDisabledReason ? 'payment-disabled-reason' : undefined"
                         @click="emit('submit')"
                     >
                         {{
-                            props.isRedirectingToOrder
+                            isRedirectingToOrder
                                 ? "Finishing order..."
-                                : props.isLoading || props.isPaymentInitializing
+                                : isLoading || isPaymentInitializing
                                     ? "Processing..."
                                     : "Pay now"
                         }}

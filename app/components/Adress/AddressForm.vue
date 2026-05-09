@@ -195,7 +195,7 @@ function save(): void {
                 Address details
             </span>
             <h2 :id="addressTitleId" class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950">
-                {{ props.title }}
+                {{ title }}
             </h2>
             <p :id="addressDescriptionId" class="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
                 Add or update the address details you want available during future checkout and support flows.

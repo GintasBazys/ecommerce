@@ -2,11 +2,11 @@
 import type {
     CategoryFilterSection,
     CategoryProductsFacets,
-    CategorySelectionGroup,
     FacetItem,
     PriceRange
 } from "~/types/category-listing"
 
+import CategoryFacetSection from "~/components/Category/CategoryFacetSection.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
 const props = defineProps<{
@@ -108,40 +108,6 @@ function toggleSection(sectionId: string): void {
     openSectionIds.value = [...openSectionIds.value, sectionId]
 }
 
-function getSelectionModel(group: CategorySelectionGroup): typeof selectedChildCategoryIds {
-    if (group === "child") {
-        return selectedChildCategoryIds
-    }
-
-    if (group === "collection") {
-        return selectedCollectionIds
-    }
-
-    if (group === "type") {
-        return selectedTypeIds
-    }
-
-    return selectedTagIds
-}
-
-function toggleSelection(group: CategorySelectionGroup, itemId: string, checked: boolean): void {
-    const model = getSelectionModel(group)
-    const current = Array.isArray(model.value) ? model.value : []
-
-    if (checked) {
-        if (!current.includes(itemId)) {
-            model.value = [...current, itemId]
-        }
-        return
-    }
-
-    model.value = current.filter((id) => id !== itemId)
-}
-
-function getCheckboxValue(event: Event): boolean {
-    return event.target instanceof HTMLInputElement ? event.target.checked : false
-}
-
 const sectionClass =
     "overflow-hidden rounded-card border border-slate-200/80 bg-white/95 shadow-card transition hover:border-brand-100 hover:shadow-panel"
 const sectionButtonClass =
@@ -165,7 +131,7 @@ const checkboxClass =
                     Filters
                 </span>
                 <h2 class="mt-4 max-w-60 text-2xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-3xl">
-                    {{ props.sidebarTitle }}
+                    {{ sidebarTitle }}
                 </h2>
                 <p class="mt-2 max-w-64 text-sm leading-6 text-slate-600">
                     Narrow the catalogue by fit, availability, and price.
@@ -173,14 +139,14 @@ const checkboxClass =
             </div>
             <div class="flex shrink-0 items-center gap-2">
                 <span
-                    v-if="props.activeFilterCount"
+                    v-if="activeFilterCount"
                     class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full bg-slate-950 px-2 text-xs font-bold text-white"
-                    :aria-label="`${props.activeFilterCount} active filters`"
+                    :aria-label="`${activeFilterCount} active filters`"
                 >
-                    {{ props.activeFilterCount }}
+                    {{ activeFilterCount }}
                 </span>
                 <BaseButton
-                    v-if="props.activeFilterCount"
+                    v-if="activeFilterCount"
                     type="button"
                     class="inline-flex min-h-9 items-center rounded-full border border-slate-200 bg-white/90 px-3 text-xs font-bold text-slate-700 transition hover:border-brand-200 hover:text-brand-800 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
                     @click="emit('clearAll')"
@@ -188,7 +154,7 @@ const checkboxClass =
                     Clear
                 </BaseButton>
                 <BaseButton
-                    v-if="props.showMobileClose"
+                    v-if="showMobileClose"
                     type="button"
                     class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
                     @click="emit('close')"
@@ -203,133 +169,41 @@ const checkboxClass =
         </div>
 
         <div class="grid gap-4">
-            <section v-if="props.childCategoryFacets.length" :class="sectionClass">
-                <BaseButton
-                    type="button"
-                    :class="sectionButtonClass"
-                    :aria-expanded="isSectionOpen('subcategories')"
-                    @click="toggleSection('subcategories')"
-                >
-                    <span class="text-lg font-bold text-slate-950">Subcategories</span>
-                    <span
-                        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
-                        :style="isSectionOpen('subcategories') ? 'transform: rotate(45deg)' : ''"
-                    >+</span
-                    >
-                </BaseButton>
-                <div v-if="isSectionOpen('subcategories')" :class="sectionContentClass">
-                    <label
-                        v-for="item in props.childCategoryFacets"
-                        :key="item.id"
-                        :class="optionLabelClass"
-                    >
-                        <input
-                            :checked="selectedChildCategoryIds.includes(item.id)"
-                            type="checkbox"
-                            :class="checkboxClass"
-                            @change="toggleSelection('child', item.id, getCheckboxValue($event))"
-                        />
-                        <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
-                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">{{ item.count }}</span>
-                    </label>
-                </div>
-            </section>
+            <CategoryFacetSection
+                v-model:selected-ids="selectedChildCategoryIds"
+                section-id="subcategories"
+                title="Subcategories"
+                :items="childCategoryFacets"
+                :open="isSectionOpen('subcategories')"
+                @toggle="toggleSection"
+            />
 
-            <section v-if="props.facets.types.length" :class="sectionClass">
-                <BaseButton
-                    type="button"
-                    :class="sectionButtonClass"
-                    :aria-expanded="isSectionOpen('types')"
-                    @click="toggleSection('types')"
-                >
-                    <span class="text-lg font-bold text-slate-950">Product types</span>
-                    <span
-                        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
-                        :style="isSectionOpen('types') ? 'transform: rotate(45deg)' : ''"
-                    >+</span
-                    >
-                </BaseButton>
-                <div v-if="isSectionOpen('types')" :class="sectionContentClass">
-                    <label
-                        v-for="item in props.facets.types"
-                        :key="item.id"
-                        :class="optionLabelClass"
-                    >
-                        <input
-                            :checked="selectedTypeIds.includes(item.id)"
-                            type="checkbox"
-                            :class="checkboxClass"
-                            @change="toggleSelection('type', item.id, getCheckboxValue($event))"
-                        />
-                        <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
-                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">{{ item.count }}</span>
-                    </label>
-                </div>
-            </section>
+            <CategoryFacetSection
+                v-model:selected-ids="selectedTypeIds"
+                section-id="types"
+                title="Product types"
+                :items="facets.types"
+                :open="isSectionOpen('types')"
+                @toggle="toggleSection"
+            />
 
-            <section v-if="props.facets.collections.length" :class="sectionClass">
-                <BaseButton
-                    type="button"
-                    :class="sectionButtonClass"
-                    :aria-expanded="isSectionOpen('collections')"
-                    @click="toggleSection('collections')"
-                >
-                    <span class="text-lg font-bold text-slate-950">Collections</span>
-                    <span
-                        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
-                        :style="isSectionOpen('collections') ? 'transform: rotate(45deg)' : ''"
-                    >+</span
-                    >
-                </BaseButton>
-                <div v-if="isSectionOpen('collections')" :class="sectionContentClass">
-                    <label
-                        v-for="item in props.facets.collections"
-                        :key="item.id"
-                        :class="optionLabelClass"
-                    >
-                        <input
-                            :checked="selectedCollectionIds.includes(item.id)"
-                            type="checkbox"
-                            :class="checkboxClass"
-                            @change="toggleSelection('collection', item.id, getCheckboxValue($event))"
-                        />
-                        <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
-                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">{{ item.count }}</span>
-                    </label>
-                </div>
-            </section>
+            <CategoryFacetSection
+                v-model:selected-ids="selectedCollectionIds"
+                section-id="collections"
+                title="Collections"
+                :items="facets.collections"
+                :open="isSectionOpen('collections')"
+                @toggle="toggleSection"
+            />
 
-            <section v-if="props.facets.tags.length" :class="sectionClass">
-                <BaseButton
-                    type="button"
-                    :class="sectionButtonClass"
-                    :aria-expanded="isSectionOpen('tags')"
-                    @click="toggleSection('tags')"
-                >
-                    <span class="text-lg font-bold text-slate-950">Tags</span>
-                    <span
-                        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
-                        :style="isSectionOpen('tags') ? 'transform: rotate(45deg)' : ''"
-                    >+</span
-                    >
-                </BaseButton>
-                <div v-if="isSectionOpen('tags')" :class="sectionContentClass">
-                    <label
-                        v-for="item in props.facets.tags"
-                        :key="item.id"
-                        :class="optionLabelClass"
-                    >
-                        <input
-                            :checked="selectedTagIds.includes(item.id)"
-                            type="checkbox"
-                            :class="checkboxClass"
-                            @change="toggleSelection('tag', item.id, getCheckboxValue($event))"
-                        />
-                        <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
-                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">{{ item.count }}</span>
-                    </label>
-                </div>
-            </section>
+            <CategoryFacetSection
+                v-model:selected-ids="selectedTagIds"
+                section-id="tags"
+                title="Tags"
+                :items="facets.tags"
+                :open="isSectionOpen('tags')"
+                @toggle="toggleSection"
+            />
 
             <section :class="sectionClass">
                 <BaseButton
@@ -358,7 +232,7 @@ const checkboxClass =
             </section>
 
             <section
-                v-if="props.facets.price.max > props.facets.price.min"
+                v-if="facets.price.max > facets.price.min"
                 :class="sectionClass"
             >
                 <BaseButton
@@ -377,22 +251,22 @@ const checkboxClass =
                 <div v-if="isSectionOpen('price')" :class="sectionContentClass">
                     <div class="grid gap-4">
                         <div class="rounded-2xl border border-amber-100 bg-amber-50/70 px-4 py-3 text-sm font-bold text-slate-950">
-                            {{ props.priceSummary }}
+                            {{ priceSummary }}
                         </div>
                         <div class="grid gap-3">
                             <input
                                 v-model="priceRangeMin"
-                                :min="props.facets.price.min"
-                                :max="props.facets.price.max"
-                                :step="props.priceStep"
+                                :min="facets.price.min"
+                                :max="facets.price.max"
+                                :step="priceStep"
                                 type="range"
                                 class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
                             />
                             <input
                                 v-model="priceRangeMax"
-                                :min="props.facets.price.min"
-                                :max="props.facets.price.max"
-                                :step="props.priceStep"
+                                :min="facets.price.min"
+                                :max="facets.price.max"
+                                :step="priceStep"
                                 type="range"
                                 class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
                             />
@@ -411,7 +285,7 @@ const checkboxClass =
                 </div>
             </section>
 
-            <div v-if="props.facets.price.max > props.facets.price.min" class="grid gap-3 pt-2 sm:grid-cols-2">
+            <div v-if="facets.price.max > facets.price.min" class="grid gap-3 pt-2 sm:grid-cols-2">
                 <BaseButton
                     type="button"
                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-4 text-sm font-bold text-slate-900 shadow-card transition hover:border-slate-400 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"

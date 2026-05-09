@@ -217,26 +217,26 @@ onBeforeUnmount(() => {
         <div v-if="model" :class="overlayClass" @pointerdown="onBackdropPointerDown" @pointerup="onBackdropPointerUp">
             <section
                 ref="panel"
-                :class="[panelBaseClass, props.panelClass]"
+                :class="[panelBaseClass, panelClass]"
                 role="dialog"
                 aria-modal="true"
-                :aria-labelledby="props.titleId"
-                :aria-describedby="props.descriptionId"
-                :aria-label="props.titleId ? undefined : props.ariaLabel"
+                :aria-labelledby="titleId"
+                :aria-describedby="descriptionId"
+                :aria-label="titleId ? undefined : ariaLabel"
                 tabindex="-1"
                 @keydown="onKeydown"
             >
                 <BaseButton
-                    v-if="props.showCloseButton"
+                    v-if="showCloseButton"
                     type="button"
                     class="absolute top-4 right-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
-                    :aria-label="props.closeLabel"
+                    :aria-label="closeLabel"
                     @click="close"
                 >
                     <span aria-hidden="true" class="text-lg leading-none">×</span>
                 </BaseButton>
 
-                <div :class="['min-h-0 flex-1 overflow-y-auto', props.contentClass]">
+                <div :class="['min-h-0 flex-1 overflow-y-auto', contentClass]">
                     <slot :close="close"></slot>
                 </div>
             </section>

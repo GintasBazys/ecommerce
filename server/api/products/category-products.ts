@@ -1,7 +1,18 @@
 import type { HttpTypes } from "@medusajs/types"
 
-import { fetchAllStoreProducts, getAggregatedProductPrice, getProductCurrencyCode, isProductInStock } from "#server/utils/products"
+import { fetchAllStoreProducts, fetchStoreProducts, getAggregatedProductPrice, getProductCurrencyCode, isProductInStock } from "#server/utils/products"
 import { toUpstreamError } from "#server/utils/medusa-proxy"
+
+const DEFAULT_ORDER = "-created_at"
+const MAX_LIMIT = 48
+const ALLOWED_ORDERS = new Set([
+    "-created_at",
+    "created_at",
+    "variants.calculated_price.calculated_amount",
+    "-variants.calculated_price.calculated_amount",
+    "title",
+    "-title"
+])
 
 type ProductRelation = {
     id: string
@@ -175,6 +186,26 @@ function buildFacets(products: ProductWithRelations[]) {
     }
 }
 
+function hasClientSideFilters(filters: {
+    selectedChildCategoryIds: string[]
+    selectedCollectionIds: string[]
+    selectedTypeIds: string[]
+    selectedTagIds: string[]
+    inStockOnly: boolean
+    minPrice: number | null
+    maxPrice: number | null
+}) {
+    return Boolean(
+        filters.selectedChildCategoryIds.length ||
+            filters.selectedCollectionIds.length ||
+            filters.selectedTypeIds.length ||
+            filters.selectedTagIds.length ||
+            filters.inStockOnly ||
+            filters.minPrice !== null ||
+            filters.maxPrice !== null
+    )
+}
+
 function filterProducts(
     products: ProductWithRelations[],
     filters: {
@@ -241,9 +272,10 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "region_id is required" })
     }
 
-    const limit = parsePositiveInteger(query.limit, 9)
+    const limit = Math.min(parsePositiveInteger(query.limit, 9), MAX_LIMIT)
     const offset = parsePositiveInteger(query.offset, 0)
-    const order = query.order ? String(query.order) : "-created_at"
+    const requestedOrder = query.order ? String(query.order) : DEFAULT_ORDER
+    const order = ALLOWED_ORDERS.has(requestedOrder) ? requestedOrder : DEFAULT_ORDER
 
     const filters = {
         selectedChildCategoryIds: parseIds(query.child_category_ids),
@@ -269,6 +301,31 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+        const usesPriceSort = order.includes("variants.calculated_price")
+        const canUseUpstreamPagination = !usesPriceSort && !hasClientSideFilters(filters)
+
+        if (canUseUpstreamPagination) {
+            const pageSearchParams = new URLSearchParams(searchParams)
+            pageSearchParams.set("order", order)
+            pageSearchParams.set("limit", String(limit))
+            pageSearchParams.set("offset", String(offset))
+
+            const [pageResponse, facetResponse] = await Promise.all([
+                fetchStoreProducts<ProductWithRelations>(event, pageSearchParams, "/store/category-products"),
+                fetchAllStoreProducts<ProductWithRelations>(event, searchParams, {
+                    endpoint: "/store/category-products"
+                })
+            ])
+
+            setHeader(event, "Cache-Control", "no-store")
+
+            return {
+                products: Array.isArray(pageResponse.products) ? pageResponse.products : [],
+                count: Number(pageResponse.count ?? facetResponse.count ?? 0),
+                facets: buildFacets(facetResponse.products)
+            }
+        }
+
         const { products } = await fetchAllStoreProducts<ProductWithRelations>(event, searchParams, {
             endpoint: "/store/category-products"
         })

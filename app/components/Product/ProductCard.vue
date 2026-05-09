@@ -13,9 +13,9 @@ const { product, compact = false } = defineProps<{
 }>()
 
 const cartStore = useCartStore()
-const { openCartDrawer } = storeToRefs(cartStore)
 
 const loading = ref<boolean>(false)
+const errorMessage = ref<string | null>(null)
 
 const selectedVariant = computed<ProductVariantDTO | null>(() => product.variants?.[0] ?? null)
 
@@ -56,10 +56,13 @@ async function addToCart(): Promise<void> {
     }
 
     loading.value = true
+    errorMessage.value = null
 
     try {
         await cartStore.updateLineItem(selectedVariant.value)
-        openCartDrawer.value = true
+    } catch (error) {
+        console.error("Product card add to cart failed", error)
+        errorMessage.value = "Could not add this product. Please try again."
     } finally {
         loading.value = false
     }
@@ -82,6 +85,7 @@ async function addToCart(): Promise<void> {
                     :alt="product.title || 'Product image'"
                     format="webp"
                     :width="720"
+                    :height="720"
                     :sizes="compact ? '50vw sm:33vw lg:25vw' : '280px md:33vw xl:22vw'"
                     loading="lazy"
                     decoding="async"
@@ -179,6 +183,7 @@ async function addToCart(): Promise<void> {
                     ></span>
                     {{ selectedVariant?.inventory_quantity ? "Add to cart" : "Unavailable" }}
                 </BaseButton>
+                <p v-if="errorMessage" class="text-sm leading-6 text-rose-700" role="alert">{{ errorMessage }}</p>
             </div>
         </div>
     </article>
