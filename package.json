@@ -29,6 +29,7 @@
         "@vueuse/integrations": "^14.3.0",
         "jwt-decode": "^4.0.0",
         "nuxt": "^4.4.4",
+        "pinia": "^3.0.4",
         "posthog-js": "^1.372.9",
         "posthog-node": "^5.33.3",
         "querystring-es3": "^0.2.1",
