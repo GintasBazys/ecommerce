@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AnnouncementBarResponse, AnnouncementMessage, LocationItem } from "~/types/navigation"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
@@ -358,7 +359,7 @@ function observeAnnouncementTextElements(): void {
                         Special offers
                     </NuxtLink>
                     <div ref="catalogMenuRef" class="relative" @keydown="onCatalogKeydown">
-                        <button
+                        <BaseButton
                             type="button"
                             class="group inline-flex items-center gap-1.5 text-base font-semibold text-slate-700 transition hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                             :aria-expanded="catalogMenuOpen"
@@ -379,7 +380,7 @@ function observeAnnouncementTextElements(): void {
                                     clip-rule="evenodd"
                                 />
                             </svg>
-                        </button>
+                        </BaseButton>
 
                         <transition
                             enter-active-class="transition duration-200 ease-out"
@@ -488,7 +489,7 @@ function observeAnnouncementTextElements(): void {
                         />
                     </label>
 
-                    <button
+                    <BaseButton
                         type="button"
                         class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                         @click="openSearchDialog"
@@ -498,7 +499,7 @@ function observeAnnouncementTextElements(): void {
                             <circle cx="11" cy="11" r="7" />
                             <path d="m20 20-3.5-3.5" stroke-linecap="round" />
                         </svg>
-                    </button>
+                    </BaseButton>
 
                     <NuxtLink to="/cart" class="relative inline-flex">
                         <span
@@ -545,7 +546,7 @@ function observeAnnouncementTextElements(): void {
                         Sign in
                     </NuxtLink>
 
-                    <button
+                    <BaseButton
                         type="button"
                         class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden xl:hidden"
                         @click="drawer = true"
@@ -554,7 +555,7 @@ function observeAnnouncementTextElements(): void {
                         <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
                         </svg>
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
         </div>

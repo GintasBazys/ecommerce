@@ -3,6 +3,7 @@ import type { CustomerAddressDTO } from "@medusajs/types"
 
 import AddressCard from "@/components/Adress/AddressCard.vue"
 import AddressForm from "@/components/Adress/AddressForm.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 
 definePageMeta({
     layout: "account",
@@ -114,9 +115,9 @@ function changePage(nextPage: number): void {
                 <strong class="mt-2 block text-4xl leading-none font-bold tracking-tight text-slate-950">{{ totalCount }}</strong>
             </div>
 
-            <button type="button" class="ui-btn-accent min-h-13 px-7 text-base motion-reduce:transition-none" @click="showAdd = true">
+            <BaseButton type="button" variant="accent" class="min-h-13 px-7 text-base motion-reduce:transition-none" @click="showAdd = true">
                 Add new address
-            </button>
+            </BaseButton>
         </div>
 
         <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
@@ -169,7 +170,7 @@ function changePage(nextPage: number): void {
             </div>
 
             <div v-if="totalCount > limit" class="mt-6 flex flex-wrap items-center justify-center gap-2">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                     :disabled="page <= 1"
@@ -177,9 +178,9 @@ function changePage(nextPage: number): void {
                     @click="changePage(page - 1)"
                 >
                     ‹
-                </button>
+                </BaseButton>
 
-                <button
+                <BaseButton
                     v-for="pageNumber in totalPages"
                     :key="pageNumber"
                     type="button"
@@ -193,9 +194,9 @@ function changePage(nextPage: number): void {
                     @click="changePage(pageNumber)"
                 >
                     {{ pageNumber }}
-                </button>
+                </BaseButton>
 
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                     :disabled="page >= totalPages"
@@ -203,7 +204,7 @@ function changePage(nextPage: number): void {
                     @click="changePage(page + 1)"
                 >
                     ›
-                </button>
+                </BaseButton>
             </div>
 
             <div

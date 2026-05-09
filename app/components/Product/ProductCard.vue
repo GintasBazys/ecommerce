@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
@@ -165,9 +166,9 @@ async function addToCart(): Promise<void> {
                     <span class="truncate text-sm text-slate-600" :class="compact ? 'text-label-xs' : ''">{{ variantLabel }}</span>
                 </div>
 
-                <button
+                <BaseButton
                     type="button"
-                    class="ui-btn-accent w-full px-4 disabled:bg-slate-200 disabled:text-slate-500"
+                    variant="accent" class="w-full px-4 disabled:bg-slate-200 disabled:text-slate-500"
                     :class="compact ? 'min-h-9 px-3 text-sm' : ''"
                     :disabled="loading || !selectedVariant?.inventory_quantity"
                     @click="addToCart"
@@ -177,7 +178,7 @@ async function addToCart(): Promise<void> {
                         class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-950/35 border-t-slate-950"
                     ></span>
                     {{ selectedVariant?.inventory_quantity ? "Add to cart" : "Unavailable" }}
-                </button>
+                </BaseButton>
             </div>
         </div>
     </article>

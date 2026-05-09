@@ -2,6 +2,9 @@ import type { ProductDTO } from "@medusajs/types"
 
 export type ProductListResponse = {
     products?: ProductDTO[]
+    count?: number
+    productLimit?: number
+    productOffset?: number
 }
 
 export type ProductCategorySummary = {

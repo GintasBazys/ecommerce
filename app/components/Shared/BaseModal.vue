@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 defineOptions({ inheritAttrs: false })
 
 type ModalSize = "sm" | "md" | "lg"
@@ -224,7 +226,7 @@ onBeforeUnmount(() => {
                 tabindex="-1"
                 @keydown="onKeydown"
             >
-                <button
+                <BaseButton
                     v-if="props.showCloseButton"
                     type="button"
                     class="absolute top-4 right-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
@@ -232,7 +234,7 @@ onBeforeUnmount(() => {
                     @click="close"
                 >
                     <span aria-hidden="true" class="text-lg leading-none">×</span>
-                </button>
+                </BaseButton>
 
                 <div :class="['min-h-0 flex-1 overflow-y-auto', props.contentClass]">
                     <slot :close="close"></slot>

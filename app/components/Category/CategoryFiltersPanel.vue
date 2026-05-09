@@ -7,6 +7,8 @@ import type {
     PriceRange
 } from "~/types/category-listing"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const props = defineProps<{
     sidebarTitle: string
     activeFilterCount: number
@@ -177,15 +179,15 @@ const checkboxClass =
                 >
                     {{ props.activeFilterCount }}
                 </span>
-                <button
+                <BaseButton
                     v-if="props.activeFilterCount"
                     type="button"
                     class="inline-flex min-h-9 items-center rounded-full border border-slate-200 bg-white/90 px-3 text-xs font-bold text-slate-700 transition hover:border-brand-200 hover:text-brand-800 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
                     @click="emit('clearAll')"
                 >
                     Clear
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     v-if="props.showMobileClose"
                     type="button"
                     class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
@@ -196,13 +198,13 @@ const checkboxClass =
                         <path d="M5 5L15 15" stroke-linecap="round" />
                         <path d="M15 5L5 15" stroke-linecap="round" />
                     </svg>
-                </button>
+                </BaseButton>
             </div>
         </div>
 
         <div class="grid gap-4">
             <section v-if="props.childCategoryFacets.length" :class="sectionClass">
-                <button
+                <BaseButton
                     type="button"
                     :class="sectionButtonClass"
                     :aria-expanded="isSectionOpen('subcategories')"
@@ -214,7 +216,7 @@ const checkboxClass =
                         :style="isSectionOpen('subcategories') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
-                </button>
+                </BaseButton>
                 <div v-if="isSectionOpen('subcategories')" :class="sectionContentClass">
                     <label
                         v-for="item in props.childCategoryFacets"
@@ -234,7 +236,7 @@ const checkboxClass =
             </section>
 
             <section v-if="props.facets.types.length" :class="sectionClass">
-                <button
+                <BaseButton
                     type="button"
                     :class="sectionButtonClass"
                     :aria-expanded="isSectionOpen('types')"
@@ -246,7 +248,7 @@ const checkboxClass =
                         :style="isSectionOpen('types') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
-                </button>
+                </BaseButton>
                 <div v-if="isSectionOpen('types')" :class="sectionContentClass">
                     <label
                         v-for="item in props.facets.types"
@@ -266,7 +268,7 @@ const checkboxClass =
             </section>
 
             <section v-if="props.facets.collections.length" :class="sectionClass">
-                <button
+                <BaseButton
                     type="button"
                     :class="sectionButtonClass"
                     :aria-expanded="isSectionOpen('collections')"
@@ -278,7 +280,7 @@ const checkboxClass =
                         :style="isSectionOpen('collections') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
-                </button>
+                </BaseButton>
                 <div v-if="isSectionOpen('collections')" :class="sectionContentClass">
                     <label
                         v-for="item in props.facets.collections"
@@ -298,7 +300,7 @@ const checkboxClass =
             </section>
 
             <section v-if="props.facets.tags.length" :class="sectionClass">
-                <button
+                <BaseButton
                     type="button"
                     :class="sectionButtonClass"
                     :aria-expanded="isSectionOpen('tags')"
@@ -310,7 +312,7 @@ const checkboxClass =
                         :style="isSectionOpen('tags') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
-                </button>
+                </BaseButton>
                 <div v-if="isSectionOpen('tags')" :class="sectionContentClass">
                     <label
                         v-for="item in props.facets.tags"
@@ -330,7 +332,7 @@ const checkboxClass =
             </section>
 
             <section :class="sectionClass">
-                <button
+                <BaseButton
                     type="button"
                     :class="sectionButtonClass"
                     :aria-expanded="isSectionOpen('availability')"
@@ -342,7 +344,7 @@ const checkboxClass =
                         :style="isSectionOpen('availability') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
-                </button>
+                </BaseButton>
                 <div v-if="isSectionOpen('availability')" :class="sectionContentClass">
                     <label :class="optionLabelClass">
                         <input
@@ -359,7 +361,7 @@ const checkboxClass =
                 v-if="props.facets.price.max > props.facets.price.min"
                 :class="sectionClass"
             >
-                <button
+                <BaseButton
                     type="button"
                     :class="sectionButtonClass"
                     :aria-expanded="isSectionOpen('price')"
@@ -371,7 +373,7 @@ const checkboxClass =
                         :style="isSectionOpen('price') ? 'transform: rotate(45deg)' : ''"
                     >+</span
                     >
-                </button>
+                </BaseButton>
                 <div v-if="isSectionOpen('price')" :class="sectionContentClass">
                     <div class="grid gap-4">
                         <div class="rounded-2xl border border-amber-100 bg-amber-50/70 px-4 py-3 text-sm font-bold text-slate-950">
@@ -410,20 +412,20 @@ const checkboxClass =
             </section>
 
             <div v-if="props.facets.price.max > props.facets.price.min" class="grid gap-3 pt-2 sm:grid-cols-2">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-4 text-sm font-bold text-slate-900 shadow-card transition hover:border-slate-400 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
                     @click="emit('resetPriceRange')"
                 >
                     Reset price
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
-                    class="ui-btn-accent min-h-12 px-4 font-bold shadow-lg"
+                    variant="accent" class="min-h-12 px-4 font-bold shadow-lg"
                     @click="emit('applyPriceRange')"
                 >
                     Apply price
-                </button>
+                </BaseButton>
             </div>
         </div>
     </div>

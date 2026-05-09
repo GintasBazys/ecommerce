@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const { accept, decline, isBannerVisible } = useCookieConsent()
 const canRenderBanner = ref<boolean>(false)
 
@@ -38,20 +40,20 @@ onMounted(() => {
                     </div>
 
                     <div class="grid gap-3 sm:grid-cols-2 lg:min-w-76">
-                        <button
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="accept"
                         >
                             Accept
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="decline"
                         >
                             Decline
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             </section>

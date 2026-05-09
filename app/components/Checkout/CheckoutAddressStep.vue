@@ -4,6 +4,7 @@ import type { AddressErrors, CountryOption, EditableAddressField } from "~/types
 import type { Address } from "~/types/interfaces"
 
 import CheckoutAddressFields from "~/components/Checkout/CheckoutAddressFields.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 
 const props = defineProps<{
     currentStep: string
@@ -250,20 +251,20 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     v-if="!props.addressCompleted || props.currentStep === 'address'"
                     class="flex flex-col gap-3 sm:flex-row sm:justify-between"
                 >
-                    <button
+                    <BaseButton
                         type="button"
                         class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                         @click="emit('back')"
                     >
                         Back
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="props.isSubmitting"
                     >
                         {{ props.isSubmitting ? "Saving..." : "Save and continue" }}
-                    </button>
+                    </BaseButton>
                 </div>
             </form>
         </div>

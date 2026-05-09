@@ -2,6 +2,8 @@
 import type { AuthTab, GuestErrors, LoginErrors, RegisterErrors } from "~/types/checkout"
 import type { TurnstileWidgetInstance } from "~/types/forms"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const props = defineProps<{
     currentStep: string
     authTab: AuthTab
@@ -119,13 +121,13 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                 <p class="mt-1 text-sm leading-6 text-slate-600">{{ props.checkoutIdentity }}</p>
             </div>
             <div v-if="props.isGuestIdentity" class="flex flex-col gap-3 sm:flex-row">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:border-amber-300 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                     @click="emit('change-identity')"
                 >
                     Sign in or create account
-                </button>
+                </BaseButton>
             </div>
         </div>
 
@@ -144,7 +146,7 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
             </div>
 
             <div class="mt-5 grid gap-2 rounded-3xl border border-slate-200/80 bg-slate-950 p-2 sm:grid-cols-3">
-                <button
+                <BaseButton
                     type="button"
                     :class="[
                         tabBaseClass,
@@ -153,8 +155,8 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     @click="emit('update:authTab', 'login')"
                 >
                     Login
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
                     :class="[
                         tabBaseClass,
@@ -163,8 +165,8 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     @click="emit('update:authTab', 'register')"
                 >
                     Create account
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
                     :class="[
                         tabBaseClass,
@@ -173,28 +175,28 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                     @click="emit('update:authTab', 'guest')"
                 >
                     Guest
-                </button>
+                </BaseButton>
             </div>
 
             <div class="mt-5">
                 <div v-if="props.authTab === 'login'" class="grid gap-5">
                     <div class="grid gap-3">
-                        <button
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="emit('social-login', 'google')"
                         >
                             <img :src="googleIconUrl" width="24" height="24" alt="" aria-hidden="true" class="block h-6 w-6 shrink-0" />
                             <span class="inline-flex items-center leading-none">Log in with Google</span>
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="emit('social-login', 'facebook')"
                         >
                             <img :src="facebookIconUrl" width="24" height="24" alt="" aria-hidden="true" class="block h-6 w-6 shrink-0" />
                             <span class="inline-flex items-center leading-none">Log in with Facebook</span>
-                        </button>
+                        </BaseButton>
                     </div>
 
                     <div class="relative text-center text-sm text-slate-500">
@@ -261,13 +263,13 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                             </p>
                         </div>
 
-                        <button
+                        <BaseButton
                             type="submit"
                             class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="props.isSubmitting || props.isAuthLoading"
                         >
                             {{ props.isSubmitting || props.isAuthLoading ? "Logging in..." : "Log in and continue" }}
-                        </button>
+                        </BaseButton>
                     </form>
                 </div>
 
@@ -364,13 +366,13 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                         </p>
                     </div>
 
-                    <button
+                    <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="props.isSubmitting || props.isAuthLoading"
                     >
                         {{ props.isSubmitting || props.isAuthLoading ? "Creating account..." : "Create account and continue" }}
-                    </button>
+                    </BaseButton>
                 </form>
 
                 <form v-else class="grid gap-4" novalidate @submit.prevent="emit('submit-guest')">
@@ -398,13 +400,13 @@ defineExpose({ executeLoginTurnstile, executeRegisterTurnstile })
                         }}</span>
                     </label>
 
-                    <button
+                    <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="props.isSubmitting"
                     >
                         {{ props.isSubmitting ? "Continuing..." : "Continue as guest" }}
-                    </button>
+                    </BaseButton>
                 </form>
             </div>
         </div>

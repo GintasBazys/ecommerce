@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CategorySortOption } from "~/types/category-listing"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
 const props = defineProps<{
@@ -35,7 +36,7 @@ const emit = defineEmits<{
                 </p>
             </div>
             <div class="grid xl:flex gap-3 sm:grid-cols-2 sm:items-end lg:justify-end">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card xl:hidden"
                     @click="emit('openFilters')"
@@ -46,7 +47,7 @@ const emit = defineEmits<{
                         <path d="M8 15H12" stroke-linecap="round" />
                     </svg>
                     <span>{{ props.activeFilterCount ? `Filters (${props.activeFilterCount})` : "Filters" }}</span>
-                </button>
+                </BaseButton>
                 <label class="grid gap-1 text-sm font-semibold text-slate-700">
                     <span>Sort by</span>
                     <span class="w-full sm:min-w-60 lg:max-w-68">

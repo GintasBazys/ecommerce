@@ -2,6 +2,7 @@
 import type { CartLineItemDTO } from "@medusajs/types"
 
 import TaxedLinePrice from "~/components/Cart/TaxedLinePrice.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
@@ -89,7 +90,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                         <p class="sr-only">Quantity</p>
 
                         <div class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 p-1 shadow-inner">
-                            <button
+                            <BaseButton
                                 type="button"
                                 class="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-slate-700 transition hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
                                 :disabled="props.quantity <= 1"
@@ -97,7 +98,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                                 @click="emit('decrement')"
                             >
                                 −
-                            </button>
+                            </BaseButton>
 
                             <input
                                 :value="props.quantity"
@@ -110,7 +111,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                                 @input="emit('quantityInput', $event)"
                             />
 
-                            <button
+                            <BaseButton
                                 type="button"
                                 class="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-slate-700 transition hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
                                 :disabled="props.quantity >= props.maxQuantity"
@@ -118,7 +119,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                                 @click="emit('increment')"
                             >
                                 +
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
 
@@ -129,7 +130,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
             </div>
 
             <div class="hidden min-w-32 text-right sm:grid sm:gap-3">
-                <button
+                <BaseButton
                     type="button"
                     class="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
                     :aria-label="`Remove ${props.item.product_title} from cart`"
@@ -138,7 +139,7 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
                     <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <path d="M4 7h16M9 7V5h6v2m-7 3v7m4-7v7m4-7v7M6 7l1 12h10l1-12" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                </button>
+                </BaseButton>
 
                 <div>
                     <p class="text-label-xs tracking-label font-bold text-slate-500 uppercase">Line total</p>
@@ -149,14 +150,14 @@ const variantSku = computed<string>(() => props.item.variant_sku || "N/A")
             </div>
 
             <div class="flex items-center justify-between border-t border-slate-200/80 pt-3 sm:hidden">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
                     :aria-label="`Remove ${props.item.product_title} from cart`"
                     @click="emit('remove')"
                 >
                     Remove
-                </button>
+                </BaseButton>
             </div>
         </div>
     </article>

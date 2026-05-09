@@ -3,6 +3,8 @@ import { ref, computed } from "vue"
 
 import type { ProductReviewForm } from "~/types/product"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const props = defineProps<ProductReviewForm & { titleId?: string }>()
 const emit = defineEmits<{
     (_: "submit", __: ProductReviewForm): void
@@ -75,7 +77,7 @@ function handleCancel(): void {
             <div class="grid gap-2">
                 <span class="text-sm font-medium text-slate-700">Rating</span>
                 <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Select a rating">
-                    <button
+                    <BaseButton
                         v-for="value in 5"
                         :key="value"
                         type="button"
@@ -91,7 +93,7 @@ function handleCancel(): void {
                         @click="form.rating = value"
                     >
                         <span aria-hidden="true">★</span>
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
 
@@ -131,16 +133,16 @@ function handleCancel(): void {
             </div>
 
             <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-end">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                     @click="handleCancel"
                 >
                     Cancel
-                </button>
-                <button type="submit" class="ui-btn-accent px-6 motion-reduce:transition-none" :disabled="!isValid">
+                </BaseButton>
+                <BaseButton type="submit" variant="accent" class="px-6 motion-reduce:transition-none" :disabled="!isValid">
                     Submit review
-                </button>
+                </BaseButton>
             </div>
         </form>
 

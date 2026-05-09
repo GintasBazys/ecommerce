@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const { snackbar, closeSnackbar } = useSnackbar()
 
 const toneClasses = computed<string>(() => {
@@ -106,7 +108,7 @@ const displayMessage = computed<string>(() => {
                         </p>
                     </div>
 
-                    <button
+                    <BaseButton
                         type="button"
                         class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:outline-hidden"
                         @click="closeSnackbar"
@@ -117,7 +119,7 @@ const displayMessage = computed<string>(() => {
                                 d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
                             />
                         </svg>
-                    </button>
+                    </BaseButton>
                 </section>
             </div>
         </transition>

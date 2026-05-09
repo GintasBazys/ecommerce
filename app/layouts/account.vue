@@ -2,6 +2,8 @@
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { AccountHighlight, AccountPageContent } from "~/types/content-pages"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
@@ -240,13 +242,13 @@ async function handleLogout(): Promise<void> {
                         </NuxtLink>
                     </nav>
 
-                    <button
+                    <BaseButton
                         type="button"
                         class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         @click="handleLogout"
                     >
                         Log out
-                    </button>
+                    </BaseButton>
                 </aside>
 
                 <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6 xl:col-span-3">

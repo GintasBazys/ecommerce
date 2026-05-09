@@ -5,6 +5,7 @@ import type { OrdersListItem } from "~/types/orders"
 import { formatFulfillmentStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
 definePageMeta({
@@ -205,7 +206,7 @@ function changePage(nextPage: number): void {
             </div>
 
             <div v-if="totalOrders > perPage" class="mt-6 flex flex-wrap items-center justify-center gap-2">
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                     :disabled="page <= 1"
@@ -213,9 +214,9 @@ function changePage(nextPage: number): void {
                     @click="changePage(page - 1)"
                 >
                     ‹
-                </button>
+                </BaseButton>
 
-                <button
+                <BaseButton
                     v-for="pageNumber in totalPages"
                     :key="pageNumber"
                     type="button"
@@ -229,9 +230,9 @@ function changePage(nextPage: number): void {
                     @click="changePage(pageNumber)"
                 >
                     {{ pageNumber }}
-                </button>
+                </BaseButton>
 
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                     :disabled="page >= totalPages"
@@ -239,7 +240,7 @@ function changePage(nextPage: number): void {
                     @click="changePage(page + 1)"
                 >
                     ›
-                </button>
+                </BaseButton>
             </div>
         </section>
     </div>

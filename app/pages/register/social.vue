@@ -5,6 +5,7 @@ import type { CustomJwtPayload } from "@/types/interfaces"
 import type { CustomerDTO } from "@medusajs/types"
 import type { IdentityResponse, SocialProvider, SocialStage } from "~/types/auth"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { SOCIAL_AUTH_REDIRECT_KEY, SOCIAL_AUTH_PROVIDER_KEY } from "~/composables/useCustomerAuth"
 
 const config = useRuntimeConfig()
@@ -388,14 +389,14 @@ onMounted(() => {
                     </div>
 
                     <div v-else-if="stage === 'error'" class="mt-6 grid gap-3">
-                        <button
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
                             :disabled="isRetrying"
                             @click="retrySocialLogin"
                         >
                             {{ isRetrying ? "Retrying..." : `Retry ${providerLabel} sign-in` }}
-                        </button>
+                        </BaseButton>
                         <NuxtLink
                             to="/signin"
                             class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"

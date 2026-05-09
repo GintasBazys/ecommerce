@@ -5,6 +5,7 @@ import { computed } from "vue"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 
 const props = defineProps<{
     error: NuxtError
@@ -71,7 +72,7 @@ function backToHome() {
                             </p>
 
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                                <button type="button" class="ui-btn-accent min-h-12 px-6" @click="backToHome">Back to home</button>
+                                <BaseButton type="button" variant="accent" class="min-h-12 px-6" @click="backToHome">Back to home</BaseButton>
                                 <NuxtLink
                                     to="/special-offers"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300/80 bg-white px-6 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"

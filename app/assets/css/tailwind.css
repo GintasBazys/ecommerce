@@ -37,6 +37,18 @@
         @apply focus:border-accent-400 focus:ring-accent-100 min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-hidden transition placeholder:text-slate-500 focus:ring-2;
     }
 
+    .mobile-filter-drawer {
+        top: var(--mobile-filter-top-offset, 5rem);
+        max-height: calc(var(--mobile-filter-viewport-height, 100vh) - var(--mobile-filter-top-offset, 5rem));
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+
+    @media (min-width: 640px) {
+        .mobile-filter-drawer {
+            padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+        }
+    }
+
     .blog-richtext {
         @apply text-base leading-8 text-slate-700;
     }

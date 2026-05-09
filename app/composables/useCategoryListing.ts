@@ -91,7 +91,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const sortLoading = ref<boolean>(false)
     const filterLoading = ref<boolean>(false)
     const facets = ref<CategoryProductsFacets>(createEmptyFacets())
-    const limit = 10
+    const limit = 12
     const sortOption = ref<string>(categorySortOptions[0]!.value)
     const selectedChildCategoryIds = ref<string[]>([])
     const selectedCollectionIds = ref<string[]>([])

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { CategoryProduct } from "~/types/category-listing"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const props = defineProps<{
     loading: boolean
     gridIsInitialLoading: boolean
@@ -43,6 +45,6 @@ const emit = defineEmits<{
     >
         <h2 class="text-2xl leading-tight font-semibold text-slate-950">No products match these filters.</h2>
         <p class="max-w-120 text-sm leading-6 text-slate-600">{{ props.emptyStateText }}</p>
-        <button type="button" class="ui-btn-accent" @click="emit('clearAll')">Reset filters</button>
+        <BaseButton type="button" variant="accent" @click="emit('clearAll')">Reset filters</BaseButton>
     </div>
 </template>

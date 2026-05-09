@@ -2,6 +2,7 @@
 import type { FetchError } from "ofetch"
 import type { SubscribeErrorPayload } from "~/types/newsletter"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { usePostHog } from "~/composables/usePostHog"
 
 const posthog = usePostHog()
@@ -109,7 +110,7 @@ async function handleSubscribe(e: Event): Promise<void> {
                         "
                     />
 
-                    <button type="submit" class="ui-btn-accent min-h-12 px-6 sm:min-w-36" :disabled="loading">
+                    <BaseButton type="submit" variant="accent" class="min-h-12 px-6 sm:min-w-36" :disabled="loading">
                         <span
                             v-if="loading"
                             class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-900/35 border-t-slate-900"
@@ -117,7 +118,7 @@ async function handleSubscribe(e: Event): Promise<void> {
                         ></span>
 
                         {{ loading ? "Joining..." : "Join" }}
-                    </button>
+                    </BaseButton>
                 </div>
 
                 <p v-if="errorMessage" id="footer-newsletter-error" class="mt-3 text-sm leading-6 text-rose-200">

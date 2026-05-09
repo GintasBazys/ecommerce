@@ -4,6 +4,7 @@ import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import PublicOrderStatusTracker from "@/components/Orders/PublicOrderStatusTracker.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 
 const route = useRoute()
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Order status" }])
@@ -79,9 +80,9 @@ async function lookupOrder(): Promise<void> {
                                 :aria-invalid="Boolean(errorMessage)"
                                 aria-describedby="order-status-help order-status-error"
                             />
-                            <button type="submit" class="ui-btn-primary min-h-12 px-6" :disabled="isLoading">
+                            <BaseButton type="submit" variant="primary" class="min-h-12 px-6" :disabled="isLoading">
                                 {{ isLoading ? "Checking..." : "Check status" }}
-                            </button>
+                            </BaseButton>
                         </div>
                         <p id="order-status-help" class="mt-3 text-xs leading-5 text-slate-500">
                             You can find the order ID in your order confirmation email.

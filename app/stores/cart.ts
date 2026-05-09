@@ -105,7 +105,9 @@ export const useCartStore = defineStore("cart", () => {
                     if (response && response.success) {
                         clearRecoveryMessage()
                         cart.value = response.cart
-                        openCartDrawer.value = true
+                        if (!updateItem) {
+                            openCartDrawer.value = true
+                        }
                     }
                 } else {
                     const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
@@ -123,7 +125,9 @@ export const useCartStore = defineStore("cart", () => {
                     if (response && response.success) {
                         clearRecoveryMessage()
                         cart.value = response.cart
-                        openCartDrawer.value = true
+                        if (!updateItem) {
+                            openCartDrawer.value = true
+                        }
                     }
                 }
             } catch (error) {

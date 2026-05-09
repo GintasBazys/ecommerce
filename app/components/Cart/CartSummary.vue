@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { PromotionSummary } from "~/types/checkout"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const props = defineProps<{
     itemCount: number
     promotionCount: number
@@ -67,13 +69,13 @@ function onCouponInput(event: Event): void {
                     @input="onCouponInput"
                 />
             </label>
-            <button type="submit" class="ui-btn-accent min-h-12" :disabled="props.isCouponDisabled">
+            <BaseButton type="submit" variant="accent" class="min-h-12" :disabled="props.isCouponDisabled">
                 <span
                     v-if="props.isApplyingCoupon"
                     class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950"
                 ></span>
                 Apply code
-            </button>
+            </BaseButton>
         </form>
 
         <p class="mt-3 text-sm leading-6 text-slate-600">{{ props.couponHint }}</p>
@@ -91,7 +93,7 @@ function onCouponInput(event: Event): void {
                         {{ props.promotionValue(promo) }}
                     </p>
                 </div>
-                <button
+                <BaseButton
                     type="button"
                     class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
                     aria-label="Remove promotion"
@@ -102,7 +104,7 @@ function onCouponInput(event: Event): void {
                             d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
                         />
                     </svg>
-                </button>
+                </BaseButton>
             </div>
         </div>
 

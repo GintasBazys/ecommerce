@@ -4,6 +4,7 @@ import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { FaqSection } from "~/types/content-pages"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 const route = useRoute()
@@ -227,7 +228,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                                 :key="item.question"
                                 class="overflow-hidden rounded-card border border-slate-200 bg-white shadow-card"
                             >
-                                <button
+                                <BaseButton
                                     type="button"
                                     class="flex w-full items-start justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5"
                                     :aria-controls="`${section.id}-panel-${itemIndex}`"
@@ -253,7 +254,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                                             <path d="M4 10H16" stroke-linecap="round" />
                                         </svg>
                                     </span>
-                                </button>
+                                </BaseButton>
 
                                 <div
                                     v-if="isPanelOpen(section.id, itemIndex)"

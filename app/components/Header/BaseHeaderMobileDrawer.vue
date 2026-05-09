@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { LocationItem, NavigationCategory } from "~/types/navigation"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
 
@@ -55,7 +56,7 @@ function closeDrawer(): void {
                         <h2 class="mt-3 text-lg font-semibold tracking-tight text-slate-950">Menu</h2>
                     </div>
 
-                    <button
+                    <BaseButton
                         type="button"
                         class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                         @click="closeDrawer"
@@ -66,7 +67,7 @@ function closeDrawer(): void {
                                 d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
                             />
                         </svg>
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
 

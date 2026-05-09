@@ -2,6 +2,7 @@
 import type { CustomerAddressDTO } from "@medusajs/types"
 import type { AddressErrors, RequiredAddressField } from "~/types/checkout"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseModal from "~/components/Shared/BaseModal.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
@@ -394,14 +395,15 @@ function save(): void {
             </fieldset>
 
             <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-end">
-                <button
+                <BaseButton
                     type="button"
-                    class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
+                    variant="secondary"
+                    class="motion-reduce:transition-none"
                     @click="close"
                 >
                     Cancel
-                </button>
-                <button type="submit" class="ui-btn-accent px-6 motion-reduce:transition-none">Save</button>
+                </BaseButton>
+                <BaseButton type="submit" variant="accent" class="px-6 motion-reduce:transition-none">Save</BaseButton>
             </div>
         </form>
     </BaseModal>

@@ -1,33 +1,84 @@
 <script setup lang="ts">
 import type { ProductDTO } from "@medusajs/types"
+import type { LocationQueryRaw } from "vue-router"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { ProductListResponse } from "~/types/product"
 
+import CategoryPagination from "~/components/Category/CategoryPagination.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
+const route = useRoute()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Special Offers" }])
 
-const browsingNotes = ["Newer offers appear first", "Live sale pricing updates automatically", "Two-up mobile browsing for faster scanning"]
+const limit = 12
+const browsingNotes = ["Sale products appear first", "Pricing updates automatically", "Two-up mobile browsing for faster scanning"]
+const currentPage = computed<number>(() => parsePage(route.query.page))
+const offset = computed<number>(() => (currentPage.value - 1) * limit)
+const productParams = computed(() => ({
+    ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
+    ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {}),
+    limit,
+    offset: offset.value,
+    view: "card"
+}))
 
-const { data, pending, error } = await useFetch<ProductListResponse>("/api/products/products", {
-    params: {
-        ...(regionStoreId.value ? { region_id: regionStoreId.value } : {}),
-        ...(selectedCountryCode.value ? { country_code: selectedCountryCode.value } : {}),
-        limit: 100,
-        order: "-created_at"
-    }
+const { data, pending, error } = await useFetch<ProductListResponse>("/api/products/on-sale", {
+    params: productParams,
+    watch: [regionStoreId, selectedCountryCode, currentPage]
 })
 
-const saleProducts = computed<ProductDTO[]>(() =>
-    (data.value?.products ?? []).filter((product) =>
-        product.variants?.some(
-            (variant) =>
-                variant.calculated_price?.calculated_price?.price_list_type === "sale" && Boolean(variant.calculated_price?.original_amount)
-        )
-    )
-)
+const offerProducts = computed<ProductDTO[]>(() => data.value?.products ?? [])
+const totalOfferProducts = computed<number>(() => data.value?.count ?? offerProducts.value.length)
+const totalPages = computed<number>(() => Math.max(1, Math.ceil(totalOfferProducts.value / limit)))
+const paginationLabel = computed<string>(() => `Page ${currentPage.value} of ${totalPages.value}`)
+const paginationItems = computed<(number | string)[]>(() => {
+    if (totalPages.value <= 7) {
+        return Array.from({ length: totalPages.value }, (_, index) => index + 1)
+    }
+
+    const pages = new Set<number>([1, totalPages.value, currentPage.value])
+
+    if (currentPage.value > 1) {
+        pages.add(currentPage.value - 1)
+    }
+
+    if (currentPage.value < totalPages.value) {
+        pages.add(currentPage.value + 1)
+    }
+
+    const sortedPages = [...pages].sort((left, right) => left - right)
+    const items: (number | string)[] = []
+
+    for (const page of sortedPages) {
+        const previousPage = items.at(-1)
+
+        if (typeof previousPage === "number" && page - previousPage > 1) {
+            items.push(`ellipsis-${previousPage}-${page}`)
+        }
+
+        items.push(page)
+    }
+
+    return items
+})
+
+function parsePage(page: unknown): number {
+    const parsedPage = Number(Array.isArray(page) ? page[0] : page)
+
+    return Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1
+}
+
+function buildPageLink(page: number): { query: LocationQueryRaw } {
+    const query: LocationQueryRaw = {}
+
+    if (page > 1) {
+        query.page = String(page)
+    }
+
+    return { query }
+}
 
 useHead({
     title: "Special Offers | Medusa Commerce"
@@ -76,7 +127,7 @@ useSeoMeta({
                                 Current sale products in one place.
                             </h1>
                             <p class="mt-4 max-w-2xl text-sm leading-6 text-slate-100 sm:text-base sm:leading-7">
-                                Explore every discounted product in the catalog without jumping through categories. The page keeps the same
+                                Explore discounted products in the catalog without jumping through categories. The page keeps the same
                                 polished feel as the newer storefront experience while making mobile browsing denser and faster.
                             </p>
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -98,11 +149,11 @@ useSeoMeta({
             <div class="grid gap-4 sm:grid-cols-3">
                 <article class="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-lg">
                     <p class="text-xs font-bold tracking-widest text-slate-500 uppercase">Sale products</p>
-                    <p class="mt-2 text-2xl leading-none font-semibold text-slate-950">{{ saleProducts.length }}</p>
+                    <p class="mt-2 text-2xl leading-none font-semibold text-slate-950">{{ totalOfferProducts }}</p>
                 </article>
                 <article class="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-lg">
                     <p class="text-xs font-bold tracking-widest text-slate-500 uppercase">Sorted by</p>
-                    <p class="mt-2 text-base leading-6 font-semibold text-slate-950">Newest offers first</p>
+                    <p class="mt-2 text-base leading-6 font-semibold text-slate-950">Sale products first</p>
                 </article>
                 <article class="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-lg">
                     <p class="text-xs font-bold tracking-widest text-slate-500 uppercase">Mobile UX</p>
@@ -127,7 +178,7 @@ useSeoMeta({
                 Could not load special offers right now.
             </div>
 
-            <div v-else-if="saleProducts.length" class="grid gap-6">
+            <div v-else-if="offerProducts.length" class="grid gap-6">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div class="max-w-136">
                         <span
@@ -136,7 +187,7 @@ useSeoMeta({
                             On sale now
                         </span>
                         <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tight text-slate-950 sm:text-4xl">
-                            Every discounted product currently available.
+                            Discounted products currently available.
                         </h2>
                     </div>
                     <ul class="grid gap-2 text-sm text-slate-600 sm:text-right">
@@ -145,8 +196,16 @@ useSeoMeta({
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-                    <ProductCard v-for="product in saleProducts" :key="product.id" :product="product" compact />
+                    <ProductCard v-for="product in offerProducts" :key="product.id" :product="product" compact />
                 </div>
+
+                <CategoryPagination
+                    :current-page="currentPage"
+                    :total-pages="totalPages"
+                    :pagination-items="paginationItems"
+                    :pagination-label="paginationLabel"
+                    :build-page-link="buildPageLink"
+                />
             </div>
 
             <div
@@ -166,7 +225,7 @@ useSeoMeta({
                         No sale products live right now
                     </h2>
                     <p class="mt-3 max-w-136 text-sm leading-7 text-slate-600 sm:text-base">
-                        The next offer drop will appear here automatically once discounted products are available.
+                        Sale products will appear here automatically once discounts are available.
                     </p>
                 </div>
                 <NuxtLink to="/" class="ui-btn-primary px-6">Browse the full shop</NuxtLink>

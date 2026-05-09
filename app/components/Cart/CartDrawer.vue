@@ -2,6 +2,7 @@
 import type { CartLineItemDTO } from "@medusajs/types"
 import type { PricedCartLineItem } from "~/types/checkout"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { usePostHog } from "~/composables/usePostHog"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
@@ -14,7 +15,7 @@ const posthog = usePostHog()
 
 const isHydrated = ref<boolean>(false)
 const drawerRef = ref<HTMLElement | null>(null)
-const closeButtonRef = ref<HTMLButtonElement | null>(null)
+const closeButtonRef = ref<Pick<HTMLButtonElement, "focus"> | null>(null)
 const titleId = useId()
 const previousFocusedElement = ref<HTMLElement | null>(null)
 
@@ -272,7 +273,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                 </p>
                             </div>
 
-                            <button
+                            <BaseButton
                                 ref="closeButtonRef"
                                 type="button"
                                 class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-xl transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
@@ -284,7 +285,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                         d="M5.22 5.22a.75.75 0 0 1 1.06 0L10 8.94l3.72-3.72a.75.75 0 1 1 1.06 1.06L11.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06L10 11.06l-3.72 3.72a.75.75 0 1 1-1.06-1.06L8.94 10 5.22 6.28a.75.75 0 0 1 0-1.06Z"
                                     />
                                 </svg>
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
 
@@ -295,14 +296,14 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             role="status"
                         >
                             <p>{{ recoveryMessage }}</p>
-                            <button
+                            <BaseButton
                                 type="button"
                                 class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 aria-label="Dismiss cart recovery message"
                                 @click="clearRecoveryMessage"
                             >
                                 <span aria-hidden="true">x</span>
-                            </button>
+                            </BaseButton>
                         </div>
 
                         <div v-if="cart?.items?.length" class="grid gap-3.5">
@@ -332,7 +333,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                         <div
                                             class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50/90 p-1 shadow-inner"
                                         >
-                                            <button
+                                            <BaseButton
                                                 type="button"
                                                 class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                                                 :disabled="(qtyMap[item.id] ?? 1) <= 1"
@@ -340,11 +341,11 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                                 @click="decrementQty(item.id)"
                                             >
                                                 -
-                                            </button>
+                                            </BaseButton>
                                             <span class="min-w-7 text-center text-sm font-semibold text-slate-900">{{
                                                 qtyMap[item.id] ?? Number(item.quantity)
                                             }}</span>
-                                            <button
+                                            <BaseButton
                                                 type="button"
                                                 class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-0 bg-transparent text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                                                 :disabled="
@@ -354,14 +355,14 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                                 @click="incrementQty(item)"
                                             >
                                                 +
-                                            </button>
+                                            </BaseButton>
                                         </div>
 
                                         <div class="flex items-center gap-2">
                                             <p class="text-sm font-semibold text-slate-950">
                                                 {{ getItemDisplayTotal(item) }}
                                             </p>
-                                            <button
+                                            <BaseButton
                                                 type="button"
                                                 class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 transition hover:border-rose-200 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden"
                                                 :aria-label="`Remove ${item.product_title}`"
@@ -381,7 +382,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                                         stroke-linejoin="round"
                                                     />
                                                 </svg>
-                                            </button>
+                                            </BaseButton>
                                         </div>
                                     </div>
                                 </div>
@@ -422,10 +423,10 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                         </div>
 
                         <div class="mt-4 grid gap-2">
-                            <button
+                            <BaseButton
                                 v-if="isCartDirty"
                                 type="button"
-                                class="ui-btn-accent w-full"
+                                variant="accent" class="w-full"
                                 :disabled="!isCartDirty || isAnyUpdating"
                                 @click="updateCart"
                             >
@@ -434,7 +435,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                                     class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950"
                                 ></span>
                                 Update cart
-                            </button>
+                            </BaseButton>
 
                             <NuxtLink
                                 to="/cart"

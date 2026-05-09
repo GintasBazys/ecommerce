@@ -2,6 +2,7 @@
 import type { CartLineItemDTO } from "@medusajs/types"
 
 import TaxedLinePrice from "~/components/Cart/TaxedLinePrice.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { formatPrice } from "~/utils/formatPrice"
 
 const props = defineProps<{
@@ -25,7 +26,7 @@ const emit = defineEmits<{
 
 <template>
     <section v-if="props.collapsible" aria-label="Order summary" class="lg:hidden">
-        <button
+        <BaseButton
             type="button"
             class="flex w-full items-center justify-between gap-4 rounded-3xl border border-amber-200/80 bg-white/95 px-4 py-4 text-left"
             :aria-expanded="props.isOpen ? 'true' : 'false'"
@@ -46,7 +47,7 @@ const emit = defineEmits<{
                     </svg>
                 </span>
             </span>
-        </button>
+        </BaseButton>
 
         <div
             v-show="props.isOpen"

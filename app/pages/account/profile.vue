@@ -5,6 +5,7 @@ import type { ProfileOrdersResponse } from "~/types/orders"
 
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 
 definePageMeta({
     layout: "account",
@@ -219,9 +220,9 @@ async function onSubmit(): Promise<void> {
 
                 <div class="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
                     <p class="text-sm leading-6 text-slate-500">Changes are saved to your account immediately after a successful update.</p>
-                    <button type="submit" class="ui-btn-accent min-h-12 px-6 motion-reduce:transition-none" :disabled="isSubmitting">
+                    <BaseButton type="submit" variant="accent" class="min-h-12 px-6 motion-reduce:transition-none" :disabled="isSubmitting">
                         {{ isSubmitting ? "Saving..." : "Save changes" }}
-                    </button>
+                    </BaseButton>
                 </div>
             </form>
         </section>

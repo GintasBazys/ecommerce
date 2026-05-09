@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NavLink } from "@/types/interfaces"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { ALL_PRODUCTS_URL_HANDLE, BLOG_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
 
@@ -112,14 +113,14 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
             <LazyNewsletterComponent />
             <div class="grid gap-4 py-7 lg:grid-cols-4 lg:gap-6">
                 <section class="rounded-3xl border border-white/15 bg-white/5 p-4 shadow-xl md:p-5">
-                    <button
+                    <BaseButton
                         type="button"
                         class="flex w-full items-center justify-between text-left text-base font-semibold text-white md:pointer-events-none"
                         @click="toggleMobileSection('help')"
                     >
                         Help & Contact
                         <span class="text-amber-300/95 md:hidden">{{ expandedMobileSections.help ? "-" : "+" }}</span>
-                    </button>
+                    </BaseButton>
                     <ul v-show="expandedMobileSections.help" class="mt-4 grid gap-3 md:mt-5">
                         <li v-for="item in helpLinks" :key="item.label">
                             <NuxtLink :to="item.to" class="text-slate-200/90 transition hover:text-white">{{ item.label }}</NuxtLink>
@@ -128,14 +129,14 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                 </section>
 
                 <section class="rounded-3xl border border-white/15 bg-white/5 p-4 shadow-xl md:p-5">
-                    <button
+                    <BaseButton
                         type="button"
                         class="flex w-full items-center justify-between text-left text-base font-semibold text-white md:pointer-events-none"
                         @click="toggleMobileSection('categories')"
                     >
                         Categories
                         <span class="text-amber-300/95 md:hidden">{{ expandedMobileSections.categories ? "-" : "+" }}</span>
-                    </button>
+                    </BaseButton>
                     <ul v-show="expandedMobileSections.categories" class="mt-4 grid gap-3 md:mt-5">
                         <li>
                             <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="text-slate-200/90 transition hover:text-white"
@@ -151,14 +152,14 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                 </section>
 
                 <section class="rounded-3xl border border-white/15 bg-white/5 p-4 shadow-xl md:p-5">
-                    <button
+                    <BaseButton
                         type="button"
                         class="flex w-full items-center justify-between text-left text-base font-semibold text-white md:pointer-events-none"
                         @click="toggleMobileSection('about')"
                     >
                         About
                         <span class="text-amber-300/95 md:hidden">{{ expandedMobileSections.about ? "-" : "+" }}</span>
-                    </button>
+                    </BaseButton>
                     <ul v-show="expandedMobileSections.about" class="mt-4 grid gap-3 md:mt-5">
                         <li v-for="item in aboutLinks" :key="item.label">
                             <NuxtLink
@@ -193,9 +194,9 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
             <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/15 px-1 pt-6">
                 <p class="text-sm text-slate-300/90">Copyright Gintas Bazys {{ currentYear }}. All rights reserved.</p>
                 <div class="flex flex-wrap items-center gap-3">
-                    <button type="button" class="text-sm font-semibold text-slate-200/90 transition hover:text-white" @click="openBanner">
+                    <BaseButton type="button" class="text-sm font-semibold text-slate-200/90 transition hover:text-white" @click="openBanner">
                         Cookie Settings
-                    </button>
+                    </BaseButton>
                     <NuxtLink to="/privacy" class="text-sm font-semibold text-slate-200/90 transition hover:text-white"
                     >Privacy Policy</NuxtLink
                     >

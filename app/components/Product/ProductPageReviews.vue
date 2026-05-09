@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Review } from "@/types/interfaces"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 defineProps<{
     customer: unknown
     reviews: Review[]
@@ -27,14 +29,14 @@ const emit = defineEmits<{
                     Read recent feedback from verified shoppers before making a decision.
                 </p>
             </div>
-            <button
+            <BaseButton
                 v-if="customer"
                 type="button"
                 class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                 @click="emit('open-review')"
             >
                 Write a review
-            </button>
+            </BaseButton>
         </div>
 
         <ProductReviews :reviews="reviews" :average-rating="averageRating" :review-count="reviewCount" />

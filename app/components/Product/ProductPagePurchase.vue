@@ -2,6 +2,8 @@
 import type { ProductVariantDTO } from "@medusajs/types"
 import type { ProductFact } from "~/types/product"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 defineProps<{
     variants: ProductVariantDTO[]
     selectedVariantId: string | null
@@ -30,7 +32,7 @@ const emit = defineEmits<{
                 <span class="text-sm font-semibold text-slate-900">{{ selectedVariantTitle }}</span>
             </div>
             <div class="flex flex-wrap gap-2.5">
-                <button
+                <BaseButton
                     v-for="variant in variants"
                     :key="variant.id"
                     type="button"
@@ -44,7 +46,7 @@ const emit = defineEmits<{
                     @click="emit('select-variant', variant.id)"
                 >
                     {{ variant.title }}
-                </button>
+                </BaseButton>
             </div>
         </div>
 
@@ -59,7 +61,7 @@ const emit = defineEmits<{
             <div class="grid gap-2">
                 <span class="text-sm font-medium text-slate-500">Quantity</span>
                 <div class="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-slate-50 p-1">
-                    <button
+                    <BaseButton
                         type="button"
                         class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                         :disabled="quantity <= 1"
@@ -67,9 +69,9 @@ const emit = defineEmits<{
                         @click="emit('decrement')"
                     >
                         <span aria-hidden="true" class="text-lg leading-none">−</span>
-                    </button>
+                    </BaseButton>
                     <span class="min-w-10 text-center text-base font-semibold text-slate-950">{{ quantity }}</span>
-                    <button
+                    <BaseButton
                         type="button"
                         class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                         :disabled="quantity >= maxStock"
@@ -77,18 +79,18 @@ const emit = defineEmits<{
                         @click="emit('increment')"
                     >
                         <span aria-hidden="true" class="text-lg leading-none">+</span>
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
 
-            <button
+            <BaseButton
                 type="button"
-                class="ui-btn-accent w-full px-6 text-base motion-reduce:transition-none sm:w-auto sm:min-w-64"
+                variant="accent" class="w-full px-6 text-base motion-reduce:transition-none sm:w-auto sm:min-w-64"
                 :disabled="!selectedVariant || quantity < 1 || quantity > maxStock || adding"
                 @click="emit('add-to-cart')"
             >
                 {{ adding ? "Adding..." : "Add to cart" }}
-            </button>
+            </BaseButton>
         </div>
 
         <div v-else class="rounded-card-sm mt-5 border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600">

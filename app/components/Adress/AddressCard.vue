@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { CustomerAddress } from "~/types/checkout"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const props = defineProps<{ address: CustomerAddress }>()
 const emit = defineEmits<{
     (_: "edit", __: CustomerAddress): void
@@ -61,7 +63,7 @@ function onDelete(): void {
                 </div>
 
                 <div class="flex shrink-0 gap-2">
-                    <button
+                    <BaseButton
                         type="button"
                         class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/95 text-slate-600 shadow-sm transition hover:bg-amber-50 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         :aria-label="`Edit ${addressLabel}`"
@@ -71,8 +73,8 @@ function onDelete(): void {
                             <path d="M4 20h4l10-10-4-4L4 16v4Z" stroke-linecap="round" stroke-linejoin="round" />
                             <path d="m13.5 6.5 4 4" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         type="button"
                         class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-rose-200 bg-white/95 text-rose-600 shadow-sm transition hover:bg-rose-50 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-hidden motion-reduce:transition-none"
                         :aria-label="`Delete ${addressLabel}`"
@@ -85,7 +87,7 @@ function onDelete(): void {
                             <path d="M6 7l1 12h10l1-12" stroke-linecap="round" stroke-linejoin="round" />
                             <path d="M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
 

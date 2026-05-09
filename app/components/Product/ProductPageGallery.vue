@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ProductGalleryImage } from "~/types/product"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
 const props = defineProps<{
@@ -94,7 +95,7 @@ function syncActiveImageFromScroll(): void {
             </div>
 
             <div v-if="productImages.length > 1" class="grid grid-cols-4 gap-3">
-                <button
+                <BaseButton
                     v-for="(image, index) in productImages"
                     :key="image.id"
                     type="button"
@@ -115,12 +116,12 @@ function syncActiveImageFromScroll(): void {
                         format="png"
                         class="block aspect-square w-full rounded-xl object-cover object-center"
                     />
-                </button>
+                </BaseButton>
             </div>
         </div>
 
         <div v-if="productImages.length > 1" class="mt-4 flex items-center justify-center gap-2 lg:hidden">
-            <button
+            <BaseButton
                 v-for="(image, index) in productImages"
                 :key="`${image.id}-dot-${index}`"
                 type="button"
@@ -129,7 +130,7 @@ function syncActiveImageFromScroll(): void {
                 :aria-label="`Go to image ${index + 1}`"
                 :aria-pressed="index === activeImageIndex"
                 @click="selectImage(index)"
-            ></button>
+            />
         </div>
     </div>
 </template>

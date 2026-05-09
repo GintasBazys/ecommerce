@@ -2,6 +2,7 @@
 import type { CustomerResponseInterface } from "@/types/interfaces"
 import type { TurnstileWidgetInstance } from "~/types/forms"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { usePostHog } from "~/composables/usePostHog"
 
 useHead({
@@ -298,13 +299,13 @@ async function handleRegister(): Promise<void> {
                             <p v-if="formErrors.verification" class="text-sm text-rose-600">{{ formErrors.verification }}</p>
                         </div>
 
-                        <button
+                        <BaseButton
                             type="submit"
                             class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
                             :disabled="isLoading"
                         >
                             {{ isLoading ? "Creating account..." : "Register" }}
-                        </button>
+                        </BaseButton>
                     </form>
 
                     <p class="mt-5 text-center text-sm text-slate-600">

@@ -9,6 +9,7 @@ import CategoryHero from "~/components/Category/CategoryHero.vue"
 import CategoryPagination from "~/components/Category/CategoryPagination.vue"
 import CategoryResultsGrid from "~/components/Category/CategoryResultsGrid.vue"
 import CategoryToolbar from "~/components/Category/CategoryToolbar.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import NotFoundPageContent from "~/components/Shared/NotFoundPageContent.vue"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
@@ -24,6 +25,7 @@ const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { absoluteUrl } = useSiteIdentity()
 
 const isMobileFilterDrawerOpen = ref<boolean>(false)
+const mobileFilterViewportHeight = ref<number>(0)
 const notFoundPath = ref<string | null>(null)
 const productsStartRef = ref<HTMLElement | null>(null)
 const category = ref<ProductCategoryDTO | null>(null)
@@ -115,6 +117,10 @@ const metaDescription = computed<string>(() => {
     return `${baseDescription} Page ${currentPage.value} of ${totalPages.value}.`
 })
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: pageHeading.value }])
+const mobileFilterDrawerStyle = computed<Record<string, string>>(() => ({
+    "--mobile-filter-viewport-height": `${mobileFilterViewportHeight.value || 640}px`,
+    "--mobile-filter-top-offset": "5rem"
+}))
 
 const collectionSchema = computed<SchemaNode | null>(() => {
     if (notFoundPath.value || !pageHeading.value) {
@@ -257,7 +263,21 @@ watch(isMobileFilterDrawerOpen, (isOpen) => {
     }
 
     document.body.style.overflow = isOpen ? "hidden" : ""
+
+    if (isOpen) {
+        updateMobileFilterViewportHeight()
+        window.visualViewport?.addEventListener("resize", updateMobileFilterViewportHeight)
+        window.addEventListener("resize", updateMobileFilterViewportHeight)
+        return
+    }
+
+    window.visualViewport?.removeEventListener("resize", updateMobileFilterViewportHeight)
+    window.removeEventListener("resize", updateMobileFilterViewportHeight)
 })
+
+function updateMobileFilterViewportHeight(): void {
+    mobileFilterViewportHeight.value = Math.floor(window.visualViewport?.height ?? window.innerHeight)
+}
 
 onUnmounted(() => {
     if (!import.meta.client) {
@@ -265,6 +285,8 @@ onUnmounted(() => {
     }
 
     document.body.style.overflow = ""
+    window.visualViewport?.removeEventListener("resize", updateMobileFilterViewportHeight)
+    window.removeEventListener("resize", updateMobileFilterViewportHeight)
 })
 
 useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "category-structured-data")
@@ -293,11 +315,11 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                     leave-to-class="opacity-0"
                 >
                     <div v-if="isMobileFilterDrawerOpen" class="fixed inset-0 z-50 xl:hidden">
-                        <button
+                        <BaseButton
                             type="button"
                             class="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
                             @click="isMobileFilterDrawerOpen = false"
-                        ></button>
+                        />
                         <Transition
                             enter-active-class="transition duration-300 ease-out"
                             enter-from-class="translate-y-full"
@@ -308,7 +330,8 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         >
                             <div
                                 v-if="isMobileFilterDrawerOpen"
-                                class="absolute inset-x-0 bottom-0 max-h-screen overflow-y-auto rounded-t-panel bg-white p-4 shadow-2xl will-change-transform sm:p-5"
+                                class="mobile-filter-drawer absolute inset-x-0 bottom-0 overflow-y-auto overscroll-contain rounded-t-panel bg-white p-4 shadow-2xl will-change-transform sm:p-5"
+                                :style="mobileFilterDrawerStyle"
                             >
                                 <CategoryFiltersPanel
                                     v-model:selected-child-category-ids="selectedChildCategoryIds"

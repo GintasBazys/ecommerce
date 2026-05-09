@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ContactFormErrors, ContactFormState } from "~/types/contact"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { usePostHog } from "~/composables/usePostHog"
 
 const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ea50e93bb59d60512a0ab63ded1f9169"
@@ -153,7 +154,7 @@ function handleSubmit(event: SubmitEvent): void {
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-sm leading-6 text-slate-600">By sending this form, you share contact details only for support follow-up.</p>
-            <button type="submit" class="ui-btn-primary px-7">Send message</button>
+            <BaseButton type="submit" variant="primary" class="px-7">Send message</BaseButton>
         </div>
 
         <div v-if="errorMessage" class="rounded-card-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

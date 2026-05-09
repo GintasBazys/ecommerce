@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseButton from "~/components/Shared/BaseButton.vue"
+
 const route = useRoute()
 const router = useRouter()
 const token = computed<string>(() => String(route.query.token || "").trim())
@@ -138,13 +140,13 @@ onBeforeUnmount(() => {
                             <p v-if="passwordError" class="mt-1 text-sm text-rose-600">{{ passwordError }}</p>
                         </div>
 
-                        <button
+                        <BaseButton
                             type="submit"
                             class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
                             :disabled="isLoading"
                         >
                             {{ isLoading ? "Resetting password..." : "Reset password" }}
-                        </button>
+                        </BaseButton>
                     </form>
 
                     <div v-if="errorMessage" class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">

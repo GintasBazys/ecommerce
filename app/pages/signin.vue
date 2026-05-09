@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TurnstileWidgetInstance } from "~/types/forms"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseModal from "~/components/Shared/BaseModal.vue"
 import { usePostHog } from "~/composables/usePostHog"
 
@@ -224,22 +225,22 @@ async function handleReset(): Promise<void> {
                     </div>
 
                     <div class="mt-6 grid gap-3">
-                        <button
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="handleSocialLogin('google')"
                         >
                             <img src="/images/google_login_icon.svg" width="24" height="24" alt="" aria-hidden="true" />
                             Log in with Google
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                             @click="handleSocialLogin('facebook')"
                         >
                             <img src="/images/facebook_login_icon.svg" width="24" height="24" alt="" aria-hidden="true" />
                             Log in with Facebook
-                        </button>
+                        </BaseButton>
                     </div>
 
                     <div class="relative my-6 text-center text-xs font-medium tracking-widest text-slate-500 uppercase">
@@ -279,13 +280,13 @@ async function handleReset(): Promise<void> {
                         </div>
 
                         <div class="flex justify-end">
-                            <button
+                            <BaseButton
                                 type="button"
                                 class="text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-hidden"
                                 @click="showResetDialog = true"
                             >
                                 Forgot password?
-                            </button>
+                            </BaseButton>
                         </div>
 
                         <div>
@@ -305,13 +306,13 @@ async function handleReset(): Promise<void> {
                             <p v-if="loginErrors.verification" class="mt-1 text-sm text-rose-600">{{ loginErrors.verification }}</p>
                         </div>
 
-                        <button
+                        <BaseButton
                             type="submit"
                             class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-70"
                             :disabled="loginIsSubmitting"
                         >
                             {{ loginIsSubmitting ? "Logging in..." : "Log in" }}
-                        </button>
+                        </BaseButton>
                     </form>
 
                     <p class="mt-5 text-center text-sm text-slate-600">
@@ -367,12 +368,12 @@ async function handleReset(): Promise<void> {
                     <p v-if="resetEmailError" id="reset-email-error" class="mt-1 text-sm text-rose-600">{{ resetEmailError }}</p>
                 </div>
 
-                <button
+                <BaseButton
                     type="submit"
                     class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                 >
                     Send reset link
-                </button>
+                </BaseButton>
             </form>
         </BaseModal>
 

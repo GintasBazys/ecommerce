@@ -5,6 +5,7 @@ import type { PricedCartLineItem } from "~/types/checkout"
 import CartHero from "~/components/Cart/CartHero.vue"
 import CartLineItem from "~/components/Cart/CartLineItem.vue"
 import CartSummary from "~/components/Cart/CartSummary.vue"
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
 import { debounce } from "~/utils/debounce"
 import { formatPrice } from "~/utils/formatPrice"
@@ -255,14 +256,14 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                             role="status"
                         >
                             <p>{{ recoveryMessage }}</p>
-                            <button
+                            <BaseButton
                                 type="button"
                                 class="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white/80 text-amber-900 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 aria-label="Dismiss cart recovery message"
                                 @click="clearRecoveryMessage"
                             >
                                 <span aria-hidden="true">x</span>
-                            </button>
+                            </BaseButton>
                         </div>
 
                         <div v-if="isCartLoading" class="grid justify-items-center gap-4 px-4 py-14 text-center">
@@ -294,9 +295,9 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                                     <span v-if="isCartDirty">You have unsaved quantity changes.</span>
                                     <span v-else>Your cart is up to date and ready for checkout.</span>
                                 </p>
-                                <button
+                                <BaseButton
                                     type="button"
-                                    class="ui-btn-accent min-h-12 px-6"
+                                    variant="accent" class="min-h-12 px-6"
                                     :disabled="!isCartDirty || isUpdatingCart"
                                     @click="updateCart"
                                 >
@@ -305,7 +306,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                                         class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950"
                                     ></span>
                                     Update cart
-                                </button>
+                                </BaseButton>
                             </div>
                         </template>
 
