@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NuxtImageProps } from "~/types/media"
+import type { NuxtImageProps } from "../../types/media"
 
 const props = defineProps<NuxtImageProps>()
 

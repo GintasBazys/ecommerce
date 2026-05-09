@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue"
 
-import type { ProductReviewForm } from "~/types/product"
+import type { ProductReviewForm } from "../../types/product"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
