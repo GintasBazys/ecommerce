@@ -15,7 +15,10 @@ import { useCheckoutPayment } from "~/composables/checkout/useCheckoutPayment"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
 definePageMeta({ layout: "checkout" })
-useHead({ title: "Checkout | Medusa Commerce" })
+useHead({
+    title: "Checkout | Medusa Commerce",
+    meta: [{ name: "robots", content: "noindex,nofollow" }]
+})
 
 const cartStore = useCartStore()
 const customerStore = useCustomerStore()

@@ -14,6 +14,7 @@ import { useProductReviews } from "~/composables/product/useProductReviews"
 import { useSiteIdentity } from "~/composables/shared/useStructuredData"
 
 const route = useRoute()
+const event = useRequestEvent()
 const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { openCartDrawer } = storeToRefs(useCartStore())
@@ -80,6 +81,10 @@ const isOnSale = computed<boolean>(
 )
 
 const { displayPrice, originalPrice, taxLabel } = useProductPrice(selectedVariant)
+
+if (productNotFound.value && event) {
+    setResponseStatus(event, 404)
+}
 
 const maxStock = computed<number>(() => selectedVariant.value?.inventory_quantity ?? 99)
 const inStock = computed<boolean>(() => typeof selectedVariant.value?.inventory_quantity !== "number" || selectedVariant.value.inventory_quantity > 0)

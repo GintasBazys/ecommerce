@@ -81,7 +81,7 @@ export type CreatePaymentIntentPayload = {
     client_secret?: string
 }
 
-export type CompleteCartPayload = { order?: { id?: string } }
+export type CompleteCartPayload = { order?: { id?: string; email?: string | null; shipping_address?: { postal_code?: string | null } | null } }
 
 export type CheckoutAccountStepInstance = {
     executeLoginTurnstile: () => Promise<string>

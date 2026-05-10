@@ -12,7 +12,10 @@ import { formatPrice } from "~/utils/formatPrice"
 
 definePageMeta({ layout: "checkout" })
 
-useHead({ title: "Cart | Medusa Commerce" })
+useHead({
+    title: "Cart | Medusa Commerce",
+    meta: [{ name: "robots", content: "noindex,nofollow" }]
+})
 
 const cartStore = useCartStore()
 const { cart, recoveryMessage } = storeToRefs(cartStore)

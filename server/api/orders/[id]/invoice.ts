@@ -1,4 +1,5 @@
 import { assertMedusaResponse, fetchMedusaResponse } from "#server/utils/medusa-proxy"
+import { fetchAuthorizedStoreOrder } from "#server/utils/orders"
 
 export default defineEventHandler(async (event) => {
     const { id } = event.context.params!
@@ -6,6 +7,8 @@ export default defineEventHandler(async (event) => {
     if (!id) {
         throw createError({ statusCode: 400, statusMessage: "Missing order id" })
     }
+
+    await fetchAuthorizedStoreOrder(event, id)
 
     const response = await fetchMedusaResponse(event, `/store/orders/${encodeURIComponent(id)}/invoices`, {
         method: "GET",

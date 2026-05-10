@@ -32,10 +32,10 @@ const emit = defineEmits<{
                     <template v-else-if="filterLoading">Refreshing filtered results...</template>
                     <template v-else-if="loading && !gridIsInitialLoading">Loading page {{ currentPage }}...</template>
                     <template v-else-if="activeFilterCount">{{ activeFilterCount }} active filters</template>
-                    <template v-else>Medusa-backed filters for categories, collections, types, tags, stock, and price.</template>
+                    <template v-else>Medusa-backed filters for categories, collections, types, and stock.</template>
                 </p>
             </div>
-            <div class="grid xl:flex gap-3 sm:grid-cols-2 sm:items-end lg:justify-end">
+            <div class="grid gap-3 sm:grid-cols-2 sm:items-end lg:justify-end xl:flex">
                 <BaseButton
                     type="button"
                     class="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 shadow-card xl:hidden"

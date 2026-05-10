@@ -54,7 +54,7 @@ export default defineNuxtConfig({
     },
 
     robots: {
-        disallow: ["/account", "/account/**", "/register/**"]
+        disallow: ["/account", "/account/**", "/cart", "/checkout", "/order-completed", "/register/**", "/signin"]
     },
 
     runtimeConfig: {

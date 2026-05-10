@@ -6,11 +6,25 @@ type ProductsResponse = {
     count?: number
 }
 
+const DEFAULT_LIMIT = Number(LIMIT) || 12
+const MAX_LIMIT = 48
+
+function parseBoundedInteger(value: unknown, fallbackValue: number, maximumValue: number): number {
+    const source = Array.isArray(value) ? value[0] : value
+    const parsedValue = Number.parseInt(String(source ?? ""), 10)
+
+    if (!Number.isFinite(parsedValue) || parsedValue < 0) {
+        return fallbackValue
+    }
+
+    return Math.min(parsedValue, maximumValue)
+}
+
 export default defineEventHandler(async (event) => {
     const query = getQuery(event)
 
-    const limit = query.limit != null ? String(query.limit) : LIMIT
-    const offset = query.offset != null ? String(query.offset) : "0"
+    const limit = parseBoundedInteger(query.limit, DEFAULT_LIMIT, MAX_LIMIT)
+    const offset = parseBoundedInteger(query.offset, 0, Number.MAX_SAFE_INTEGER)
     const categoryId = query.category_id != null ? String(query.category_id) : null
     const handle = query.handle ? String(query.handle) : null
     const order = query.order ? String(query.order) : "-created_at"
@@ -42,8 +56,11 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "country_code is required for tax pricing" })
     }
 
+    queryParams.set("limit", String(limit))
+    queryParams.set("offset", String(offset))
+
     const endpoint = categoryId ? "/store/category-products" : "/store/products"
-    const path = `${endpoint}?${queryParams.toString()}&limit=${limit}&offset=${offset}`
+    const path = `${endpoint}?${queryParams.toString()}`
 
     try {
         const response = await fetchMedusaResponse(event, path, {

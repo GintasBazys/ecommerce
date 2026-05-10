@@ -11,8 +11,6 @@ export type FacetItem = {
     count: number
 }
 
-export type PriceRange = [number, number]
-
 export type CategoryProduct = ProductDTO & {
     collection?: { id: string; title?: string } | null
     type?: { id: string; value?: string } | null
@@ -25,11 +23,6 @@ export type CategoryProductsFacets = {
     collections: FacetItem[]
     types: FacetItem[]
     tags: FacetItem[]
-    price: {
-        min: number
-        max: number
-        currencyCode: string | null
-    }
 }
 
 export type CategoryProductsResponse = {

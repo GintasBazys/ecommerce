@@ -7,7 +7,10 @@ import { usePostHog } from "~/composables/analytics/usePostHog"
 import { useCustomerAuth } from "~/composables/auth/useCustomerAuth"
 import { useSnackbar } from "~/composables/shared/useSnackbar"
 
-useHead({ title: "Signin | Medusa Commerce" })
+useHead({
+    title: "Signin | Medusa Commerce",
+    meta: [{ name: "robots", content: "noindex,nofollow" }]
+})
 definePageMeta({ layout: "default" })
 
 const router = useRouter()

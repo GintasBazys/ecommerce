@@ -2,8 +2,7 @@ import type { ProductCategoryDTO } from "@medusajs/types"
 import type { Ref } from "vue"
 import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from "vue-router"
 
-import { formatPrice } from "@/utils/formatPrice"
-import type { CategoryProductsFacets, CategoryProductsResponse, CategorySortOption, FacetItem, PriceRange } from "~/types/category-listing"
+import type { CategoryProductsFacets, CategoryProductsResponse, CategorySortOption, FacetItem } from "~/types/category-listing"
 import { useCategoryListingPagination } from "~/composables/category/useCategoryListingPagination"
 
 type FetchSource = "initial" | "sort" | "filters" | "pagination"
@@ -14,30 +13,20 @@ type UseCategoryListingOptions = {
     regionStoreId: Ref<string | null | undefined>
     selectedCountryCode: Ref<string | null | undefined>
 }
+
 export const categorySortOptions: CategorySortOption[] = [
     { text: "From latest", value: "-created_at" },
     { text: "From oldest", value: "created_at" },
-    { text: "Price: low → high", value: "variants.calculated_price.calculated_amount" },
-    { text: "Price: high → low", value: "-variants.calculated_price.calculated_amount" },
     { text: "Title: A → Z", value: "title" },
     { text: "Title: Z → A", value: "-title" }
 ]
-
-function createPriceRange(min: number, max: number): PriceRange {
-    return [min, max]
-}
 
 function createEmptyFacets(): CategoryProductsFacets {
     return {
         categories: [],
         collections: [],
         types: [],
-        tags: [],
-        price: {
-            min: 0,
-            max: 0,
-            currencyCode: null
-        }
+        tags: []
     }
 }
 
@@ -54,21 +43,6 @@ function parseQueryList(value: LocationQueryValue | LocationQueryValue[] | undef
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean)
-}
-
-function parseQueryNumber(value: LocationQueryValue | LocationQueryValue[] | undefined): number | undefined {
-    const source = Array.isArray(value) ? value[0] : value
-
-    if (typeof source !== "string" || source.trim() === "") {
-        return undefined
-    }
-
-    const parsed = Number(source)
-    return Number.isFinite(parsed) ? parsed : undefined
-}
-
-function clampPriceValue(value: number, min: number, max: number): number {
-    return Math.min(Math.max(value, min), max)
 }
 
 export function useCategoryListing({ category, isAllProductsPage, regionStoreId, selectedCountryCode }: UseCategoryListingOptions) {
@@ -89,13 +63,9 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const selectedTypeIds = ref<string[]>([])
     const selectedTagIds = ref<string[]>([])
     const inStockOnly = ref<boolean>(false)
-    const priceRange = ref<PriceRange>([0, 0])
-    const appliedPriceRange = ref<PriceRange>([0, 0])
-    const initialPriceRangeApplied = ref<boolean>(false)
     const isChangingCategoryPage = ref<boolean>(false)
     const isSyncingQuery = ref<boolean>(false)
     const isApplyingQueryState = ref<boolean>(false)
-    const pendingQueryPrice = ref<{ min?: number; max?: number } | null>(null)
 
     const activeFilterCount = computed<number>(() => {
         let count = 0
@@ -106,10 +76,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         count += selectedTagIds.value.length
 
         if (inStockOnly.value) {
-            count += 1
-        }
-
-        if (appliedPriceRange.value[0] > facets.value.price.min || appliedPriceRange.value[1] < facets.value.price.max) {
             count += 1
         }
 
@@ -131,28 +97,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     )
 
     const hasFacetedQuery = computed<boolean>(() => activeFilterCount.value > 0 || sortOption.value !== categorySortOptions[0]!.value)
-
-    const priceSummary = computed<string>(() => {
-        if (!facets.value.price.currencyCode) {
-            return `${appliedPriceRange.value[0]} - ${appliedPriceRange.value[1]}`
-        }
-
-        return `${formatPrice(appliedPriceRange.value[0], facets.value.price.currencyCode)} - ${formatPrice(appliedPriceRange.value[1], facets.value.price.currencyCode)}`
-    })
-
-    const priceStep = computed<number>(() => {
-        const difference = Math.max(facets.value.price.max - facets.value.price.min, 1)
-
-        if (difference > 50000) {
-            return 1000
-        }
-
-        if (difference > 10000) {
-            return 500
-        }
-
-        return 100
-    })
 
     const gridIsInitialLoading = computed<boolean>(() => loadingRef.value && products.value.length === 0)
 
@@ -187,14 +131,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             query.stock = "1"
         }
 
-        if (appliedPriceRange.value[0] > facets.value.price.min) {
-            query.minPrice = String(appliedPriceRange.value[0])
-        }
-
-        if (appliedPriceRange.value[1] < facets.value.price.max) {
-            query.maxPrice = String(appliedPriceRange.value[1])
-        }
-
         return query
     }
 
@@ -205,9 +141,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             collections: parseQueryList(query.collections),
             types: parseQueryList(query.types),
             tags: parseQueryList(query.tags),
-            stock: query.stock === "1",
-            minPrice: parseQueryNumber(query.minPrice),
-            maxPrice: parseQueryNumber(query.maxPrice)
+            stock: query.stock === "1"
         })
     }
 
@@ -229,11 +163,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         selectedTypeIds.value = parseQueryList(query.types)
         selectedTagIds.value = parseQueryList(query.tags)
         inStockOnly.value = query.stock === "1"
-
-        const queryMinPrice = parseQueryNumber(query.minPrice)
-        const queryMaxPrice = parseQueryNumber(query.maxPrice)
-        pendingQueryPrice.value =
-            queryMinPrice !== undefined || queryMaxPrice !== undefined ? { min: queryMinPrice, max: queryMaxPrice } : null
 
         isApplyingQueryState.value = false
     }
@@ -257,39 +186,9 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         selectedTypeIds.value = []
         selectedTagIds.value = []
         inStockOnly.value = false
-        priceRange.value = createPriceRange(0, 0)
-        appliedPriceRange.value = createPriceRange(0, 0)
-        initialPriceRangeApplied.value = false
-    }
-
-    function syncPriceRange(force = false) {
-        const nextMin = facets.value.price.min
-        const nextMax = facets.value.price.max
-
-        if (!initialPriceRangeApplied.value || force) {
-            const nextRange = createPriceRange(nextMin, nextMax)
-            const queryPrice = pendingQueryPrice.value
-
-            if (queryPrice) {
-                const clampedMin = clampPriceValue(queryPrice.min ?? nextMin, nextMin, nextMax)
-                const clampedMax = clampPriceValue(queryPrice.max ?? nextMax, clampedMin, nextMax)
-
-                priceRange.value = createPriceRange(clampedMin, clampedMax)
-                appliedPriceRange.value = createPriceRange(clampedMin, clampedMax)
-                pendingQueryPrice.value = null
-            } else {
-                priceRange.value = nextRange
-                appliedPriceRange.value = nextRange
-            }
-
-            initialPriceRangeApplied.value = true
-        }
     }
 
     function buildProductQuery(page = currentPage.value) {
-        const initialMinPrice = !initialPriceRangeApplied.value ? pendingQueryPrice.value?.min : undefined
-        const initialMaxPrice = !initialPriceRangeApplied.value ? pendingQueryPrice.value?.max : undefined
-
         return {
             category_id: isAllProductsPage.value ? undefined : category.value?.id,
             region_id: regionStoreId.value,
@@ -301,9 +200,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             collection_ids: selectedCollectionIds.value.join(",") || undefined,
             type_ids: selectedTypeIds.value.join(",") || undefined,
             tag_ids: selectedTagIds.value.join(",") || undefined,
-            in_stock_only: inStockOnly.value ? "true" : undefined,
-            min_price: initialMinPrice ?? (appliedPriceRange.value[0] > facets.value.price.min ? appliedPriceRange.value[0] : undefined),
-            max_price: initialMaxPrice ?? (appliedPriceRange.value[1] < facets.value.price.max ? appliedPriceRange.value[1] : undefined)
+            in_stock_only: inStockOnly.value ? "true" : undefined
         }
     }
 
@@ -334,7 +231,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             products.value = newProducts
             totalCount.value = response.count
             facets.value = response.facets
-            syncPriceRange(source === "initial")
         } catch (error) {
             console.error("Error fetching category products", error)
             errorRef.value = "We could not load products right now. Please try again."
@@ -351,17 +247,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         selectedTypeIds.value = []
         selectedTagIds.value = []
         inStockOnly.value = false
-        priceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
-        appliedPriceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
-    }
-
-    function resetPriceRange() {
-        priceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
-        appliedPriceRange.value = createPriceRange(facets.value.price.min, facets.value.price.max)
-    }
-
-    async function applyPriceRange() {
-        appliedPriceRange.value = createPriceRange(priceRange.value[0], priceRange.value[1])
     }
 
     watch(sortOption, async () => {
@@ -388,8 +273,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
                 collections: selectedCollectionIds.value,
                 types: selectedTypeIds.value,
                 tags: selectedTagIds.value,
-                inStockOnly: inStockOnly.value,
-                price: appliedPriceRange.value
+                inStockOnly: inStockOnly.value
             }),
         async () => {
             if (isChangingCategoryPage.value || isApplyingQueryState.value) {
@@ -437,8 +321,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         selectedTypeIds,
         selectedTagIds,
         inStockOnly,
-        priceRange,
-        appliedPriceRange,
         isChangingCategoryPage,
         isSyncingQuery,
         isApplyingQueryState,
@@ -448,8 +330,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         activeFilterCount,
         childCategoryFacets,
         hasFacetedQuery,
-        priceSummary,
-        priceStep,
         gridIsInitialLoading,
         paginationLabel,
         paginationItems,
@@ -457,8 +337,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         applyQueryStateFromRoute,
         resetCategoryPageState,
         fetchProducts,
-        clearAllFilters,
-        resetPriceRange,
-        applyPriceRange
+        clearAllFilters
     }
 }

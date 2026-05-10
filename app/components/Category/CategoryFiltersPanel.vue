@@ -2,8 +2,7 @@
 import type {
     CategoryFilterSection,
     CategoryProductsFacets,
-    FacetItem,
-    PriceRange
+    FacetItem
 } from "~/types/category-listing"
 
 import CategoryFacetSection from "~/components/Category/CategoryFacetSection.vue"
@@ -14,8 +13,6 @@ const props = defineProps<{
     activeFilterCount: number
     childCategoryFacets: FacetItem[]
     facets: CategoryProductsFacets
-    priceSummary: string
-    priceStep: number
     showMobileClose?: boolean
 }>()
 
@@ -24,12 +21,9 @@ const selectedCollectionIds = defineModel<string[]>("selectedCollectionIds", { d
 const selectedTypeIds = defineModel<string[]>("selectedTypeIds", { default: [] })
 const selectedTagIds = defineModel<string[]>("selectedTagIds", { default: [] })
 const inStockOnly = defineModel<boolean>("inStockOnly", { default: false })
-const priceRange = defineModel<PriceRange>("priceRange", { default: [0, 0] })
 
 const emit = defineEmits<{
     clearAll: []
-    resetPriceRange: []
-    applyPriceRange: []
     close: []
 }>()
 
@@ -54,10 +48,6 @@ const sectionIds = computed<CategoryFilterSection[]>(() => {
 
     sections.push({ id: "availability", title: "Availability" })
 
-    if (props.facets.price.max > props.facets.price.min) {
-        sections.push({ id: "price", title: "Price" })
-    }
-
     return sections
 })
 
@@ -78,22 +68,6 @@ watch(
     },
     { immediate: true }
 )
-
-const priceRangeMin = computed<number>({
-    get: () => priceRange.value[0],
-    set: (value) => {
-        const nextValue = Math.min(Number(value), priceRange.value[1])
-        priceRange.value = [nextValue, priceRange.value[1]]
-    }
-})
-
-const priceRangeMax = computed<number>({
-    get: () => priceRange.value[1],
-    set: (value) => {
-        const nextValue = Math.max(Number(value), priceRange.value[0])
-        priceRange.value = [priceRange.value[0], nextValue]
-    }
-})
 
 function isSectionOpen(sectionId: string): boolean {
     return openSectionIds.value.includes(sectionId)
@@ -134,7 +108,7 @@ const checkboxClass =
                     {{ sidebarTitle }}
                 </h2>
                 <p class="mt-2 max-w-64 text-sm leading-6 text-slate-600">
-                    Narrow the catalogue by fit, availability, and price.
+                    Narrow the catalogue by fit, category, and availability.
                 </p>
             </div>
             <div class="flex shrink-0 items-center gap-2">
@@ -231,76 +205,6 @@ const checkboxClass =
                 </div>
             </section>
 
-            <section
-                v-if="facets.price.max > facets.price.min"
-                :class="sectionClass"
-            >
-                <BaseButton
-                    type="button"
-                    :class="sectionButtonClass"
-                    :aria-expanded="isSectionOpen('price')"
-                    @click="toggleSection('price')"
-                >
-                    <span class="text-lg font-bold text-slate-950">Price</span>
-                    <span
-                        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
-                        :style="isSectionOpen('price') ? 'transform: rotate(45deg)' : ''"
-                    >+</span
-                    >
-                </BaseButton>
-                <div v-if="isSectionOpen('price')" :class="sectionContentClass">
-                    <div class="grid gap-4">
-                        <div class="rounded-2xl border border-amber-100 bg-amber-50/70 px-4 py-3 text-sm font-bold text-slate-950">
-                            {{ priceSummary }}
-                        </div>
-                        <div class="grid gap-3">
-                            <input
-                                v-model="priceRangeMin"
-                                :min="facets.price.min"
-                                :max="facets.price.max"
-                                :step="priceStep"
-                                type="range"
-                                class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
-                            />
-                            <input
-                                v-model="priceRangeMax"
-                                :min="facets.price.min"
-                                :max="facets.price.max"
-                                :step="priceStep"
-                                type="range"
-                                class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-700"
-                            />
-                            <div class="grid grid-cols-2 gap-3 text-sm font-semibold text-slate-700">
-                                <div class="rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-                                    <span class="block text-xs font-bold text-slate-400 uppercase">Min</span>
-                                    {{ priceRange[0] }}
-                                </div>
-                                <div class="rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-                                    <span class="block text-xs font-bold text-slate-400 uppercase">Max</span>
-                                    {{ priceRange[1] }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <div v-if="facets.price.max > facets.price.min" class="grid gap-3 pt-2 sm:grid-cols-2">
-                <BaseButton
-                    type="button"
-                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-4 text-sm font-bold text-slate-900 shadow-card transition hover:border-slate-400 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
-                    @click="emit('resetPriceRange')"
-                >
-                    Reset price
-                </BaseButton>
-                <BaseButton
-                    type="button"
-                    variant="accent" class="min-h-12 px-4 font-bold shadow-lg"
-                    @click="emit('applyPriceRange')"
-                >
-                    Apply price
-                </BaseButton>
-            </div>
         </div>
     </div>
 </template>

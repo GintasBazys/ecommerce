@@ -10,15 +10,22 @@ import { DEFAULT_CURENCY } from "~/utils/consts"
 
 definePageMeta({ layout: "checkout" })
 
-useHead({ title: "Order Completed | Medusa Commerce" })
+useHead({
+    title: "Order Completed | Medusa Commerce",
+    meta: [{ name: "robots", content: "noindex,nofollow" }]
+})
 
 const route = useRoute()
-const orderId = route.query.orderId
+const orderId = computed<string>(() => String(route.query.orderId || ""))
+const orderVerificationQuery = computed<Record<string, string>>(() => ({
+    ...(route.query.email ? { email: String(route.query.email) } : {}),
+    ...(route.query.postalCode ? { postal_code: String(route.query.postalCode) } : {})
+}))
 const posthog = usePostHog()
 
 const { customerEmail } = storeToRefs(useCustomerStore())
 
-if (!orderId) {
+if (!orderId.value) {
     throw new Error("Missing orderId")
 }
 
@@ -26,14 +33,23 @@ const {
     data: orderRes,
     pending,
     error
-} = await useFetch<{ order: OrderDTO }>(`/api/orders/${orderId}`, {
+} = await useFetch<{ order: OrderDTO }>(() => `/api/orders/${encodeURIComponent(orderId.value)}`, {
     method: "GET",
-    credentials: "include"
+    credentials: "include",
+    query: orderVerificationQuery
 })
 
 const order = computed<OrderDTO | null>(() => orderRes.value?.order ?? null)
 const currencyCode = computed<string>(() => order.value?.currency_code ?? DEFAULT_CURENCY)
-const invoiceDownloadUrl = computed<string>(() => (order.value?.id ? `/api/orders/${order.value.id}/invoice` : ""))
+const invoiceDownloadUrl = computed<string>(() => {
+    if (!order.value?.id) {
+        return ""
+    }
+
+    const params = new URLSearchParams(orderVerificationQuery.value)
+    const query = params.toString()
+    return `/api/orders/${order.value.id}/invoice${query ? `?${query}` : ""}`
+})
 const orderDate = computed<string>(() => formatDate(order.value?.created_at))
 const shippingMethod = computed<NonNullable<OrderDTO["shipping_methods"]>[number] | null>(() => order.value?.shipping_methods?.[0] ?? null)
 const orderItems = computed<NonNullable<OrderDTO["items"]>>(() => order.value?.items ?? [])

@@ -26,15 +26,25 @@ export function useProductPageSchema(options: {
     absoluteUrl: (_path?: string) => string
 }) {
     useHead(() => ({
-        title: `${options.productTitle.value} | ${options.siteName.value}`,
-        link: [{ rel: "canonical", href: options.productUrl.value }],
+        title: options.product.value ? `${options.productTitle.value} | ${options.siteName.value}` : `Product Not Found | ${options.siteName.value}`,
+        link: options.product.value ? [{ rel: "canonical", href: options.productUrl.value }] : [],
         meta: [
             { name: "description", content: options.productDescription.value },
-            { property: "og:title", content: `${options.productTitle.value} | ${options.siteName.value}` },
+            ...(options.product.value ? [] : [{ name: "robots", content: "noindex,follow" }]),
+            {
+                property: "og:title",
+                content: options.product.value ? `${options.productTitle.value} | ${options.siteName.value}` : `Product Not Found | ${options.siteName.value}`
+            },
             { property: "og:description", content: options.productDescription.value },
-            { property: "og:type", content: "product" },
-            { property: "og:url", content: options.productUrl.value },
-            ...(options.productImages.value[0]?.src ? [{ property: "og:image", content: options.absoluteUrl(options.productImages.value[0].src) }] : [])
+            ...(options.product.value
+                ? [
+                      { property: "og:type", content: "product" },
+                      { property: "og:url", content: options.productUrl.value },
+                      ...(options.productImages.value[0]?.src
+                          ? [{ property: "og:image", content: options.absoluteUrl(options.productImages.value[0].src) }]
+                          : [])
+                  ]
+                : [])
         ]
     }))
 

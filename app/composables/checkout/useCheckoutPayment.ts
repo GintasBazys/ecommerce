@@ -378,7 +378,17 @@ export function useCheckoutPayment(options: {
         isRedirectingToOrder.value = true
         options.guestCheckoutEmailCookie.value = null
         options.hasExplicitGuestIdentity.value = false
-        await router.push({ name: "order-completed", query: { orderId } })
+        await router.push({
+            name: "order-completed",
+            query: {
+                orderId,
+                ...(payload.order?.shipping_address?.postal_code
+                    ? { postalCode: payload.order.shipping_address.postal_code }
+                    : payload.order?.email
+                      ? { email: payload.order.email }
+                      : {})
+            }
+        })
         await createNewCart(options.cartStore)
     }
 

@@ -1,18 +1,11 @@
 import type { HttpTypes } from "@medusajs/types"
 
-import { fetchAllStoreProducts, fetchStoreProducts, getAggregatedProductPrice, getProductCurrencyCode, isProductInStock } from "#server/utils/products"
+import { fetchAllStoreProducts, fetchStoreProducts, isProductInStock } from "#server/utils/products"
 import { toUpstreamError } from "#server/utils/medusa-proxy"
 
 const DEFAULT_ORDER = "-created_at"
 const MAX_LIMIT = 48
-const ALLOWED_ORDERS = new Set([
-    "-created_at",
-    "created_at",
-    "variants.calculated_price.calculated_amount",
-    "-variants.calculated_price.calculated_amount",
-    "title",
-    "-title"
-])
+const ALLOWED_ORDERS = new Set(["-created_at", "created_at", "title", "-title"])
 
 type ProductRelation = {
     id: string
@@ -95,61 +88,15 @@ function addFacetCount(facetMap: Map<string, FacetItem>, relation: ProductRelati
     })
 }
 
-function compareProducts(leftProduct: ProductWithRelations, rightProduct: ProductWithRelations, order: string) {
-    const isDescending = order.startsWith("-")
-    const normalizedOrder = order.replace(/^-/, "")
-
-    if (normalizedOrder.includes("variants.calculated_price")) {
-        const leftPrice = getAggregatedProductPrice(leftProduct, isDescending ? "max" : "min")
-        const rightPrice = getAggregatedProductPrice(rightProduct, isDescending ? "max" : "min")
-        const leftValue = leftPrice ?? (isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
-        const rightValue = rightPrice ?? (isDescending ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
-
-        return isDescending ? rightValue - leftValue : leftValue - rightValue
-    }
-
-    if (normalizedOrder === "title") {
-        const leftTitle = String(leftProduct.title ?? "")
-        const rightTitle = String(rightProduct.title ?? "")
-        return isDescending ? rightTitle.localeCompare(leftTitle) : leftTitle.localeCompare(rightTitle)
-    }
-
-    if (normalizedOrder === "created_at") {
-        const leftTime = new Date(String(leftProduct.created_at ?? 0)).getTime()
-        const rightTime = new Date(String(rightProduct.created_at ?? 0)).getTime()
-        return isDescending ? rightTime - leftTime : leftTime - rightTime
-    }
-
-    return 0
-}
-
 function buildFacets(products: ProductWithRelations[]) {
     const categoryFacetMap = new Map<string, FacetItem>()
     const collectionFacetMap = new Map<string, FacetItem>()
     const typeFacetMap = new Map<string, FacetItem>()
     const tagFacetMap = new Map<string, FacetItem>()
 
-    let minimumPrice = Number.POSITIVE_INFINITY
-    let maximumPrice = 0
-    let currencyCode: string | null = null
-
     for (const product of products) {
         const seenCategoryIds = new Set<string>()
         const seenTagIds = new Set<string>()
-        const productMinimumPrice = getAggregatedProductPrice(product, "min")
-        const productMaximumPrice = getAggregatedProductPrice(product, "max")
-
-        if (productMinimumPrice !== null) {
-            minimumPrice = Math.min(minimumPrice, productMinimumPrice)
-        }
-
-        if (productMaximumPrice !== null) {
-            maximumPrice = Math.max(maximumPrice, productMaximumPrice)
-        }
-
-        if (!currencyCode) {
-            currencyCode = getProductCurrencyCode(product)
-        }
 
         addFacetCount(collectionFacetMap, product.collection)
         addFacetCount(typeFacetMap, product.type)
@@ -177,13 +124,27 @@ function buildFacets(products: ProductWithRelations[]) {
         categories: [...categoryFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
         collections: [...collectionFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
         types: [...typeFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
-        tags: [...tagFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
-        price: {
-            min: Number.isFinite(minimumPrice) ? minimumPrice : 0,
-            max: maximumPrice,
-            currencyCode
-        }
+        tags: [...tagFacetMap.values()].sort((left, right) => left.label.localeCompare(right.label))
     }
+}
+
+function compareProducts(leftProduct: ProductWithRelations, rightProduct: ProductWithRelations, order: string) {
+    const isDescending = order.startsWith("-")
+    const normalizedOrder = order.replace(/^-/, "")
+
+    if (normalizedOrder === "title") {
+        const leftTitle = String(leftProduct.title ?? "")
+        const rightTitle = String(rightProduct.title ?? "")
+        return isDescending ? rightTitle.localeCompare(leftTitle) : leftTitle.localeCompare(rightTitle)
+    }
+
+    if (normalizedOrder === "created_at") {
+        const leftTime = new Date(String(leftProduct.created_at ?? 0)).getTime()
+        const rightTime = new Date(String(rightProduct.created_at ?? 0)).getTime()
+        return isDescending ? rightTime - leftTime : leftTime - rightTime
+    }
+
+    return 0
 }
 
 function hasClientSideFilters(filters: {
@@ -192,17 +153,13 @@ function hasClientSideFilters(filters: {
     selectedTypeIds: string[]
     selectedTagIds: string[]
     inStockOnly: boolean
-    minPrice: number | null
-    maxPrice: number | null
 }) {
     return Boolean(
         filters.selectedChildCategoryIds.length ||
             filters.selectedCollectionIds.length ||
             filters.selectedTypeIds.length ||
             filters.selectedTagIds.length ||
-            filters.inStockOnly ||
-            filters.minPrice !== null ||
-            filters.maxPrice !== null
+            filters.inStockOnly
     )
 }
 
@@ -214,8 +171,6 @@ function filterProducts(
         selectedTypeIds: string[]
         selectedTagIds: string[]
         inStockOnly: boolean
-        minPrice: number | null
-        maxPrice: number | null
     }
 ) {
     return products.filter((product) => {
@@ -244,20 +199,7 @@ function filterProducts(
             }
         }
 
-        if (filters.inStockOnly && !isProductInStock(product)) {
-            return false
-        }
-
-        const minimumProductPrice = getAggregatedProductPrice(product, "min")
-        if ((filters.minPrice !== null || filters.maxPrice !== null) && minimumProductPrice === null) {
-            return false
-        }
-
-        if (filters.minPrice !== null && minimumProductPrice !== null && minimumProductPrice < filters.minPrice) {
-            return false
-        }
-
-        return !(filters.maxPrice !== null && minimumProductPrice !== null && minimumProductPrice > filters.maxPrice)
+        return !(filters.inStockOnly && !isProductInStock(product));
     })
 }
 
@@ -282,9 +224,7 @@ export default defineEventHandler(async (event) => {
         selectedCollectionIds: parseIds(query.collection_ids),
         selectedTypeIds: parseIds(query.type_ids),
         selectedTagIds: parseIds(query.tag_ids),
-        inStockOnly: String(query.in_stock_only ?? "false") === "true",
-        minPrice: parseNumber(query.min_price),
-        maxPrice: parseNumber(query.max_price)
+        inStockOnly: String(query.in_stock_only ?? "false") === "true"
     }
 
     const searchParams = new URLSearchParams({
@@ -301,8 +241,7 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        const usesPriceSort = order.includes("variants.calculated_price")
-        const canUseUpstreamPagination = !usesPriceSort && !hasClientSideFilters(filters)
+        const canUseUpstreamPagination = !hasClientSideFilters(filters)
 
         if (canUseUpstreamPagination) {
             const pageSearchParams = new URLSearchParams(searchParams)
@@ -310,19 +249,16 @@ export default defineEventHandler(async (event) => {
             pageSearchParams.set("limit", String(limit))
             pageSearchParams.set("offset", String(offset))
 
-            const [pageResponse, facetResponse] = await Promise.all([
-                fetchStoreProducts<ProductWithRelations>(event, pageSearchParams, "/store/category-products"),
-                fetchAllStoreProducts<ProductWithRelations>(event, searchParams, {
-                    endpoint: "/store/category-products"
-                })
-            ])
+            const pageResponse = await fetchStoreProducts<ProductWithRelations>(event, pageSearchParams, "/store/category-products")
+            const products = Array.isArray(pageResponse.products) ? pageResponse.products : []
+            const sortedProducts = [...products].sort((leftProduct, rightProduct) => compareProducts(leftProduct, rightProduct, order))
 
             setHeader(event, "Cache-Control", "no-store")
 
             return {
-                products: Array.isArray(pageResponse.products) ? pageResponse.products : [],
-                count: Number(pageResponse.count ?? facetResponse.count ?? 0),
-                facets: buildFacets(facetResponse.products)
+                products: sortedProducts,
+                count: Number(pageResponse.count ?? products.length),
+                facets: buildFacets(products)
             }
         }
 

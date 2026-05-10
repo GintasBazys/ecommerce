@@ -53,7 +53,6 @@ const {
     selectedTypeIds,
     selectedTagIds,
     inStockOnly,
-    priceRange,
     isChangingCategoryPage,
     currentPage,
     totalPages,
@@ -61,8 +60,6 @@ const {
     activeFilterCount,
     childCategoryFacets,
     hasFacetedQuery,
-    priceSummary,
-    priceStep,
     gridIsInitialLoading,
     paginationLabel,
     paginationItems,
@@ -70,9 +67,7 @@ const {
     applyQueryStateFromRoute,
     resetCategoryPageState,
     fetchProducts,
-    clearAllFilters,
-    resetPriceRange,
-    applyPriceRange
+    clearAllFilters
 } = useCategoryListing({
     category,
     isAllProductsPage,
@@ -98,7 +93,7 @@ const categoryPath = computed<string>(() =>
 const pageHeading = computed<string>(() => (isAllProductsPage.value ? "All Products" : category.value?.name || "Category"))
 const basePageDescription = computed<string>(() => (isAllProductsPage.value ? ALL_PRODUCTS_DESCRIPTION : category.value?.description || ""))
 const sidebarTitle = computed<string>(() => (isAllProductsPage.value ? "Refine every product" : "Refine this category"))
-const emptyStateText = computed<string>(() => "Try clearing some filters or adjusting the selected price range.")
+const emptyStateText = computed<string>(() => "Try clearing some filters or browsing another category.")
 const heroEyebrow = computed<string>(() => (isAllProductsPage.value ? "Store catalog" : "Category"))
 const currentListingPath = computed<string>(() => {
     if (currentPage.value <= 1) {
@@ -354,7 +349,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             >
                                 <h2 :id="mobileFilterTitleId" class="sr-only">Filter products</h2>
                                 <p :id="mobileFilterDescriptionId" class="sr-only">
-                                    Refine the current product listing by category, availability, and price.
+                                    Refine the current product listing by category and availability.
                                 </p>
                                 <CategoryFiltersPanel
                                     v-model:selected-child-category-ids="selectedChildCategoryIds"
@@ -362,17 +357,12 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                     v-model:selected-type-ids="selectedTypeIds"
                                     v-model:selected-tag-ids="selectedTagIds"
                                     v-model:in-stock-only="inStockOnly"
-                                    v-model:price-range="priceRange"
                                     :sidebar-title="sidebarTitle"
                                     :active-filter-count="activeFilterCount"
                                     :child-category-facets="childCategoryFacets"
                                     :facets="facets"
-                                    :price-summary="priceSummary"
-                                    :price-step="priceStep"
                                     :show-mobile-close="true"
                                     @clear-all="clearAllFilters"
-                                    @reset-price-range="resetPriceRange"
-                                    @apply-price-range="applyPriceRange"
                                     @close="closeMobileFilters"
                                 />
                             </div>
@@ -391,16 +381,11 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         v-model:selected-type-ids="selectedTypeIds"
                         v-model:selected-tag-ids="selectedTagIds"
                         v-model:in-stock-only="inStockOnly"
-                        v-model:price-range="priceRange"
                         :sidebar-title="sidebarTitle"
                         :active-filter-count="activeFilterCount"
                         :child-category-facets="childCategoryFacets"
                         :facets="facets"
-                        :price-summary="priceSummary"
-                        :price-step="priceStep"
                         @clear-all="clearAllFilters"
-                        @reset-price-range="resetPriceRange"
-                        @apply-price-range="applyPriceRange"
                     />
                 </aside>
 
