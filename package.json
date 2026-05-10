@@ -51,5 +51,11 @@
         "tailwindcss": "^4.3.0",
         "vitest": "^4.1.5",
         "vue-eslint-parser": "^10.4.0"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@sentry/cli",
+            "protobufjs"
+        ]
     }
 }
