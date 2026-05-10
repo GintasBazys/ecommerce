@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import AboutCta from "@/components/About/AboutCta.vue"
-import MainBanner from "@/components/Banner/MainBanner.vue"
 import { createBreadcrumbSchema, useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 
 const route = useRoute()
@@ -39,8 +37,8 @@ useStructuredData(
 
 <template>
     <section>
-        <MainBanner />
-        <AboutCta :link-shown="true" :extra-spacer-class="'pb-0'" />
+        <NuxtIsland name="MainBanner" />
+        <NuxtIsland name="AboutCta" :props="{ linkShown: true, extraSpacerClass: 'pb-0' }" />
         <DeferredLatestProducts />
         <DeferredBestSellers />
         <DeferredLatestPosts />

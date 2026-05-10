@@ -2,7 +2,6 @@
 import type { BlogCategoriesResponse, BlogCategory, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
-import BlogCard from "~/components/Blog/BlogCard.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import { createBreadcrumbSchema, type SchemaNode, useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 import { BLOG_HANDLE } from "~/utils/consts"
@@ -166,7 +165,7 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
 
             <section v-if="articles.length" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 <article v-for="article in articles" :key="article.id" class="min-w-0">
-                    <BlogCard :article="article" />
+                    <NuxtIsland name="BlogCard" :props="{ article }" />
                 </article>
             </section>
 

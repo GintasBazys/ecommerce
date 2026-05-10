@@ -239,11 +239,7 @@ async function addToCart(): Promise<void> {
                     </div>
 
                     <div class="mt-8">
-                        <ProductPageDetails
-                            :product-description="
-                                productDescription
-                            "
-                        />
+                        <NuxtIsland name="ProductPageDetails" :props="{ productDescription }" />
                     </div>
 
                     <ProductPageReviews

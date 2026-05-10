@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 
-import BlogCard from "~/components/Blog/BlogCard.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 
 const { data: latestPostsData, error: latestPostsError } = await useAsyncData("latest-blog-posts", () =>
@@ -44,7 +43,7 @@ const latestPosts = computed<BlogPostSummary[]>(() => latestPostsData.value?.pos
 
             <div v-if="latestPosts.length" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div v-for="article in latestPosts" :key="article.id" class="min-w-0">
-                    <BlogCard :article="article" />
+                    <NuxtIsland name="BlogCard" :props="{ article }" />
                 </div>
             </div>
 

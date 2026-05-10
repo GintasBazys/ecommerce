@@ -4,7 +4,6 @@ import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { CategoryImage } from "~/types/category-listing"
 
 import CategoryFiltersPanel from "~/components/Category/CategoryFiltersPanel.vue"
-import CategoryHero from "~/components/Category/CategoryHero.vue"
 import CategoryPagination from "~/components/Category/CategoryPagination.vue"
 import CategoryResultsGrid from "~/components/Category/CategoryResultsGrid.vue"
 import CategoryToolbar from "~/components/Category/CategoryToolbar.vue"
@@ -305,13 +304,16 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 <template>
     <NotFoundPageContent v-if="notFoundPath" :requested-path="notFoundPath" />
     <section v-else class="from-brand-50 to-brand-50 bg-linear-to-b via-white">
-        <CategoryHero
-            :breadcrumb-items="breadcrumbItems"
-            :hero-eyebrow="heroEyebrow"
-            :page-heading="pageHeading"
-            :description="basePageDescription"
-            :hero-image="heroImage"
-            :is-all-products-page="isAllProductsPage"
+        <NuxtIsland
+            name="CategoryHero"
+            :props="{
+                breadcrumbItems,
+                heroEyebrow,
+                pageHeading,
+                description: basePageDescription,
+                heroImage,
+                isAllProductsPage
+            }"
         />
 
         <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">

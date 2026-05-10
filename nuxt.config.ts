@@ -5,6 +5,10 @@ const posthogPublicKey = process.env.NUXT_PUBLIC_POSTHOG_PUBLIC_KEY || process.e
 const posthogHost = process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com"
 
 export default defineNuxtConfig({
+    experimental: {
+        componentIslands: true
+    },
+
     features: {
         inlineStyles: true
     },

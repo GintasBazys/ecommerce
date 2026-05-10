@@ -1,0 +1,314 @@
+<script setup lang="ts">
+import type { BreadcrumbItem } from "~/types/breadcrumbs"
+import type { PolicyHighlight, ReturnFaqItem, ReturnStep } from "~/types/content-pages"
+
+import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import NuxtImage from "~/components/Shared/NuxtImage.vue"
+
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Returns" }])
+
+const returnSteps: ReturnStep[] = [
+    {
+        number: "01",
+        title: "Start your return",
+        detail: "Open your account, choose the order, and request a return from the item details page."
+    },
+    {
+        number: "02",
+        title: "Pack everything securely",
+        detail: "Use the original packaging when possible and include all tags, accessories, and inserts."
+    },
+    {
+        number: "03",
+        title: "Send it back",
+        detail: "Attach the label, drop the parcel with the carrier, and we will confirm once it is received."
+    }
+]
+
+const policyHighlights: PolicyHighlight[] = [
+    {
+        title: "30-day return window",
+        text: "Eligible items can be returned within 30 days of delivery for a refund or exchange."
+    },
+    {
+        title: "Condition matters",
+        text: "Products should be unused, in original condition, and returned with packaging and accessories."
+    },
+    {
+        title: "Fast support for damaged items",
+        text: "If something arrives damaged or defective, contact us within 48 hours so we can help quickly."
+    }
+]
+
+const returnFaq: ReturnFaqItem[] = [
+    {
+        question: "Are all items eligible for return?",
+        answer: "Most standard items are, but final sale products, personalized orders, and perishable goods are excluded. If you are unsure about an item, contact support before sending it back."
+    },
+    {
+        question: "Do I have to pay for return shipping?",
+        answer: "Domestic returns are usually covered with a prepaid label. For international returns, the return shipping cost may be deducted from the refund depending on destination and carrier."
+    },
+    {
+        question: "How long does a refund take?",
+        answer: "Once the parcel reaches us and the return is approved, refunds are typically processed within a few business days. Your bank or payment provider may take additional time to post the funds."
+    }
+]
+
+const returnChecklist = [
+    "Include your order number in any return request",
+    "Keep original packaging and accessories when possible",
+    "Contact support first if the item arrived damaged or incorrect"
+]
+
+const supportDetails = [
+    {
+        label: "Return window",
+        value: "30 days from delivery for eligible items"
+    },
+    {
+        label: "Support hours",
+        value: "Mon-Fri, 09:00-17:00"
+    },
+    {
+        label: "Best for",
+        value: "Return approvals, damaged items, exchanges, and refund timing"
+    }
+]
+</script>
+
+<template>
+    <section class="bg-linear-to-b from-brand-50 via-white to-brand-50">
+        <div class="px-0 pt-15 pb-8 sm:pt-18 xl:pt-23">
+            <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
+                <div class="grid items-end gap-8 xl:grid-cols-2 xl:gap-10">
+                    <div class="max-w-2xl xl:pb-6">
+                        <AppBreadcrumbs :items="breadcrumbItems" class="mb-4" />
+                        <span
+                            class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
+                        >
+                            Returns center
+                        </span>
+                        <h1
+                            class="mt-4 text-3xl leading-none font-bold tracking-tighter text-slate-950 sm:text-5xl xl:max-w-md xl:text-7xl"
+                        >
+                            A return process designed to feel as clear and calm as the updated storefront.
+                        </h1>
+                        <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                            If something is not quite right, the process stays simple: request the return, send the item back, and we will
+                            handle the refund or exchange with a straightforward follow-up.
+                        </p>
+                        <div class="mt-7 flex flex-wrap items-center gap-3">
+                            <NuxtLink to="/contact" class="ui-btn-primary px-7">Contact support</NuxtLink>
+                            <NuxtLink to="/faq" class="ui-btn-secondary px-6">Browse FAQ</NuxtLink>
+                        </div>
+                    </div>
+
+                    <div
+                        class="relative rounded-panel border border-white/80 bg-white/90 p-3 shadow-panel sm:rounded-4xl sm:p-4"
+                    >
+                        <div class="relative overflow-hidden rounded-card sm:rounded-panel">
+                            <NuxtImage
+                                src="/images/hero-main.jpg"
+                                alt="Packaging and support visual for returns guidance"
+                                width="1200"
+                                height="1411"
+                                sizes="100vw lg:45vw"
+                                format="webp"
+                                quality="68"
+                                loading="lazy"
+                                decoding="async"
+                                class="block aspect-square w-full object-cover object-center"
+                            />
+                            <div
+                                class="absolute inset-0 bg-linear-to-br from-slate-950/20 via-transparent to-white/10"
+                            ></div>
+                        </div>
+
+                        <div
+                            class="text-label-sm absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 font-semibold tracking-widest text-slate-950 shadow-card sm:top-5 sm:left-5"
+                        >
+                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            Clear return steps
+                        </div>
+
+                        <div
+                            class="absolute inset-x-3 bottom-3 rounded-card-sm border border-white/10 bg-slate-950/90 p-4 text-white shadow-xl sm:inset-x-5 sm:bottom-5 sm:p-5"
+                        >
+                            <span class="text-label-eyebrow-sm tracking-label font-bold text-amber-200 uppercase">What to expect</span>
+                            <p class="mt-3 max-w-md text-sm leading-6 text-slate-100 sm:text-base">
+                                Three steps, transparent timing, and real help if anything feels unclear before or after the parcel is on
+                                the way back.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto w-full max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8">
+            <div class="grid gap-4 md:grid-cols-3">
+                <article
+                    v-for="step in returnSteps"
+                    :key="step.number"
+                    class="rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 shadow-card"
+                >
+                    <span
+                        class="tracking-label inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-600 uppercase"
+                    >
+                        {{ step.number }}
+                    </span>
+                    <h2 class="mt-4 text-xl leading-7 font-semibold text-slate-950">{{ step.title }}</h2>
+                    <p class="mt-2 text-sm leading-7 text-slate-600">{{ step.detail }}</p>
+                </article>
+            </div>
+        </div>
+
+        <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">
+            <div class="grid gap-6 xl:grid-cols-3 xl:gap-8">
+                <div class="grid gap-5 xl:col-span-2">
+                    <section
+                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 shadow-panel sm:p-7 lg:p-8"
+                    >
+                        <div class="max-w-2xl">
+                            <span
+                                class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+                            >
+                                Policy overview
+                            </span>
+                            <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-4xl">
+                                Key return guidelines without unnecessary clutter.
+                            </h2>
+                            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                                We want you to feel confident ordering from us. If a product does not work out, the return process should
+                                stay predictable and easy to understand.
+                            </p>
+                        </div>
+
+                        <div class="mt-6 grid gap-4 md:grid-cols-3">
+                            <article
+                                v-for="item in policyHighlights"
+                                :key="item.title"
+                                class="rounded-card border border-slate-200 bg-white p-5 shadow-card"
+                            >
+                                <h3 class="text-lg leading-7 font-semibold text-slate-950">{{ item.title }}</h3>
+                                <p class="mt-2 text-sm leading-7 text-slate-600">{{ item.text }}</p>
+                            </article>
+                        </div>
+
+                        <div
+                            class="mt-6 grid gap-4 rounded-card border border-slate-200 bg-slate-50/70 p-5 text-sm leading-7 text-slate-600 sm:text-base"
+                        >
+                            <p>
+                                To initiate a return, use your account order history and follow the return instructions for the relevant
+                                item. If the return is approved, you will receive the next steps and any applicable shipping label details.
+                            </p>
+                            <p>
+                                Returns should include the original packaging where possible and be sent back in unused condition. This
+                                helps us approve refunds faster and keeps exchange handling smoother.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section
+                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 shadow-panel sm:p-7 lg:p-8"
+                    >
+                        <div class="max-w-2xl">
+                            <span
+                                class="bg-brand-100 text-brand-700 text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full px-4 py-2 font-bold uppercase"
+                            >
+                                Questions
+                            </span>
+                            <h2 class="mt-4 text-3xl leading-tight font-bold tracking-tighter text-slate-950 sm:text-4xl">
+                                Return policy FAQ
+                            </h2>
+                        </div>
+
+                        <div class="mt-6 grid gap-3">
+                            <details
+                                v-for="(item, itemIndex) in returnFaq"
+                                :key="item.question"
+                                class="group overflow-hidden rounded-card border border-slate-200 bg-white shadow-card"
+                                :open="itemIndex === 0"
+                            >
+                                <summary class="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5">
+                                    <span class="pr-3 text-base leading-7 font-semibold text-slate-950">
+                                        {{ item.question }}
+                                    </span>
+                                    <span
+                                        class="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-700"
+                                        aria-hidden="true"
+                                    >
+                                        <svg
+                                            viewBox="0 0 20 20"
+                                            fill="none"
+                                            class="h-4 w-4 transition-transform duration-200 group-open:rotate-45"
+                                            stroke="currentColor"
+                                            stroke-width="1.8"
+                                        >
+                                            <path d="M10 4V16" stroke-linecap="round" />
+                                            <path d="M4 10H16" stroke-linecap="round" />
+                                        </svg>
+                                    </span>
+                                </summary>
+
+                                <div
+                                    :id="`returns-panel-${itemIndex}`"
+                                    class="border-t border-slate-200 px-5 py-4 sm:px-6 sm:py-5"
+                                >
+                                    <p class="text-sm leading-7 text-slate-600 sm:text-base">
+                                        {{ item.answer }}
+                                    </p>
+                                </div>
+                            </details>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="grid gap-5 xl:sticky xl:top-6 xl:self-start">
+                    <div
+                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-6 shadow-panel sm:p-8"
+                    >
+                        <span
+                            class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
+                        >
+                            Need help first?
+                        </span>
+                        <h2 class="mt-4 text-2xl leading-tight font-bold tracking-tighter text-slate-950">
+                            Talk to support before sending anything back.
+                        </h2>
+                        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+                            If your item is damaged, incorrect, or you are not sure whether it is eligible, contact us and include your
+                            order number.
+                        </p>
+                        <div class="mt-6 grid gap-4 border-t border-slate-200 pt-6 text-sm text-slate-700">
+                            <div v-for="detail in supportDetails" :key="detail.label">
+                                <p class="font-semibold text-slate-950">{{ detail.label }}</p>
+                                <p class="mt-1">{{ detail.value }}</p>
+                            </div>
+                        </div>
+                        <NuxtLink to="/contact" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
+                    </div>
+
+                    <div class="rounded-panel border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+                        <span
+                            class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full bg-slate-100 px-4 py-2 font-bold text-slate-700 uppercase"
+                        >
+                            Before you return
+                        </span>
+                        <ul class="mt-5 grid gap-4">
+                            <li
+                                v-for="item in returnChecklist"
+                                :key="item"
+                                class="rounded-card-sm flex items-start gap-3 border border-slate-200 bg-slate-50/80 p-4"
+                            >
+                                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500"></span>
+                                <span class="text-sm leading-6 text-slate-700">{{ item }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</template>
