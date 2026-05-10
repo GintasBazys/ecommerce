@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
 RUN corepack enable
 
@@ -14,7 +14,7 @@ ENV NUXT_PUBLIC_STRIPE_PUBLIC_KEY=$NUXT_PUBLIC_STRIPE_PUBLIC_KEY
 COPY . .
 RUN pnpm build
 
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NITRO_HOST=0.0.0.0
