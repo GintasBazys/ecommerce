@@ -45,7 +45,7 @@ const emit = defineEmits<{
 
 const panelRef = useTemplateRef<HTMLElement>("panel")
 const backdropPointerStarted = ref<boolean>(false)
-const previousFocusedElement = ref<HTMLElement | null>(null)
+const previousFocusedElement = shallowRef<HTMLElement>()
 const previousBodyOverflow = ref<string>("")
 const previousBodyTouchAction = ref<string>("")
 

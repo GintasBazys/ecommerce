@@ -16,7 +16,7 @@ const emit = defineEmits<{
     (_e: "select-image", _index: number): void
 }>()
 
-const mobileGalleryTrack = ref<HTMLElement | null>(null)
+const mobileGalleryTrack = useTemplateRef<HTMLElement>("mobileGalleryTrack")
 
 function selectImage(index: number): void {
     emit("select-image", index)

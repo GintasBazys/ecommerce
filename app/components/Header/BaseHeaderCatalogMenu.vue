@@ -17,7 +17,7 @@ const emit = defineEmits<{
     "update:open": [value: boolean]
 }>()
 
-const catalogMenuRef = ref<HTMLElement | null>(null)
+const catalogMenuRef = useTemplateRef<HTMLElement>("catalogMenuRef")
 
 function toggleCatalogMenu(): void {
     emit("update:open", !props.open)

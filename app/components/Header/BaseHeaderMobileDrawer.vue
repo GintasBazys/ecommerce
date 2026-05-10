@@ -26,7 +26,7 @@ const locationModel = computed<string>({
     get: () => props.locationValue,
     set: (value) => emit("update-location", value)
 })
-const drawerRef = ref<HTMLElement | null>(null)
+const drawerRef = useTemplateRef<HTMLElement>("drawerRef")
 const previousBodyOverflow = ref<string>("")
 
 const drawerTitleId = "mobile-navigation-title"

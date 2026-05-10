@@ -18,7 +18,7 @@ const emit = defineEmits<{
     close: []
 }>()
 
-const searchInputRef = ref<HTMLInputElement | null>(null)
+const searchInputRef = useTemplateRef<HTMLInputElement>("searchInputRef")
 const searchQuery = ref<string>("")
 const searchLoading = ref<boolean>(false)
 const searchError = ref<string | null>(null)

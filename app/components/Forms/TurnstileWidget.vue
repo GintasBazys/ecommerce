@@ -16,7 +16,7 @@ const emit = defineEmits<{
     expired: [message: string]
 }>()
 
-const widgetContainer = ref<HTMLElement | null>(null)
+const widgetContainer = useTemplateRef<HTMLElement>("widgetContainer")
 const widgetId = ref<string | null>(null)
 const isWidgetReady = ref<boolean>(false)
 const isWidgetVisible = ref<boolean>(false)

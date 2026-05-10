@@ -13,7 +13,7 @@ await callOnce(async () => {
     })
 })
 
-const railRef = ref<HTMLElement | null>(null)
+const railRef = useTemplateRef<HTMLElement>('railRef')
 
 const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
 </script>

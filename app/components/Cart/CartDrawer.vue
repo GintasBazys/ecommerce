@@ -14,10 +14,10 @@ const { removeLineItem, updateLineItem, clearRecoveryMessage } = cartStore
 const posthog = usePostHog()
 
 const isHydrated = ref<boolean>(false)
-const drawerRef = ref<HTMLElement | null>(null)
+const drawerRef = useTemplateRef<HTMLElement>('drawerRef')
 const closeButtonRef = ref<Pick<HTMLButtonElement, "focus"> | null>(null)
 const titleId = useId()
-const previousFocusedElement = ref<HTMLElement | null>(null)
+const previousFocusedElement = shallowRef<HTMLElement>()
 
 const qtyMap = reactive<Record<string, number | undefined>>({})
 const updating = reactive<Record<string, boolean>>({})

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useAttrs } from "vue"
+import { computed, useAttrs, useTemplateRef } from "vue"
 
 defineOptions({
     inheritAttrs: false
@@ -28,7 +28,7 @@ const props = withDefaults(
     }
 )
 
-const buttonRef = ref<HTMLButtonElement | null>(null)
+const buttonRef = useTemplateRef<HTMLButtonElement>("buttonRef")
 const attrs = useAttrs()
 
 const variantClasses: Record<ButtonVariant, string> = {

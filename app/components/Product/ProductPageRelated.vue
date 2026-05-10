@@ -14,7 +14,7 @@ const emit = defineEmits<{
     retry: []
 }>()
 
-const relatedRailRef = ref<HTMLElement | null>(null)
+const relatedRailRef = useTemplateRef<HTMLElement>("relatedRailRef")
 const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRailRef)
 </script>
 
