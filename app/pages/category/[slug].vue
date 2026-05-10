@@ -46,12 +46,15 @@ const {
     sortLoading,
     filterLoading,
     facets,
+    priceRange,
     sortOption,
     sortOptions,
     selectedChildCategoryIds,
     selectedCollectionIds,
     selectedTypeIds,
     selectedTagIds,
+    selectedMinPrice,
+    selectedMaxPrice,
     inStockOnly,
     isChangingCategoryPage,
     currentPage,
@@ -356,11 +359,14 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                     v-model:selected-collection-ids="selectedCollectionIds"
                                     v-model:selected-type-ids="selectedTypeIds"
                                     v-model:selected-tag-ids="selectedTagIds"
+                                    v-model:selected-min-price="selectedMinPrice"
+                                    v-model:selected-max-price="selectedMaxPrice"
                                     v-model:in-stock-only="inStockOnly"
                                     :sidebar-title="sidebarTitle"
                                     :active-filter-count="activeFilterCount"
                                     :child-category-facets="childCategoryFacets"
                                     :facets="facets"
+                                    :price-range="priceRange"
                                     :show-mobile-close="true"
                                     @clear-all="clearAllFilters"
                                     @close="closeMobileFilters"
@@ -380,11 +386,14 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         v-model:selected-collection-ids="selectedCollectionIds"
                         v-model:selected-type-ids="selectedTypeIds"
                         v-model:selected-tag-ids="selectedTagIds"
+                        v-model:selected-min-price="selectedMinPrice"
+                        v-model:selected-max-price="selectedMaxPrice"
                         v-model:in-stock-only="inStockOnly"
                         :sidebar-title="sidebarTitle"
                         :active-filter-count="activeFilterCount"
                         :child-category-facets="childCategoryFacets"
                         :facets="facets"
+                        :price-range="priceRange"
                         @clear-all="clearAllFilters"
                     />
                 </aside>

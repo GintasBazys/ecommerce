@@ -2,7 +2,13 @@ import type { ProductCategoryDTO } from "@medusajs/types"
 import type { Ref } from "vue"
 import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from "vue-router"
 
-import type { CategoryProductsFacets, CategoryProductsResponse, CategorySortOption, FacetItem } from "~/types/category-listing"
+import type {
+    CategoryPriceRange,
+    CategoryProductsFacets,
+    CategoryProductsResponse,
+    CategorySortOption,
+    FacetItem
+} from "~/types/category-listing"
 import { useCategoryListingPagination } from "~/composables/category/useCategoryListingPagination"
 
 type FetchSource = "initial" | "sort" | "filters" | "pagination"
@@ -17,6 +23,8 @@ type UseCategoryListingOptions = {
 export const categorySortOptions: CategorySortOption[] = [
     { text: "From latest", value: "-created_at" },
     { text: "From oldest", value: "created_at" },
+    { text: "Price: Low to high", value: "price_asc" },
+    { text: "Price: High to low", value: "price_desc" },
     { text: "Title: A → Z", value: "title" },
     { text: "Title: Z → A", value: "-title" }
 ]
@@ -27,6 +35,14 @@ function createEmptyFacets(): CategoryProductsFacets {
         collections: [],
         types: [],
         tags: []
+    }
+}
+
+function createEmptyPriceRange(): CategoryPriceRange {
+    return {
+        min: null,
+        max: null,
+        currencyCode: null
     }
 }
 
@@ -45,6 +61,17 @@ function parseQueryList(value: LocationQueryValue | LocationQueryValue[] | undef
         .filter(Boolean)
 }
 
+function parseQueryNumber(value: LocationQueryValue | LocationQueryValue[] | undefined): number | null {
+    const rawValue = Array.isArray(value) ? value[0] : value
+
+    if (typeof rawValue !== "string" || rawValue.trim() === "") {
+        return null
+    }
+
+    const parsedValue = Number(rawValue)
+    return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : null
+}
+
 export function useCategoryListing({ category, isAllProductsPage, regionStoreId, selectedCountryCode }: UseCategoryListingOptions) {
     const route = useRoute()
     const router = useRouter()
@@ -56,12 +83,15 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const sortLoading = ref<boolean>(false)
     const filterLoading = ref<boolean>(false)
     const facets = ref<CategoryProductsFacets>(createEmptyFacets())
+    const priceRange = ref<CategoryPriceRange>(createEmptyPriceRange())
     const limit = 12
     const sortOption = ref<string>(categorySortOptions[0]!.value)
     const selectedChildCategoryIds = ref<string[]>([])
     const selectedCollectionIds = ref<string[]>([])
     const selectedTypeIds = ref<string[]>([])
     const selectedTagIds = ref<string[]>([])
+    const selectedMinPrice = ref<number | null>(null)
+    const selectedMaxPrice = ref<number | null>(null)
     const inStockOnly = ref<boolean>(false)
     const isChangingCategoryPage = ref<boolean>(false)
     const isSyncingQuery = ref<boolean>(false)
@@ -76,6 +106,10 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         count += selectedTagIds.value.length
 
         if (inStockOnly.value) {
+            count += 1
+        }
+
+        if (selectedMinPrice.value !== null || selectedMaxPrice.value !== null) {
             count += 1
         }
 
@@ -131,6 +165,14 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             query.stock = "1"
         }
 
+        if (selectedMinPrice.value !== null) {
+            query.min_price = String(selectedMinPrice.value)
+        }
+
+        if (selectedMaxPrice.value !== null) {
+            query.max_price = String(selectedMaxPrice.value)
+        }
+
         return query
     }
 
@@ -141,7 +183,9 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             collections: parseQueryList(query.collections),
             types: parseQueryList(query.types),
             tags: parseQueryList(query.tags),
-            stock: query.stock === "1"
+            stock: query.stock === "1",
+            minPrice: parseQueryNumber(query.min_price),
+            maxPrice: parseQueryNumber(query.max_price)
         })
     }
 
@@ -163,6 +207,8 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         selectedTypeIds.value = parseQueryList(query.types)
         selectedTagIds.value = parseQueryList(query.tags)
         inStockOnly.value = query.stock === "1"
+        selectedMinPrice.value = parseQueryNumber(query.min_price)
+        selectedMaxPrice.value = parseQueryNumber(query.max_price)
 
         isApplyingQueryState.value = false
     }
@@ -181,10 +227,13 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         products.value = []
         totalCount.value = 0
         facets.value = createEmptyFacets()
+        priceRange.value = createEmptyPriceRange()
         selectedChildCategoryIds.value = []
         selectedCollectionIds.value = []
         selectedTypeIds.value = []
         selectedTagIds.value = []
+        selectedMinPrice.value = null
+        selectedMaxPrice.value = null
         inStockOnly.value = false
     }
 
@@ -200,7 +249,9 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             collection_ids: selectedCollectionIds.value.join(",") || undefined,
             type_ids: selectedTypeIds.value.join(",") || undefined,
             tag_ids: selectedTagIds.value.join(",") || undefined,
-            in_stock_only: inStockOnly.value ? "true" : undefined
+            in_stock_only: inStockOnly.value ? "true" : undefined,
+            min_price: selectedMinPrice.value ?? undefined,
+            max_price: selectedMaxPrice.value ?? undefined
         }
     }
 
@@ -231,6 +282,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
             products.value = newProducts
             totalCount.value = response.count
             facets.value = response.facets
+            priceRange.value = response.priceRange ?? createEmptyPriceRange()
         } catch (error) {
             console.error("Error fetching category products", error)
             errorRef.value = "We could not load products right now. Please try again."
@@ -246,6 +298,8 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         selectedCollectionIds.value = []
         selectedTypeIds.value = []
         selectedTagIds.value = []
+        selectedMinPrice.value = null
+        selectedMaxPrice.value = null
         inStockOnly.value = false
     }
 
@@ -273,6 +327,8 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
                 collections: selectedCollectionIds.value,
                 types: selectedTypeIds.value,
                 tags: selectedTagIds.value,
+                minPrice: selectedMinPrice.value,
+                maxPrice: selectedMaxPrice.value,
                 inStockOnly: inStockOnly.value
             }),
         async () => {
@@ -314,12 +370,15 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         sortLoading,
         filterLoading,
         facets,
+        priceRange,
         sortOption,
         sortOptions: categorySortOptions,
         selectedChildCategoryIds,
         selectedCollectionIds,
         selectedTypeIds,
         selectedTagIds,
+        selectedMinPrice,
+        selectedMaxPrice,
         inStockOnly,
         isChangingCategoryPage,
         isSyncingQuery,

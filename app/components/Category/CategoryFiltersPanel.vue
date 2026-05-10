@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type {
     CategoryFilterSection,
+    CategoryPriceRange,
     CategoryProductsFacets,
     FacetItem
 } from "~/types/category-listing"
 
 import CategoryFacetSection from "~/components/Category/CategoryFacetSection.vue"
+import CategoryPriceFilter from "~/components/Category/CategoryPriceFilter.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
 const props = defineProps<{
@@ -13,6 +15,7 @@ const props = defineProps<{
     activeFilterCount: number
     childCategoryFacets: FacetItem[]
     facets: CategoryProductsFacets
+    priceRange: CategoryPriceRange
     showMobileClose?: boolean
 }>()
 
@@ -20,6 +23,8 @@ const selectedChildCategoryIds = defineModel<string[]>("selectedChildCategoryIds
 const selectedCollectionIds = defineModel<string[]>("selectedCollectionIds", { default: [] })
 const selectedTypeIds = defineModel<string[]>("selectedTypeIds", { default: [] })
 const selectedTagIds = defineModel<string[]>("selectedTagIds", { default: [] })
+const selectedMinPrice = defineModel<number | null>("selectedMinPrice", { default: null })
+const selectedMaxPrice = defineModel<number | null>("selectedMaxPrice", { default: null })
 const inStockOnly = defineModel<boolean>("inStockOnly", { default: false })
 
 const emit = defineEmits<{
@@ -44,6 +49,10 @@ const sectionIds = computed<CategoryFilterSection[]>(() => {
 
     if (props.facets.tags.length) {
         sections.push({ id: "tags", title: "Tags" })
+    }
+
+    if (props.priceRange.min !== null && props.priceRange.max !== null) {
+        sections.push({ id: "price", title: "Price" })
     }
 
     sections.push({ id: "availability", title: "Availability" })
@@ -178,6 +187,29 @@ const checkboxClass =
                 :open="isSectionOpen('tags')"
                 @toggle="toggleSection"
             />
+
+            <section v-if="priceRange.min !== null && priceRange.max !== null" :class="sectionClass">
+                <BaseButton
+                    type="button"
+                    :class="sectionButtonClass"
+                    :aria-expanded="isSectionOpen('price')"
+                    @click="toggleSection('price')"
+                >
+                    <span class="text-lg font-bold text-slate-950">Price</span>
+                    <span
+                        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xl font-semibold text-slate-500 transition"
+                        :style="isSectionOpen('price') ? 'transform: rotate(45deg)' : ''"
+                    >+</span
+                    >
+                </BaseButton>
+                <div v-if="isSectionOpen('price')" :class="sectionContentClass">
+                    <CategoryPriceFilter
+                        v-model:selected-min-price="selectedMinPrice"
+                        v-model:selected-max-price="selectedMaxPrice"
+                        :price-range="priceRange"
+                    />
+                </div>
+            </section>
 
             <section :class="sectionClass">
                 <BaseButton

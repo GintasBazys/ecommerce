@@ -25,10 +25,17 @@ export type CategoryProductsFacets = {
     tags: FacetItem[]
 }
 
+export type CategoryPriceRange = {
+    min: number | null
+    max: number | null
+    currencyCode: string | null
+}
+
 export type CategoryProductsResponse = {
     products: CategoryProduct[]
     count: number
     facets: CategoryProductsFacets
+    priceRange: CategoryPriceRange
 }
 
 export type CategorySortOption = {
