@@ -3,6 +3,7 @@ import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { useProductPrice } from "~/composables/product/useProductPrice"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 const FALLBACK_IMAGE = "/images/about/about-premium.jpg"
@@ -22,7 +23,7 @@ function isVariantAvailable(variant: ProductVariantDTO | null): boolean {
         return false
     }
 
-    return typeof variant.inventory_quantity !== "number" || variant.inventory_quantity > 0
+    return variant.inventory_quantity > 0
 }
 
 const selectedVariant = computed<ProductVariantDTO | null>(() => {

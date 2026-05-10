@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseHeader from "@/components/Header/BaseHeader.vue"
+import { useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 
 const { organizationSchema, websiteSchema } = useSiteIdentity()
 const LazyAppFooter = defineAsyncComponent(() => import("@/components/Footer/AppFooter.vue"))

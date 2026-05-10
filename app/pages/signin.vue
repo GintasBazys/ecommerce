@@ -3,7 +3,9 @@ import type { TurnstileWidgetInstance } from "~/types/forms"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseModal from "~/components/Shared/BaseModal.vue"
-import { usePostHog } from "~/composables/usePostHog"
+import { usePostHog } from "~/composables/analytics/usePostHog"
+import { useCustomerAuth } from "~/composables/auth/useCustomerAuth"
+import { useSnackbar } from "~/composables/shared/useSnackbar"
 
 useHead({ title: "Signin | Medusa Commerce" })
 definePageMeta({ layout: "default" })

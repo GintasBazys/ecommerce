@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ProductVariantDTO } from "@medusajs/types"
 
+import { useProductPrice } from "~/composables/product/useProductPrice"
+
 const props = withDefaults(
     defineProps<{
         amountWithTax: number

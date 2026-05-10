@@ -3,6 +3,7 @@ import type { NavLink } from "@/types/interfaces"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { useCookieConsent } from "~/composables/shared/useCookieConsent"
 import { ALL_PRODUCTS_URL_HANDLE, BLOG_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
 
 const { categories } = useProductStore()

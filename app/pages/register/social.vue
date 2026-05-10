@@ -6,7 +6,8 @@ import type { CustomerDTO } from "@medusajs/types"
 import type { IdentityResponse, SocialProvider, SocialStage } from "~/types/auth"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
-import { SOCIAL_AUTH_REDIRECT_KEY, SOCIAL_AUTH_PROVIDER_KEY } from "~/composables/useCustomerAuth"
+import { SOCIAL_AUTH_REDIRECT_KEY, SOCIAL_AUTH_PROVIDER_KEY, useCustomerAuth } from "~/composables/auth/useCustomerAuth"
+import { useSnackbar } from "~/composables/shared/useSnackbar"
 
 const config = useRuntimeConfig()
 const router = useRouter()
@@ -351,7 +352,6 @@ useHead({
 onMounted(() => {
     void validateAndAuthenticate()
 })
-
 </script>
 
 <template>
@@ -407,6 +407,5 @@ onMounted(() => {
                 </div>
             </div>
         </section>
-
     </main>
 </template>

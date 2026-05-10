@@ -6,6 +6,7 @@ import { nextTick } from 'vue'
 import { clearNuxtState } from '#app'
 
 import AppSnackbar from '~/components/Shared/AppSnackbar.vue'
+import { useSnackbar } from '~/composables/shared/useSnackbar'
 
 const mountedWrappers: VueWrapper[] = []
 

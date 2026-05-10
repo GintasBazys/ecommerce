@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createBreadcrumbSchema, normalizeSchemaDate } from '../../app/composables/useStructuredData'
+import { createBreadcrumbSchema, normalizeSchemaDate } from '../../app/composables/shared/useStructuredData'
 
 const siteUrl = 'https://shop.example.com'
 

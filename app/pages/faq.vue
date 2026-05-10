@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { FaqSection } from "~/types/content-pages"
 
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { createBreadcrumbSchema, type SchemaNode, useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 
 const route = useRoute()
 const { absoluteUrl } = useSiteIdentity()
@@ -125,7 +125,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
 </script>
 
 <template>
-    <section class="bg-linear-to-b from-brand-50 via-white to-brand-50">
+    <section class="from-brand-50 to-brand-50 bg-linear-to-b via-white">
         <div class="px-0 pt-15 pb-8 sm:pt-18 xl:pt-23">
             <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 <div class="grid items-end gap-8 xl:grid-cols-2 xl:gap-10">
@@ -152,10 +152,8 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                         </div>
                     </div>
 
-                    <div
-                        class="relative rounded-panel border border-white/80 bg-white/90 p-3 shadow-panel sm:rounded-4xl sm:p-4"
-                    >
-                        <div class="relative overflow-hidden rounded-card sm:rounded-panel">
+                    <div class="rounded-panel shadow-panel relative border border-white/80 bg-white/90 p-3 sm:rounded-4xl sm:p-4">
+                        <div class="rounded-card sm:rounded-panel relative overflow-hidden">
                             <NuxtImage
                                 src="/images/hero-main.jpg"
                                 alt="Support and delivery guidance visual"
@@ -168,20 +166,18 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                                 decoding="async"
                                 class="block aspect-square w-full object-cover object-center"
                             />
-                            <div
-                                class="absolute inset-0 bg-linear-to-br from-slate-950/20 via-transparent to-white/10"
-                            ></div>
+                            <div class="absolute inset-0 bg-linear-to-br from-slate-950/20 via-transparent to-white/10"></div>
                         </div>
 
                         <div
-                            class="text-label-sm absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 font-semibold tracking-widest text-slate-950 shadow-card sm:top-5 sm:left-5"
+                            class="text-label-sm shadow-card absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-4 py-2 font-semibold tracking-widest text-slate-950 sm:top-5 sm:left-5"
                         >
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                             Fast support paths
                         </div>
 
                         <div
-                            class="absolute inset-x-3 bottom-3 rounded-card-sm border border-white/10 bg-slate-950/90 p-4 text-white shadow-xl sm:inset-x-5 sm:bottom-5 sm:p-5"
+                            class="rounded-card-sm absolute inset-x-3 bottom-3 border border-white/10 bg-slate-950/90 p-4 text-white shadow-xl sm:inset-x-5 sm:bottom-5 sm:p-5"
                         >
                             <span class="text-label-eyebrow-sm tracking-label font-bold text-amber-200 uppercase">Most common topics</span>
                             <ul class="mt-4 grid gap-3">
@@ -206,7 +202,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                     <article
                         v-for="section in faqSections"
                         :key="section.id"
-                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 shadow-panel sm:p-7 lg:p-8"
+                        class="rounded-panel shadow-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-5 sm:p-7 lg:p-8"
                     >
                         <div class="max-w-2xl">
                             <span
@@ -226,7 +222,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                             <section
                                 v-for="(item, itemIndex) in section.items"
                                 :key="item.question"
-                                class="overflow-hidden rounded-card border border-slate-200 bg-white shadow-card"
+                                class="rounded-card shadow-card overflow-hidden border border-slate-200 bg-white"
                             >
                                 <BaseButton
                                     type="button"
@@ -271,9 +267,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                 </div>
 
                 <aside class="grid gap-5 xl:sticky xl:top-6 xl:self-start">
-                    <div
-                        class="rounded-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-6 shadow-panel sm:p-8"
-                    >
+                    <div class="rounded-panel shadow-panel border border-white/80 bg-linear-to-b from-white to-slate-50 p-6 sm:p-8">
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full border border-amber-200/70 bg-amber-50 px-4 py-2 font-bold text-amber-900 uppercase"
                         >
@@ -295,7 +289,7 @@ useStructuredData(() => [faqSchema.value, breadcrumbSchema.value], "faq-structur
                         <NuxtLink to="/contact" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
                     </div>
 
-                    <div class="rounded-panel border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+                    <div class="rounded-panel shadow-card border border-slate-200 bg-white p-6 sm:p-8">
                         <span
                             class="text-label-sm tracking-label inline-flex min-h-9 items-center rounded-full bg-slate-100 px-4 py-2 font-bold text-slate-700 uppercase"
                         >

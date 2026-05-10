@@ -5,7 +5,7 @@ import type { OrderAddress, OrderSupportFact } from "~/types/orders"
 import { formatPaymentStatus, formatStorefrontOrderStatus } from "@/enumerators/order"
 import { formatDate } from "@/utils/formatDate"
 import { formatPrice } from "@/utils/formatPrice"
-import { usePostHog } from "~/composables/usePostHog"
+import { usePostHog } from "~/composables/analytics/usePostHog"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
 definePageMeta({ layout: "checkout" })

@@ -3,7 +3,8 @@ import type { CustomerResponseInterface } from "@/types/interfaces"
 import type { TurnstileWidgetInstance } from "~/types/forms"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
-import { usePostHog } from "~/composables/usePostHog"
+import { usePostHog } from "~/composables/analytics/usePostHog"
+import { useSnackbar } from "~/composables/shared/useSnackbar"
 
 useHead({
     title: "Register | Medusa Commerce"

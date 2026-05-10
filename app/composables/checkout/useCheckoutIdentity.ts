@@ -1,6 +1,7 @@
 import type { ComputedRef, Ref, ShallowRef } from "vue"
 import type { CheckoutAccountStepInstance, CheckoutCart, GuestErrors, LoginErrors, RegisterErrors } from "~/types/checkout"
 import { checkoutEmailRules, checkoutPasswordRules, checkoutAddressRules, clearValidationErrors, runValidationRules } from "~/utils/checkoutValidation"
+import type { useCustomerAuth } from "~/composables/auth/useCustomerAuth"
 
 type CheckoutAuth = ReturnType<typeof useCustomerAuth>
 type CartStore = ReturnType<typeof useCartStore>

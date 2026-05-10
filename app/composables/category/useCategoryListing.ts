@@ -4,6 +4,7 @@ import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from "vue-ro
 
 import { formatPrice } from "@/utils/formatPrice"
 import type { CategoryProductsFacets, CategoryProductsResponse, CategorySortOption, FacetItem, PriceRange } from "~/types/category-listing"
+import { useCategoryListingPagination } from "~/composables/category/useCategoryListingPagination"
 
 type FetchSource = "initial" | "sort" | "filters" | "pagination"
 

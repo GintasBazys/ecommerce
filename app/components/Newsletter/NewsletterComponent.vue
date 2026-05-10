@@ -3,7 +3,7 @@ import type { FetchError } from "ofetch"
 import type { SubscribeErrorPayload } from "~/types/newsletter"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
-import { usePostHog } from "~/composables/usePostHog"
+import { usePostHog } from "~/composables/analytics/usePostHog"
 
 const posthog = usePostHog()
 const errorMessage = ref<string | null>(null)

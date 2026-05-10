@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogPost, BlogPostResponse, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import BlogCard from "~/components/Blog/BlogCard.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import {
+    createBreadcrumbSchema,
+    normalizeSchemaDate,
+    type SchemaNode,
+    useSiteIdentity,
+    useStructuredData
+} from "~/composables/shared/useStructuredData"
 import { BLOG_HANDLE } from "~/utils/consts"
 import { formatDate } from "~/utils/formatDate"
 
@@ -133,7 +139,7 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
 </script>
 
 <template>
-    <main class="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-14 sm:py-20">
+    <main class="min-h-screen bg-linear-to-b from-slate-50 to-slate-100 px-4 py-14 sm:py-20">
         <div class="relative z-10 mx-auto w-full max-w-7xl">
             <section class="mb-8 flex justify-center">
                 <div class="w-full max-w-4xl text-center">

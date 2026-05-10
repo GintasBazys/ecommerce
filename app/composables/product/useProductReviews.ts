@@ -1,11 +1,12 @@
 import type { Review, ReviewApiResponse } from "@/types/interfaces"
 import type { ProductDTO } from "@medusajs/types"
 import type { ComputedRef } from "vue"
+import type { PostHogTracker } from "~/composables/analytics/usePostHog"
 
 export function useProductReviews(options: {
     product: ComputedRef<ProductDTO | null>
     productMetadata: ComputedRef<Record<string, unknown>>
-    posthog?: ReturnType<typeof usePostHog>
+    posthog?: PostHogTracker | null
     onSubmitted?: () => void
 }) {
     const reviewsData = ref<ReviewApiResponse | null>(null)

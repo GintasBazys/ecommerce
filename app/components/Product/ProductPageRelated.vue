@@ -2,7 +2,7 @@
 import type { ProductDTO } from "@medusajs/types"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
-import { useDragScroll } from "~/composables/useDragScroll"
+import { useDragScroll } from "~/composables/shared/useDragScroll"
 
 defineProps<{
     relatedProducts: ProductDTO[]

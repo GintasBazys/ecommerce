@@ -1,10 +1,10 @@
 import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 import type { ComputedRef } from "vue"
-import type { SchemaNode } from "~/composables/useStructuredData"
+import { createBreadcrumbSchema, type SchemaNode, useStructuredData } from "~/composables/shared/useStructuredData"
 import type { ProductCategorySummary, ProductGalleryImage } from "~/types/product"
 
 import type { Review } from "@/types/interfaces"
-import { normalizeSchemaDate } from "~/composables/useStructuredData"
+import { normalizeSchemaDate } from "~/composables/shared/useStructuredData"
 import { DEFAULT_CURENCY } from "~/utils/consts"
 
 export function useProductPageSchema(options: {

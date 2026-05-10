@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BlogCategoriesResponse, BlogCategory, BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 
 import BlogCard from "~/components/Blog/BlogCard.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
+import { createBreadcrumbSchema, type SchemaNode, useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 import { BLOG_HANDLE } from "~/utils/consts"
 
 const route = useRoute()
@@ -125,7 +125,9 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
             <section class="mb-6 flex justify-center">
                 <div class="w-full max-w-5xl text-center">
                     <AppBreadcrumbs :items="breadcrumbItems" class="mx-auto mb-4" />
-                    <h1 class="mx-auto mb-4 max-w-4xl text-5xl leading-none font-bold tracking-tighter text-slate-950 sm:text-6xl xl:text-7xl">
+                    <h1
+                        class="mx-auto mb-4 max-w-4xl text-5xl leading-none font-bold tracking-tighter text-slate-950 sm:text-6xl xl:text-7xl"
+                    >
                         Product stories, store notes, and cleaner editorial reading.
                     </h1>
                     <p class="mx-auto max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
@@ -169,18 +171,26 @@ useStructuredData(() => [blogSchema.value, blogListSchema.value, breadcrumbSchem
             </section>
 
             <section v-else-if="pending" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading posts">
-                <div v-for="item in 3" :key="item" class="min-h-72 animate-pulse rounded-panel border border-slate-200 bg-slate-100 shadow-card"></div>
+                <div
+                    v-for="item in 3"
+                    :key="item"
+                    class="rounded-panel shadow-card min-h-72 animate-pulse border border-slate-200 bg-slate-100"
+                ></div>
             </section>
 
-            <div v-else-if="error" class="rounded-panel border border-slate-200 bg-white/90 p-6 text-center text-slate-600 shadow-card">
+            <div v-else-if="error" class="rounded-panel shadow-card border border-slate-200 bg-white/90 p-6 text-center text-slate-600">
                 Something went wrong while loading blog posts. Please try again.
             </div>
 
-            <div v-else class="rounded-panel border border-slate-200 bg-white/90 p-6 text-center text-slate-600 shadow-card">
+            <div v-else class="rounded-panel shadow-card border border-slate-200 bg-white/90 p-6 text-center text-slate-600">
                 No blog posts found. Try removing a filter or check back soon.
             </div>
 
-            <nav v-if="articles.length && totalPages > 1" class="mt-8 flex flex-wrap items-center justify-center gap-4" aria-label="Blog pagination">
+            <nav
+                v-if="articles.length && totalPages > 1"
+                class="mt-8 flex flex-wrap items-center justify-center gap-4"
+                aria-label="Blog pagination"
+            >
                 <NuxtLink
                     v-if="currentPage > 1"
                     :to="{ query: buildQuery(currentPage - 1) }"

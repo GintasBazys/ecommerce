@@ -4,7 +4,7 @@ import type { Ref } from 'vue'
 import { describe, expect, it } from 'vitest'
 import { ref } from 'vue'
 
-import { useProductPrice } from '../../../app/composables/useProductPrice'
+import { useProductPrice } from '../../../app/composables/product/useProductPrice'
 
 type TestCalculatedPrice = {
     calculated_amount: number

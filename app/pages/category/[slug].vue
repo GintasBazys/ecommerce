@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ProductCategoryDTO } from "@medusajs/types"
-import type { SchemaNode } from "~/composables/useStructuredData"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { CategoryImage } from "~/types/category-listing"
 
@@ -11,6 +10,9 @@ import CategoryResultsGrid from "~/components/Category/CategoryResultsGrid.vue"
 import CategoryToolbar from "~/components/Category/CategoryToolbar.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NotFoundPageContent from "~/components/Shared/NotFoundPageContent.vue"
+import { useCategoryListing } from "~/composables/category/useCategoryListing"
+import { useFocusTrap } from "~/composables/shared/useFocusTrap"
+import { useSiteIdentity, type SchemaNode, createBreadcrumbSchema, useStructuredData } from "~/composables/shared/useStructuredData"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
 
 definePageMeta({ layout: "default" })
@@ -304,7 +306,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
 <template>
     <NotFoundPageContent v-if="notFoundPath" :requested-path="notFoundPath" />
-    <section v-else class="bg-linear-to-b from-brand-50 via-white to-brand-50">
+    <section v-else class="from-brand-50 to-brand-50 bg-linear-to-b via-white">
         <CategoryHero
             :breadcrumb-items="breadcrumbItems"
             :hero-eyebrow="heroEyebrow"
@@ -342,7 +344,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             <div
                                 v-if="isMobileFilterDrawerOpen"
                                 ref="mobileFilterDrawerRef"
-                                class="mobile-filter-drawer absolute inset-x-0 bottom-0 overflow-y-auto overscroll-contain rounded-t-panel bg-white p-4 shadow-2xl will-change-transform sm:p-5"
+                                class="mobile-filter-drawer rounded-t-panel absolute inset-x-0 bottom-0 overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl will-change-transform sm:p-5"
                                 :style="mobileFilterDrawerStyle"
                                 role="dialog"
                                 aria-modal="true"
@@ -351,7 +353,9 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                                 tabindex="-1"
                             >
                                 <h2 :id="mobileFilterTitleId" class="sr-only">Filter products</h2>
-                                <p :id="mobileFilterDescriptionId" class="sr-only">Refine the current product listing by category, availability, and price.</p>
+                                <p :id="mobileFilterDescriptionId" class="sr-only">
+                                    Refine the current product listing by category, availability, and price.
+                                </p>
                                 <CategoryFiltersPanel
                                     v-model:selected-child-category-ids="selectedChildCategoryIds"
                                     v-model:selected-collection-ids="selectedCollectionIds"
@@ -379,7 +383,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
 
             <div class="grid gap-6 xl:flex xl:items-start xl:gap-8">
                 <aside
-                    class="hidden xl:sticky xl:top-20 xl:grid xl:max-h-screen-sticky-header xl:w-96 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pr-2 xl:pb-2"
+                    class="xl:max-h-screen-sticky-header hidden xl:sticky xl:top-20 xl:grid xl:w-96 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pr-2 xl:pb-2"
                 >
                     <CategoryFiltersPanel
                         v-model:selected-child-category-ids="selectedChildCategoryIds"

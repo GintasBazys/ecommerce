@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDragScroll } from "~/composables/useDragScroll"
+import { useDragScroll } from "~/composables/shared/useDragScroll"
 import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())

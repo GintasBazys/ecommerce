@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AboutCta from "@/components/About/AboutCta.vue"
 import MainBanner from "@/components/Banner/MainBanner.vue"
+import { createBreadcrumbSchema, useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()

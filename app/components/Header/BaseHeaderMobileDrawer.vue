@@ -3,6 +3,7 @@ import type { LocationItem, NavigationCategory } from "~/types/navigation"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
+import { useFocusTrap } from "~/composables/shared/useFocusTrap"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
 
 const props = defineProps<{

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseButton from "~/components/Shared/BaseButton.vue"
+import { useSnackbar } from "~/composables/shared/useSnackbar"
 
 const { snackbar, closeSnackbar } = useSnackbar()
 

@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import type { ContactFormErrors, ContactFormState } from "~/types/contact"
-import type { TurnstileWidgetInstance } from "~/types/forms"
 
-import TurnstileWidget from "~/components/Forms/TurnstileWidget.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
-import { usePostHog } from "~/composables/usePostHog"
+import { usePostHog } from "~/composables/analytics/usePostHog"
+import { useSnackbar } from "~/composables/shared/useSnackbar"
 
 const posthog = usePostHog()
-const runtimeConfig = useRuntimeConfig()
-const turnstileSiteKey = computed<string>(() => String(runtimeConfig.public.TURNSTILE_SITE_KEY || ""))
+const route = useRoute()
+const router = useRouter()
+const requestUrl = useRequestURL()
+const { showSnackbar } = useSnackbar()
+const formSubmitEndpoint = "https://formsubmit.co/ea50e93bb59d60512a0ab63ded1f9169"
+const formSubmitSuccessRedirect = computed<string>(() => `${requestUrl.origin}/contact?contact=sent`)
 
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
-const isSubmitting = ref<boolean>(false)
-const turnstileToken = ref<string>("")
-const turnstileResetKey = ref<number>(0)
-const turnstileWidget = ref<TurnstileWidgetInstance | null>(null)
 
 const form = reactive<ContactFormState>({
     subject: "",
@@ -56,66 +55,36 @@ function validateForm(): boolean {
     return isValid
 }
 
-function resetTurnstile(): void {
-    turnstileToken.value = ""
-    turnstileResetKey.value += 1
-}
-
-function handleTurnstileError(message: string): void {
-    turnstileToken.value = ""
-    errorMessage.value = message
-}
-
-async function handleSubmit(): Promise<void> {
+function handleSubmit(event: Event): void {
     if (!validateForm()) {
+        event.preventDefault()
         errorMessage.value = "Please correct the errors below."
         return
     }
 
-    if (!turnstileSiteKey.value) {
-        errorMessage.value = "Security verification is not configured. Please contact support by email."
+    errorMessage.value = null
+    posthog?.capture("contact_form_submitted", { has_subject: !!form.subject, has_order_number: !!form.orderNumber })
+}
+
+onMounted(() => {
+    if (route.query.contact !== "sent") {
         return
     }
 
-    errorMessage.value = null
-    successMessage.value = null
-    isSubmitting.value = true
+    successMessage.value = "Message sent successfully. We will get back to you soon."
+    showSnackbar(successMessage.value, "success")
 
-    try {
-        const token = turnstileToken.value || await turnstileWidget.value?.execute()
-
-        if (!token) {
-            throw new Error("Security verification is required.")
-        }
-
-        await $fetch("/api/contact", {
-            method: "POST",
-            body: {
-                ...form,
-                turnstileToken: token
-            }
-        })
-
-        posthog?.capture("contact_form_submitted", { has_subject: !!form.subject, has_order_number: !!form.orderNumber })
-        form.subject = ""
-        form.email = ""
-        form.phone = ""
-        form.orderNumber = ""
-        form.message = ""
-        successMessage.value = "Message sent successfully."
-        resetTurnstile()
-    } catch (error) {
-        console.error("Contact form submission failed", error)
-        errorMessage.value = error instanceof Error ? error.message : "Could not send your message. Please try again."
-        resetTurnstile()
-    } finally {
-        isSubmitting.value = false
-    }
-}
+    const query = { ...route.query }
+    delete query.contact
+    void router.replace({ path: route.path, query })
+})
 </script>
 
 <template>
-    <form class="grid gap-5" @submit.prevent="handleSubmit">
+    <form class="grid gap-5" :action="formSubmitEndpoint" method="POST" @submit="handleSubmit">
+        <input type="hidden" name="_subject" value="New contact form submission" />
+        <input type="hidden" name="_next" :value="formSubmitSuccessRedirect" />
+
         <div class="grid gap-5 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label for="contact-subject" class="mb-2 block text-sm font-semibold text-slate-900">Subject</label>
@@ -195,23 +164,8 @@ async function handleSubmit(): Promise<void> {
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-sm leading-6 text-slate-600">By sending this form, you share contact details only for support follow-up.</p>
-            <BaseButton type="submit" variant="primary" class="px-7" :disabled="isSubmitting">
-                {{ isSubmitting ? "Sending..." : "Send message" }}
-            </BaseButton>
+            <BaseButton type="submit" variant="primary" class="px-7">Send message</BaseButton>
         </div>
-
-        <TurnstileWidget
-            v-if="turnstileSiteKey"
-            ref="turnstileWidget"
-            v-model="turnstileToken"
-            :site-key="turnstileSiteKey"
-            action="contact"
-            appearance="execute"
-            execution="execute"
-            :reset-key="turnstileResetKey"
-            @error="handleTurnstileError"
-            @expired="handleTurnstileError"
-        />
 
         <div v-if="errorMessage" class="rounded-card-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
             {{ errorMessage }}

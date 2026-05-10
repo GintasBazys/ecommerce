@@ -5,8 +5,13 @@ import type { ProductFact } from "~/types/product"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseModal from "~/components/Shared/BaseModal.vue"
-import { usePostHog } from "~/composables/usePostHog"
-import { useProductPrice } from "~/composables/useProductPrice"
+import { usePostHog } from "~/composables/analytics/usePostHog"
+import { useProductGallery } from "~/composables/product/useProductGallery"
+import { useProductPageData } from "~/composables/product/useProductPageData"
+import { useProductPageSchema } from "~/composables/product/useProductPageSchema"
+import { useProductPrice } from "~/composables/product/useProductPrice"
+import { useProductReviews } from "~/composables/product/useProductReviews"
+import { useSiteIdentity } from "~/composables/shared/useStructuredData"
 
 const route = useRoute()
 const { siteName, organizationId, absoluteUrl } = useSiteIdentity()

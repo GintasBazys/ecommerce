@@ -4,7 +4,7 @@ import type { PricedCartLineItem } from "~/types/checkout"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
-import { usePostHog } from "~/composables/usePostHog"
+import { usePostHog } from "~/composables/analytics/usePostHog"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
 

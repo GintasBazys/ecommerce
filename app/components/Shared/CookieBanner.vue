@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseButton from "~/components/Shared/BaseButton.vue"
+import { useCookieConsent } from "~/composables/shared/useCookieConsent"
 
 const { accept, decline, isBannerVisible } = useCookieConsent()
 const canRenderBanner = ref<boolean>(false)

@@ -1,4 +1,5 @@
 import { disablePostHogClient, initPostHogClient } from "~/utils/posthog-client"
+import { useCookieConsent } from "~/composables/shared/useCookieConsent"
 
 export default defineNuxtPlugin(() => {
     const runtimeConfig = useRuntimeConfig()
