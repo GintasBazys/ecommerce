@@ -4,7 +4,6 @@ RUN corepack enable
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
-RUN echo "approve-builds=@sentry/cli,protobufjs" >> .npmrc
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
