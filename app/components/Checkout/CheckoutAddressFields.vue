@@ -26,6 +26,20 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
         value: country.iso_2
     }))
 ])
+
+type AddressErrorField = keyof AddressErrors
+
+function fieldErrorId(field: AddressErrorField): string {
+    return `${props.prefix}-${field.replace(/_/g, "-")}-error`
+}
+
+function hasFieldError(field: AddressErrorField): boolean {
+    return Boolean(props.errors[field])
+}
+
+function fieldErrorDescription(field: AddressErrorField): string | undefined {
+    return hasFieldError(field) ? fieldErrorId(field) : undefined
+}
 </script>
 
 <template>
@@ -51,9 +65,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :autocomplete="`${autocompletePrefix} given-name`"
                     class="ui-input min-h-12 rounded-2xl"
                     :class="errors.first_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('first_name')"
+                    :aria-describedby="fieldErrorDescription('first_name')"
                     @input="emit('update:field', { field: 'first_name', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="errors.first_name" class="block text-sm leading-6 text-rose-600">{{ errors.first_name }}</span>
+                <span v-if="errors.first_name" :id="fieldErrorId('first_name')" class="block text-sm leading-6 text-rose-600">{{ errors.first_name }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -65,9 +81,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :autocomplete="`${autocompletePrefix} family-name`"
                     class="ui-input min-h-12 rounded-2xl"
                     :class="errors.last_name ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('last_name')"
+                    :aria-describedby="fieldErrorDescription('last_name')"
                     @input="emit('update:field', { field: 'last_name', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="errors.last_name" class="block text-sm leading-6 text-rose-600">{{ errors.last_name }}</span>
+                <span v-if="errors.last_name" :id="fieldErrorId('last_name')" class="block text-sm leading-6 text-rose-600">{{ errors.last_name }}</span>
             </label>
         </div>
 
@@ -80,9 +98,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                 :autocomplete="`${autocompletePrefix} address-line1`"
                 class="ui-input min-h-12 rounded-2xl"
                 :class="errors.address_1 ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                :aria-invalid="hasFieldError('address_1')"
+                :aria-describedby="fieldErrorDescription('address_1')"
                 @input="emit('update:field', { field: 'address_1', value: ($event.target as HTMLInputElement).value })"
             />
-            <span v-if="errors.address_1" class="block text-sm leading-6 text-rose-600">{{ errors.address_1 }}</span>
+            <span v-if="errors.address_1" :id="fieldErrorId('address_1')" class="block text-sm leading-6 text-rose-600">{{ errors.address_1 }}</span>
         </label>
 
         <label class="grid gap-2">
@@ -107,9 +127,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :autocomplete="`${autocompletePrefix} postal-code`"
                     class="ui-input min-h-12 rounded-2xl"
                     :class="errors.postal_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('postal_code')"
+                    :aria-describedby="fieldErrorDescription('postal_code')"
                     @input="emit('update:field', { field: 'postal_code', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="errors.postal_code" class="block text-sm leading-6 text-rose-600">{{ errors.postal_code }}</span>
+                <span v-if="errors.postal_code" :id="fieldErrorId('postal_code')" class="block text-sm leading-6 text-rose-600">{{ errors.postal_code }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -121,9 +143,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :autocomplete="`${autocompletePrefix} address-level2`"
                     class="ui-input min-h-12 rounded-2xl"
                     :class="errors.city ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('city')"
+                    :aria-describedby="fieldErrorDescription('city')"
                     @input="emit('update:field', { field: 'city', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="errors.city" class="block text-sm leading-6 text-rose-600">{{ errors.city }}</span>
+                <span v-if="errors.city" :id="fieldErrorId('city')" class="block text-sm leading-6 text-rose-600">{{ errors.city }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -135,9 +159,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :autocomplete="`${autocompletePrefix} address-level1`"
                     class="ui-input min-h-12 rounded-2xl"
                     :class="errors.province ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('province')"
+                    :aria-describedby="fieldErrorDescription('province')"
                     @input="emit('update:field', { field: 'province', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="errors.province" class="block text-sm leading-6 text-rose-600">{{ errors.province }}</span>
+                <span v-if="errors.province" :id="fieldErrorId('province')" class="block text-sm leading-6 text-rose-600">{{ errors.province }}</span>
             </label>
         </div>
 
@@ -150,9 +176,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :options="countryOptions"
                     option-label-key="title"
                     :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('country_code')"
+                    :aria-describedby="fieldErrorDescription('country_code')"
                     @update:model-value="emit('update:field', { field: 'country_code', value: String($event) })"
                 />
-                <span v-if="errors.country_code" class="block text-sm leading-6 text-rose-600">{{ errors.country_code }}</span>
+                <span v-if="errors.country_code" :id="fieldErrorId('country_code')" class="block text-sm leading-6 text-rose-600">{{ errors.country_code }}</span>
             </label>
 
             <label class="grid gap-2">
@@ -164,9 +192,11 @@ const countryOptions = computed<{ title: string; value: string }[]>(() => [
                     :autocomplete="`${autocompletePrefix} tel`"
                     class="ui-input min-h-12 rounded-2xl"
                     :class="errors.phone ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
+                    :aria-invalid="hasFieldError('phone')"
+                    :aria-describedby="fieldErrorDescription('phone')"
                     @input="emit('update:field', { field: 'phone', value: ($event.target as HTMLInputElement).value })"
                 />
-                <span v-if="errors.phone" class="block text-sm leading-6 text-rose-600">{{ errors.phone }}</span>
+                <span v-if="errors.phone" :id="fieldErrorId('phone')" class="block text-sm leading-6 text-rose-600">{{ errors.phone }}</span>
             </label>
         </div>
     </section>

@@ -4,6 +4,7 @@ import { fetchMedusaJson } from "#server/utils/medusa-proxy"
 
 const DEFAULT_PAGE_SIZE = 200
 const DEFAULT_MAX_FETCH = 3000
+const DEFAULT_FETCH_CONCURRENCY = 4
 
 type StoreProductsResponse<Product> = {
     products?: Product[]
@@ -33,6 +34,7 @@ type ProductFetchOptions = {
     pageSize?: number
     maxFetch?: number
     endpoint?: string
+    concurrency?: number
 }
 
 type ProductPriceField = keyof Pick<ProductPrice, "calculated_amount" | "original_amount">
@@ -70,9 +72,32 @@ function getResolvedVariantPrice(price: ProductPrice | null | undefined, field: 
     return typeof baseAmount === "number" ? baseAmount : null
 }
 
+async function mapWithConcurrency<Input, Output>(
+    items: Input[],
+    concurrency: number,
+    mapper: (item: Input) => Promise<Output>
+): Promise<Output[]> {
+    const results: Output[] = []
+    let nextIndex = 0
+
+    async function worker(): Promise<void> {
+        while (nextIndex < items.length) {
+            const currentIndex = nextIndex
+            nextIndex++
+            results[currentIndex] = await mapper(items[currentIndex]!)
+        }
+    }
+
+    const workerCount = Math.max(1, Math.min(concurrency, items.length))
+    await Promise.all(Array.from({ length: workerCount }, () => worker()))
+
+    return results
+}
+
 export async function fetchAllStoreProducts<Product>(event: H3Event, searchParams: URLSearchParams, options: ProductFetchOptions = {}) {
     const pageSize = options.pageSize ?? DEFAULT_PAGE_SIZE
     const maxFetch = options.maxFetch ?? DEFAULT_MAX_FETCH
+    const concurrency = options.concurrency ?? DEFAULT_FETCH_CONCURRENCY
 
     const endpoint = options.endpoint ?? "/store/products"
     const firstPage = await fetchStoreProductsPage<Product>(event, searchParams, pageSize, 0, endpoint)
@@ -125,10 +150,8 @@ export async function fetchAllStoreProducts<Product>(event: H3Event, searchParam
         offsets.push(offset)
     }
 
-    const remainingPages = await Promise.all(
-        offsets.map((offset) =>
-            fetchStoreProductsPage<Product>(event, searchParams, Math.min(pageSize, targetCount - offset), offset, endpoint)
-        )
+    const remainingPages = await mapWithConcurrency(offsets, concurrency, (offset) =>
+        fetchStoreProductsPage<Product>(event, searchParams, Math.min(pageSize, targetCount - offset), offset, endpoint)
     )
 
     const products = [...firstProducts]

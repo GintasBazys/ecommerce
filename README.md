@@ -134,3 +134,16 @@ Notes:
 - The frontend is being migrated incrementally toward Tailwind-based ecommerce UI patterns.
 - Keep changes focused and prefer preserving existing business logic when updating UI.
 - Do not edit generated directories such as `.nuxt/`, `.output/`, `dist/`, or `node_modules/`.
+
+## TODO
+
+- Wishlist / save for later.
+- Recently viewed products.
+- Back-in-stock notifications.
+- Product comparison.
+- Returns/RMA portal.
+- Buy-again/reorder from account orders.
+- Payment methods in account.
+- Better order lookup by display order number plus email/postal verification.
+- Selected filter chips on listing pages.
+- Search refinement: sort, filters, total count, pagination/load-more.

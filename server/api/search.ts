@@ -8,6 +8,10 @@ type SearchRequestBody = {
     q?: string
 }
 
+const SEARCH_SORT_OPTIONS = new Set(["relevance", "price_asc", "price_desc", "newest"])
+const DEFAULT_LIMIT = 24
+const MAX_LIMIT = 96
+
 function normalizeSearchValue(value: string) {
     return value.toLowerCase().replace(/\s+/g, " ").trim()
 }
@@ -57,10 +61,50 @@ function dedupeProducts(products: ProductDTO[]) {
     return dedupedProducts
 }
 
+function getProductPrice(product: ProductDTO): number | null {
+    const prices = (product.variants ?? [])
+        .map((variant) => variant.calculated_price?.calculated_amount)
+        .filter((price): price is number => typeof price === "number")
+
+    return prices.length ? Math.min(...prices) : null
+}
+
+function isProductInStock(product: ProductDTO): boolean {
+    return (product.variants ?? []).some((variant) => typeof variant.inventory_quantity !== "number" || variant.inventory_quantity > 0)
+}
+
+function parsePositiveInteger(value: unknown, fallbackValue: number): number {
+    const parsedValue = Number(value)
+
+    return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : fallbackValue
+}
+
+function getProductTimestamp(product: ProductDTO): number {
+    const timestamp = product.created_at ? Date.parse(String(product.created_at)) : Number.NEGATIVE_INFINITY
+
+    return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp
+}
+
+function sortProducts(products: ProductDTO[], sort: string): ProductDTO[] {
+    if (sort === "price_asc") {
+        return [...products].sort((left, right) => (getProductPrice(left) ?? Number.POSITIVE_INFINITY) - (getProductPrice(right) ?? Number.POSITIVE_INFINITY))
+    }
+
+    if (sort === "price_desc") {
+        return [...products].sort((left, right) => (getProductPrice(right) ?? Number.NEGATIVE_INFINITY) - (getProductPrice(left) ?? Number.NEGATIVE_INFINITY))
+    }
+
+    if (sort === "newest") {
+        return [...products].sort((left, right) => getProductTimestamp(right) - getProductTimestamp(left))
+    }
+
+    return products
+}
+
 function buildBaseSearchParams(regionId: string | null, countryCode: string | null) {
     const searchParams = new URLSearchParams({
         fields: "*variants.calculated_price,*variants.inventory_quantity",
-        limit: "48",
+        limit: "100",
         offset: "0"
     })
 
@@ -93,6 +137,10 @@ export default defineEventHandler(async (event) => {
 
     const regionId = query.region_id ? String(query.region_id) : null
     const countryCode = query.country_code ? String(query.country_code) : null
+    const requestedSort = query.sort ? String(query.sort) : "relevance"
+    const sort = SEARCH_SORT_OPTIONS.has(requestedSort) ? requestedSort : "relevance"
+    const limit = Math.min(parsePositiveInteger(query.limit, DEFAULT_LIMIT), MAX_LIMIT)
+    const inStockOnly = String(query.in_stock_only ?? "false") === "true"
     const baseSearchParams = buildBaseSearchParams(regionId, countryCode)
     const queryTokens = normalizeSearchValue(rawQuery).split(" ").filter(Boolean)
 
@@ -110,8 +158,8 @@ export default defineEventHandler(async (event) => {
 
         if (!collectedProducts.length && rawQuery.length >= 3) {
             const fallbackParams = new URLSearchParams(baseSearchParams)
-            fallbackParams.set("limit", "200")
-            const fallbackResponse = await fetchAllStoreProducts<ProductDTO>(event, fallbackParams, { maxFetch: 200, pageSize: 200 })
+            fallbackParams.set("limit", "100")
+            const fallbackResponse = await fetchAllStoreProducts<ProductDTO>(event, fallbackParams, { maxFetch: 100, pageSize: 100, concurrency: 2 })
             const normalizedQuery = normalizeSearchValue(rawQuery)
 
             collectedProducts = dedupeProducts(
@@ -120,10 +168,12 @@ export default defineEventHandler(async (event) => {
                     .filter((entry) => entry.rank > 0)
                     .sort((left, right) => right.rank - left.rank)
                     .map((entry) => entry.product)
-            ).slice(0, 48)
+            )
         }
 
-        if (!collectedProducts.length) {
+        const refinedProducts = sortProducts(inStockOnly ? collectedProducts.filter(isProductInStock) : collectedProducts, sort)
+
+        if (!refinedProducts.length) {
             return {
                 ...primaryResponse,
                 products: [],
@@ -133,10 +183,10 @@ export default defineEventHandler(async (event) => {
 
         return {
             ...primaryResponse,
-            products: collectedProducts,
-            count: collectedProducts.length,
-            limit: primaryResponse.limit ?? collectedProducts.length,
-            offset: primaryResponse.offset ?? 0
+            products: refinedProducts.slice(0, limit),
+            count: refinedProducts.length,
+            limit,
+            offset: 0
         }
     } catch (error: unknown) {
         throw toUpstreamError(error, "Failed to fetch search results")

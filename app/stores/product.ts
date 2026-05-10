@@ -1,4 +1,5 @@
 import type { ProductDTO, CartDTO } from "@medusajs/types"
+import type { NavigationCategory } from "~/types/navigation"
 
 import { LIMIT } from "@/utils/consts"
 
@@ -7,13 +8,6 @@ interface ProductResponse {
     count: number
     productLimit: number
     productOffset: number
-}
-
-type NavigationCategory = {
-    id: string
-    handle: string
-    name: string
-    imageUrl?: string | null
 }
 
 type ProductFetchOptions = {

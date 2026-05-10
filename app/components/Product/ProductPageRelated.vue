@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import type { ProductDTO } from "@medusajs/types"
 
+import BaseButton from "~/components/Shared/BaseButton.vue"
 import { useDragScroll } from "~/composables/useDragScroll"
 
 defineProps<{
     relatedProducts: ProductDTO[]
+    pending?: boolean
+    error?: boolean
+}>()
+
+const emit = defineEmits<{
+    retry: []
 }>()
 
 const relatedRailRef = ref<HTMLElement | null>(null)
@@ -13,7 +20,6 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
 
 <template>
     <section
-        v-if="relatedProducts.length"
         class="mt-8 overflow-hidden rounded-panel border border-slate-200 bg-white px-5 py-6 shadow-sm sm:rounded-4xl sm:px-7 sm:py-8 xl:px-8"
     >
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -40,7 +46,30 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(relatedRail
             </NuxtLink>
         </div>
 
-        <div class="mt-9">
+        <div v-if="pending" class="mt-9" aria-live="polite">
+            <div class="flex gap-4 overflow-x-hidden pt-1 pr-6 pb-4 sm:gap-5 sm:pr-8">
+                <div v-for="n in 5" :key="n" class="min-w-0 shrink-0 basis-10/12 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
+                    <div class="rounded-card h-full border border-slate-200 bg-linear-to-b from-slate-50 to-white p-3 shadow-card">
+                        <div class="aspect-square animate-pulse rounded-2xl bg-slate-200"></div>
+                        <div class="mt-4 h-4 w-3/4 animate-pulse rounded bg-slate-200"></div>
+                        <div class="mt-3 h-3 w-full animate-pulse rounded bg-slate-200"></div>
+                        <div class="mt-2 h-3 w-2/3 animate-pulse rounded bg-slate-200"></div>
+                        <div class="mt-5 h-11 w-full animate-pulse rounded-full bg-slate-200"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else-if="error" class="mt-9 rounded-card-sm border border-rose-200 bg-rose-50 p-4 text-sm leading-6 text-rose-700" role="alert">
+            <p>Related products could not be loaded.</p>
+            <BaseButton type="button" variant="accent" class="mt-3 px-5" @click="emit('retry')">Try again</BaseButton>
+        </div>
+
+        <div v-else-if="!relatedProducts.length" class="mt-9 rounded-card-sm border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+            No related products are available right now.
+        </div>
+
+        <div v-else class="mt-9">
             <div
                 ref="relatedRailRef"
                 class="flex cursor-grab gap-4 overflow-x-auto overscroll-x-contain pt-1 pr-6 pb-4 sm:gap-5 sm:pr-8 [&.is-pointer-down]:cursor-grabbing"

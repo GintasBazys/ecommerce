@@ -42,7 +42,8 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "country_code is required for tax pricing" })
     }
 
-    const path = `/store/products?${queryParams.toString()}&limit=${limit}&offset=${offset}`
+    const endpoint = categoryId ? "/store/category-products" : "/store/products"
+    const path = `${endpoint}?${queryParams.toString()}&limit=${limit}&offset=${offset}`
 
     try {
         const response = await fetchMedusaResponse(event, path, {

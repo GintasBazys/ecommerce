@@ -17,7 +17,18 @@ const cartStore = useCartStore()
 const loading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 
-const selectedVariant = computed<ProductVariantDTO | null>(() => product.variants?.[0] ?? null)
+function isVariantAvailable(variant: ProductVariantDTO | null): boolean {
+    if (!variant?.id) {
+        return false
+    }
+
+    return typeof variant.inventory_quantity !== "number" || variant.inventory_quantity > 0
+}
+
+const selectedVariant = computed<ProductVariantDTO | null>(() => {
+    const variants = product.variants ?? []
+    return variants.find((variant) => isVariantAvailable(variant) && variant.calculated_price?.calculated_amount != null) ?? variants[0] ?? null
+})
 
 const productHref = computed<string>(() => (product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : "#"))
 
@@ -28,7 +39,7 @@ const productDescription = computed<string>(() => {
         return product.description
     }
 
-    return "A polished ecommerce pick selected for quality, everyday utility, and easy styling."
+    return "Product details are currently unavailable."
 })
 
 const { displayPrice, originalPrice, taxLabel } = useProductPrice(selectedVariant)
@@ -48,10 +59,30 @@ const roundedRating = computed<number>(() => (averageRating.value ? Math.round(a
 
 const variantLabel = computed<string>(() => selectedVariant.value?.title || "Selected option")
 
-const stockLabel = computed<string>(() => (selectedVariant.value?.inventory_quantity ? "Ready to ship" : "Currently unavailable"))
+const isSelectedVariantAvailable = computed<boolean>(() => isVariantAvailable(selectedVariant.value))
+
+const hasSelectedVariantPrice = computed<boolean>(() => selectedVariant.value?.calculated_price?.calculated_amount != null)
+
+const canAddSelectedVariantToCart = computed<boolean>(() => isSelectedVariantAvailable.value && hasSelectedVariantPrice.value)
+
+const stockLabel = computed<string>(() => (canAddSelectedVariantToCart.value ? "Ready to ship" : "Currently unavailable"))
+
+const ratingLabel = computed<string>(() => (averageRating.value ? `Rated ${averageRating.value.toFixed(1)} out of 5` : ""))
+
+const priceLabel = computed<string>(() => {
+    if (!displayPrice.value) {
+        return "Price unavailable"
+    }
+
+    if (isOnSale.value && originalPrice.value) {
+        return `Sale price ${displayPrice.value}, original price ${originalPrice.value}`
+    }
+
+    return `Price ${displayPrice.value}`
+})
 
 async function addToCart(): Promise<void> {
-    if (!selectedVariant.value || loading.value) {
+    if (!selectedVariant.value || !canAddSelectedVariantToCart.value || loading.value) {
         return
     }
 
@@ -152,15 +183,16 @@ async function addToCart(): Promise<void> {
                         />
                     </svg>
                 </div>
+                <span v-if="ratingLabel" class="sr-only">{{ ratingLabel }}</span>
             </div>
 
             <div class="grid gap-3 border-t border-slate-200/80 pt-3" :class="compact ? 'gap-2 pt-2.5' : ''">
                 <div class="grid gap-1">
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2" :aria-label="priceLabel">
                         <span class="text-lg leading-none font-semibold text-slate-950" :class="compact ? 'text-base' : ''">{{
                             displayPrice
                         }}</span>
-                        <del v-if="isOnSale && originalPrice" class="text-sm text-rose-500" :class="compact ? 'text-label-sm' : ''">
+                        <del v-if="isOnSale && originalPrice" class="text-sm text-rose-500" :class="compact ? 'text-label-sm' : ''" aria-hidden="true">
                             {{ originalPrice }}
                         </del>
                     </div>
@@ -174,14 +206,14 @@ async function addToCart(): Promise<void> {
                     type="button"
                     variant="accent" class="w-full px-4 disabled:bg-slate-200 disabled:text-slate-500"
                     :class="compact ? 'min-h-9 px-3 text-sm' : ''"
-                    :disabled="loading || !selectedVariant?.inventory_quantity"
+                    :disabled="loading || !canAddSelectedVariantToCart"
                     @click="addToCart"
                 >
                     <span
                         v-if="loading"
                         class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-950/35 border-t-slate-950"
                     ></span>
-                    {{ selectedVariant?.inventory_quantity ? "Add to cart" : "Unavailable" }}
+                    {{ canAddSelectedVariantToCart ? "Add to cart" : "Unavailable" }}
                 </BaseButton>
                 <p v-if="errorMessage" class="text-sm leading-6 text-rose-700" role="alert">{{ errorMessage }}</p>
             </div>

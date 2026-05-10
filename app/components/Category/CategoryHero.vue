@@ -26,8 +26,10 @@ defineProps<{
                     sizes="100vw xl:1280px"
                     format="webp"
                     quality="72"
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
+                    fetchpriority="high"
+                    preload
                     class="absolute inset-0 h-full w-full object-cover object-center"
                 />
                 <div class="absolute inset-0 bg-linear-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20"></div>

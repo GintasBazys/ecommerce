@@ -40,17 +40,6 @@ function createEmptyFacets(): CategoryProductsFacets {
     }
 }
 
-function parsePage(value: LocationQueryValue | LocationQueryValue[] | undefined): number {
-    const source = Array.isArray(value) ? value[0] : value
-
-    if (typeof source !== "string" || source.trim() === "") {
-        return 1
-    }
-
-    const parsed = Number.parseInt(source, 10)
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1
-}
-
 function parseQueryList(value: LocationQueryValue | LocationQueryValue[] | undefined): string[] {
     if (Array.isArray(value)) {
         return value.flatMap((item) => parseQueryList(item)).filter(Boolean)
@@ -106,10 +95,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const isSyncingQuery = ref<boolean>(false)
     const isApplyingQueryState = ref<boolean>(false)
     const pendingQueryPrice = ref<{ min?: number; max?: number } | null>(null)
-
-    const currentPage = computed<number>(() => parsePage(route.query.page))
-    const totalPages = computed<number>(() => Math.max(1, Math.ceil(totalCount.value / limit)))
-    const offset = computed<number>(() => (currentPage.value - 1) * limit)
 
     const activeFilterCount = computed<number>(() => {
         let count = 0
@@ -169,37 +154,6 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     })
 
     const gridIsInitialLoading = computed<boolean>(() => loadingRef.value && products.value.length === 0)
-    const paginationLabel = computed<string>(() => `Page ${currentPage.value} of ${totalPages.value}`)
-    const paginationItems = computed<(number | string)[]>(() => {
-        if (totalPages.value <= 7) {
-            return Array.from({ length: totalPages.value }, (_, index) => index + 1)
-        }
-
-        const pages = new Set<number>([1, totalPages.value, currentPage.value])
-
-        if (currentPage.value > 1) {
-            pages.add(currentPage.value - 1)
-        }
-
-        if (currentPage.value < totalPages.value) {
-            pages.add(currentPage.value + 1)
-        }
-
-        const sortedPages = [...pages].sort((left, right) => left - right)
-        const items: (number | string)[] = []
-
-        for (const page of sortedPages) {
-            const previousPage = items.at(-1)
-
-            if (typeof previousPage === "number" && page - previousPage > 1) {
-                items.push(`ellipsis-${previousPage}-${page}`)
-            }
-
-            items.push(page)
-        }
-
-        return items
-    })
 
     function buildQueryState(page = currentPage.value): LocationQueryRaw {
         const query: LocationQueryRaw = {}
@@ -256,11 +210,11 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         })
     }
 
-    function buildPageLink(page: number): { query: LocationQueryRaw } {
-        return {
-            query: buildQueryState(page)
-        }
-    }
+    const { currentPage, totalPages, offset, paginationLabel, paginationItems, buildPageLink } = useCategoryListingPagination({
+        totalCount,
+        limit,
+        buildQueryState
+    })
 
     function applyQueryStateFromRoute(query: LocationQuery): void {
         isApplyingQueryState.value = true

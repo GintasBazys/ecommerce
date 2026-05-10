@@ -24,7 +24,7 @@ const emit = defineEmits<{
 }>()
 
 function isVariantAvailable(variant: ProductVariantDTO): boolean {
-    return Number(variant.inventory_quantity || 0) > 0
+    return typeof variant.inventory_quantity !== "number" || variant.inventory_quantity > 0
 }
 </script>
 

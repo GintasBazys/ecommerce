@@ -165,12 +165,15 @@ useStructuredData(() => [articleSchema.value, breadcrumbSchema.value], "blog-pos
                     height="900"
                     sizes="100vw md:960px"
                     densities="x1 x2"
+                    loading="eager"
+                    fetchpriority="high"
+                    preload
                     class="rounded-panel mb-6 w-full object-cover"
                 />
 
                 <div class="rounded-panel shadow-panel border border-white/80 bg-white/90 p-5 text-slate-700 sm:p-8">
                     <!-- eslint-disable vue/no-v-html -->
-                    <!-- The Medusa blog API returns sanitized HTML for post bodies. -->
+                    <!-- Blog HTML is sanitized in the server blog normalizer before rendering. -->
                     <div class="blog-richtext" v-html="currentPost?.html"></div>
                     <!-- eslint-enable vue/no-v-html -->
                 </div>

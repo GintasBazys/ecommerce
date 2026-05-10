@@ -61,7 +61,7 @@ export const useCartStore = defineStore("cart", () => {
 
     const updateLineItem = (
         selectedVariant: {
-            inventory_quantity: number
+            inventory_quantity?: number | null
             id: string | null
             title: string
             calculated_price: { calculated_amount: number }
@@ -71,18 +71,15 @@ export const useCartStore = defineStore("cart", () => {
     ): Promise<void> => {
         return queueCartMutation(async () => {
             if (!cart.value || !cart.value.items) {
-                console.warn("Cart or cart items are not initialized")
-                return
+                throw new Error("Cart is not ready yet. Please try again.")
             }
 
             if (!selectedVariant.id) {
-                console.warn("Variant id is missing")
-                return
+                throw new Error("This product option is unavailable.")
             }
 
-            if (selectedVariant.inventory_quantity <= 0) {
-                console.warn("Selected variant is out of stock")
-                return
+            if (typeof selectedVariant.inventory_quantity === "number" && selectedVariant.inventory_quantity <= 0) {
+                throw new Error("This product option is currently out of stock.")
             }
 
             try {
@@ -108,6 +105,8 @@ export const useCartStore = defineStore("cart", () => {
                         if (!updateItem) {
                             openCartDrawer.value = true
                         }
+                    } else {
+                        throw new Error(response?.error || "Could not update the cart. Please try again.")
                     }
                 } else {
                     const response = await $fetch<CartResponseInterface>("/api/cart/line-items", {
@@ -128,10 +127,13 @@ export const useCartStore = defineStore("cart", () => {
                         if (!updateItem) {
                             openCartDrawer.value = true
                         }
+                    } else {
+                        throw new Error(response?.error || "Could not update the cart. Please try again.")
                     }
                 }
             } catch (error) {
                 console.error("Failed to update line item:", error)
+                throw error
             }
         })
     }

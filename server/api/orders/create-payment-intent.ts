@@ -9,9 +9,14 @@ type StripeSessionData = {
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const { cartId } = await readBody(event)
+    const sessionCartId = getCookie(event, "cart_id") || null
 
     if (!cartId) {
-        throw new Error("Cart ID is required.")
+        throw createError({ statusCode: 400, statusMessage: "Cart ID is required." })
+    }
+
+    if (!sessionCartId || sessionCartId !== cartId) {
+        throw createError({ statusCode: 403, statusMessage: "This cart is not available for payment." })
     }
 
     const headers = {
@@ -27,7 +32,8 @@ export default defineEventHandler(async (event) => {
         })
 
         if (!res.ok) {
-            throw new Error(`Failed to fetch cart: ${await res.text()}`)
+            console.error("Failed to fetch payment cart", await res.text().catch(() => res.statusText))
+            throw createError({ statusCode: 502, statusMessage: "Could not prepare this cart for payment." })
         }
 
         const data = await res.json()
@@ -47,7 +53,8 @@ export default defineEventHandler(async (event) => {
         })
 
         if (!collectionResponse.ok) {
-            throw new Error(`Failed to create payment collection: ${await collectionResponse.text()}`)
+            console.error("Failed to create payment collection", await collectionResponse.text().catch(() => collectionResponse.statusText))
+            throw createError({ statusCode: 502, statusMessage: "Could not prepare payment for this cart." })
         }
 
         const { payment_collection } = await collectionResponse.json()
@@ -72,7 +79,8 @@ export default defineEventHandler(async (event) => {
         )
 
         if (!createSessionResponse.ok) {
-            throw new Error(`Failed to create Stripe payment session: ${await createSessionResponse.text()}`)
+            console.error("Failed to create Stripe payment session", await createSessionResponse.text().catch(() => createSessionResponse.statusText))
+            throw createError({ statusCode: 502, statusMessage: "Could not start the secure payment session." })
         }
 
         cart = await fetchCart()
@@ -83,7 +91,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (!stripeSession?.data?.client_secret) {
-        throw new Error("Client secret not available for Stripe payment session.")
+        throw createError({ statusCode: 502, statusMessage: "Secure payment details are not available yet." })
     }
 
     return {

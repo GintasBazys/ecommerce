@@ -70,6 +70,21 @@ function cleanText(value: unknown) {
     return normalizedValue ? normalizedValue : null
 }
 
+function sanitizeBlogHtml(value: unknown): string {
+    const html = cleanText(value)
+
+    if (!html) {
+        return ""
+    }
+
+    return html
+        .replace(/<\s*(script|style|iframe|object|embed|form|input|button|textarea|select)[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
+        .replace(/<\s*(script|style|iframe|object|embed|form|input|button|textarea|select)\b[^>]*\/?>/gi, "")
+        .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+        .replace(/\s+(href|src)\s*=\s*(["'])\s*javascript:[\s\S]*?\2/gi, "")
+        .replace(/\s+style\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+}
+
 function normalizeDate(value: unknown) {
     const normalizedValue = cleanText(value)
     if (!normalizedValue) {
@@ -138,6 +153,6 @@ export function normalizeBlogPost(rawPost: StoreBlogPost, categoryMap: Map<strin
 
     return {
         ...summary,
-        html: cleanText(rawPost.content_html) || ""
+        html: sanitizeBlogHtml(rawPost.content_html)
     }
 }
