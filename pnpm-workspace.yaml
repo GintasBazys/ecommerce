@@ -7,3 +7,5 @@ allowBuilds:
   unrs-resolver: false
   '@sentry/cli': true
   protobufjs: true
+
+minimumReleaseAge: 10080
