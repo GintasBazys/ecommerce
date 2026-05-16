@@ -15,6 +15,7 @@ const props = defineProps<{
     locationValue: string
     selectionLoading: boolean
     isSignedIn: boolean
+    wishlistCount: number
 }>()
 
 const emit = defineEmits<{
@@ -151,6 +152,15 @@ function closeDrawer(): void {
                         @click="closeDrawer"
                     >
                         {{ cat.name }}
+                    </NuxtLink>
+
+                    <NuxtLink
+                        v-if="isSignedIn"
+                        class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
+                        to="/account/wishlist"
+                        @click="closeDrawer"
+                    >
+                        Wishlist<span v-if="wishlistCount" aria-live="polite"> ({{ wishlistCount < 99 ? wishlistCount : "99+" }})</span>
                     </NuxtLink>
 
                     <NuxtLink

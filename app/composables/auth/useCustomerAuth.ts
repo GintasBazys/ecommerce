@@ -11,6 +11,7 @@ function normalizeError(e: any): string {
 export function useCustomerAuth() {
     const customerStore = useCustomerStore()
     const cartStore = useCartStore()
+    const wishlistStore = useWishlistStore()
 
     const loading = ref<boolean>(false)
     const error = ref<string | null>(null)
@@ -27,6 +28,13 @@ export function useCustomerAuth() {
                 credentials: "include"
             })
             customerStore.setCustomer(res.customer)
+
+            if (res.customer) {
+                await wishlistStore.loadWishlist()
+            } else {
+                wishlistStore.clearWishlist()
+            }
+
             return res.customer
         } catch (e) {
             error.value = normalizeError(e)
@@ -60,6 +68,8 @@ export function useCustomerAuth() {
             if (opts?.loadCart) {
                 await cartStore.loadCart()
             }
+
+            await wishlistStore.loadWishlist()
 
             return res.customer
         } catch (e) {
@@ -99,6 +109,8 @@ export function useCustomerAuth() {
             if (opts?.loadCart) {
                 await cartStore.loadCart()
             }
+
+            await wishlistStore.loadWishlist()
 
             return res.customer
         } catch (e) {

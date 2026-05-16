@@ -7,10 +7,12 @@ import BaseButton from "~/components/Shared/BaseButton.vue"
 const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
+const wishlistStore = useWishlistStore()
 const { customerEmail, customerFullName } = storeToRefs(customerStore)
 
 const accountNav = [
     { label: "Dashboard", to: "/account", icon: "dashboard" },
+    { label: "Wishlist", to: "/account/wishlist", icon: "wishlist" },
     { label: "Profile", to: "/account/profile", icon: "profile" },
     { label: "Addresses", to: "/account/address", icon: "addresses" },
     { label: "Orders", to: "/account/orders", icon: "orders" }
@@ -31,6 +33,14 @@ const pageContent = computed<AccountPageContent>(() => {
             eyebrow: "Profile settings",
             title: "Keep your details current for smoother future orders.",
             description: "Update the information attached to your account while staying inside the same focused account workspace."
+        }
+    }
+
+    if (route.path.startsWith("/account/wishlist")) {
+        return {
+            eyebrow: "Saved products",
+            title: "Your wishlist keeps future purchases close at hand.",
+            description: "Review saved products, add available items to your cart, or remove anything you no longer need."
         }
     }
 
@@ -66,6 +76,11 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
 
     if (route.path.startsWith("/account/profile")) {
         items.push({ label: "Profile", to: "/account/profile" })
+        return items
+    }
+
+    if (route.path.startsWith("/account/wishlist")) {
+        items.push({ label: "Wishlist", to: "/account/wishlist" })
         return items
     }
 
@@ -114,6 +129,10 @@ function iconPaths(icon: (typeof accountNav)[number]["icon"]): string[] {
         return ["M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z", "M4.5 19.5a7.5 7.5 0 0 1 15 0"]
     }
 
+    if (icon === "wishlist") {
+        return ["M12 20.2S4.5 15.7 4.5 9.4A4.4 4.4 0 0 1 12 6.2a4.4 4.4 0 0 1 7.5 3.2c0 6.3-7.5 10.8-7.5 10.8Z"]
+    }
+
     if (icon === "addresses") {
         return ["M12 21s-5.5-5.7-5.5-10a5.5 5.5 0 1 1 11 0c0 4.3-5.5 10-5.5 10Z", "M12 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"]
     }
@@ -127,6 +146,7 @@ async function handleLogout(): Promise<void> {
 
         if (response.success) {
             customerStore.clearCustomer()
+            wishlistStore.clearWishlist()
             await router.push("/")
         }
     } catch (error) {

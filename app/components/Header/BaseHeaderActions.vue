@@ -9,6 +9,7 @@ defineProps<{
     locationValue: string
     selectionLoading: boolean
     itemCount: number
+    wishlistCount: number
     isAuthenticated: boolean
 }>()
 
@@ -56,6 +57,26 @@ const emit = defineEmits<{
                 <path d="m20 20-3.5-3.5" stroke-linecap="round" />
             </svg>
         </BaseButton>
+
+        <NuxtLink :to="isAuthenticated ? '/account/wishlist' : '/signin'" class="relative inline-flex">
+            <span class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden">
+                <span class="sr-only">Open wishlist</span>
+                <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path
+                        d="M12 20.2S4.5 15.7 4.5 9.4A4.4 4.4 0 0 1 12 6.2a4.4 4.4 0 0 1 7.5 3.2c0 6.3-7.5 10.8-7.5 10.8Z"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </span>
+            <span
+                v-if="wishlistCount"
+                class="bg-rose-500 text-label-xs absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1 font-semibold text-white ring-2 ring-white"
+                aria-live="polite"
+            >
+                {{ wishlistCount < 99 ? wishlistCount : "99+" }}
+            </span>
+        </NuxtLink>
 
         <NuxtLink to="/cart" class="relative inline-flex">
             <span class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden">

@@ -137,7 +137,6 @@ Notes:
 
 ## TODO
 
-- Wishlist / save for later.
 - Recently viewed products.
 - Back-in-stock notifications.
 - Product comparison.

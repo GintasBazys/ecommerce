@@ -25,12 +25,17 @@ function hasCustomerSessionHint(cookieHeader: string): boolean {
 export default defineNuxtPlugin(async () => {
     const cartStore = useCartStore()
     const regionStore = useRegionStore()
+    const wishlistStore = useWishlistStore()
 
     if (!import.meta.server) {
         if (import.meta.client && regionStore.regionStoreId && !cartStore.cart) {
             window.setTimeout(() => {
                 if (!cartStore.cart) {
                     void cartStore.loadCart()
+                }
+
+                if (useCustomerStore().isAuthenticated) {
+                    void wishlistStore.loadWishlist()
                 }
             }, 1)
         }
@@ -137,6 +142,12 @@ export default defineNuxtPlugin(async () => {
             cartIdCookie.value = cartStore.cart.id
         }
 
+        if (customerStore.isAuthenticated) {
+            await wishlistStore.loadWishlist()
+        } else {
+            wishlistStore.clearWishlist()
+        }
+
         return
     }
 
@@ -146,4 +157,10 @@ export default defineNuxtPlugin(async () => {
         productStore.categories = categoriesState.value
     }
     customerStore.setCustomer(customerState.value ?? null)
+
+    if (customerStore.isAuthenticated) {
+        await wishlistStore.loadWishlist()
+    } else {
+        wishlistStore.clearWishlist()
+    }
 })

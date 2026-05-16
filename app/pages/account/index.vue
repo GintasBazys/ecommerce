@@ -19,6 +19,13 @@ const accountLinks = [
         icon: "profile"
     },
     {
+        title: "Wishlist",
+        description: "Return to saved products and move available items into your cart.",
+        detail: "Keep future purchases organized in one persistent list.",
+        to: "/account/wishlist",
+        icon: "wishlist"
+    },
+    {
         title: "Addresses",
         description: "Manage saved billing and delivery locations.",
         detail: "Review saved destinations before your next checkout.",
@@ -48,6 +55,10 @@ const accountHighlights = computed<AccountHighlight[]>(() => [
 function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
     if (icon === "profile") {
         return ["M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z", "M4.5 19.5a7.5 7.5 0 0 1 15 0"]
+    }
+
+    if (icon === "wishlist") {
+        return ["M12 20.2S4.5 15.7 4.5 9.4A4.4 4.4 0 0 1 12 6.2a4.4 4.4 0 0 1 7.5 3.2c0 6.3-7.5 10.8-7.5 10.8Z"]
     }
 
     if (icon === "addresses") {
@@ -85,7 +96,7 @@ function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
             </div>
         </section>
 
-        <section class="grid gap-4 lg:grid-cols-3">
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <NuxtLink
                 v-for="link in accountLinks"
                 :key="link.to"

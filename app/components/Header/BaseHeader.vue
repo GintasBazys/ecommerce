@@ -33,6 +33,7 @@ const { data: announcementBarData } = await useAsyncData<AnnouncementBarResponse
 const regionStore = useRegionStore()
 const { isAuthenticated } = storeToRefs(useCustomerStore())
 const { itemCount } = storeToRefs(useCartStore())
+const { itemCount: wishlistCount } = storeToRefs(useWishlistStore())
 const { categories } = storeToRefs(useProductStore())
 const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
 
@@ -338,6 +339,7 @@ function observeAnnouncementTextElements(): void {
                     :location-value="locationValue"
                     :selection-loading="selectionLoading"
                     :item-count="itemCount"
+                    :wishlist-count="wishlistCount"
                     :is-authenticated="isAuthenticated"
                     @search="openSearchDialog"
                     @menu="drawer = true"
@@ -356,6 +358,7 @@ function observeAnnouncementTextElements(): void {
             :location-value="locationValue"
             :selection-loading="selectionLoading"
             :is-signed-in="isAuthenticated"
+            :wishlist-count="wishlistCount"
             @close="closeDrawer"
             @update-location="updateLocation"
         />
