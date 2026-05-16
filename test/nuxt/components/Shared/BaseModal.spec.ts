@@ -1,10 +1,11 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
 import type { VueWrapper } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 import BaseModal from '~/components/Shared/BaseModal.vue'
+import { flushNuxtUpdates } from "~~/test/utils/async"
+import { cleanupDocumentBody, cleanupMountedWrappers, getBodyElement, trackWrapper } from "~~/test/utils/dom"
 
 type ModalHarnessProps = {
     initialOpen?: boolean
@@ -16,9 +17,10 @@ type ModalHarnessProps = {
     contentClass?: string
     closeOnEscape?: boolean
     closeOnBackdrop?: boolean
+    showCloseButton?: boolean
+    size?: 'sm' | 'md' | 'lg'
+    mobileMode?: 'center' | 'sheet'
 }
-
-const mountedWrappers: VueWrapper[] = []
 
 const ModalHarness = defineComponent({
     components: { BaseModal },
@@ -31,7 +33,10 @@ const ModalHarness = defineComponent({
         panelClass: { type: String, default: '' },
         contentClass: { type: String, default: '' },
         closeOnEscape: { type: Boolean, default: true },
-        closeOnBackdrop: { type: Boolean, default: true }
+        closeOnBackdrop: { type: Boolean, default: true },
+        showCloseButton: { type: Boolean, default: true },
+        size: { type: String, default: 'md' },
+        mobileMode: { type: String, default: 'center' }
     },
     setup(props) {
         const open = ref<boolean>(props.initialOpen)
@@ -50,6 +55,9 @@ const ModalHarness = defineComponent({
             :content-class="contentClass"
             :close-on-escape="closeOnEscape"
             :close-on-backdrop="closeOnBackdrop"
+            :show-close-button="showCloseButton"
+            :size="size"
+            :mobile-mode="mobileMode"
             close-label="Close test modal"
         >
             <h2 :id="titleId || undefined">Modal title</h2>
@@ -67,26 +75,14 @@ async function mountModal(props: ModalHarnessProps = {}): Promise<VueWrapper> {
         route: '/'
     })
 
-    mountedWrappers.push(wrapper)
-    await flushModalUpdates()
+    trackWrapper(wrapper)
+    await flushNuxtUpdates()
 
     return wrapper
 }
 
-async function flushModalUpdates(): Promise<void> {
-    await nextTick()
-    await flushPromises()
-    await nextTick()
-}
-
 function getDialog(): HTMLElement {
-    const dialog = document.body.querySelector<HTMLElement>('[role="dialog"]')
-
-    if (!dialog) {
-        throw new Error('Dialog was not found')
-    }
-
-    return dialog
+    return getBodyElement('[role="dialog"]', 'Dialog')
 }
 
 function getOverlay(): HTMLElement {
@@ -109,10 +105,8 @@ function dispatchPointerEvent(element: HTMLElement, eventName: 'pointerdown' | '
 
 describe('BaseModal', () => {
     afterEach(() => {
-        mountedWrappers.splice(0).forEach((wrapper) => wrapper.unmount())
-        document.body.innerHTML = ''
-        document.body.style.overflow = ''
-        document.body.style.touchAction = ''
+        cleanupMountedWrappers()
+        cleanupDocumentBody()
     })
 
     it('renders teleported dialog content only when open', async () => {
@@ -121,7 +115,7 @@ describe('BaseModal', () => {
         expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
         await wrapper.get('[data-testid="trigger"]').trigger('click')
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(getDialog().textContent).toContain('Modal title')
     })
@@ -152,7 +146,7 @@ describe('BaseModal', () => {
         expect(closeButton).not.toBeNull()
 
         closeButton?.click()
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.querySelector('[role="dialog"]')).toBeNull()
     })
@@ -161,17 +155,17 @@ describe('BaseModal', () => {
         await mountModal()
 
         getDialog().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
-        mountedWrappers.splice(0).forEach((wrapper) => wrapper.unmount())
-        document.body.innerHTML = ''
+        cleanupMountedWrappers()
+        cleanupDocumentBody()
 
         await mountModal({ closeOnEscape: false })
 
         getDialog().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
     })
@@ -184,13 +178,13 @@ describe('BaseModal', () => {
 
         dispatchPointerEvent(dialog, 'pointerdown')
         dispatchPointerEvent(overlay, 'pointerup')
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
 
         dispatchPointerEvent(overlay, 'pointerdown')
         dispatchPointerEvent(overlay, 'pointerup')
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.querySelector('[role="dialog"]')).toBeNull()
     })
@@ -217,7 +211,7 @@ describe('BaseModal', () => {
         expect(document.body.style.touchAction).toBe('none')
 
         document.body.querySelector<HTMLButtonElement>('button[aria-label="Close test modal"]')?.click()
-        await flushModalUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.style.overflow).toBe('auto')
         expect(document.body.style.touchAction).toBe('pan-y')
@@ -229,5 +223,49 @@ describe('BaseModal', () => {
         const autofocusInput = document.body.querySelector<HTMLInputElement>('input[data-autofocus]')
 
         expect(document.activeElement).toBe(autofocusInput)
+    })
+
+    it('traps keyboard focus inside the dialog', async () => {
+        await mountModal()
+
+        const dialog = getDialog()
+        const focusableElements = [...dialog.querySelectorAll<HTMLElement>('input, button')]
+        const firstElement = focusableElements[0]
+        const lastElement = focusableElements[focusableElements.length - 1]
+
+        expect(firstElement).toBeDefined()
+        expect(lastElement).toBeDefined()
+
+        lastElement?.focus()
+        dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+
+        expect(document.activeElement).toBe(firstElement)
+
+        firstElement?.focus()
+        dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }))
+
+        expect(document.activeElement).toBe(lastElement)
+    })
+
+    it('restores focus to the previously focused element after close', async () => {
+        const trigger = document.createElement('button')
+        trigger.type = 'button'
+        document.body.appendChild(trigger)
+        trigger.focus()
+
+        await mountModal()
+
+        document.body.querySelector<HTMLButtonElement>('button[aria-label="Close test modal"]')?.click()
+        await flushNuxtUpdates()
+
+        expect(document.activeElement).toBe(trigger)
+    })
+
+    it('can hide the close button and apply size/mobile mode classes', async () => {
+        await mountModal({ showCloseButton: false, size: 'lg', mobileMode: 'sheet' })
+
+        expect(document.body.querySelector('button[aria-label="Close test modal"]')).toBeNull()
+        expect(getDialog().className).toContain('max-w-3xl')
+        expect(getDialog().className).toContain('rounded-t-3xl')
     })
 })

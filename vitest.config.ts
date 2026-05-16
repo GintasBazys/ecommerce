@@ -20,6 +20,14 @@ const publicAssetStubPlugin = {
 
 const nuxtTestAliases = [
     {
+        find: /^~\/(.*)$/,
+        replacement: fileURLToPath(new URL('./app/$1', import.meta.url)),
+    },
+    {
+        find: /^@\/(.*)$/,
+        replacement: fileURLToPath(new URL('./app/$1', import.meta.url)),
+    },
+    {
         find: /^#app\/composables\/.+$/,
         replacement: fileURLToPath(new URL('./node_modules/nuxt/dist/app/composables/index.js', import.meta.url)),
     },
@@ -55,13 +63,22 @@ export default defineConfig({
         alias: nuxtTestAliases,
     },
     test: {
+        clearMocks: true,
+        restoreMocks: true,
+        unstubGlobals: true,
         projects: [
             {
+                resolve: {
+                    alias: nuxtTestAliases,
+                },
                 test: {
                     name: 'unit',
                     include: ['test/unit/**/*.{test,spec}.ts'],
                     environment: 'node',
                     setupFiles: ['test/setup.ts'],
+                    clearMocks: true,
+                    restoreMocks: true,
+                    unstubGlobals: true,
                 },
             },
             await defineVitestProject({
@@ -74,6 +91,9 @@ export default defineConfig({
                     include: ['test/nuxt/**/*.{test,spec}.ts'],
                     environment: 'nuxt',
                     setupFiles: ['test/setup.ts'],
+                    clearMocks: true,
+                    restoreMocks: true,
+                    unstubGlobals: true,
                     environmentOptions: {
                         nuxt: {
                             domEnvironment: 'happy-dom',

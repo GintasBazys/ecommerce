@@ -78,6 +78,27 @@ describe('useProductPrice', () => {
         expect(price.taxLabel.value).toBe('Incl. €21.00 tax')
     })
 
+    it('shows original price only when it is higher than the displayed price', () => {
+        const selectedVariant = ref<ProductVariantDTO | null>(
+            createVariant({
+                calculated_amount: 75,
+                calculated_amount_with_tax: 90,
+                original_amount: 120
+            })
+        )
+        const price = getProductPrice(selectedVariant)
+
+        expect(price.originalPrice.value).toBe('€120.00')
+
+        selectedVariant.value = createVariant({
+            calculated_amount: 75,
+            calculated_amount_with_tax: 90,
+            original_amount: 80
+        })
+
+        expect(price.originalPrice.value).toBe('')
+    })
+
     it('falls back to calculated amount when amount with tax is missing', () => {
         const selectedVariant = ref<ProductVariantDTO | null>(
             createVariant({

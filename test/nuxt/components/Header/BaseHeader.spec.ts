@@ -1,8 +1,6 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
 import type { CartDTO, CustomerDTO, RegionDTO } from '@medusajs/types'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick } from 'vue'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { clearNuxtData } from '#app'
 
 import BaseHeader from '~/components/Header/BaseHeader.vue'
@@ -10,6 +8,8 @@ import { useCartStore } from '~/stores/cart'
 import { useCustomerStore } from '~/stores/customer'
 import { useProductStore } from '~/stores/product'
 import { useRegionStore } from '~/stores/region'
+import { flushNuxtUpdates } from "~~/test/utils/async"
+import { cleanupMountedWrappers, trackWrapper } from "~~/test/utils/dom"
 
 type AnnouncementMessage = {
     id: string
@@ -89,16 +89,9 @@ function seedHeaderStores(options: HeaderStoreOptions = {}): void {
 async function mountHeader() {
     clearNuxtData('announcement-bar-messages')
 
-    return await mountSuspended(BaseHeader, {
+    return trackWrapper(await mountSuspended(BaseHeader, {
         route: '/'
-    })
-}
-
-async function flushAsyncUpdates(): Promise<void> {
-    await nextTick()
-    await flushPromises()
-    await nextTick()
-    await flushPromises()
+    }))
 }
 
 describe('BaseHeader', () => {
@@ -108,6 +101,11 @@ describe('BaseHeader', () => {
         }
 
         seedHeaderStores()
+    })
+
+    afterEach(() => {
+        cleanupMountedWrappers()
+        document.documentElement.style.removeProperty('--site-header-offset')
     })
 
     it('renders the commerce logo and primary navigation links', async () => {
@@ -124,7 +122,7 @@ describe('BaseHeader', () => {
         expect(wrapper.find('a[href="/category/new-arrivals"]').exists()).toBe(false)
 
         await wrapper.get('button[aria-controls="catalog-menu"]').trigger('click')
-        await flushAsyncUpdates()
+        await flushNuxtUpdates()
 
         expect(wrapper.get('#catalog-menu').text()).toContain('Shop by category')
         expect(wrapper.get('a[href="/category/new-arrivals"]').text()).toContain('New arrivals')
@@ -197,12 +195,12 @@ describe('BaseHeader', () => {
             expect(wrapper.text()).toContain('Free delivery on orders over 50 EUR')
 
             vi.advanceTimersByTime(5000)
-            await flushAsyncUpdates()
+            await flushNuxtUpdates()
 
             expect(wrapper.text()).toContain('Members save more this week')
 
             vi.advanceTimersByTime(5000)
-            await flushAsyncUpdates()
+            await flushNuxtUpdates()
 
             expect(wrapper.text()).toContain('Free delivery on orders over 50 EUR')
         } finally {

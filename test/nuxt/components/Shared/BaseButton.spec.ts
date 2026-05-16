@@ -1,4 +1,4 @@
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { mount } from '@vue/test-utils'
 import type { VueWrapper } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -9,12 +9,11 @@ type BaseButtonExposed = {
 }
 
 async function mountButton(props: Record<string, unknown> = {}, slot = 'Add to cart'): Promise<VueWrapper> {
-    return await mountSuspended(BaseButton, {
+    return mount(BaseButton, {
         props,
         slots: {
             default: slot
-        },
-        route: '/'
+        }
     })
 }
 

@@ -1,44 +1,29 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
-import type { VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { nextTick } from 'vue'
 import { clearNuxtState } from '#app'
 
 import AppSnackbar from '~/components/Shared/AppSnackbar.vue'
 import { useSnackbar } from '~/composables/shared/useSnackbar'
-
-const mountedWrappers: VueWrapper[] = []
+import { flushNuxtUpdates } from "~~/test/utils/async"
+import { cleanupDocumentBody, cleanupMountedWrappers, getBodyElement, trackWrapper } from "~~/test/utils/dom"
 
 async function mountSnackbar(): Promise<void> {
     const wrapper = await mountSuspended(AppSnackbar, {
         route: '/'
     })
 
-    mountedWrappers.push(wrapper)
-}
-
-async function flushSnackbarUpdates(): Promise<void> {
-    await nextTick()
-    await flushPromises()
-    await nextTick()
+    trackWrapper(wrapper)
 }
 
 async function showMountedSnackbar(message: string, tone: 'success' | 'error' | 'info' = 'info'): Promise<void> {
     const { showSnackbar } = useSnackbar()
 
     showSnackbar(message, tone, 30000)
-    await flushSnackbarUpdates()
+    await flushNuxtUpdates()
 }
 
 function getSnackbarElement(): HTMLElement {
-    const element = document.body.querySelector<HTMLElement>('[role="status"], [role="alert"]')
-
-    if (!element) {
-        throw new Error('Snackbar was not found')
-    }
-
-    return element
+    return getBodyElement('[role="status"], [role="alert"]', 'Snackbar')
 }
 
 function getDismissButton(): HTMLButtonElement {
@@ -62,8 +47,8 @@ describe('AppSnackbar', () => {
         const { closeSnackbar } = useSnackbar()
 
         closeSnackbar()
-        mountedWrappers.splice(0).forEach((wrapper) => wrapper.unmount())
-        document.body.innerHTML = ''
+        cleanupMountedWrappers()
+        cleanupDocumentBody()
     })
 
     it('renders a prominent success notification', async () => {
@@ -107,7 +92,7 @@ describe('AppSnackbar', () => {
         await showMountedSnackbar('Cart was updated.', 'success')
 
         getDismissButton().click()
-        await flushSnackbarUpdates()
+        await flushNuxtUpdates()
 
         expect(document.body.textContent).not.toContain('Cart was updated.')
     })
