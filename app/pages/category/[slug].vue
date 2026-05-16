@@ -3,6 +3,7 @@ import type { ProductCategoryDTO } from "@medusajs/types"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { CategoryImage } from "~/types/category-listing"
 
+import CategoryFilterChips from "~/components/Category/CategoryFilterChips.vue"
 import CategoryFiltersPanel from "~/components/Category/CategoryFiltersPanel.vue"
 import CategoryPagination from "~/components/Category/CategoryPagination.vue"
 import CategoryResultsGrid from "~/components/Category/CategoryResultsGrid.vue"
@@ -60,6 +61,7 @@ const {
     totalPages,
     offset,
     activeFilterCount,
+    activeFilterChips,
     childCategoryFacets,
     hasFacetedQuery,
     gridIsInitialLoading,
@@ -69,7 +71,8 @@ const {
     applyQueryStateFromRoute,
     resetCategoryPageState,
     fetchProducts,
-    clearAllFilters
+    clearAllFilters,
+    removeFilterChip
 } = useCategoryListing({
     category,
     isAllProductsPage,
@@ -412,6 +415,13 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         :active-filter-count="activeFilterCount"
                         :sort-options="sortOptions"
                         @open-filters="isMobileFilterDrawerOpen = true"
+                    />
+
+                    <CategoryFilterChips
+                        :chips="activeFilterChips"
+                        :active-filter-count="activeFilterCount"
+                        @remove="removeFilterChip"
+                        @clear-all="clearAllFilters"
                     />
 
                     <CategoryResultsGrid

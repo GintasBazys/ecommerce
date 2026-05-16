@@ -49,3 +49,10 @@ export type CategoryFilterSection = {
 }
 
 export type CategorySelectionGroup = "child" | "collection" | "type" | "tag"
+
+export type ActiveCategoryFilterChip = {
+    id: string
+    group: CategorySelectionGroup | "price" | "stock"
+    label: string
+    value?: string
+}

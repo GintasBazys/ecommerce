@@ -145,5 +145,4 @@ Notes:
 - Buy-again/reorder from account orders.
 - Payment methods in account.
 - Better order lookup by display order number plus email/postal verification.
-- Selected filter chips on listing pages.
 - Search refinement: sort, filters, total count, pagination/load-more.

@@ -3,13 +3,17 @@ import type { Ref } from "vue"
 import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from "vue-router"
 
 import type {
+    ActiveCategoryFilterChip,
     CategoryPriceRange,
     CategoryProductsFacets,
     CategoryProductsResponse,
+    CategorySelectionGroup,
     CategorySortOption,
     FacetItem
 } from "~/types/category-listing"
 import { useCategoryListingPagination } from "~/composables/category/useCategoryListingPagination"
+import { DEFAULT_CURENCY } from "~/utils/consts"
+import { formatPrice } from "~/utils/formatPrice"
 
 type FetchSource = "initial" | "sort" | "filters" | "pagination"
 
@@ -129,6 +133,31 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
     const childCategoryFacets = computed<FacetItem[]>(() =>
         facets.value.categories.filter((item) => directChildCategoryIds.value.includes(item.id))
     )
+
+    const currencyCode = computed<string>(() => priceRange.value.currencyCode?.toUpperCase() || DEFAULT_CURENCY)
+
+    const activeFilterChips = computed<ActiveCategoryFilterChip[]>(() => {
+        const chips: ActiveCategoryFilterChip[] = []
+
+        chips.push(
+            ...buildFacetChips(selectedChildCategoryIds.value, facets.value.categories, "child", "Category"),
+            ...buildFacetChips(selectedTypeIds.value, facets.value.types, "type", "Type"),
+            ...buildFacetChips(selectedCollectionIds.value, facets.value.collections, "collection", "Collection"),
+            ...buildFacetChips(selectedTagIds.value, facets.value.tags, "tag", "Tag")
+        )
+
+        if (inStockOnly.value) {
+            chips.push({ id: "stock", group: "stock", label: "In stock" })
+        }
+
+        const priceLabel = buildPriceChipLabel()
+
+        if (priceLabel) {
+            chips.push({ id: "price", group: "price", label: priceLabel })
+        }
+
+        return chips
+    })
 
     const hasFacetedQuery = computed<boolean>(() => activeFilterCount.value > 0 || sortOption.value !== categorySortOptions[0]!.value)
 
@@ -303,6 +332,72 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         inStockOnly.value = false
     }
 
+    function buildFacetChips(
+        selectedIds: string[],
+        facetItems: FacetItem[],
+        group: CategorySelectionGroup,
+        fallbackLabel: string
+    ): ActiveCategoryFilterChip[] {
+        const labelsById = new Map(facetItems.map((item) => [item.id, item.label]))
+
+        return selectedIds.map((id) => ({
+            id: `${group}-${id}`,
+            group,
+            value: id,
+            label: labelsById.get(id) || `Selected ${fallbackLabel.toLowerCase()}`
+        }))
+    }
+
+    function buildPriceChipLabel(): string | null {
+        if (selectedMinPrice.value === null && selectedMaxPrice.value === null) {
+            return null
+        }
+
+        if (selectedMinPrice.value !== null && selectedMaxPrice.value !== null) {
+            return `Price: ${formatPrice(selectedMinPrice.value, currencyCode.value)} - ${formatPrice(selectedMaxPrice.value, currencyCode.value)}`
+        }
+
+        if (selectedMinPrice.value !== null) {
+            return `Price: from ${formatPrice(selectedMinPrice.value, currencyCode.value)}`
+        }
+
+        return `Price: up to ${formatPrice(selectedMaxPrice.value ?? 0, currencyCode.value)}`
+    }
+
+    function removeFilterChip(chip: ActiveCategoryFilterChip): void {
+        if (chip.group === "price") {
+            selectedMinPrice.value = null
+            selectedMaxPrice.value = null
+            return
+        }
+
+        if (chip.group === "stock") {
+            inStockOnly.value = false
+            return
+        }
+
+        if (!chip.value) {
+            return
+        }
+
+        if (chip.group === "child") {
+            selectedChildCategoryIds.value = selectedChildCategoryIds.value.filter((id) => id !== chip.value)
+            return
+        }
+
+        if (chip.group === "collection") {
+            selectedCollectionIds.value = selectedCollectionIds.value.filter((id) => id !== chip.value)
+            return
+        }
+
+        if (chip.group === "type") {
+            selectedTypeIds.value = selectedTypeIds.value.filter((id) => id !== chip.value)
+            return
+        }
+
+        selectedTagIds.value = selectedTagIds.value.filter((id) => id !== chip.value)
+    }
+
     watch(sortOption, async () => {
         if (isApplyingQueryState.value || isChangingCategoryPage.value) {
             return
@@ -387,6 +482,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         totalPages,
         offset,
         activeFilterCount,
+        activeFilterChips,
         childCategoryFacets,
         hasFacetedQuery,
         gridIsInitialLoading,
@@ -396,6 +492,7 @@ export function useCategoryListing({ category, isAllProductsPage, regionStoreId,
         applyQueryStateFromRoute,
         resetCategoryPageState,
         fetchProducts,
-        clearAllFilters
+        clearAllFilters,
+        removeFilterChip
     }
 }

@@ -9,6 +9,13 @@ const props = defineProps<{
     priceRange: CategoryPriceRange
 }>()
 
+type PricePreset = {
+    id: string
+    label: string
+    min: number | null
+    max: number | null
+}
+
 const selectedMinPrice = defineModel<number | null>("selectedMinPrice", { default: null })
 const selectedMaxPrice = defineModel<number | null>("selectedMaxPrice", { default: null })
 
@@ -17,12 +24,66 @@ const minBound = computed<number | null>(() => props.priceRange.min)
 const maxBound = computed<number | null>(() => props.priceRange.max)
 const hasPriceBounds = computed<boolean>(() => minBound.value !== null && maxBound.value !== null)
 const hasSelectedPrice = computed<boolean>(() => selectedMinPrice.value !== null || selectedMaxPrice.value !== null)
+const selectedPriceLabel = computed<string>(() => {
+    if (selectedMinPrice.value !== null && selectedMaxPrice.value !== null) {
+        return `${formatPrice(selectedMinPrice.value, currencyCode.value)} to ${formatPrice(selectedMaxPrice.value, currencyCode.value)}`
+    }
+
+    if (selectedMinPrice.value !== null) {
+        return `From ${formatPrice(selectedMinPrice.value, currencyCode.value)}`
+    }
+
+    if (selectedMaxPrice.value !== null) {
+        return `Up to ${formatPrice(selectedMaxPrice.value, currencyCode.value)}`
+    }
+
+    return "No price limit selected"
+})
 const priceRangeLabel = computed<string>(() => {
     if (!hasPriceBounds.value || minBound.value === null || maxBound.value === null) {
         return "Price range is unavailable for these products."
     }
 
     return `${formatPrice(minBound.value, currencyCode.value)} to ${formatPrice(maxBound.value, currencyCode.value)}`
+})
+const pricePresets = computed<PricePreset[]>(() => {
+    if (!hasPriceBounds.value || minBound.value === null || maxBound.value === null) {
+        return []
+    }
+
+    const span = maxBound.value - minBound.value
+
+    if (span < 3) {
+        return []
+    }
+
+    const firstBreak = Math.floor(minBound.value + span / 3)
+    const secondBreak = Math.ceil(minBound.value + (span * 2) / 3)
+
+    if (firstBreak <= minBound.value || secondBreak >= maxBound.value || firstBreak >= secondBreak) {
+        return []
+    }
+
+    return [
+        {
+            id: "price-low",
+            label: `Under ${formatPrice(firstBreak, currencyCode.value)}`,
+            min: null,
+            max: firstBreak
+        },
+        {
+            id: "price-mid",
+            label: `${formatPrice(firstBreak, currencyCode.value)} - ${formatPrice(secondBreak, currencyCode.value)}`,
+            min: firstBreak,
+            max: secondBreak
+        },
+        {
+            id: "price-high",
+            label: `Over ${formatPrice(secondBreak, currencyCode.value)}`,
+            min: secondBreak,
+            max: null
+        }
+    ]
 })
 
 function parseInputValue(event: Event): number | null {
@@ -45,6 +106,15 @@ function updateMaxPrice(event: Event): void {
 function clearPriceRange(): void {
     selectedMinPrice.value = null
     selectedMaxPrice.value = null
+}
+
+function applyPreset(preset: PricePreset): void {
+    selectedMinPrice.value = preset.min
+    selectedMaxPrice.value = preset.max
+}
+
+function isPresetSelected(preset: PricePreset): boolean {
+    return selectedMinPrice.value === preset.min && selectedMaxPrice.value === preset.max
 }
 </script>
 
@@ -85,36 +155,38 @@ function clearPriceRange(): void {
             </label>
         </div>
 
-        <div v-if="hasPriceBounds" class="grid gap-3" aria-label="Price range sliders">
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                <span>Minimum slider</span>
-                <input
-                    :value="selectedMinPrice ?? minBound"
-                    type="range"
-                    :min="minBound ?? 0"
-                    :max="selectedMaxPrice ?? maxBound ?? 0"
-                    step="1"
-                    class="h-11 w-full accent-brand-700"
-                    @input="updateMinPrice"
-                />
-            </label>
-
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                <span>Maximum slider</span>
-                <input
-                    :value="selectedMaxPrice ?? maxBound"
-                    type="range"
-                    :min="selectedMinPrice ?? minBound ?? 0"
-                    :max="maxBound ?? 0"
-                    step="1"
-                    class="h-11 w-full accent-brand-700"
-                    @input="updateMaxPrice"
-                />
-            </label>
+        <div v-if="pricePresets.length" class="grid gap-3" aria-label="Quick price filters">
+            <span class="text-sm font-semibold text-slate-700">Popular price ranges</span>
+            <div class="grid gap-2">
+                <BaseButton
+                    v-for="preset in pricePresets"
+                    :key="preset.id"
+                    type="button"
+                    class="inline-flex min-h-11 items-center justify-between rounded-2xl border px-4 text-left text-sm font-bold transition focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
+                    :class="
+                        isPresetSelected(preset)
+                            ? 'border-brand-200 bg-brand-50 text-brand-800 shadow-inner'
+                            : 'border-slate-200 bg-white text-slate-800 shadow-inner hover:border-brand-200 hover:text-brand-800'
+                    "
+                    :aria-pressed="isPresetSelected(preset)"
+                    @click="applyPreset(preset)"
+                >
+                    <span>{{ preset.label }}</span>
+                    <span
+                        v-if="isPresetSelected(preset)"
+                        class="ml-3 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white"
+                        aria-hidden="true"
+                    >
+                        <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" stroke="currentColor" stroke-width="2">
+                            <path d="M5 10.5L8.5 14L15 6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </BaseButton>
+            </div>
         </div>
 
         <div v-if="hasSelectedPrice" class="flex items-center justify-between gap-3 rounded-2xl bg-brand-50 px-3 py-2">
-            <span class="text-sm font-semibold text-brand-800">Price filter active</span>
+            <span class="text-sm font-semibold text-brand-800">{{ selectedPriceLabel }}</span>
             <BaseButton
                 type="button"
                 class="inline-flex min-h-9 items-center rounded-full border border-brand-100 bg-white px-3 text-xs font-bold text-brand-800 transition hover:border-brand-200 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
