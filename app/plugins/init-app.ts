@@ -26,15 +26,16 @@ export default defineNuxtPlugin(async () => {
     const cartStore = useCartStore()
     const regionStore = useRegionStore()
     const wishlistStore = useWishlistStore()
+    const customerStore = useCustomerStore()
 
     if (!import.meta.server) {
-        if (import.meta.client && regionStore.regionStoreId && !cartStore.cart) {
+        if (import.meta.client && regionStore.regionStoreId) {
             window.setTimeout(() => {
                 if (!cartStore.cart) {
                     void cartStore.loadCart()
                 }
 
-                if (useCustomerStore().isAuthenticated) {
+                if (customerStore.isAuthenticated) {
                     void wishlistStore.loadWishlist()
                 }
             }, 1)
@@ -45,7 +46,6 @@ export default defineNuxtPlugin(async () => {
 
     const config = useRuntimeConfig()
     const productStore = useProductStore()
-    const customerStore = useCustomerStore()
 
     const requestFetch = useRequestFetch()
     const requestHeaders = useRequestHeaders(["cookie"])
