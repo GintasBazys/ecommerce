@@ -120,12 +120,12 @@ function isPresetSelected(preset: PricePreset): boolean {
 
 <template>
     <div class="grid gap-4">
-        <p class="text-sm leading-6 text-slate-600">
+        <p class="min-w-0 break-words text-sm leading-6 text-slate-600">
             Available prices: {{ priceRangeLabel }}
         </p>
 
-        <div class="grid gap-3 sm:grid-cols-2">
-            <label class="grid gap-1 text-sm font-semibold text-slate-700">
+        <div class="grid min-w-0 gap-3 sm:grid-cols-2">
+            <label class="grid min-w-0 gap-1 text-sm font-semibold text-slate-700">
                 <span>Minimum price</span>
                 <input
                     :value="selectedMinPrice ?? ''"
@@ -134,13 +134,13 @@ function isPresetSelected(preset: PricePreset): boolean {
                     min="0"
                     :max="selectedMaxPrice ?? maxBound ?? undefined"
                     placeholder="No minimum"
-                    class="min-h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-950 shadow-inner outline-hidden transition focus:border-brand-300 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-100 disabled:text-slate-500"
+                    class="min-h-11 min-w-0 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-950 shadow-inner outline-hidden transition focus:border-brand-300 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-100 disabled:text-slate-500"
                     :disabled="!hasPriceBounds"
                     @input="updateMinPrice"
                 />
             </label>
 
-            <label class="grid gap-1 text-sm font-semibold text-slate-700">
+            <label class="grid min-w-0 gap-1 text-sm font-semibold text-slate-700">
                 <span>Maximum price</span>
                 <input
                     :value="selectedMaxPrice ?? ''"
@@ -148,7 +148,7 @@ function isPresetSelected(preset: PricePreset): boolean {
                     inputmode="numeric"
                     :min="selectedMinPrice ?? minBound ?? 0"
                     placeholder="No maximum"
-                    class="min-h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-950 shadow-inner outline-hidden transition focus:border-brand-300 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-100 disabled:text-slate-500"
+                    class="min-h-11 min-w-0 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-950 shadow-inner outline-hidden transition focus:border-brand-300 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-100 disabled:text-slate-500"
                     :disabled="!hasPriceBounds"
                     @input="updateMaxPrice"
                 />
@@ -162,7 +162,7 @@ function isPresetSelected(preset: PricePreset): boolean {
                     v-for="preset in pricePresets"
                     :key="preset.id"
                     type="button"
-                    class="inline-flex min-h-11 items-center justify-between rounded-2xl border px-4 text-left text-sm font-bold transition focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
+                    class="inline-flex min-h-11 min-w-0 items-center justify-between rounded-2xl border px-4 text-left text-sm font-bold transition focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"
                     :class="
                         isPresetSelected(preset)
                             ? 'border-brand-200 bg-brand-50 text-brand-800 shadow-inner'
@@ -171,7 +171,7 @@ function isPresetSelected(preset: PricePreset): boolean {
                     :aria-pressed="isPresetSelected(preset)"
                     @click="applyPreset(preset)"
                 >
-                    <span>{{ preset.label }}</span>
+                    <span class="min-w-0 break-words">{{ preset.label }}</span>
                     <span
                         v-if="isPresetSelected(preset)"
                         class="ml-3 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white"
@@ -185,8 +185,8 @@ function isPresetSelected(preset: PricePreset): boolean {
             </div>
         </div>
 
-        <div v-if="hasSelectedPrice" class="flex items-center justify-between gap-3 rounded-2xl bg-brand-50 px-3 py-2">
-            <span class="text-sm font-semibold text-brand-800">{{ selectedPriceLabel }}</span>
+        <div v-if="hasSelectedPrice" class="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-2xl bg-brand-50 px-3 py-2">
+            <span class="min-w-0 break-words text-sm font-semibold text-brand-800">{{ selectedPriceLabel }}</span>
             <BaseButton
                 type="button"
                 class="inline-flex min-h-9 items-center rounded-full border border-brand-100 bg-white px-3 text-xs font-bold text-brand-800 transition hover:border-brand-200 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-hidden"

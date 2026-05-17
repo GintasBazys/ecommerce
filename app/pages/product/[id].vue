@@ -11,6 +11,7 @@ import { useProductPageData } from "~/composables/product/useProductPageData"
 import { useProductPageSchema } from "~/composables/product/useProductPageSchema"
 import { useProductPrice } from "~/composables/product/useProductPrice"
 import { useProductReviews } from "~/composables/product/useProductReviews"
+import { useRecentlyViewedProducts } from "~/composables/product/useRecentlyViewedProducts"
 import { useSiteIdentity } from "~/composables/shared/useStructuredData"
 
 const route = useRoute()
@@ -49,6 +50,12 @@ const {
     regionStoreId,
     selectedCountryCode,
     absoluteUrl
+})
+
+const { recentlyViewedProducts, recentlyViewedPending, recentlyViewedError, refreshRecentlyViewedProducts } = useRecentlyViewedProducts({
+    product,
+    regionStoreId,
+    selectedCountryCode
 })
 
 const selectedVariantId = ref<string | null>(null)
@@ -278,6 +285,13 @@ onUnmounted(() => {
                         :pending="relatedPending"
                         :error="Boolean(relatedError)"
                         @retry="refreshRelatedProducts"
+                    />
+
+                    <ProductPageRecentlyViewed
+                        :products="recentlyViewedProducts"
+                        :pending="recentlyViewedPending"
+                        :error="Boolean(recentlyViewedError)"
+                        @retry="refreshRecentlyViewedProducts"
                     />
                 </div>
             </div>

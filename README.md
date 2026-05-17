@@ -137,7 +137,6 @@ Notes:
 
 ## TODO
 
-- Recently viewed products.
 - Back-in-stock notifications.
 - Product comparison.
 - Returns/RMA portal.
