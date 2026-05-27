@@ -10,6 +10,7 @@ import {
     mergeCookieHeader,
     toUpstreamError
 } from "#server/utils/medusa-proxy"
+import { verifyTurnstileToken } from "#server/utils/turnstile"
 import { canTrackServerAnalytics, useServerPostHog } from "../../utils/posthog"
 
 type LoginBody = {
@@ -24,11 +25,6 @@ type AuthTokenResponse = {
 
 type CustomerResponse = {
     customer?: CustomerDTO | null
-}
-
-type TurnstileVerificationResponse = {
-    success: boolean
-    action?: string
 }
 
 type HandledError = {
@@ -73,49 +69,7 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        const runtimeConfig = useRuntimeConfig(event)
-        const turnstileSecretKey =
-            (typeof runtimeConfig.turnstileSecretKey === "string" ? runtimeConfig.turnstileSecretKey : "") ||
-            process.env.NUXT_TURNSTILE_SECRET_KEY ||
-            process.env.TURNSTILE_SECRET_KEY ||
-            ""
-
-        if (!turnstileSecretKey) {
-            throw createError({
-                statusCode: 500,
-                statusMessage: "Turnstile secret key is missing. Set NUXT_TURNSTILE_SECRET_KEY and restart the Nuxt server."
-            })
-        }
-
-        const remoteIp =
-            getHeader(event, "cf-connecting-ip") ||
-            getHeader(event, "x-forwarded-for")?.split(",")[0]?.trim() ||
-            getRequestIP(event, { xForwardedFor: true }) ||
-            undefined
-
-        const verificationBody = new URLSearchParams({
-            secret: turnstileSecretKey,
-            response: turnstileToken
-        })
-
-        if (remoteIp) {
-            verificationBody.set("remoteip", remoteIp)
-        }
-
-        const verificationResponse = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-            method: "POST",
-            body: verificationBody
-        })
-
-        if (!verificationResponse.ok) {
-            throw createError({ statusCode: 502, statusMessage: "Security verification failed" })
-        }
-
-        const verificationResult = (await verificationResponse.json()) as TurnstileVerificationResponse
-
-        if (!verificationResult.success || (verificationResult.action && !ALLOWED_TURNSTILE_ACTIONS.has(verificationResult.action))) {
-            throw createError({ statusCode: 400, statusMessage: "Security verification failed" })
-        }
+        await verifyTurnstileToken(event, turnstileToken, ALLOWED_TURNSTILE_ACTIONS)
 
         const tokenData = await fetchMedusaJson<AuthTokenResponse>(event, "/auth/customer/emailpass", {
             method: "POST",

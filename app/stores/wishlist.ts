@@ -1,6 +1,44 @@
 import type { ProductDTO } from "@medusajs/types"
 import type { WishlistItem, WishlistMutationResponse, WishlistResponse } from "~/types/wishlist"
 
+type FetchErrorLike = {
+    status?: unknown
+    statusCode?: unknown
+    response?: {
+        status?: unknown
+    }
+    data?: {
+        statusCode?: unknown
+        statusMessage?: unknown
+        message?: unknown
+    }
+    message?: unknown
+}
+
+function isFetchErrorLike(error: unknown): error is FetchErrorLike {
+    return typeof error === "object" && error !== null
+}
+
+function getErrorStatus(error: unknown): number | undefined {
+    if (!isFetchErrorLike(error)) {
+        return undefined
+    }
+
+    const status = error.status ?? error.statusCode ?? error.response?.status ?? error.data?.statusCode
+
+    return typeof status === "number" ? status : undefined
+}
+
+function getErrorMessage(error: unknown): string {
+    if (!isFetchErrorLike(error)) {
+        return "Unknown error"
+    }
+
+    const message = error.data?.statusMessage ?? error.data?.message ?? error.message
+
+    return typeof message === "string" && message.trim() ? message : "Unknown error"
+}
+
 export const useWishlistStore = defineStore("wishlist", () => {
     const items = ref<WishlistItem[]>([])
     const loading = ref<boolean>(false)
@@ -54,8 +92,14 @@ export const useWishlistStore = defineStore("wishlist", () => {
             })
 
             items.value = response.wishlist.items ?? []
-        } catch (error) {
-            console.error("Failed to load wishlist", error)
+        } catch (error: unknown) {
+            if (getErrorStatus(error) !== 401) {
+                console.error("Failed to load wishlist", {
+                    status: getErrorStatus(error),
+                    message: getErrorMessage(error)
+                })
+            }
+
             items.value = []
         } finally {
             loading.value = false

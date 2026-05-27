@@ -177,7 +177,7 @@ async function handleReset(): Promise<void> {
             body: JSON.stringify({ email: resetEmail.value })
         })
 
-        successMessage.value = "Password reset email sent"
+        successMessage.value = "If an account exists, password reset instructions will be sent."
         showSnackbar(successMessage.value, "success")
 
         showResetDialog.value = false

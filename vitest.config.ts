@@ -28,6 +28,10 @@ const nuxtTestAliases = [
         replacement: fileURLToPath(new URL('./app/$1', import.meta.url)),
     },
     {
+        find: /^#server\/(.*)$/,
+        replacement: fileURLToPath(new URL('./server/$1', import.meta.url)),
+    },
+    {
         find: /^#app\/composables\/.+$/,
         replacement: fileURLToPath(new URL('./node_modules/nuxt/dist/app/composables/index.js', import.meta.url)),
     },

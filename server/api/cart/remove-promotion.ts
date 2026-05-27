@@ -1,6 +1,7 @@
-export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
+import { assertCartOwnership } from "#server/utils/cart"
+import { fetchMedusaJson } from "#server/utils/medusa-proxy"
 
+export default defineEventHandler(async (event) => {
     const body = await readBody<{
         cartId: string
         promo_codes: string[]
@@ -21,18 +22,17 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const headers = {
-        "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-        "Content-Type": "application/json"
-    }
+    const trustedCartId = assertCartOwnership(event, cartId)
 
-    await $fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/promotions`, {
-        method: "DELETE",
-        headers,
-        body: {
-            promo_codes
-        }
-    })
+    await fetchMedusaJson(
+        event,
+        `/store/carts/${trustedCartId}/promotions`,
+        {
+            method: "DELETE",
+            body: JSON.stringify({ promo_codes })
+        },
+        "Could not remove this promotion."
+    )
 
     return { success: true }
 })

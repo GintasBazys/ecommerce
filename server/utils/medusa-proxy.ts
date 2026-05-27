@@ -6,6 +6,10 @@ type ErrorPayload = {
     details?: string
 }
 
+type UpstreamError = ErrorWithCode & {
+    upstreamMessage?: string
+}
+
 type MedusaRequestOptions = Omit<RequestInit, "headers"> & {
     headers?: HeadersInit
     includePublishableKey?: boolean
@@ -120,8 +124,17 @@ function isHandledError(error: unknown): error is ErrorWithCode {
     return typeof error === "object" && error !== null && ("statusCode" in error || "statusMessage" in error)
 }
 
-function getErrorMessage(payload: ErrorPayload | null, fallbackMessage: string, response: Response) {
-    return payload?.message || payload?.error || payload?.details || `${fallbackMessage}: ${response.status} ${response.statusText}`
+function getUpstreamMessage(payload: ErrorPayload | null, response: Response) {
+    return payload?.message || payload?.error || payload?.details || `${response.status} ${response.statusText}`
+}
+
+function logMedusaError(response: Response, fallbackMessage: string, upstreamMessage: string) {
+    console.error("Medusa request failed", {
+        status: response.status,
+        statusText: response.statusText,
+        fallbackMessage,
+        upstreamMessage
+    })
 }
 
 export function toUpstreamError(error: unknown, fallbackMessage: string) {
@@ -145,11 +158,17 @@ export async function assertMedusaResponse(response: Response, fallbackMessage: 
     }
 
     const payload = await safeJson<ErrorPayload>(response)
+    const upstreamMessage = getUpstreamMessage(payload, response)
 
-    throw createError({
+    logMedusaError(response, fallbackMessage, upstreamMessage)
+
+    const error = createError({
         statusCode: response.status,
-        statusMessage: getErrorMessage(payload, fallbackMessage, response)
-    })
+        statusMessage: fallbackMessage
+    }) as UpstreamError
+
+    error.upstreamMessage = upstreamMessage
+    throw error
 }
 
 export async function fetchMedusaResponse(event: H3Event, path: string, options: MedusaRequestOptions = {}) {
@@ -163,9 +182,9 @@ export async function fetchMedusaResponse(event: H3Event, path: string, options:
     }
 }
 
-export async function fetchMedusaJson<T>(event: H3Event, path: string, options: MedusaRequestOptions = {}) {
+export async function fetchMedusaJson<T>(event: H3Event, path: string, options: MedusaRequestOptions = {}, fallbackMessage = "Medusa request failed") {
     const response = await fetchMedusaResponse(event, path, options)
-    await assertMedusaResponse(response, "Medusa request failed")
+    await assertMedusaResponse(response, fallbackMessage)
 
     const payload = await safeJson<T>(response)
     if (payload === null) {

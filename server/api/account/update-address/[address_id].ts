@@ -1,3 +1,5 @@
+import { fetchMedusaJson } from "#server/utils/medusa-proxy"
+
 export default defineEventHandler(async (event) => {
     const accessToken = getCookie(event, "connect.sid")
     if (!accessToken) {
@@ -5,20 +7,16 @@ export default defineEventHandler(async (event) => {
     }
 
     const { address_id } = event.context.params as { address_id: string }
-    const config = useRuntimeConfig()
-
-    const headers = {
-        Authorization: `Bearer ${accessToken}`,
-        "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-        "Content-Type": "application/json",
-        cookie: event.node.req.headers.cookie || ""
-    }
 
     const body = validateCustomerAddressPayload(await readBody(event))
-    return $fetch(`${config.public.MEDUSA_URL}/store/customers/me/addresses/${address_id}`, {
-        method: "POST",
-        headers,
-        body,
-        credentials: "include"
-    })
+    return fetchMedusaJson(
+        event,
+        `/store/customers/me/addresses/${address_id}`,
+        {
+            method: "POST",
+            headers: { Authorization: `Bearer ${accessToken}` },
+            body: JSON.stringify(body)
+        },
+        "Could not update this address."
+    )
 })

@@ -1,4 +1,5 @@
-import type { FetchError } from "ofetch"
+import { assertCartOwnership, getSessionCartId } from "#server/utils/cart"
+import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 interface GuestBody {
     email: string
@@ -10,41 +11,40 @@ interface GuestBody {
 export default defineEventHandler(async (event) => {
     const body = await readBody<GuestBody>(event)
 
-    const cookies = parseCookies(event)
-    const cartId = cookies.cart_id || cookies.cartId
+    const cartId = getSessionCartId(event)
     if (!cartId) {
         throw createError({ statusCode: 400, statusMessage: "Cart ID not found in cookies" })
     }
 
-    const config = useRuntimeConfig()
+    const trustedCartId = assertCartOwnership(event, cartId)
 
     try {
-        return await $fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}`, {
-            method: "POST",
-            headers: {
-                "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-                "Content-Type": "application/json"
+        return await fetchMedusaJson(
+            event,
+            `/store/carts/${trustedCartId}`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email: body.email,
+                    additional_data: {
+                        guest: {
+                            first_name: body.first_name,
+                            last_name: body.last_name,
+                            phone: body.phone || ""
+                        }
+                    },
+                    metadata: {
+                        guest: {
+                            first_name: body.first_name,
+                            last_name: body.last_name,
+                            phone: body.phone || ""
+                        }
+                    }
+                })
             },
-            body: {
-                email: body.email,
-                additional_data: {
-                    guest: {
-                        first_name: body.first_name,
-                        last_name: body.last_name,
-                        phone: body.phone || ""
-                    }
-                },
-                metadata: {
-                    guest: {
-                        first_name: body.first_name,
-                        last_name: body.last_name,
-                        phone: body.phone || ""
-                    }
-                }
-            }
-        })
+            "Could not update this cart."
+        )
     } catch (error: unknown) {
-        const err = error as FetchError
-        throw createError({ statusCode: err.statusCode || 500, statusMessage: err.message })
+        throw toUpstreamError(error, "Could not update this cart.")
     }
 })

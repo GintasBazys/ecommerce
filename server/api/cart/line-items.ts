@@ -1,4 +1,4 @@
-import { isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { assertCartOwnership, isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 type CreateLineItemBody = {
@@ -15,14 +15,21 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "cartId, variant_id, and a positive quantity are required" })
     }
 
+    const trustedCartId = assertCartOwnership(event, cartId)
+
     const countryCode = getCookie(event, "country_code") || null
     try {
-        await fetchMedusaJson(event, `/store/carts/${cartId}/line-items`, {
-            method: "POST",
-            body: JSON.stringify({ variant_id, quantity })
-        })
+        await fetchMedusaJson(
+            event,
+            `/store/carts/${trustedCartId}/line-items`,
+            {
+                method: "POST",
+                body: JSON.stringify({ variant_id, quantity })
+            },
+            "Could not update this cart."
+        )
 
-        const updatedCart = await retrieveExpandedCart(event, cartId)
+        const updatedCart = await retrieveExpandedCart(event, trustedCartId)
 
         return {
             success: true,
@@ -30,7 +37,7 @@ export default defineEventHandler(async (event) => {
         }
     } catch (error: unknown) {
         if (isPoisonedPaymentSessionError(error)) {
-            const currentCart = await retrieveExpandedCart(event, cartId)
+            const currentCart = await retrieveExpandedCart(event, trustedCartId)
             const existingItem = (currentCart.items ?? []).find((item) => item.variant_id === variant_id)
             const nextItems = existingItem
                 ? (currentCart.items ?? []).map((item) =>

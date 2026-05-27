@@ -73,7 +73,7 @@ describe('useWishlistStore', () => {
 
     it('clears wishlist and resets loading when loading fails', async () => {
         fetchMock.mockRejectedValueOnce(new Error('Network failed'))
-        vi.spyOn(console, 'error').mockImplementation(() => {})
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
         const store = await createWishlistStore()
         store.items.value = [
             {
@@ -87,6 +87,34 @@ describe('useWishlistStore', () => {
 
         expect(store.items.value).toEqual([])
         expect(store.loading.value).toBe(false)
+        expect(consoleError).toHaveBeenCalledWith('Failed to load wishlist', {
+            status: undefined,
+            message: 'Network failed',
+        })
+    })
+
+    it('silently clears wishlist when the session is unauthenticated', async () => {
+        fetchMock.mockRejectedValueOnce({
+            statusCode: 401,
+            data: {
+                statusMessage: 'Sign in to view your wishlist',
+            },
+        })
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const store = await createWishlistStore()
+        store.items.value = [
+            {
+                id: 'wish_stale',
+                customer_id: 'cus_1',
+                product_id: 'prod_stale',
+            },
+        ]
+
+        await store.loadWishlist()
+
+        expect(store.items.value).toEqual([])
+        expect(store.loading.value).toBe(false)
+        expect(consoleError).not.toHaveBeenCalled()
     })
 
     it('adds products and prepends returned wishlist item', async () => {

@@ -1,36 +1,23 @@
 import { canTrackServerAnalytics, useServerPostHog } from "../../utils/posthog"
-
-function getSetCookies(res: Response): string[] {
-    if (typeof res.headers.getSetCookie === "function") return res.headers.getSetCookie()
-    const single = res.headers.get("set-cookie")
-    return single ? [single] : []
-}
+import { assertCartOwnership } from "#server/utils/cart"
+import { assertMedusaResponse, fetchMedusaResponse, forwardSetCookies, getSetCookieHeaders, safeJson } from "#server/utils/medusa-proxy"
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const { cartId } = await readBody(event)
+    const trustedCartId = assertCartOwnership(event, cartId)
 
-    if (!cartId) throw createError({ statusCode: 400, statusMessage: "Cart ID is required." })
+    const medusaRes = await fetchMedusaResponse(event, `/store/carts/${trustedCartId}/complete`, { method: "POST" })
 
-    const medusaRes = await fetch(`${config.public.MEDUSA_URL}/store/carts/${cartId}/complete`, {
-        method: "POST",
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json",
-            cookie: getHeader(event, "cookie") ?? ""
-        }
-    })
-
-    for (const c of getSetCookies(medusaRes)) appendHeader(event, "set-cookie", c)
-
-    if (!medusaRes.ok) {
-        const errorText = await medusaRes.text().catch(() => "")
-        throw createError({ statusCode: medusaRes.status, statusMessage: `Cart completion failed: ${errorText}` })
-    }
+    forwardSetCookies(event, getSetCookieHeaders(medusaRes))
+    await assertMedusaResponse(medusaRes, "Could not complete this cart.")
 
     deleteCookie(event, "cart_id", { path: "/" })
 
-    const result = await medusaRes.json()
+    const result = await safeJson<{ order?: { id?: string } } & Record<string, unknown>>(medusaRes)
+
+    if (!result) {
+        throw createError({ statusCode: 502, statusMessage: "Could not complete this cart." })
+    }
 
     const sessionId = getHeader(event, "x-posthog-session-id")
     const distinctId = getHeader(event, "x-posthog-distinct-id")
@@ -42,7 +29,7 @@ export default defineEventHandler(async (event) => {
             event: "server_cart_completed",
             properties: {
                 $session_id: sessionId,
-                cart_id: cartId,
+                cart_id: trustedCartId,
                 order_id: result?.order?.id
             }
         })

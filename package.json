@@ -1,7 +1,7 @@
 {
     "name": "nuxt-app",
     "private": true,
-    "packageManager": "pnpm@11.1.2",
+    "packageManager": "pnpm@11.2.2",
     "type": "module",
     "scripts": {
         "build": "nuxt build",
@@ -17,45 +17,39 @@
         "type-check": "npx nuxt typecheck"
     },
     "dependencies": {
-        "@medusajs/types": "^2.15.2",
+        "@medusajs/types": "^2.15.3",
         "@nuxt/eslint": "^1.15.2",
         "@nuxt/image": "^2.0.0",
         "@nuxtjs/robots": "6.0.8",
         "@nuxtjs/sitemap": "^8.0.15",
         "@pinia/nuxt": "^0.11.3",
         "@sentry/nuxt": "^10.53.1",
-        "@stripe/stripe-js": "^9.5.0",
+        "@stripe/stripe-js": "^9.6.0",
         "@vueuse/core": "^14.3.0",
         "@vueuse/integrations": "^14.3.0",
         "jwt-decode": "^4.0.0",
-        "nuxt": "^4.4.5",
+        "nuxt": "^4.4.6",
         "pinia": "^3.0.4",
-        "posthog-js": "^1.373.4",
-        "posthog-node": "^5.34.1",
+        "posthog-js": "^1.374.4",
+        "posthog-node": "^5.34.10",
         "querystring-es3": "^0.2.1",
         "vue": "^3.5.34"
     },
     "devDependencies": {
         "@nuxt/test-utils": "^4.0.3",
         "@tailwindcss/vite": "^4.3.0",
-        "@typescript-eslint/parser": "^8.59.3",
-        "@vue/language-core": "^3.2.9",
+        "@typescript-eslint/parser": "^8.59.4",
+        "@vue/language-core": "^3.3.1",
         "@vue/test-utils": "^2.4.10",
         "devalue": "5.8.1",
-        "eslint": "^10.3.0",
+        "eslint": "^10.4.0",
         "happy-dom": "^20.9.0",
         "prettier": "3.8.3",
         "prettier-plugin-tailwindcss": "^0.8.0",
         "sass": "1.99.0",
-        "sass-loader": "^16.0.8",
+        "sass-loader": "^17.0.0",
         "tailwindcss": "^4.3.0",
-        "vitest": "^4.1.6",
+        "vitest": "^4.1.7",
         "vue-eslint-parser": "^10.4.0"
-    },
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "@sentry/cli",
-            "protobufjs"
-        ]
     }
 }

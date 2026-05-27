@@ -1,4 +1,4 @@
-import { isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { assertCartOwnership, isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 type UpdateLineItemBody = {
@@ -16,25 +16,32 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "cartId, lineItemId, variant_id, and a positive quantity are required" })
     }
 
+    const trustedCartId = assertCartOwnership(event, cartId)
+
     const countryCode = getCookie(event, "country_code") || null
-    let currentCart: Awaited<ReturnType<typeof retrieveExpandedCart>> | null = null
 
     try {
-        currentCart = await retrieveExpandedCart(event, cartId)
+        await fetchMedusaJson(
+            event,
+            `/store/carts/${trustedCartId}/line-items/${lineItemId}`,
+            { method: "DELETE" },
+            "Could not update this cart."
+        )
 
-        await fetchMedusaJson(event, `/store/carts/${cartId}/line-items/${lineItemId}`, {
-            method: "DELETE"
-        })
+        await fetchMedusaJson(
+            event,
+            `/store/carts/${trustedCartId}/line-items`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    variant_id,
+                    quantity
+                })
+            },
+            "Could not update this cart."
+        )
 
-        await fetchMedusaJson(event, `/store/carts/${cartId}/line-items`, {
-            method: "POST",
-            body: JSON.stringify({
-                variant_id,
-                quantity
-            })
-        })
-
-        const updatedCart = await retrieveExpandedCart(event, cartId)
+        const updatedCart = await retrieveExpandedCart(event, trustedCartId)
 
         return {
             success: true,
@@ -42,15 +49,13 @@ export default defineEventHandler(async (event) => {
         }
     } catch (error: unknown) {
         if (isPoisonedPaymentSessionError(error)) {
-            currentCart = currentCart ?? await retrieveExpandedCart(event, cartId)
+            const currentCart = await retrieveExpandedCart(event, trustedCartId)
+            const currentItems = currentCart.items ?? []
+            const existingItem = currentItems.find((item) => item.id === lineItemId)
 
-            const nextItems = (currentCart.items ?? []).flatMap((item) => {
-                if (item.id === lineItemId) {
-                    return [{ ...item, variant_id, quantity }]
-                }
-
-                return [item]
-            })
+            const nextItems = existingItem
+                ? currentItems.map((item) => item.id === lineItemId ? { ...item, variant_id, quantity } : item)
+                : [...currentItems, { id: `pending-${variant_id}`, variant_id, quantity }]
 
             const recoveredCart = await recoverPoisonedCart({
                 event,

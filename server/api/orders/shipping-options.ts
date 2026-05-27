@@ -1,31 +1,25 @@
+import { assertCartOwnership } from "#server/utils/cart"
+import { fetchMedusaJson } from "#server/utils/medusa-proxy"
+
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const { cart_id: cartId } = await readBody<{ cart_id?: string }>(event)
 
     if (!cartId) {
         throw createError({ statusCode: 400, statusMessage: "`cart_id` is required" })
     }
 
-    const url = new URL(`${config.public.MEDUSA_URL}/store/shipping-options`)
-    url.searchParams.set("cart_id", cartId)
+    const trustedCartId = assertCartOwnership(event, cartId)
 
-    const res = await fetch(url.toString(), {
-        headers: {
-            "x-publishable-api-key": config.public.PUBLISHABLE_KEY,
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    })
+    const data = await fetchMedusaJson<{ shipping_options?: unknown }>(
+        event,
+        `/store/shipping-options?cart_id=${encodeURIComponent(trustedCartId)}`,
+        { method: "GET" },
+        "Could not load shipping options."
+    )
 
-    if (!res.ok) {
-        const body = await res.text().catch(() => res.statusText)
-        throw createError({ statusCode: res.status, statusMessage: body })
+    if (!Array.isArray(data.shipping_options)) {
+        throw createError({ statusCode: 502, statusMessage: "Could not load shipping options." })
     }
 
-    const { shipping_options } = await res.json()
-    if (!Array.isArray(shipping_options)) {
-        throw createError({ statusCode: 502, statusMessage: "Invalid response from Medusa" })
-    }
-
-    return shipping_options
+    return data.shipping_options
 })

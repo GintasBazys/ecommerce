@@ -1,4 +1,4 @@
-import { isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { assertCartOwnership, isPoisonedPaymentSessionError, recoverPoisonedCart, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 export default defineEventHandler(async (event) => {
@@ -14,14 +14,17 @@ export default defineEventHandler(async (event) => {
         })
     }
 
+    const trustedCartId = assertCartOwnership(event, cartId)
+
     try {
-        currentCart = await retrieveExpandedCart(event, cartId)
+        await fetchMedusaJson(
+            event,
+            `/store/carts/${trustedCartId}/line-items/${lineItemId}`,
+            { method: "DELETE" },
+            "Could not update this cart."
+        )
 
-        await fetchMedusaJson(event, `/store/carts/${cartId}/line-items/${lineItemId}`, {
-            method: "DELETE"
-        })
-
-        const updatedCart = await retrieveExpandedCart(event, cartId)
+        const updatedCart = await retrieveExpandedCart(event, trustedCartId)
 
         return {
             success: true,
@@ -29,7 +32,7 @@ export default defineEventHandler(async (event) => {
         }
     } catch (error: unknown) {
         if (isPoisonedPaymentSessionError(error)) {
-            currentCart = currentCart ?? await retrieveExpandedCart(event, cartId)
+            currentCart = currentCart ?? await retrieveExpandedCart(event, trustedCartId)
             const nextItems = (currentCart.items ?? []).filter((item) => item.id !== lineItemId)
 
             const recoveredCart = await recoverPoisonedCart({

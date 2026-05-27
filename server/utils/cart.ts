@@ -27,6 +27,11 @@ const CART_FIELDS = "+items.*,+shipping_methods.*"
 
 export type RecoverableCartItem = NonNullable<StoreCartLike["items"]>[number]
 
+type ErrorWithUpstreamData = {
+    statusMessage?: string
+    upstreamMessage?: string
+}
+
 type RecoveryResponse = {
     success: true
     cart: StoreCartLike
@@ -44,11 +49,33 @@ type RecoverPoisonedCartOptions = {
 }
 
 export function isPoisonedPaymentSessionError(error: unknown): error is { statusMessage?: string } {
-    return typeof error === "object"
-        && error !== null
-        && "statusMessage" in error
-        && typeof error.statusMessage === "string"
-        && error.statusMessage.toLowerCase().includes("payment session")
+    if (typeof error !== "object" || error === null) {
+        return false
+    }
+
+    const typedError = error as ErrorWithUpstreamData
+    const message = typedError.upstreamMessage || typedError.statusMessage || ""
+
+    return message.toLowerCase().includes("payment session")
+}
+
+export function getSessionCartId(event: H3Event) {
+    const cookies = parseCookies(event)
+    return cookies.cart_id || cookies.cartId || null
+}
+
+export function assertCartOwnership(event: H3Event, cartId: string | null | undefined) {
+    if (!cartId) {
+        throw createError({ statusCode: 400, statusMessage: "Cart ID is required." })
+    }
+
+    const sessionCartId = getSessionCartId(event)
+
+    if (!sessionCartId || sessionCartId !== cartId) {
+        throw createError({ statusCode: 403, statusMessage: "This cart is not available for this session." })
+    }
+
+    return sessionCartId
 }
 
 export async function recoverPoisonedCart({
