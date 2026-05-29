@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import type { ProductCategoryDTO } from "@medusajs/types"
-import type { BreadcrumbItem } from "~/types/breadcrumbs"
-import type { CategoryImage } from "~/types/category-listing"
-
 import CategoryFilterChips from "~/components/Category/CategoryFilterChips.vue"
 import CategoryFiltersPanel from "~/components/Category/CategoryFiltersPanel.vue"
 import CategoryPagination from "~/components/Category/CategoryPagination.vue"
@@ -11,32 +7,39 @@ import CategoryToolbar from "~/components/Category/CategoryToolbar.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NotFoundPageContent from "~/components/Shared/NotFoundPageContent.vue"
 import { useCategoryListing } from "~/composables/category/useCategoryListing"
-import { useFocusTrap } from "~/composables/shared/useFocusTrap"
-import { useSiteIdentity, type SchemaNode, createBreadcrumbSchema, useStructuredData } from "~/composables/shared/useStructuredData"
-import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE, PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { useCategoryPageData } from "~/composables/category/useCategoryPageData"
+import { useCategoryPageSeo } from "~/composables/category/useCategoryPageSeo"
+import { useViewportDrawer } from "~/composables/shared/useViewportDrawer"
 
 definePageMeta({ layout: "default" })
 
-const ALL_PRODUCTS_SLUG = "all-products"
-const ALL_PRODUCTS_DESCRIPTION =
-    "Browse the full product catalog with category filters, sorting, and clear paginated navigation across every listing page."
-
 const route = useRoute()
-const event = useRequestEvent()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
-const { absoluteUrl } = useSiteIdentity()
 
-const isMobileFilterDrawerOpen = ref<boolean>(false)
-const mobileFilterViewportHeight = ref<number>(0)
-const notFoundPath = ref<string | null>(null)
 const productsStartRef = useTemplateRef<HTMLElement>("productsStartRef")
 const mobileFilterDrawerRef = useTemplateRef<HTMLElement>("mobileFilterDrawerRef")
-const category = ref<ProductCategoryDTO | null>(null)
-const isAllProductsPage = computed<boolean>(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
 const mobileFilterTitleId = "mobile-filter-title"
 const mobileFilterDescriptionId = "mobile-filter-description"
-
-useFocusTrap(mobileFilterDrawerRef, isMobileFilterDrawerOpen, { onEscape: closeMobileFilters })
+const {
+    category,
+    notFoundPath,
+    isAllProductsPage,
+    heroImage,
+    categoryPath,
+    pageHeading,
+    basePageDescription,
+    sidebarTitle,
+    emptyStateText,
+    heroEyebrow,
+    breadcrumbItems,
+    loadCategoryPage
+} = useCategoryPageData()
+const {
+    isOpen: isMobileFilterDrawerOpen,
+    drawerStyle: mobileFilterDrawerStyle,
+    openDrawer: openMobileFilters,
+    closeDrawer: closeMobileFilters
+} = useViewportDrawer(mobileFilterDrawerRef)
 
 const {
     products,
@@ -80,173 +83,19 @@ const {
     selectedCountryCode
 })
 
-const categoryThumbnail = computed<string | null>(() => {
-    if (isAllProductsPage.value) {
-        return null
-    }
+await loadCategoryPage({ isChangingCategoryPage, resetCategoryPageState, applyQueryStateFromRoute, fetchProducts })
 
-    const images = ((category.value as ProductCategoryDTO & { product_category_image?: CategoryImage[] })?.product_category_image ??
-        []) as CategoryImage[]
-    return images.find((image) => image.type === "thumbnail")?.url || images.find((image) => image.url)?.url || null
-})
-
-const heroFallbackImage = computed<string>(() => (isAllProductsPage.value ? "/images/hero-premium.jpg" : "/images/hero-main.jpg"))
-const heroImage = computed<string>(() => categoryThumbnail.value || heroFallbackImage.value)
-const categoryPath = computed<string>(() =>
-    isAllProductsPage.value ? ALL_PRODUCTS_URL_HANDLE : `${CATEGORY_HANDLE}/${String(route.params.slug || "")}`
-)
-const pageHeading = computed<string>(() => (isAllProductsPage.value ? "All Products" : category.value?.name || "Category"))
-const basePageDescription = computed<string>(() => (isAllProductsPage.value ? ALL_PRODUCTS_DESCRIPTION : category.value?.description || ""))
-const sidebarTitle = computed<string>(() => (isAllProductsPage.value ? "Refine every product" : "Refine this category"))
-const emptyStateText = computed<string>(() => "Try clearing some filters or browsing another category.")
-const heroEyebrow = computed<string>(() => (isAllProductsPage.value ? "Store catalog" : "Category"))
-const currentListingPath = computed<string>(() => {
-    if (currentPage.value <= 1) {
-        return categoryPath.value
-    }
-
-    return `${categoryPath.value}?page=${currentPage.value}`
-})
-const canonicalPath = computed<string>(() => (hasFacetedQuery.value ? categoryPath.value : currentListingPath.value))
-const metaTitle = computed<string>(() => {
-    if (currentPage.value <= 1) {
-        return `${pageHeading.value} | Medusa Commerce`
-    }
-
-    return `${pageHeading.value} - Page ${currentPage.value} | Medusa Commerce`
-})
-const metaDescription = computed<string>(() => {
-    const baseDescription = basePageDescription.value || `Browse products in ${pageHeading.value}.`
-
-    if (currentPage.value <= 1) {
-        return baseDescription
-    }
-
-    return `${baseDescription} Page ${currentPage.value} of ${totalPages.value}.`
-})
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: pageHeading.value }])
-const mobileFilterDrawerStyle = computed<Record<string, string>>(() => ({
-    "--mobile-filter-viewport-height": `${mobileFilterViewportHeight.value || 640}px`,
-    "--mobile-filter-top-offset": "5rem"
-}))
-
-const collectionSchema = computed<SchemaNode | null>(() => {
-    if (notFoundPath.value || !pageHeading.value) {
-        return null
-    }
-
-    return {
-        "@type": "CollectionPage",
-        "@id": `${absoluteUrl(canonicalPath.value)}#collection`,
-        name: pageHeading.value,
-        description: metaDescription.value || undefined,
-        url: absoluteUrl(canonicalPath.value),
-        mainEntity: products.value.length
-            ? {
-                  "@type": "ItemList",
-                  numberOfItems: totalCount.value,
-                  itemListElement: products.value.map((product, index) => ({
-                      "@type": "ListItem",
-                      position: offset.value + index + 1,
-                      url: absoluteUrl(product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : categoryPath.value),
-                      name: product.title
-                  }))
-              }
-            : undefined
-    }
-})
-
-const breadcrumbSchema = computed<SchemaNode | null>(() =>
-    notFoundPath.value
-        ? null
-        : createBreadcrumbSchema(
-              [
-                  { name: "Home", path: "/" },
-                  { name: pageHeading.value, path: categoryPath.value }
-              ],
-              absoluteUrl
-          )
-)
-
-function markNotFound() {
-    notFoundPath.value = route.fullPath
-
-    if (event) {
-        setResponseStatus(event, 404)
-    }
-}
-
-function closeMobileFilters(): void {
-    isMobileFilterDrawerOpen.value = false
-}
-
-async function loadCategoryPage() {
-    isChangingCategoryPage.value = true
-    notFoundPath.value = null
-    category.value = null
-    resetCategoryPageState()
-    applyQueryStateFromRoute(route.query)
-
-    if (!isAllProductsPage.value) {
-        try {
-            category.value = await $fetch<ProductCategoryDTO | null>(`/api/categories/${String(route.params.slug || "")}`)
-        } catch {
-            category.value = null
-        }
-
-        if (!category.value) {
-            markNotFound()
-            isChangingCategoryPage.value = false
-            return
-        }
-    }
-
-    try {
-        await fetchProducts("initial")
-    } finally {
-        isChangingCategoryPage.value = false
-    }
-}
-
-await loadCategoryPage()
-
-useHead(() => {
-    if (notFoundPath.value) {
-        return {
-            title: "404 | Medusa Commerce",
-            meta: [
-                {
-                    name: "description",
-                    content: "The requested page could not be found. Continue browsing current products and active storefront pages."
-                },
-                { name: "robots", content: "noindex,follow" }
-            ]
-        }
-    }
-
-    const links: { rel: string; href: string }[] = [{ rel: "canonical", href: absoluteUrl(canonicalPath.value) }]
-
-    if (!hasFacetedQuery.value && totalPages.value > 1) {
-        if (currentPage.value > 1) {
-            links.push({
-                rel: "prev",
-                href: absoluteUrl(currentPage.value - 1 === 1 ? categoryPath.value : `${categoryPath.value}?page=${currentPage.value - 1}`)
-            })
-        }
-
-        if (currentPage.value < totalPages.value) {
-            links.push({ rel: "next", href: absoluteUrl(`${categoryPath.value}?page=${currentPage.value + 1}`) })
-        }
-    }
-
-    return {
-        title: metaTitle.value,
-        link: links,
-        meta: [
-            { name: "description", content: metaDescription.value },
-            { name: "robots", content: hasFacetedQuery.value ? "noindex,follow" : "index,follow" }
-        ]
-    }
+useCategoryPageSeo({
+    notFoundPath,
+    pageHeading,
+    basePageDescription,
+    categoryPath,
+    hasFacetedQuery,
+    currentPage,
+    totalPages,
+    totalCount,
+    products,
+    offset
 })
 
 watch(
@@ -256,7 +105,7 @@ watch(
             return
         }
 
-        await loadCategoryPage()
+        await loadCategoryPage({ isChangingCategoryPage, resetCategoryPageState, applyQueryStateFromRoute, fetchProducts })
     }
 )
 
@@ -269,39 +118,6 @@ watch(currentPage, async (page, previousPage) => {
     productsStartRef.value?.scrollIntoView({ behavior: "smooth", block: "start" })
 })
 
-watch(isMobileFilterDrawerOpen, (isOpen) => {
-    if (!import.meta.client) {
-        return
-    }
-
-    document.body.style.overflow = isOpen ? "hidden" : ""
-
-    if (isOpen) {
-        updateMobileFilterViewportHeight()
-        window.visualViewport?.addEventListener("resize", updateMobileFilterViewportHeight)
-        window.addEventListener("resize", updateMobileFilterViewportHeight)
-        return
-    }
-
-    window.visualViewport?.removeEventListener("resize", updateMobileFilterViewportHeight)
-    window.removeEventListener("resize", updateMobileFilterViewportHeight)
-})
-
-function updateMobileFilterViewportHeight(): void {
-    mobileFilterViewportHeight.value = Math.floor(window.visualViewport?.height ?? window.innerHeight)
-}
-
-onUnmounted(() => {
-    if (!import.meta.client) {
-        return
-    }
-
-    document.body.style.overflow = ""
-    window.visualViewport?.removeEventListener("resize", updateMobileFilterViewportHeight)
-    window.removeEventListener("resize", updateMobileFilterViewportHeight)
-})
-
-useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "category-structured-data")
 </script>
 
 <template>
@@ -334,7 +150,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                             type="button"
                             class="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
                             aria-label="Close filters"
-                            @click="isMobileFilterDrawerOpen = false"
+                            @click="closeMobileFilters"
                         />
                         <Transition
                             enter-active-class="transition duration-300 ease-out"
@@ -414,7 +230,7 @@ useStructuredData(() => [collectionSchema.value, breadcrumbSchema.value], "categ
                         :current-page="currentPage"
                         :active-filter-count="activeFilterCount"
                         :sort-options="sortOptions"
-                        @open-filters="isMobileFilterDrawerOpen = true"
+                        @open-filters="openMobileFilters"
                     />
 
                     <CategoryFilterChips

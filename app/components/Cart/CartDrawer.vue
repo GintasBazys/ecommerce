@@ -5,6 +5,7 @@ import type { PricedCartLineItem } from "~/types/checkout"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { usePostHog } from "~/composables/analytics/usePostHog"
+import { useFocusTrap } from "~/composables/shared/useFocusTrap"
 import { ALL_PRODUCTS_URL_HANDLE, DEFAULT_CURENCY } from "~/utils/consts"
 import { formatPrice } from "~/utils/formatPrice"
 
@@ -15,9 +16,7 @@ const posthog = usePostHog()
 
 const isHydrated = ref<boolean>(false)
 const drawerRef = useTemplateRef<HTMLElement>('drawerRef')
-const closeButtonRef = ref<Pick<HTMLButtonElement, "focus"> | null>(null)
 const titleId = useId()
-const previousFocusedElement = shallowRef<HTMLElement>()
 
 const qtyMap = reactive<Record<string, number | undefined>>({})
 const updating = reactive<Record<string, boolean>>({})
@@ -27,11 +26,12 @@ const unregisterAfterEach = router.afterEach(() => {
     openCartDrawer.value = false
 })
 
+useFocusTrap(drawerRef, openCartDrawer, { onEscape: closeDrawer })
+
 onMounted(() => {
     isHydrated.value = true
 
     if (openCartDrawer.value) {
-        previousFocusedElement.value = document.activeElement as HTMLElement
         document.body.style.overflow = "hidden"
         document.body.style.touchAction = "none"
     }
@@ -49,17 +49,13 @@ watch(openCartDrawer, async (opened) => {
     }
 
     if (opened) {
-        previousFocusedElement.value = document.activeElement as HTMLElement
         document.body.style.overflow = "hidden"
         document.body.style.touchAction = "none"
-        await nextTick()
-        closeButtonRef.value?.focus()
         return
     }
 
     document.body.style.overflow = ""
     document.body.style.touchAction = ""
-    previousFocusedElement.value?.focus()
 })
 
 watch(
@@ -195,46 +191,6 @@ function updateCart(): void {
 function closeDrawer(): void {
     openCartDrawer.value = false
 }
-
-function onDrawerKeydown(event: KeyboardEvent): void {
-    if (event.key === "Escape") {
-        closeDrawer()
-        return
-    }
-
-    if (event.key !== "Tab") {
-        return
-    }
-
-    const container = drawerRef.value
-    if (!container) {
-        return
-    }
-
-    const focusableElements = container.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-
-    if (!focusableElements.length) {
-        return
-    }
-
-    const firstElement = focusableElements[0]
-    const lastElement = focusableElements[focusableElements.length - 1]
-
-    if (!firstElement || !lastElement) {
-        return
-    }
-    const activeElement = document.activeElement
-
-    if (event.shiftKey && activeElement === firstElement) {
-        event.preventDefault()
-        lastElement.focus()
-    } else if (!event.shiftKey && activeElement === lastElement) {
-        event.preventDefault()
-        firstElement.focus()
-    }
-}
 </script>
 
 <template>
@@ -249,8 +205,9 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                 class="fixed top-0 right-0 bottom-0 z-85 w-full max-w-110 overflow-hidden border-l border-white/60 bg-linear-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out"
                 :class="openCartDrawer ? 'translate-x-0' : 'translate-x-full'"
                 :aria-labelledby="titleId"
-                role="search"
-                @keydown="onDrawerKeydown"
+                role="dialog"
+                aria-modal="true"
+                tabindex="-1"
             >
                 <div class="flex h-full min-h-0 flex-col">
                     <div class="shrink-0 border-b border-slate-200/80 px-4 py-4 sm:px-5 sm:py-5">
@@ -274,7 +231,7 @@ function onDrawerKeydown(event: KeyboardEvent): void {
                             </div>
 
                             <BaseButton
-                                ref="closeButtonRef"
+                                data-autofocus
                                 type="button"
                                 class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-xl transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 @click="closeDrawer"
