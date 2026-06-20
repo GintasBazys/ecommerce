@@ -7,3 +7,22 @@ allowBuilds:
   unrs-resolver: false
   '@sentry/cli': true
   protobufjs: true
+  vue-demi: true
+minimumReleaseAgeExclude:
+  - '@posthog/core@1.35.3'
+  - '@posthog/types@1.390.2'
+  - '@sentry/browser-utils@10.59.0'
+  - '@sentry/browser@10.59.0'
+  - '@sentry/cloudflare@10.59.0'
+  - '@sentry/core@10.59.0'
+  - '@sentry/feedback@10.59.0'
+  - '@sentry/node-core@10.59.0'
+  - '@sentry/node@10.59.0'
+  - '@sentry/nuxt@10.59.0'
+  - '@sentry/opentelemetry@10.59.0'
+  - '@sentry/replay-canvas@10.59.0'
+  - '@sentry/replay@10.59.0'
+  - '@sentry/server-utils@10.59.0'
+  - '@sentry/vue@10.59.0'
+  - posthog-js@1.391.2
+  - posthog-node@5.38.2

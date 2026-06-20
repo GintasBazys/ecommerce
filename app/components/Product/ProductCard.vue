@@ -3,6 +3,7 @@ import type { ProductDTO, ProductVariantDTO } from "@medusajs/types"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { useAddToCart } from "~/composables/cart/useAddToCart"
 import { useProductPrice } from "~/composables/product/useProductPrice"
 import { useSnackbar } from "~/composables/shared/useSnackbar"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
@@ -14,13 +15,13 @@ const { product, compact = false } = defineProps<{
     compact?: boolean
 }>()
 
-const cartStore = useCartStore()
 const wishlistStore = useWishlistStore()
 const customerStore = useCustomerStore()
 const { showSnackbar } = useSnackbar()
-
-const loading = ref<boolean>(false)
-const errorMessage = ref<string | null>(null)
+const { adding, errorMessage, addToCart: addSelectedVariantToCart } = useAddToCart({
+    product: () => product,
+    source: "product_card"
+})
 
 function isVariantAvailable(variant: ProductVariantDTO | null): boolean {
     if (!variant?.id) {
@@ -93,21 +94,11 @@ const priceLabel = computed<string>(() => {
 })
 
 async function addToCart(): Promise<void> {
-    if (!selectedVariant.value || !canAddSelectedVariantToCart.value || loading.value) {
+    if (!selectedVariant.value || !canAddSelectedVariantToCart.value || adding.value) {
         return
     }
 
-    loading.value = true
-    errorMessage.value = null
-
-    try {
-        await cartStore.updateLineItem(selectedVariant.value)
-    } catch (error) {
-        console.error("Product card add to cart failed", error)
-        errorMessage.value = "Could not add this product. Please try again."
-    } finally {
-        loading.value = false
-    }
+    await addSelectedVariantToCart(selectedVariant.value)
 }
 
 async function toggleWishlist(): Promise<void> {
@@ -262,11 +253,11 @@ async function toggleWishlist(): Promise<void> {
                     type="button"
                     variant="accent" class="w-full px-4 disabled:bg-slate-200 disabled:text-slate-500"
                     :class="compact ? 'min-h-9 px-3 text-sm' : ''"
-                    :disabled="loading || !canAddSelectedVariantToCart"
+                    :disabled="adding || !canAddSelectedVariantToCart"
                     @click="addToCart"
                 >
                     <span
-                        v-if="loading"
+                        v-if="adding"
                         class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-slate-950/35 border-t-slate-950"
                     ></span>
                     {{ canAddSelectedVariantToCart ? "Add to cart" : "Unavailable" }}

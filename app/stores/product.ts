@@ -12,6 +12,7 @@ interface ProductResponse {
 
 type ProductFetchOptions = {
     limit?: number
+    offset?: number
     view?: "default" | "card"
 }
 
@@ -48,18 +49,15 @@ export const useProductStore = defineStore("product", () => {
         }
     }
 
-    const route = useRoute()
-    const pageNumber = parseInt(route.query.page as string, 10) || 1
-    offset.value = (pageNumber - 1) * limit.value
-
     const fetchData = async (regionId?: string, countryCode?: string, options: ProductFetchOptions = {}) => {
         const requestLimit = options.limit ?? limit.value
+        const requestOffset = options.offset ?? 0
 
         try {
             const response = await $fetch<ProductResponse>("/api/products/products", {
                 query: {
                     limit: requestLimit,
-                    offset: offset.value,
+                    offset: requestOffset,
                     ...(options.view ? { view: options.view } : {}),
                     ...(regionId ? { region_id: regionId } : {}),
                     ...(countryCode ? { country_code: countryCode } : {})
@@ -93,12 +91,13 @@ export const useProductStore = defineStore("product", () => {
         }
 
         const requestLimit = options.limit ?? limit.value
+        const requestOffset = options.offset ?? 0
 
         try {
             const { products } = await $fetch<{ products: ProductDTO[] }>(`/api/categories/best-selling`, {
                 query: {
                     limit: requestLimit,
-                    offset: offset.value,
+                    offset: requestOffset,
                     ...(options.view ? { view: options.view } : {}),
                     ...(regionId ? { region_id: regionId } : {}),
                     ...(countryCode ? { country_code: countryCode } : {})

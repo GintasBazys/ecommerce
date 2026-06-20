@@ -6,6 +6,7 @@ import type { ProductFact } from "~/types/product"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseModal from "~/components/Shared/BaseModal.vue"
 import { usePostHog } from "~/composables/analytics/usePostHog"
+import { useAddToCart } from "~/composables/cart/useAddToCart"
 import { useProductGallery } from "~/composables/product/useProductGallery"
 import { useProductPageData } from "~/composables/product/useProductPageData"
 import { useProductPageSchema } from "~/composables/product/useProductPageSchema"
@@ -18,9 +19,7 @@ const route = useRoute()
 const event = useRequestEvent()
 const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
-const { openCartDrawer } = storeToRefs(useCartStore())
 const { customer } = storeToRefs(useCustomerStore())
-const posthog = usePostHog()
 
 const handle = computed<string>(() => String(route.params.id || ""))
 const routePath = computed<string>(() => route.path)
@@ -60,11 +59,9 @@ const { recentlyViewedProducts, recentlyViewedPending, recentlyViewedError, refr
 
 const selectedVariantId = ref<string | null>(null)
 const quantity = ref<number>(1)
-const adding = ref<boolean>(false)
-const addToCartError = ref<string | null>(null)
 const showReviewForm = ref<boolean>(false)
-const isStickyPurchaseVisible = ref<boolean>(true)
-const primaryProductInfoRef = useTemplateRef<HTMLElement>("primaryProductInfoRef")
+const showStickyPurchase = ref<boolean>(true)
+const primaryPurchaseRef = useTemplateRef<HTMLElement>("primaryPurchaseRef")
 const productReviewTitleId = "product-review-dialog-title"
 let primaryInfoObserver: IntersectionObserver | null = null
 
@@ -101,10 +98,15 @@ const inStock = computed<boolean>(() => typeof selectedVariant.value?.inventory_
 const { reviews, reviewAverage, displayedReviewAverage, displayedReviewCount, submitReview, submitError } = useProductReviews({
     product,
     productMetadata,
-    posthog,
+    posthog: usePostHog(),
     onSubmitted: () => {
         showReviewForm.value = false
     }
+})
+
+const { adding, errorMessage: addToCartError, addToCart: addSelectedVariantToCart } = useAddToCart({
+    product,
+    source: "product_page"
 })
 
 useProductPageSchema({
@@ -157,46 +159,23 @@ function increment(): void {
     }
 }
 
-async function addToCart(): Promise<void> {
-    if (!selectedVariant.value) {
-        return
-    }
-
-    adding.value = true
-    addToCartError.value = null
-
-    try {
-        await useCartStore().updateLineItem(selectedVariant.value, quantity.value)
-        posthog?.capture("product_added_to_cart", {
-            product_id: product.value?.id,
-            product_name: product.value?.title,
-            variant_id: selectedVariant.value.id,
-            variant_name: selectedVariant.value.title,
-            quantity: quantity.value,
-            price: selectedVariant.value.calculated_price?.calculated_amount
-        })
-        openCartDrawer.value = true
-    } catch (error) {
-        console.error("Product add to cart failed", error)
-        addToCartError.value = "Could not add this product to your cart. Please try again."
-    } finally {
-        adding.value = false
-    }
+function addToCart(): Promise<void> {
+    return addSelectedVariantToCart(selectedVariant.value, quantity.value)
 }
 
 onMounted(() => {
-    if (!primaryProductInfoRef.value || typeof IntersectionObserver === "undefined") {
+    if (!primaryPurchaseRef.value || typeof IntersectionObserver === "undefined") {
         return
     }
 
     primaryInfoObserver = new IntersectionObserver(
         ([entry]) => {
-            isStickyPurchaseVisible.value = Boolean(entry?.isIntersecting)
+            showStickyPurchase.value = !entry?.isIntersecting
         },
         { threshold: 0 }
     )
 
-    primaryInfoObserver.observe(primaryProductInfoRef.value)
+    primaryInfoObserver.observe(primaryPurchaseRef.value)
 })
 
 onUnmounted(() => {
@@ -217,7 +196,7 @@ onUnmounted(() => {
         <section v-else-if="product" class="bg-slate-50">
             <div class="px-0 pt-15 pb-28 sm:pt-18 sm:pb-12 xl:pt-23 xl:pb-16">
                 <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-                    <div ref="primaryProductInfoRef" class="grid gap-5 xl:grid-cols-2 xl:gap-8">
+                    <div class="grid gap-5 xl:grid-cols-2 xl:gap-8">
                         <ProductPageGallery
                             :product-title="productTitle"
                             :product-images="productImages"
@@ -243,21 +222,23 @@ onUnmounted(() => {
                                 :in-stock="inStock"
                             />
 
-                            <ProductPagePurchase
-                                :variants="productVariants"
-                                :selected-variant-id="selectedVariant?.id ?? null"
-                                :selected-variant-title="selectedVariant?.title || 'Choose a variant'"
-                                :product-facts="productFacts"
-                                :selected-variant="selectedVariant"
-                                :in-stock="inStock"
-                                :quantity="quantity"
-                                :max-stock="maxStock"
-                                :adding="adding"
-                                @select-variant="selectedVariantId = $event"
-                                @decrement="decrement"
-                                @increment="increment"
-                                @add-to-cart="addToCart"
-                            />
+                            <div ref="primaryPurchaseRef">
+                                <ProductPagePurchase
+                                    :variants="productVariants"
+                                    :selected-variant-id="selectedVariant?.id ?? null"
+                                    :selected-variant-title="selectedVariant?.title || 'Choose a variant'"
+                                    :product-facts="productFacts"
+                                    :selected-variant="selectedVariant"
+                                    :in-stock="inStock"
+                                    :quantity="quantity"
+                                    :max-stock="maxStock"
+                                    :adding="adding"
+                                    @select-variant="selectedVariantId = $event"
+                                    @decrement="decrement"
+                                    @increment="increment"
+                                    @add-to-cart="addToCart"
+                                />
+                            </div>
                             <div
                                 v-if="addToCartError"
                                 class="rounded-card-sm border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700"
@@ -297,7 +278,7 @@ onUnmounted(() => {
             </div>
 
             <div
-                v-if="isStickyPurchaseVisible"
+                v-if="showStickyPurchase"
                 class="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/96 px-4 py-3 shadow-2xl backdrop-blur md:hidden pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
             >
                 <div class="mx-auto flex max-w-7xl items-center gap-3">

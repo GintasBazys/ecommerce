@@ -304,8 +304,8 @@ function filterProductsWithoutPriceRange(
     })
 }
 
-function usesPriceOrder(order: string) {
-    return order === "price_asc" || order === "price_desc"
+function requiresClientSideSort(order: string) {
+    return order === "price_asc" || order === "price_desc" || order === "title" || order === "-title"
 }
 
 export default defineEventHandler(async (event) => {
@@ -348,7 +348,7 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        const canUseUpstreamPagination = !hasClientSideFilters(filters) && !usesPriceOrder(order)
+        const canUseUpstreamPagination = !hasClientSideFilters(filters) && !requiresClientSideSort(order)
 
         if (canUseUpstreamPagination) {
             const pageSearchParams = new URLSearchParams(searchParams)
