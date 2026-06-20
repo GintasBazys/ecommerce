@@ -1,4 +1,4 @@
-import { createCartForRegion, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
+import { createCartForRegion, getCartCookieOptions, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaResponse, toUpstreamError } from "#server/utils/medusa-proxy"
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     const cartId = forceNew ? null : getCookie(event, "cart_id") || null
     const countryCode = getCookie(event, "country_code") || null
 
-    const cookieOptions = { path: "/", sameSite: "lax" as const, secure: process.env.NODE_ENV === "production" }
+    const cookieOptions = getCartCookieOptions(event)
 
     try {
         if (!cartId) {

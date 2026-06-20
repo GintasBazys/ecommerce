@@ -24,6 +24,7 @@ type CartResponse = {
 }
 
 const CART_FIELDS = "+items.*,+shipping_methods.*"
+const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 
 export type RecoverableCartItem = NonNullable<StoreCartLike["items"]>[number]
 
@@ -62,6 +63,18 @@ export function isPoisonedPaymentSessionError(error: unknown): error is { status
 export function getSessionCartId(event: H3Event) {
     const cookies = parseCookies(event)
     return cookies.cart_id || cookies.cartId || null
+}
+
+export function getCartCookieOptions(event: H3Event) {
+    const forwardedProto = getHeader(event, "x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase()
+    const protocol = forwardedProto || getRequestURL(event).protocol.replace(":", "")
+
+    return {
+        path: "/",
+        sameSite: "lax" as const,
+        secure: protocol === "https",
+        maxAge: CART_COOKIE_MAX_AGE,
+    }
 }
 
 export function assertCartOwnership(event: H3Event, cartId: string | null | undefined) {
@@ -109,11 +122,7 @@ export async function recoverPoisonedCart({
     }
 
     const hydratedReplacementCart = await retrieveExpandedCart(event, replacementCart.id)
-    setCookie(event, "cart_id", replacementCart.id, {
-        path: "/",
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production"
-    })
+    setCookie(event, "cart_id", replacementCart.id, getCartCookieOptions(event))
 
     return {
         success: true,

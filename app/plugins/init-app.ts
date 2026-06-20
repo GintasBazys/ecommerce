@@ -48,7 +48,7 @@ export default defineNuxtPlugin(async () => {
     const productStore = useProductStore()
 
     const requestFetch = useRequestFetch()
-    const requestHeaders = useRequestHeaders(["cookie"])
+    const requestHeaders = useRequestHeaders(["cookie", "x-forwarded-proto"])
     const cookieHeader = requestHeaders.cookie || ""
 
     const regionPromise = regionStore.regions?.length ? Promise.resolve() : regionStore.fetchRegion()
@@ -91,10 +91,12 @@ export default defineNuxtPlugin(async () => {
     await regionPromise
 
     if (regionStore.regionStoreId) {
+        const forwardedProto = requestHeaders["x-forwarded-proto"]?.split(",")[0]?.trim().toLowerCase()
+        const requestProtocol = forwardedProto || useRequestURL().protocol.replace(":", "")
         const cartIdCookie = useCookie<string | null>("cart_id", {
             sameSite: "lax",
             path: "/",
-            secure: process.env.NODE_ENV === "production",
+            secure: requestProtocol === "https",
             maxAge: 60 * 60 * 24 * 30
         })
 
