@@ -1,0 +1,33 @@
+{
+    "language": {
+        "english": "English",
+        "label": "Language",
+        "lithuanian": "Lithuanian"
+    },
+    "routes": {
+        "about": "about",
+        "account": "account",
+        "address": "address",
+        "allProducts": "all-products",
+        "blog": "blog",
+        "cart": "cart",
+        "category": "category",
+        "checkout": "checkout",
+        "contact": "contact",
+        "faq": "faq",
+        "orderCompleted": "order-completed",
+        "orderStatus": "order-status",
+        "orders": "orders",
+        "privacy": "privacy",
+        "product": "product",
+        "profile": "profile",
+        "register": "register",
+        "resetPassword": "reset-password",
+        "returns": "returns",
+        "search": "search",
+        "shipping": "shipping",
+        "signin": "signin",
+        "specialOffers": "special-offers",
+        "wishlist": "wishlist"
+    }
+}

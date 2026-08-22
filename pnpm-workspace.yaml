@@ -26,3 +26,4 @@ minimumReleaseAgeExclude:
   - '@sentry/vue@10.59.0'
   - posthog-js@1.391.2
   - posthog-node@5.38.2
+  - prettier@3.9.1

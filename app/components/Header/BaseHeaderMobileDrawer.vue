@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { LocationItem, NavigationCategory } from "~/types/navigation"
 
+import LanguageSelect from "~/components/Header/LanguageSelect.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 import { useFocusTrap } from "~/composables/shared/useFocusTrap"
@@ -13,7 +14,11 @@ const props = defineProps<{
     categories: NavigationCategory[]
     locationItems: LocationItem[]
     locationValue: string
+    languageItems: LocationItem[]
+    languageValue: string
+    languageLabel: string
     selectionLoading: boolean
+    languageSelectionLoading: boolean
     isSignedIn: boolean
     wishlistCount: number
 }>()
@@ -21,14 +26,20 @@ const props = defineProps<{
 const emit = defineEmits<{
     close: []
     "update-location": [value: string]
+    "update-language": [value: string]
 }>()
 
 const locationModel = computed<string>({
     get: () => props.locationValue,
     set: (value) => emit("update-location", value)
 })
+const languageModel = computed<string>({
+    get: () => props.languageValue,
+    set: (value) => emit("update-language", value)
+})
 const drawerRef = useTemplateRef<HTMLElement>("drawerRef")
 const previousBodyOverflow = ref<string>("")
+const { localizedPath } = useLocalizedPath()
 
 const drawerTitleId = "mobile-navigation-title"
 const drawerDescriptionId = "mobile-navigation-description"
@@ -60,6 +71,10 @@ onBeforeUnmount(() => {
 function closeDrawer(): void {
     emit("close")
 }
+
+function getCategoryPath(handle: string): string {
+    return localizedPath(`${CATEGORY_HANDLE}/${handle}`)
+}
 </script>
 
 <template>
@@ -78,8 +93,7 @@ function closeDrawer(): void {
         class="fixed right-0 bottom-0 z-65 w-72 overflow-hidden border-l border-white/60 bg-linear-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out sm:w-80"
         :class="open ? 'translate-x-0' : 'translate-x-full'"
         :style="{ top: `${topOffset + headerHeight}px` }"
-        role="dialog"
-        aria-modal="true"
+        role="search"
         :aria-labelledby="drawerTitleId"
         :aria-describedby="drawerDescriptionId"
         tabindex="-1"
@@ -96,7 +110,7 @@ function closeDrawer(): void {
                             Navigation
                         </p>
                         <h2 :id="drawerTitleId" class="mt-3 text-lg font-semibold tracking-tight text-slate-950">Menu</h2>
-                        <p :id="drawerDescriptionId" class="sr-only">Choose a category, account link, or shipping country.</p>
+                        <p :id="drawerDescriptionId" class="sr-only">Choose a category, account link, language, or shipping country.</p>
                     </div>
 
                     <BaseButton
@@ -116,6 +130,18 @@ function closeDrawer(): void {
 
             <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pb-6">
                 <label class="shadow-panel mt-1 block rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4">
+                    <span class="text-label-xs tracking-label mb-2 block font-semibold text-slate-500 uppercase">{{ languageLabel }}</span>
+
+                    <LanguageSelect
+                        :language-items="languageItems"
+                        :language-value="languageModel"
+                        :language-label="languageLabel"
+                        :disabled="languageSelectionLoading"
+                        @update-language="languageModel = $event"
+                    />
+                </label>
+
+                <label class="shadow-panel mt-1 block rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4">
                     <span class="text-label-xs tracking-label mb-2 block font-semibold text-slate-500 uppercase">Country</span>
 
                     <BaseSelect
@@ -130,7 +156,7 @@ function closeDrawer(): void {
                 <nav class="mt-5 grid gap-2" aria-label="Mobile links">
                     <NuxtLink
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
-                        :to="ALL_PRODUCTS_URL_HANDLE"
+                        :to="localizedPath(ALL_PRODUCTS_URL_HANDLE)"
                         @click="closeDrawer"
                     >
                         All products
@@ -138,7 +164,7 @@ function closeDrawer(): void {
 
                     <NuxtLink
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
-                        to="/special-offers"
+                        :to="localizedPath('/special-offers')"
                         @click="closeDrawer"
                     >
                         Special offers
@@ -148,7 +174,7 @@ function closeDrawer(): void {
                         v-for="cat in categories"
                         :key="cat.id"
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
-                        :to="`${CATEGORY_HANDLE}/${cat.handle}`"
+                        :to="getCategoryPath(cat.handle)"
                         @click="closeDrawer"
                     >
                         {{ cat.name }}
@@ -157,7 +183,7 @@ function closeDrawer(): void {
                     <NuxtLink
                         v-if="isSignedIn"
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
-                        to="/account/wishlist"
+                        :to="localizedPath('/account/wishlist')"
                         @click="closeDrawer"
                     >
                         Wishlist<span v-if="wishlistCount" aria-live="polite"> ({{ wishlistCount < 99 ? wishlistCount : "99+" }})</span>
@@ -166,7 +192,7 @@ function closeDrawer(): void {
                     <NuxtLink
                         v-if="isSignedIn"
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
-                        to="/account"
+                        :to="localizedPath('/account')"
                         @click="closeDrawer"
                     >
                         Profile
@@ -175,7 +201,7 @@ function closeDrawer(): void {
                     <NuxtLink
                         v-else
                         class="shadow-card rounded-2xl border border-transparent bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:bg-white"
-                        to="/signin"
+                        :to="localizedPath('/signin')"
                         @click="closeDrawer"
                     >
                         Sign in

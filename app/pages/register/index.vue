@@ -16,6 +16,7 @@ definePageMeta({
 
 const router = useRouter()
 const config = useRuntimeConfig()
+const { localizedPath } = useLocalizedPath()
 const posthog = usePostHog()
 const customerStore = useCustomerStore()
 const turnstileSiteKey = computed<string>(() => String(config.public.TURNSTILE_SITE_KEY || ""))
@@ -172,7 +173,7 @@ async function handleRegister(): Promise<void> {
             last_name: lastName.value
         })
         posthog?.capture("user_registered", { email: email.value })
-        await router.push("/")
+        await router.push(localizedPath("/"))
     } catch (error: unknown) {
         console.error("Register failed:", error)
         showNotification(getErrorMessage(error), "error")
@@ -311,7 +312,7 @@ async function handleRegister(): Promise<void> {
 
                     <p class="mt-5 text-center text-sm text-slate-600">
                         Already have an account?
-                        <NuxtLink to="/signin" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
+                        <NuxtLink :to="localizedPath('/signin')" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
                             Login here
                         </NuxtLink>
                     </p>

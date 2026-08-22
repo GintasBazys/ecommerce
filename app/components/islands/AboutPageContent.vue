@@ -4,7 +4,10 @@ import AboutCta from "~/components/islands/AboutCta.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-const breadcrumbItems = [{ label: "Home", to: "/" }, { label: "About" }]
+const { localizedPath } = useLocalizedPath()
+const breadcrumbItems = computed(() => [{ label: "Home", to: localizedPath("/") }, { label: "About" }])
+const specialOffersPath = computed<string>(() => localizedPath("/special-offers"))
+const contactPath = computed<string>(() => localizedPath("/contact"))
 
 const heroStats = [
     { value: "12+", label: "years curating online retail" },
@@ -40,9 +43,9 @@ const heroStats = [
                         </p>
 
                         <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                            <NuxtLink to="/special-offers" class="ui-btn-accent min-w-44 px-7">Shop curated picks</NuxtLink>
+                            <NuxtLink :to="specialOffersPath" class="ui-btn-accent min-w-44 px-7">Shop curated picks</NuxtLink>
                             <NuxtLink
-                                to="/contact"
+                                :to="contactPath"
                                 class="hover:border-accent-200 focus-visible:ring-focus-inverse inline-flex min-h-11 items-center justify-center rounded-full border border-white/20 px-7 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:outline-hidden"
                             >
                                 Contact support

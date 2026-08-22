@@ -10,6 +10,9 @@ defineProps<{
 const emit = defineEmits<{
     retry: []
 }>()
+
+const { localizedPath } = useLocalizedPath()
+const specialOffersPath = computed<string>(() => localizedPath("/special-offers"))
 </script>
 
 <template>
@@ -24,7 +27,7 @@ const emit = defineEmits<{
         rail-label="Related products"
         error-message="Related products could not be loaded."
         empty-message="No related products are available right now."
-        cta-to="/special-offers"
+        :cta-to="specialOffersPath"
         cta-label="Explore more picks"
         @retry="emit('retry')"
     />

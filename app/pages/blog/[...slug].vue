@@ -10,19 +10,13 @@ import {
     useStructuredData
 } from "~/composables/shared/useStructuredData"
 import { formatDate } from "~/utils/formatDate"
+import { getCanonicalRouteParam, localizePath } from "~/utils/locale"
 
 const route = useRoute()
 const { organizationId, absoluteUrl } = useSiteIdentity()
+const { currentLocale } = storeToRefs(useLocaleStore())
 
-const slug = computed<string>(() => {
-    const routeSlug = route.params.slug
-
-    if (Array.isArray(routeSlug)) {
-        return routeSlug[routeSlug.length - 1] || ""
-    }
-
-    return routeSlug || route.path.split("/").filter(Boolean).at(-1) || ""
-})
+const slug = computed<string>(() => getCanonicalRouteParam(route.params.slug))
 
 const { data: postResponse } = await useAsyncData(`blog-post-${slug.value}`, () =>
     $fetch<BlogPostResponse>(`/api/blog/posts/${slug.value}`)
@@ -82,10 +76,13 @@ useHead(() => ({
     ]
 }))
 
-const articleUrl = computed<string>(() => absoluteUrl(route.path))
+const articlePath = computed<string>(() => localizePath(`/blog/${slug.value}`, currentLocale.value))
+const blogPath = computed<string>(() => localizePath("/blog", currentLocale.value))
+const homePath = computed<string>(() => localizePath("/", currentLocale.value))
+const articleUrl = computed<string>(() => absoluteUrl(articlePath.value))
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
-    { label: "Home", to: "/" },
-    { label: "Blog", to: "/blog" },
+    { label: "Home", to: homePath.value },
+    { label: "Blog", to: blogPath.value },
     { label: currentPost.value?.title || "Article" }
 ])
 
@@ -123,9 +120,9 @@ const breadcrumbSchema = computed<SchemaNode | null>(() => {
 
     return createBreadcrumbSchema(
         [
-            { name: "Home", path: "/" },
-            { name: "Blog", path: "/blog" },
-            { name: currentPost.value.title, path: route.path }
+            { name: "Home", path: homePath.value },
+            { name: "Blog", path: blogPath.value },
+            { name: currentPost.value.title, path: articlePath.value }
         ],
         absoluteUrl
     )

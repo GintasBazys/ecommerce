@@ -18,6 +18,7 @@ export function useCheckoutIdentity(options: {
     errorMessage: ShallowRef<string | null>
     isSubmitting: ShallowRef<boolean>
 }) {
+    const { localizedPath } = useLocalizedPath()
     const authTab = shallowRef<"login" | "register" | "guest">("login")
     const isEditingIdentity = shallowRef<boolean>(false)
     const hasExplicitGuestIdentity = shallowRef<boolean>(false)
@@ -169,7 +170,7 @@ export function useCheckoutIdentity(options: {
     }
 
     async function handleCheckoutSocialLogin(provider: "google" | "facebook"): Promise<void> {
-        await options.auth.startSocialLogin(provider, "/checkout")
+        await options.auth.startSocialLogin(provider, localizedPath("/checkout"))
     }
 
     async function submitRegister(turnstileSiteKey: string): Promise<void> {

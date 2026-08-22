@@ -5,7 +5,10 @@ import type { PolicyHighlight, ReturnFaqItem, ReturnStep } from "~/types/content
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Returns" }])
+const { localizedPath } = useLocalizedPath()
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizedPath("/") }, { label: "Returns" }])
+const contactPath = computed<string>(() => localizedPath("/contact"))
+const faqPath = computed<string>(() => localizedPath("/faq"))
 
 const returnSteps: ReturnStep[] = [
     {
@@ -99,8 +102,8 @@ const supportDetails = [
                             handle the refund or exchange with a straightforward follow-up.
                         </p>
                         <div class="mt-7 flex flex-wrap items-center gap-3">
-                            <NuxtLink to="/contact" class="ui-btn-primary px-7">Contact support</NuxtLink>
-                            <NuxtLink to="/faq" class="ui-btn-secondary px-6">Browse FAQ</NuxtLink>
+                            <NuxtLink :to="contactPath" class="ui-btn-primary px-7">Contact support</NuxtLink>
+                            <NuxtLink :to="faqPath" class="ui-btn-secondary px-6">Browse FAQ</NuxtLink>
                         </div>
                     </div>
 
@@ -287,7 +290,7 @@ const supportDetails = [
                                 <p class="mt-1">{{ detail.value }}</p>
                             </div>
                         </div>
-                        <NuxtLink to="/contact" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
+                        <NuxtLink :to="contactPath" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
                     </div>
 
                     <div class="rounded-panel border border-slate-200 bg-white p-6 shadow-card sm:p-8">

@@ -4,7 +4,10 @@ import type { PublicOrderStatus } from "@/types/order-status"
 import PublicOrderStatusTracker from "@/components/Orders/PublicOrderStatusTracker.vue"
 
 const route = useRoute()
+const { localizedPath } = useLocalizedPath()
 const orderId = computed<string>(() => String(route.params.id || ""))
+const orderStatusPath = computed<string>(() => localizedPath("/order-status"))
+const contactPath = computed<string>(() => localizedPath("/contact"))
 
 useHead({
     title: "Track Order | Medusa Commerce",
@@ -43,8 +46,8 @@ const order = computed<PublicOrderStatus | null>(() => orderRes.value?.order ?? 
                     We could not find a public status update for this order. Check the order ID and try again.
                 </p>
                 <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                    <NuxtLink to="/order-status" class="ui-btn-primary px-6">Check another order</NuxtLink>
-                    <NuxtLink to="/contact" class="ui-btn-secondary px-6">Contact support</NuxtLink>
+                    <NuxtLink :to="orderStatusPath" class="ui-btn-primary px-6">Check another order</NuxtLink>
+                    <NuxtLink :to="contactPath" class="ui-btn-secondary px-6">Contact support</NuxtLink>
                 </div>
             </div>
 

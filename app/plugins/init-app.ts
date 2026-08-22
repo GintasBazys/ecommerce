@@ -11,6 +11,7 @@ const NON_AUTH_COOKIE_KEYS = new Set([
     "cart_id",
     "cookie_consent",
     "country_code",
+    "locale",
     "region_id"
 ])
 

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
+const { localizedPath } = useLocalizedPath()
+const aboutPath = computed<string>(() => localizedPath("/about"))
+
 defineProps<{
     linkShown?: boolean
     extraSpacerClass?: string
@@ -119,7 +122,7 @@ const highlights = [
                             We curate a broad range of products and support customers worldwide with a practical, premium approach. The goal is
                             simple: make shopping feel confident, calm, and efficient.
                         </p>
-                        <NuxtLink v-if="linkShown" to="/about" class="ui-btn-primary min-w-48 px-6"> Learn about our approach </NuxtLink>
+                        <NuxtLink v-if="linkShown" :to="aboutPath" class="ui-btn-primary min-w-48 px-6"> Learn about our approach </NuxtLink>
                     </div>
                 </div>
             </div>

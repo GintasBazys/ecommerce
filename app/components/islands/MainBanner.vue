@@ -16,6 +16,9 @@ const heroContent = {
 } as const
 
 const heroHighlights = ["Fast shipping", "Secure checkout", "Support from real people"] as const
+const { localizedPath } = useLocalizedPath()
+const heroCtaTo = computed<string>(() => localizedPath(heroContent.ctaTo))
+const heroSecondaryTo = computed<string>(() => localizedPath(heroContent.secondaryTo))
 
 const heroInlineCss = `.home-hero{position:relative;isolation:isolate;min-height:100vh;overflow:hidden;background:#020617}.home-hero__image{position:absolute;inset:0;height:100%;width:100%;object-fit:cover;object-position:center}.home-hero__overlay{position:absolute;inset:0;z-index:0;background:rgba(2,6,23,.46)}.home-hero__inner{position:relative;z-index:10;margin-inline:auto;display:flex;height:100%;width:100%;max-width:80rem;align-items:flex-end;padding:5.5rem 1rem 2.5rem}.home-hero__panel{width:100%;max-width:42rem;border:1px solid rgba(255,255,255,.1);border-radius:1.5rem;background:rgba(2,6,23,.28);padding:1.25rem;color:#fff;box-shadow:0 20px 25px -5px rgba(0,0,0,.24),0 8px 10px -6px rgba(0,0,0,.24)}.home-hero__title{margin-top:.75rem;max-width:28rem;font-size:2.25rem;line-height:1;font-weight:600;letter-spacing:-.025em;color:#fff}.home-hero__accent{display:block;color:#fcd34d;font-weight:500;font-style:italic;letter-spacing:-.025em}.home-hero__copy{margin-top:1rem;max-width:32rem;font-size:1rem;line-height:1.5rem;color:rgba(241,245,249,.88)}.home-hero__actions{margin-top:1.5rem;display:flex;flex-wrap:wrap;align-items:center;gap:.625rem}.home-hero__secondary{display:inline-flex;min-height:2.75rem;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);padding-inline:1rem;font-size:.875rem;font-weight:600;color:#fff}.home-hero__detail{margin-top:.75rem;font-size:.75rem;color:rgba(226,232,240,.82)}@media (min-width:640px){.home-hero__overlay{background:linear-gradient(90deg,rgba(2,6,23,.88),rgba(2,6,23,.68),rgba(2,6,23,.3))}.home-hero__inner{padding:7rem 1.5rem 3.5rem}.home-hero__panel{max-width:48rem;border-radius:2rem;background:rgba(255,255,255,.1);padding:2rem;backdrop-filter:blur(12px)}.home-hero__title{margin-top:1.25rem;max-width:32rem;font-size:3rem;font-weight:700;letter-spacing:-.05em}.home-hero__copy{margin-top:1.25rem;max-width:36rem;font-size:1.125rem;line-height:2rem;color:rgba(241,245,249,.92)}.home-hero__actions{margin-top:1.75rem;gap:.75rem}.home-hero__detail{margin-top:1rem;font-size:.875rem;color:rgba(226,232,240,.9)}}@media (min-width:1024px){.home-hero__inner{padding-top:8rem;padding-bottom:5rem}.home-hero__panel{padding:2.5rem}.home-hero__title{font-size:4.5rem}}`
 
@@ -65,11 +68,11 @@ useHead({
                 </p>
 
                 <div class="home-hero__actions mt-6 flex flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-3">
-                    <NuxtLink :to="heroContent.ctaTo" class="ui-btn-accent px-6 text-sm sm:px-7 sm:text-base">
+                    <NuxtLink :to="heroCtaTo" class="ui-btn-accent px-6 text-sm sm:px-7 sm:text-base">
                         {{ heroContent.ctaLabel }}
                     </NuxtLink>
                     <NuxtLink
-                        :to="heroContent.secondaryTo"
+                        :to="heroSecondaryTo"
                         class="home-hero__secondary inline-flex min-h-11 items-center justify-center rounded-full border border-white/18 bg-white/6 px-4 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/12 sm:px-5"
                     >
                         {{ heroContent.secondaryLabel }}

@@ -14,14 +14,16 @@ import { useProductPrice } from "~/composables/product/useProductPrice"
 import { useProductReviews } from "~/composables/product/useProductReviews"
 import { useRecentlyViewedProducts } from "~/composables/product/useRecentlyViewedProducts"
 import { useSiteIdentity } from "~/composables/shared/useStructuredData"
+import { getCanonicalRouteParam } from "~/utils/locale"
 
 const route = useRoute()
 const event = useRequestEvent()
 const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const { customer } = storeToRefs(useCustomerStore())
+const { localizedPath } = useLocalizedPath()
 
-const handle = computed<string>(() => String(route.params.id || ""))
+const handle = computed<string>(() => getCanonicalRouteParam(route.params.id))
 const routePath = computed<string>(() => route.path)
 
 const {
@@ -43,7 +45,7 @@ const {
     relatedPending,
     relatedError,
     refreshRelatedProducts
-} = useProductPageData({
+} = await useProductPageData({
     handle,
     routePath,
     regionStoreId,
@@ -76,7 +78,7 @@ const selectedVariant = computed<ProductVariantDTO | null>(
     () => productVariants.value.find((variant) => variant.id === selectedVariantId.value) ?? productVariants.value[0] ?? null
 )
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: productTitle.value }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizedPath("/") }, { label: productTitle.value }])
 const { activeImageIndex, productImages, activeImage, selectImage, resetGallery } = useProductGallery(product)
 
 watch(() => product.value?.id, resetGallery)

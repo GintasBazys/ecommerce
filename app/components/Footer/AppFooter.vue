@@ -9,22 +9,30 @@ import { ALL_PRODUCTS_URL_HANDLE, BLOG_HANDLE, CATEGORY_HANDLE } from "~/utils/c
 const { categories } = useProductStore()
 
 const LazyNewsletterComponent = defineAsyncComponent(() => import("@/components/Newsletter/NewsletterComponent.vue"))
+const { localizedPath } = useLocalizedPath()
 
-const helpLinks: NavLink[] = [
+const helpLinks = computed<NavLink[]>(() => [
     { label: "FAQ", to: "/faq" },
     { label: "Order Status", to: "/order-status" },
     { label: "Returns", to: "/returns" },
     { label: "Payment & Shipping", to: "/shipping" },
     { label: "Contact Us", to: "/contact" }
-]
+].map((item) => ({ ...item, to: localizedPath(item.to) })))
 
-const aboutLinks: NavLink[] = [
+const aboutLinks = computed<NavLink[]>(() => [
     { label: "About Us", to: "/about" },
     { label: "Blog", to: BLOG_HANDLE },
     { label: "Contact Us", to: "/contact" },
     { label: "Facebook", to: "https://facebook.com" },
     { label: "Instagram", to: "https://instagram.com" }
-]
+].map((item) => ({ ...item, to: localizedPath(item.to) })))
+
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
+const privacyPath = computed<string>(() => localizedPath("/privacy"))
+
+function getCategoryPath(handle: string): string {
+    return localizedPath(`${CATEGORY_HANDLE}/${handle}`)
+}
 
 const paymentIcons = [
     { src: "/images/mastercard.svg", alt: "Mastercard" },
@@ -140,12 +148,12 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     </BaseButton>
                     <ul v-show="expandedMobileSections.categories" class="mt-4 grid gap-3 md:mt-5">
                         <li>
-                            <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="text-slate-200/90 transition hover:text-white"
+                            <NuxtLink :to="allProductsPath" class="text-slate-200/90 transition hover:text-white"
                             >All products</NuxtLink
                             >
                         </li>
                         <li v-for="category in categories" :key="category.id">
-                            <NuxtLink :to="`${CATEGORY_HANDLE}/${category.handle}`" class="text-slate-200/90 transition hover:text-white">
+                            <NuxtLink :to="getCategoryPath(category.handle)" class="text-slate-200/90 transition hover:text-white">
                                 {{ category.name }}
                             </NuxtLink>
                         </li>
@@ -198,7 +206,7 @@ function toggleMobileSection(key: "help" | "categories" | "about"): void {
                     <BaseButton type="button" class="text-sm font-semibold text-slate-200/90 transition hover:text-white" @click="openBanner">
                         Cookie Settings
                     </BaseButton>
-                    <NuxtLink to="/privacy" class="text-sm font-semibold text-slate-200/90 transition hover:text-white"
+                    <NuxtLink :to="privacyPath" class="text-sm font-semibold text-slate-200/90 transition hover:text-white"
                     >Privacy Policy</NuxtLink
                     >
                 </div>

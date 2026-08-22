@@ -6,6 +6,7 @@ import type { ProductCategorySummary, ProductGalleryImage } from "~/types/produc
 import type { Review } from "@/types/interfaces"
 import { normalizeSchemaDate } from "~/composables/shared/useStructuredData"
 import { DEFAULT_CURENCY } from "~/utils/consts"
+import { createLocalizedAlternateLinks, localizePath, type HeadLink } from "~/utils/locale"
 
 export function useProductPageSchema(options: {
     product: ComputedRef<ProductDTO | null>
@@ -25,9 +26,18 @@ export function useProductPageSchema(options: {
     organizationId: ComputedRef<string>
     absoluteUrl: (_path?: string) => string
 }) {
+    const { currentLocale } = storeToRefs(useLocaleStore())
+    const alternateLinks = computed<HeadLink[]>(() => {
+        if (!options.product.value) {
+            return []
+        }
+
+        return createLocalizedAlternateLinks(options.productPath.value, options.absoluteUrl)
+    })
+
     useHead(() => ({
         title: options.product.value ? `${options.productTitle.value} | ${options.siteName.value}` : `Product Not Found | ${options.siteName.value}`,
-        link: options.product.value ? [{ rel: "canonical", href: options.productUrl.value }] : [],
+        link: options.product.value ? [{ rel: "canonical", href: options.productUrl.value }, ...alternateLinks.value] : [],
         meta: [
             { name: "description", content: options.productDescription.value },
             ...(options.product.value ? [] : [{ name: "robots", content: "noindex,follow" }]),
@@ -133,7 +143,7 @@ export function useProductPageSchema(options: {
 
         return createBreadcrumbSchema(
             [
-                { name: "Home", path: "/" },
+                { name: "Home", path: localizePath("/", currentLocale.value) },
                 { name: options.productTitle.value, path: options.productPath.value }
             ],
             options.absoluteUrl

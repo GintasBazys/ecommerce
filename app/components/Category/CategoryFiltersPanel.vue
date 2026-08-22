@@ -19,10 +19,10 @@ const props = defineProps<{
     showMobileClose?: boolean
 }>()
 
-const selectedChildCategoryIds = defineModel<string[]>("selectedChildCategoryIds", { default: [] })
-const selectedCollectionIds = defineModel<string[]>("selectedCollectionIds", { default: [] })
-const selectedTypeIds = defineModel<string[]>("selectedTypeIds", { default: [] })
-const selectedTagIds = defineModel<string[]>("selectedTagIds", { default: [] })
+const selectedChildCategoryIds = defineModel<string[]>("selectedChildCategoryIds", { default: () => [] })
+const selectedCollectionIds = defineModel<string[]>("selectedCollectionIds", { default: () => [] })
+const selectedTypeIds = defineModel<string[]>("selectedTypeIds", { default: () => [] })
+const selectedTagIds = defineModel<string[]>("selectedTagIds", { default: () => [] })
 const selectedMinPrice = defineModel<number | null>("selectedMinPrice", { default: null })
 const selectedMaxPrice = defineModel<number | null>("selectedMaxPrice", { default: null })
 const inStockOnly = defineModel<boolean>("inStockOnly", { default: false })

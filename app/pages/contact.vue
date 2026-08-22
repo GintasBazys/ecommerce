@@ -6,7 +6,9 @@ import ContactForm from "~/components/Forms/ContactForm.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Contact" }])
+const { localizedPath } = useLocalizedPath()
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizedPath("/") }, { label: "Contact" }])
+const faqPath = computed<string>(() => localizedPath("/faq"))
 
 const contactChannels: ContactChannel[] = [
     {
@@ -31,7 +33,7 @@ const contactChannels: ContactChannel[] = [
         detail: "Start with delivery, returns, and order guidance before sending a message to the team.",
         meta: "Shipping, returns, and common support answers",
         cta: "Browse FAQ",
-        to: "/faq"
+        to: localizedPath("/faq")
     }
 ]
 
@@ -79,7 +81,7 @@ useSeoMeta({
                             practical, and easy to use on mobile.
                         </p>
                         <div class="mt-7 flex flex-wrap items-center gap-3">
-                            <NuxtLink to="/faq" class="ui-btn-primary px-7">Browse FAQ</NuxtLink>
+                            <NuxtLink :to="faqPath" class="ui-btn-primary px-7">Browse FAQ</NuxtLink>
                             <NuxtLink to="mailto:info@medusa-commerce.de" class="ui-btn-secondary px-6">Email support</NuxtLink>
                         </div>
                         <ul class="mt-6 flex flex-wrap gap-2.5" aria-label="Contact support highlights">

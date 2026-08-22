@@ -9,6 +9,7 @@ definePageMeta({
 useHead({ title: "Account | Medusa Commerce" })
 
 const { customer, customerEmail, customerFullName } = storeToRefs(useCustomerStore())
+const { localizedPath } = useLocalizedPath()
 
 const accountLinks = [
     {
@@ -51,6 +52,7 @@ const accountHighlights = computed<AccountHighlight[]>(() => [
         value: customerFullName.value
     }
 ])
+const localizedAccountLinks = computed(() => accountLinks.map((link) => ({ ...link, to: localizedPath(link.to) })))
 
 function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
     if (icon === "profile") {
@@ -98,7 +100,7 @@ function iconPaths(icon: (typeof accountLinks)[number]["icon"]): string[] {
 
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <NuxtLink
-                v-for="link in accountLinks"
+                v-for="link in localizedAccountLinks"
                 :key="link.to"
                 :to="link.to"
                 class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-amber-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"

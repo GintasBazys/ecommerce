@@ -3,6 +3,7 @@ import type { ComputedRef, Ref } from "vue"
 import type { ProductCategorySummary, ProductListResponse, ProductTag } from "~/types/product"
 
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { localizePath } from "~/utils/locale"
 
 function isNonEmptyString(value: unknown): value is string {
     return typeof value === "string" && value.trim().length > 0
@@ -12,20 +13,22 @@ function normalizeProductText(value: unknown, fallbackValue: string): string {
     return isNonEmptyString(value) ? value.trim() : fallbackValue
 }
 
-export function useProductPageData(options: {
+export async function useProductPageData(options: {
     handle: ComputedRef<string>
     routePath: ComputedRef<string> | Ref<string>
     regionStoreId: Ref<string | null | undefined>
     selectedCountryCode: Ref<string | null | undefined>
     absoluteUrl: (_path: string) => string
 }) {
+    const { currentLocale } = storeToRefs(useLocaleStore())
     const productParams = computed(() => ({
         handle: options.handle.value,
+        locale: currentLocale.value,
         ...(options.regionStoreId.value ? { region_id: options.regionStoreId.value } : {}),
         ...(options.selectedCountryCode.value ? { country_code: options.selectedCountryCode.value } : {})
     }))
 
-    const { data, pending: productPending, error: productError, refresh: refreshProduct } = useFetch<ProductListResponse>("/api/products/products", {
+    const { data, pending: productPending, error: productError, refresh: refreshProduct } = await useFetch<ProductListResponse>("/api/products/products", {
         params: productParams
     })
 
@@ -62,10 +65,10 @@ export function useProductPageData(options: {
 
     const productPath = computed<string>(() => {
         if (product.value?.handle) {
-            return `${PRODUCT_URL_HANDLE}/${product.value.handle}`
+            return localizePath(`${PRODUCT_URL_HANDLE}/${product.value.handle}`, currentLocale.value)
         }
 
-        return options.routePath.value
+        return localizePath(options.routePath.value, currentLocale.value)
     })
 
     const productUrl = computed<string>(() => options.absoluteUrl(productPath.value))
@@ -91,6 +94,7 @@ export function useProductPageData(options: {
             const response = await $fetch<ProductListResponse>("/api/products/products", {
                 query: {
                     ...(primaryCategory.value?.id ? { category_id: primaryCategory.value.id } : {}),
+                    locale: currentLocale.value,
                     region_id: options.regionStoreId.value,
                     country_code: options.selectedCountryCode.value,
                     limit: 8

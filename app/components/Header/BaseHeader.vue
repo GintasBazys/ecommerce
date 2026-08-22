@@ -4,6 +4,9 @@ import BaseHeaderCatalogMenu from "./BaseHeaderCatalogMenu.vue"
 
 import type { AnnouncementBarResponse, AnnouncementMessage, LocationItem } from "~/types/navigation"
 
+import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
+import { localizePath, normalizeLocale } from "~/utils/locale"
+
 const LazyHeaderSearchDialog = defineAsyncComponent(() => import("~/components/Header/BaseHeaderSearchDialog.vue"))
 const LazyHeaderMobileDrawer = defineAsyncComponent(() => import("~/components/Header/BaseHeaderMobileDrawer.vue"))
 
@@ -11,6 +14,7 @@ const drawer = ref<boolean>(false)
 const searchDialog = ref<boolean>(false)
 const catalogMenuOpen = ref<boolean>(false)
 const selectionLoading = ref<boolean>(false)
+const languageSelectionLoading = ref<boolean>(false)
 const currentAnnouncementIndex = ref<number>(0)
 const announcementTextWrap = useTemplateRef<HTMLElement>("announcementTextWrap")
 const announcementText = useTemplateRef<HTMLElement>("announcementText")
@@ -31,11 +35,14 @@ const { data: announcementBarData } = await useAsyncData<AnnouncementBarResponse
 )
 
 const regionStore = useRegionStore()
+const localeStore = useLocaleStore()
+const { localizedPath } = useLocalizedPath()
 const { isAuthenticated } = storeToRefs(useCustomerStore())
 const { itemCount } = storeToRefs(useCartStore())
 const { itemCount: wishlistCount } = storeToRefs(useWishlistStore())
 const { categories } = storeToRefs(useProductStore())
 const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
+const { currentLocale, languageItems, languageLabel } = storeToRefs(localeStore)
 
 const announcementMessages = computed<AnnouncementMessage[]>(() => announcementBarData.value?.announcement_messages || [])
 const currentAnnouncement = computed<AnnouncementMessage | null>(() => announcementMessages.value[currentAnnouncementIndex.value] || null)
@@ -68,6 +75,7 @@ const locationItems = computed<LocationItem[]>(() =>
 )
 
 const locationValue = computed<string>(() => selectedCountryCode.value ?? "")
+const languageValue = computed<string>(() => currentLocale.value)
 
 watch(
     () => route.fullPath,
@@ -157,6 +165,22 @@ function closeSearchDialog(): void {
     searchDialog.value = false
 }
 
+function closeTransientHeaderUi(): void {
+    drawer.value = false
+    searchDialog.value = false
+}
+
+function reloadToPath(path: string): void {
+    closeTransientHeaderUi()
+
+    if (import.meta.client) {
+        window.location.assign(path)
+        return
+    }
+
+    reloadNuxtApp({ path })
+}
+
 async function updateLocation(value: string): Promise<void> {
     if (!value || value === selectedCountryCode.value) {
         return
@@ -166,17 +190,25 @@ async function updateLocation(value: string): Promise<void> {
 
     try {
         regionStore.setCountry(value)
-        drawer.value = false
-        searchDialog.value = false
-
-        if (import.meta.client) {
-            window.location.assign(route.fullPath)
-            return
-        }
-
-        reloadNuxtApp({ path: route.fullPath })
+        reloadToPath(route.fullPath)
     } finally {
         selectionLoading.value = false
+    }
+}
+
+async function updateLanguage(value: string): Promise<void> {
+    const locale = normalizeLocale(value)
+    if (!locale || locale === currentLocale.value) {
+        return
+    }
+
+    languageSelectionLoading.value = true
+
+    try {
+        localeStore.setLocale(locale)
+        reloadToPath(localizePath(route.fullPath, locale))
+    } finally {
+        languageSelectionLoading.value = false
     }
 }
 
@@ -320,15 +352,15 @@ function observeAnnouncementTextElements(): void {
             :style="{ top: `${topOffset}px` }"
         >
             <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4">
-                <NuxtLink to="/" class="inline-flex shrink-0 items-center">
+                <NuxtLink :to="localizedPath('/')" class="inline-flex shrink-0 items-center">
                     <img :src="'/images/logo.svg'" alt="Medusa Commerce" width="640" height="144" class="block h-8 w-auto sm:h-9" />
                 </NuxtLink>
 
                 <nav class="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
-                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" to="/category/all-products">
+                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" :to="localizedPath(ALL_PRODUCTS_URL_HANDLE)">
                         All products
                     </NuxtLink>
-                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" to="/special-offers">
+                    <NuxtLink class="text-base font-semibold text-slate-700 transition hover:text-amber-900" :to="localizedPath('/special-offers')">
                         Special offers
                     </NuxtLink>
                     <BaseHeaderCatalogMenu v-model:open="catalogMenuOpen" :categories="categories" />
@@ -337,13 +369,18 @@ function observeAnnouncementTextElements(): void {
                 <BaseHeaderActions
                     :location-items="locationItems"
                     :location-value="locationValue"
+                    :language-items="languageItems"
+                    :language-value="languageValue"
+                    :language-label="languageLabel"
                     :selection-loading="selectionLoading"
+                    :language-selection-loading="languageSelectionLoading"
                     :item-count="itemCount"
                     :wishlist-count="wishlistCount"
                     :is-authenticated="isAuthenticated"
                     @search="openSearchDialog"
                     @menu="drawer = true"
                     @update-location="updateLocation"
+                    @update-language="updateLanguage"
                 />
             </div>
         </div>
@@ -356,11 +393,16 @@ function observeAnnouncementTextElements(): void {
             :categories="categories"
             :location-items="locationItems"
             :location-value="locationValue"
+            :language-items="languageItems"
+            :language-value="languageValue"
+            :language-label="languageLabel"
             :selection-loading="selectionLoading"
+            :language-selection-loading="languageSelectionLoading"
             :is-signed-in="isAuthenticated"
             :wishlist-count="wishlistCount"
             @close="closeDrawer"
             @update-location="updateLocation"
+            @update-language="updateLanguage"
         />
 
         <LazyHeaderSearchDialog

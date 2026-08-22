@@ -32,6 +32,7 @@ const auth = useCustomerAuth()
 const config = useRuntimeConfig()
 const router = useRouter()
 const posthog = usePostHog()
+const { localizedPath } = useLocalizedPath()
 
 const currentStep = shallowRef<CheckoutStep>("account")
 const checkoutAccountStep = shallowRef<CheckoutAccountStepInstance | null>(null)
@@ -177,7 +178,7 @@ onMounted(async () => {
         }
 
         if (!checkoutCart.value?.items?.length) {
-            await router.push("/cart")
+            await router.push(localizedPath("/cart"))
             return
         }
 

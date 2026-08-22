@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseButton from "~/components/Shared/BaseButton.vue"
-import { PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 defineProps<{
     status: "loading" | "error" | "not-found"
@@ -9,6 +9,9 @@ defineProps<{
 const emit = defineEmits<{
     retry: []
 }>()
+
+const { localizedPath } = useLocalizedPath()
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
 </script>
 
 <template>
@@ -30,7 +33,7 @@ const emit = defineEmits<{
             <p class="text-sm leading-6 text-rose-700">Please try again. If the issue continues, return to the catalog and choose another product.</p>
             <div class="flex flex-wrap justify-center gap-3">
                 <BaseButton type="button" variant="accent" @click="emit('retry')">Try again</BaseButton>
-                <NuxtLink :to="PRODUCT_URL_HANDLE" class="ui-btn-secondary min-h-12 px-5">Browse products</NuxtLink>
+                <NuxtLink :to="allProductsPath" class="ui-btn-secondary min-h-12 px-5">Browse products</NuxtLink>
             </div>
         </div>
     </main>
@@ -39,7 +42,7 @@ const emit = defineEmits<{
         <div class="mx-auto grid max-w-2xl justify-items-center gap-4 rounded-panel border border-slate-200 bg-white px-6 py-10 text-center shadow-panel">
             <h1 class="text-3xl font-bold tracking-tight text-slate-950">Product not found.</h1>
             <p class="text-sm leading-6 text-slate-600">This product may no longer be available. Browse the catalog to find similar products.</p>
-            <NuxtLink :to="PRODUCT_URL_HANDLE" class="ui-btn-accent min-h-12 px-5">Browse products</NuxtLink>
+            <NuxtLink :to="allProductsPath" class="ui-btn-accent min-h-12 px-5">Browse products</NuxtLink>
         </div>
     </main>
 </template>

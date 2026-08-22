@@ -3,6 +3,7 @@ import type { NavigationCategory } from "~/types/navigation"
 
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
 
 type HeaderCategory = NavigationCategory & {
     imageUrl?: string | null
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 }>()
 
 const catalogMenuRef = useTemplateRef<HTMLElement>("catalogMenuRef")
+const { localizedPath } = useLocalizedPath()
 
 function toggleCatalogMenu(): void {
     emit("update:open", !props.open)
@@ -25,6 +27,10 @@ function toggleCatalogMenu(): void {
 
 function closeCatalogMenu(): void {
     emit("update:open", false)
+}
+
+function getCategoryPath(handle: string): string {
+    return localizedPath(`${CATEGORY_HANDLE}/${handle}`)
 }
 
 function onDocumentPointerDown(event: PointerEvent): void {
@@ -96,7 +102,7 @@ onBeforeUnmount(() => {
                         <h2 class="mt-1 text-xl font-semibold tracking-tight text-slate-950">Shop by category</h2>
                     </div>
                     <NuxtLink
-                        to="/category/all-products"
+                        :to="localizedPath(ALL_PRODUCTS_URL_HANDLE)"
                         class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-amber-200 hover:bg-white hover:text-amber-900"
                         @click="closeCatalogMenu"
                     >
@@ -109,7 +115,7 @@ onBeforeUnmount(() => {
                         v-for="(cat, index) in categories"
                         :key="cat.id"
                         class="group rounded-3xl border border-slate-200/80 bg-linear-to-b from-slate-50 to-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
-                        :to="`/category/${cat.handle}`"
+                        :to="getCategoryPath(cat.handle)"
                         @click="closeCatalogMenu"
                     >
                         <span class="relative flex aspect-4/3 items-end overflow-hidden rounded-2xl bg-linear-to-br from-slate-100 via-amber-50 to-slate-200 p-3">

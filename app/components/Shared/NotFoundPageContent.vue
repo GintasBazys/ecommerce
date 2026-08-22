@@ -7,20 +7,23 @@ defineProps<{
     requestedPath: string
 }>()
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "404" }])
+const { localizedPath } = useLocalizedPath()
+const homePath = computed<string>(() => localizedPath("/"))
+const specialOffersPath = computed<string>(() => localizedPath("/special-offers"))
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: homePath.value }, { label: "404" }])
 
-const quickLinks = [
+const quickLinks = computed(() => [
     {
         title: "Back to homepage",
         description: "Return to the main storefront and keep browsing current collections.",
-        to: "/"
+        to: homePath.value
     },
     {
         title: "Browse offers",
         description: "Jump into active promotions and featured products available right now.",
-        to: "/special-offers"
+        to: specialOffersPath.value
     }
-] as const
+])
 </script>
 
 <template>
@@ -49,9 +52,9 @@ const quickLinks = [
                             </p>
 
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                                <NuxtLink to="/" class="ui-btn-accent min-h-12 px-6"> Back to homepage </NuxtLink>
+                                <NuxtLink :to="homePath" class="ui-btn-accent min-h-12 px-6"> Back to homepage </NuxtLink>
                                 <NuxtLink
-                                    to="/special-offers"
+                                    :to="specialOffersPath"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300/80 bg-white px-6 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                                 >
                                     Browse offers

@@ -9,17 +9,20 @@ const router = useRouter()
 const customerStore = useCustomerStore()
 const wishlistStore = useWishlistStore()
 const { customerEmail, customerFullName } = storeToRefs(customerStore)
+const { canonicalizePath, localizedPath } = useLocalizedPath()
 
-const accountNav = [
+const accountNavBase = [
     { label: "Dashboard", to: "/account", icon: "dashboard" },
     { label: "Wishlist", to: "/account/wishlist", icon: "wishlist" },
     { label: "Profile", to: "/account/profile", icon: "profile" },
     { label: "Addresses", to: "/account/address", icon: "addresses" },
     { label: "Orders", to: "/account/orders", icon: "orders" }
 ] as const
+const accountNav = computed(() => accountNavBase.map((item) => ({ ...item, to: localizedPath(item.to), canonicalTo: item.to })))
+const canonicalRoutePath = computed<string>(() => canonicalizePath(route.path))
 
 const pageContent = computed<AccountPageContent>(() => {
-    if (route.path === "/account") {
+    if (canonicalRoutePath.value === "/account") {
         return {
             eyebrow: "Account dashboard",
             title: "A cleaner space for everything tied to your customer account.",
@@ -28,7 +31,7 @@ const pageContent = computed<AccountPageContent>(() => {
         }
     }
 
-    if (route.path.startsWith("/account/profile")) {
+    if (canonicalRoutePath.value.startsWith("/account/profile")) {
         return {
             eyebrow: "Profile settings",
             title: "Keep your details current for smoother future orders.",
@@ -36,7 +39,7 @@ const pageContent = computed<AccountPageContent>(() => {
         }
     }
 
-    if (route.path.startsWith("/account/wishlist")) {
+    if (canonicalRoutePath.value.startsWith("/account/wishlist")) {
         return {
             eyebrow: "Saved products",
             title: "Your wishlist keeps future purchases close at hand.",
@@ -44,7 +47,7 @@ const pageContent = computed<AccountPageContent>(() => {
         }
     }
 
-    if (route.path.startsWith("/account/address")) {
+    if (canonicalRoutePath.value.startsWith("/account/address")) {
         return {
             eyebrow: "Saved addresses",
             title: "Manage delivery and billing locations in one place.",
@@ -52,7 +55,7 @@ const pageContent = computed<AccountPageContent>(() => {
         }
     }
 
-    if (route.path.startsWith("/account/orders/")) {
+    if (canonicalRoutePath.value.startsWith("/account/orders/")) {
         return {
             eyebrow: "Order details",
             title: "Review a single order with all of its invoice and delivery context.",
@@ -68,34 +71,34 @@ const pageContent = computed<AccountPageContent>(() => {
 })
 
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
-    const items: BreadcrumbItem[] = [{ label: "Account", to: "/account" }]
+    const items: BreadcrumbItem[] = [{ label: "Account", to: localizedPath("/account") }]
 
-    if (route.path === "/account") {
+    if (canonicalRoutePath.value === "/account") {
         return items
     }
 
-    if (route.path.startsWith("/account/profile")) {
-        items.push({ label: "Profile", to: "/account/profile" })
+    if (canonicalRoutePath.value.startsWith("/account/profile")) {
+        items.push({ label: "Profile", to: localizedPath("/account/profile") })
         return items
     }
 
-    if (route.path.startsWith("/account/wishlist")) {
-        items.push({ label: "Wishlist", to: "/account/wishlist" })
+    if (canonicalRoutePath.value.startsWith("/account/wishlist")) {
+        items.push({ label: "Wishlist", to: localizedPath("/account/wishlist") })
         return items
     }
 
-    if (route.path.startsWith("/account/address")) {
-        items.push({ label: "Addresses", to: "/account/address" })
+    if (canonicalRoutePath.value.startsWith("/account/address")) {
+        items.push({ label: "Addresses", to: localizedPath("/account/address") })
         return items
     }
 
-    if (route.path.startsWith("/account/orders/")) {
-        items.push({ label: "Orders", to: "/account/orders" })
+    if (canonicalRoutePath.value.startsWith("/account/orders/")) {
+        items.push({ label: "Orders", to: localizedPath("/account/orders") })
         items.push({ label: "Order details", to: route.path })
         return items
     }
 
-    items.push({ label: "Orders", to: "/account/orders" })
+    items.push({ label: "Orders", to: localizedPath("/account/orders") })
     return items
 })
 
@@ -113,14 +116,16 @@ const accountStatus = computed<AccountHighlight[]>(() => [
 const customerLabel = computed<string>(() => customerFullName.value)
 
 function isActivePath(path: string): boolean {
-    if (path === "/account") {
-        return route.path === path
+    const canonicalPath = canonicalizePath(path)
+
+    if (canonicalPath === "/account") {
+        return canonicalRoutePath.value === canonicalPath
     }
 
-    return route.path === path || route.path.startsWith(`${path}/`)
+    return canonicalRoutePath.value === canonicalPath || canonicalRoutePath.value.startsWith(`${canonicalPath}/`)
 }
 
-function iconPaths(icon: (typeof accountNav)[number]["icon"]): string[] {
+function iconPaths(icon: (typeof accountNavBase)[number]["icon"]): string[] {
     if (icon === "dashboard") {
         return ["M4 4h7v7H4z", "M13 4h7v5h-7z", "M13 11h7v9h-7z", "M4 13h7v7H4z"]
     }
@@ -147,7 +152,7 @@ async function handleLogout(): Promise<void> {
         if (response.success) {
             customerStore.clearCustomer()
             wishlistStore.clearWishlist()
-            await router.push("/")
+            await router.push(localizedPath("/"))
         }
     } catch (error) {
         console.error("Logout failed", error)
@@ -224,11 +229,11 @@ async function handleLogout(): Promise<void> {
                     <nav class="mt-4 grid gap-2" aria-label="Account navigation">
                         <NuxtLink
                             v-for="item in accountNav"
-                            :key="item.to"
+                            :key="item.canonicalTo"
                             :to="item.to"
                             class="flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold transition motion-reduce:transition-none"
                             :class="
-                                isActivePath(item.to)
+                                isActivePath(item.canonicalTo)
                                     ? 'bg-amber-50 text-slate-950 ring-1 ring-amber-100'
                                     : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
                             "
@@ -236,7 +241,7 @@ async function handleLogout(): Promise<void> {
                             <span
                                 class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border"
                                 :class="
-                                    isActivePath(item.to)
+                                    isActivePath(item.canonicalTo)
                                         ? 'border-amber-200 bg-white text-amber-900'
                                         : 'border-slate-200 bg-white text-slate-500'
                                 "

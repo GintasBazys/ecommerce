@@ -3,6 +3,7 @@ import type { Ref } from "vue"
 import { useSiteIdentity, type SchemaNode, createBreadcrumbSchema, useStructuredData } from "~/composables/shared/useStructuredData"
 import type { CategoryProductsResponse } from "~/types/category-listing"
 import { PRODUCT_URL_HANDLE } from "~/utils/consts"
+import { createLocalizedAlternateLinks, localizePath, type HeadLink } from "~/utils/locale"
 
 type UseCategoryPageSeoOptions = {
     notFoundPath: Ref<string | null>
@@ -30,6 +31,7 @@ export function useCategoryPageSeo({
     offset
 }: UseCategoryPageSeoOptions) {
     const { absoluteUrl } = useSiteIdentity()
+    const { currentLocale } = storeToRefs(useLocaleStore())
 
     const currentListingPath = computed<string>(() => {
         if (currentPage.value <= 1) {
@@ -73,7 +75,9 @@ export function useCategoryPageSeo({
                       itemListElement: products.value.map((product, index) => ({
                           "@type": "ListItem",
                           position: offset.value + index + 1,
-                          url: absoluteUrl(product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : categoryPath.value),
+                          url: absoluteUrl(
+                              product.handle ? localizePath(`${PRODUCT_URL_HANDLE}/${product.handle}`, currentLocale.value) : categoryPath.value
+                          ),
                           name: product.title
                       }))
                   }
@@ -86,7 +90,7 @@ export function useCategoryPageSeo({
             ? null
             : createBreadcrumbSchema(
                   [
-                      { name: "Home", path: "/" },
+                      { name: "Home", path: localizePath("/", currentLocale.value) },
                       { name: pageHeading.value, path: categoryPath.value }
                   ],
                   absoluteUrl
@@ -107,7 +111,10 @@ export function useCategoryPageSeo({
             }
         }
 
-        const links: { rel: string; href: string }[] = [{ rel: "canonical", href: absoluteUrl(canonicalPath.value) }]
+        const links: HeadLink[] = [
+            { rel: "canonical", href: absoluteUrl(canonicalPath.value) },
+            ...createLocalizedAlternateLinks(canonicalPath.value, absoluteUrl)
+        ]
 
         if (!hasFacetedQuery.value && totalPages.value > 1) {
             if (currentPage.value > 1) {

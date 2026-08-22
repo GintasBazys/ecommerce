@@ -21,7 +21,8 @@ const emit = defineEmits<{
     quantityInput: [event: Event]
 }>()
 
-const productUrl = computed<string>(() => (props.item.product_handle ? `${PRODUCT_URL_HANDLE}/${props.item.product_handle}` : "#"))
+const { localizedPath } = useLocalizedPath()
+const productUrl = computed<string>(() => (props.item.product_handle ? localizedPath(`${PRODUCT_URL_HANDLE}/${props.item.product_handle}`) : "#"))
 
 const productDescription = computed<string>(() => props.item.product_description || "Selected item in your cart.")
 const variantTitle = computed<string>(() => props.item.variant_title || "Standard option")

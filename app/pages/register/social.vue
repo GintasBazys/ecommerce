@@ -12,6 +12,7 @@ import { useSnackbar } from "~/composables/shared/useSnackbar"
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
+const { localizedPath } = useLocalizedPath()
 const customerStore = useCustomerStore()
 const cartStore = useCartStore()
 
@@ -398,7 +399,7 @@ onMounted(() => {
                             {{ isRetrying ? "Retrying..." : `Retry ${providerLabel} sign-in` }}
                         </BaseButton>
                         <NuxtLink
-                            to="/signin"
+                            :to="localizedPath('/signin')"
                             class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                         >
                             Back to sign in

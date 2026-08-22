@@ -12,6 +12,9 @@ definePageMeta({
     middleware: ["auth"]
 })
 
+const { localizedPath } = useLocalizedPath()
+const ordersPath = computed<string>(() => localizedPath("/account/orders"))
+
 useHead({ title: "Profile | Medusa Commerce" })
 
 const customerStore = useCustomerStore()
@@ -243,7 +246,7 @@ async function onSubmit(): Promise<void> {
                     </p>
                 </div>
                 <NuxtLink
-                    to="/account/orders"
+                    :to="ordersPath"
                     class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                 >
                     View all orders

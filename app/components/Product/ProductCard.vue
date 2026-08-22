@@ -18,6 +18,7 @@ const { product, compact = false } = defineProps<{
 const wishlistStore = useWishlistStore()
 const customerStore = useCustomerStore()
 const { showSnackbar } = useSnackbar()
+const { localizedPath } = useLocalizedPath()
 const { adding, errorMessage, addToCart: addSelectedVariantToCart } = useAddToCart({
     product: () => product,
     source: "product_card"
@@ -36,7 +37,7 @@ const selectedVariant = computed<ProductVariantDTO | null>(() => {
     return variants.find((variant) => isVariantAvailable(variant) && variant.calculated_price?.calculated_amount != null) ?? variants[0] ?? null
 })
 
-const productHref = computed<string>(() => (product.handle ? `${PRODUCT_URL_HANDLE}/${product.handle}` : "#"))
+const productHref = computed<string>(() => (product.handle ? localizedPath(`${PRODUCT_URL_HANDLE}/${product.handle}`) : "#"))
 
 const productImage = computed<string>(() => product.thumbnail || product.images?.[0]?.url || FALLBACK_IMAGE)
 

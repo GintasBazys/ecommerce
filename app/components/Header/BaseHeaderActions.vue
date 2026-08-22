@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import type { LocationItem } from "~/types/navigation"
 
+import LanguageSelect from "~/components/Header/LanguageSelect.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
 defineProps<{
     locationItems: LocationItem[]
     locationValue: string
+    languageItems: LocationItem[]
+    languageValue: string
+    languageLabel: string
     selectionLoading: boolean
+    languageSelectionLoading: boolean
     itemCount: number
     wishlistCount: number
     isAuthenticated: boolean
@@ -17,7 +22,10 @@ const emit = defineEmits<{
     search: []
     menu: []
     "update-location": [value: string]
+    "update-language": [value: string]
 }>()
+
+const { localizedPath } = useLocalizedPath()
 </script>
 
 <template>
@@ -46,6 +54,15 @@ const emit = defineEmits<{
             />
         </label>
 
+        <LanguageSelect
+            class="hidden lg:inline-flex"
+            :language-items="languageItems"
+            :language-value="languageValue"
+            :language-label="languageLabel"
+            :disabled="languageSelectionLoading"
+            @update-language="emit('update-language', $event)"
+        />
+
         <BaseButton
             type="button"
             class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
@@ -58,7 +75,7 @@ const emit = defineEmits<{
             </svg>
         </BaseButton>
 
-        <NuxtLink :to="isAuthenticated ? '/account/wishlist' : '/signin'" class="relative inline-flex">
+        <NuxtLink :to="isAuthenticated ? localizedPath('/account/wishlist') : localizedPath('/signin')" class="relative inline-flex">
             <span class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden">
                 <span class="sr-only">Open wishlist</span>
                 <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -78,7 +95,7 @@ const emit = defineEmits<{
             </span>
         </NuxtLink>
 
-        <NuxtLink to="/cart" class="relative inline-flex">
+        <NuxtLink :to="localizedPath('/cart')" class="relative inline-flex">
             <span class="shadow-card inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-300/50 bg-linear-to-b from-white to-slate-50 text-slate-700 transition hover:border-amber-200 hover:text-amber-900 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden">
                 <span class="sr-only">Open cart</span>
                 <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -98,14 +115,14 @@ const emit = defineEmits<{
         <NuxtLink
             v-if="isAuthenticated"
             class="shadow-card hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
-            to="/account"
+            :to="localizedPath('/account')"
         >
             Profile
         </NuxtLink>
         <NuxtLink
             v-else
             class="shadow-card hidden items-center rounded-full border border-slate-200 bg-white/85 px-3 py-2 text-base font-semibold text-slate-700 transition hover:border-amber-200 hover:text-amber-900 xl:inline-flex"
-            to="/signin"
+            :to="localizedPath('/signin')"
         >
             Sign in
         </NuxtLink>

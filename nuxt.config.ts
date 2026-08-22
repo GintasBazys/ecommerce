@@ -1,8 +1,38 @@
 import tailwindcss from "@tailwindcss/vite"
 
+import { NON_DEFAULT_LOCALES, localizeRoutePatternPath } from "#shared/route-slugs"
+
 const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com", "localhost"]
 const posthogPublicKey = process.env.NUXT_PUBLIC_POSTHOG_PUBLIC_KEY || process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || ""
 const posthogHost = process.env.NUXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com"
+const privateRobotsPaths = ["/account", "/account/**", "/cart", "/checkout", "/order-completed", "/register/**", "/signin"] as const
+type NonDefaultLocale = (typeof NON_DEFAULT_LOCALES)[number]
+
+type NuxtPageRoute = {
+    name?: string
+    path: string
+    file?: string
+    children?: NuxtPageRoute[]
+}
+
+function localizeConfigPath(path: string, locale: NonDefaultLocale): string {
+    return localizeRoutePatternPath(path, locale)
+}
+
+function cloneLocalizedRoutes(pages: NuxtPageRoute[], locale: NonDefaultLocale): NuxtPageRoute[] {
+    return pages
+        .filter((page) => !page.path.startsWith(`/${locale}`))
+        .map((page) => ({
+            ...page,
+            name: page.name ? `${locale}-${page.name}` : undefined,
+            path: localizeConfigPath(page.path, locale),
+            children: page.children ? cloneLocalizedRoutes(page.children, locale) : undefined
+        }))
+}
+
+function withLocalizedConfigPaths(paths: readonly string[]): string[] {
+    return paths.flatMap((path) => [path, ...NON_DEFAULT_LOCALES.map((locale) => localizeConfigPath(path, locale))])
+}
 
 export default defineNuxtConfig({
     experimental: {
@@ -58,7 +88,7 @@ export default defineNuxtConfig({
     },
 
     robots: {
-        disallow: ["/account", "/account/**", "/cart", "/checkout", "/order-completed", "/register/**", "/signin"]
+        disallow: withLocalizedConfigPaths(privateRobotsPaths)
     },
 
     runtimeConfig: {
@@ -102,5 +132,15 @@ export default defineNuxtConfig({
 
     sourcemap: {
         client: "hidden"
+    },
+
+    hooks: {
+        "pages:extend"(pages) {
+            const basePages = [...pages] as NuxtPageRoute[]
+
+            for (const locale of NON_DEFAULT_LOCALES) {
+                pages.push(...cloneLocalizedRoutes(basePages, locale))
+            }
+        }
     }
 })

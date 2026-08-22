@@ -13,10 +13,13 @@ const cartStore = useCartStore()
 const { cart, openCartDrawer, recoveryMessage } = storeToRefs(cartStore)
 const { removeLineItem, updateLineItem, clearRecoveryMessage } = cartStore
 const posthog = usePostHog()
+const { localizedPath } = useLocalizedPath()
 
 const isHydrated = ref<boolean>(false)
 const drawerRef = useTemplateRef<HTMLElement>('drawerRef')
 const titleId = useId()
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
+const cartPath = computed<string>(() => localizedPath("/cart"))
 
 const qtyMap = reactive<Record<string, number | undefined>>({})
 const updating = reactive<Record<string, boolean>>({})
@@ -205,8 +208,7 @@ function closeDrawer(): void {
                 class="fixed top-0 right-0 bottom-0 z-85 w-full max-w-110 overflow-hidden border-l border-white/60 bg-linear-to-b from-slate-50 to-slate-100 shadow-2xl transition-transform duration-300 ease-out"
                 :class="openCartDrawer ? 'translate-x-0' : 'translate-x-full'"
                 :aria-labelledby="titleId"
-                role="dialog"
-                aria-modal="true"
+                role="search"
                 tabindex="-1"
             >
                 <div class="flex h-full min-h-0 flex-col">
@@ -359,7 +361,7 @@ function closeDrawer(): void {
                             <p class="mt-2 text-sm leading-6 text-slate-700">
                                 Add a few pieces you love and they will appear here for a quick final review.
                             </p>
-                            <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="ui-btn-accent mt-5"> Keep shopping </NuxtLink>
+                            <NuxtLink :to="allProductsPath" class="ui-btn-accent mt-5"> Keep shopping </NuxtLink>
                         </section>
                     </div>
 
@@ -395,7 +397,7 @@ function closeDrawer(): void {
                             </BaseButton>
 
                             <NuxtLink
-                                to="/cart"
+                                :to="cartPath"
                                 class="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                                 :class="{ 'pointer-events-none opacity-50': isCartDirty || isAnyUpdating }"
                             >

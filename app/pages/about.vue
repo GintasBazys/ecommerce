@@ -3,6 +3,7 @@ import { createBreadcrumbSchema, type SchemaNode, useSiteIdentity, useStructured
 
 const route = useRoute()
 const { absoluteUrl } = useSiteIdentity()
+const { localizedPath } = useLocalizedPath()
 
 useHead({
     title: "About | Medusa Commerce"
@@ -16,7 +17,7 @@ useSeoMeta({
 const breadcrumbSchema = computed<SchemaNode>(() =>
     createBreadcrumbSchema(
         [
-            { name: "Home", path: "/" },
+            { name: "Home", path: localizedPath("/") },
             { name: "About", path: route.path }
         ],
         absoluteUrl

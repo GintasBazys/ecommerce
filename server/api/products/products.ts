@@ -1,4 +1,5 @@
 import { LIMIT } from "@/utils/consts"
+import { getRequestMedusaLocale } from "#server/utils/locale"
 import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
 
 type ProductsResponse = {
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event) => {
     const handles = parseHandles(query.handles)
     const order = query.order ? String(query.order) : "-created_at"
     const view = query.view ? String(query.view) : "default"
+    const locale = getRequestMedusaLocale(event, query.locale)
 
     const regionId = query.region_id ? String(query.region_id) : null
     const countryCode = query.country_code ? String(query.country_code) : ""
@@ -58,6 +60,7 @@ export default defineEventHandler(async (event) => {
         fields,
         region_id: regionId,
         country_code: countryCode,
+        locale,
         order
     })
 

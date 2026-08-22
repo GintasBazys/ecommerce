@@ -20,6 +20,7 @@ useHead({
 const cartStore = useCartStore()
 const { cart, recoveryMessage } = storeToRefs(cartStore)
 const { removeLineItem, updateLineItem, loadCart, clearRecoveryMessage } = cartStore
+const { localizedPath } = useLocalizedPath()
 const qtyMap = reactive<Record<string, number>>({})
 const updating = reactive<Record<string, boolean>>({})
 const isApplyingCoupon = ref<boolean>(false)
@@ -27,6 +28,7 @@ const isCartLoading = ref<boolean>(true)
 const couponCode = ref<string>("")
 const cartActionError = ref<string | null>(null)
 const couponError = ref<string | null>(null)
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
 
 watch(
     cart,
@@ -261,7 +263,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6">
             <section class="grid gap-5 lg:gap-7 xl:grid-cols-2">
                 <div class="space-y-5 sm:space-y-6">
-                    <CartHero :total="displayTotal" :item-count="cartItemCount" :continue-shopping-url="ALL_PRODUCTS_URL_HANDLE" />
+                    <CartHero :total="displayTotal" :item-count="cartItemCount" :continue-shopping-url="allProductsPath" />
 
                     <section
                         class="shadow-panel rounded-3xl border border-white/80 bg-linear-to-b from-white to-slate-50 p-4 sm:p-5"
@@ -369,7 +371,7 @@ function getPromotionValue(promo: { application_method?: { value?: number | stri
                                     Add a few products you love and come back here to review everything before checkout.
                                 </p>
                             </div>
-                            <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="ui-btn-accent min-h-12 px-6"> Browse products </NuxtLink>
+                            <NuxtLink :to="allProductsPath" class="ui-btn-accent min-h-12 px-6"> Browse products </NuxtLink>
                         </div>
                     </section>
                 </div>

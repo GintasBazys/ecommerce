@@ -1,7 +1,12 @@
+import { getCanonicalRouteName, localizePath } from "~/utils/locale"
+
 export default defineNuxtRouteMiddleware(async (to) => {
     const customerStore = useCustomerStore()
+    const localeStore = useLocaleStore()
+    const routeName = getCanonicalRouteName(to.name)
+    const isAccountRoute = routeName.startsWith("account")
 
-    if (typeof to.name !== "string" || !to.name.startsWith("account") || customerStore.isAuthenticated) {
+    if (!isAccountRoute || customerStore.isAuthenticated) {
         return
     }
 
@@ -17,6 +22,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
 
     if (!customerStore.isAuthenticated) {
-        return navigateTo("/signin")
+        return navigateTo(localizePath("/signin", localeStore.currentLocale))
     }
 })

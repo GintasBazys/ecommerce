@@ -7,6 +7,9 @@ import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 import { BLOG_HANDLE } from "~/utils/consts"
 
+const { localizedPath } = useLocalizedPath()
+const blogPath = computed<string>(() => localizedPath(BLOG_HANDLE))
+
 defineProps<{
     currentPost: BlogPost
     publishedDate: string
@@ -76,7 +79,7 @@ defineProps<{
 
             <div class="mt-8 flex justify-center">
                 <NuxtLink
-                    :to="BLOG_HANDLE"
+                    :to="blogPath"
                     class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white/95 px-5 text-sm font-semibold text-slate-800 no-underline transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
                 >
                     Back to all posts

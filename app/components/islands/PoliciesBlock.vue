@@ -24,6 +24,8 @@ const policies: PolicyItem[] = [
         action: "Contact support"
     }
 ]
+const { localizedPath } = useLocalizedPath()
+const localizedPolicies = computed<PolicyItem[]>(() => policies.map((policy) => ({ ...policy, to: localizedPath(policy.to) })))
 </script>
 
 <template>
@@ -54,7 +56,7 @@ const policies: PolicyItem[] = [
 
                 <div class="grid gap-3 md:grid-cols-3 lg:col-span-3">
                     <NuxtLink
-                        v-for="policy in policies"
+                        v-for="policy in localizedPolicies"
                         :key="policy.title"
                         :to="policy.to"
                         class="group shadow-card rounded-3xl border border-slate-200 bg-linear-to-b from-white to-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-hidden"

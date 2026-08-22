@@ -4,6 +4,7 @@ import type { H3Event } from "h3"
 import { fetchMedusaJson } from "#server/utils/medusa-proxy"
 import type { StoreBlogPostsResponse } from "#server/utils/blog"
 import { fetchAllStoreProducts } from "#server/utils/products"
+import { expandLocalizedPaths } from "#server/utils/locale"
 
 type SitemapProduct = Pick<HttpTypes.StoreProduct, "handle" | "updated_at">
 type SitemapCategory = Pick<ProductCategoryDTO, "handle" | "updated_at">
@@ -19,6 +20,10 @@ function toLastmod(value: string | Date | null | undefined): string | undefined 
     }
 
     return value instanceof Date ? value.toISOString() : value
+}
+
+function withLocalizedEntries(entries: SitemapEntry[]): SitemapEntry[] {
+    return entries.flatMap((entry) => expandLocalizedPaths(entry.loc).map((loc) => ({ ...entry, loc })))
 }
 
 async function fetchBlogPosts(event: H3Event) {
@@ -85,7 +90,7 @@ export default defineSitemapEventHandler(async (event) => {
             lastmod: toLastmod(post.updated_at ?? post.published_at ?? post.created_at)
         }))
 
-    const entries: SitemapEntry[] = [{ loc: "/category/all-products" }, ...categoryEntries, ...productEntries, ...blogEntries]
+    const entries: SitemapEntry[] = withLocalizedEntries([{ loc: "/category/all-products" }, ...categoryEntries, ...productEntries, ...blogEntries])
 
     const dedupedEntries = new Map<string, SitemapEntry>()
 

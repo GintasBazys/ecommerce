@@ -1,0 +1,33 @@
+{
+    "language": {
+        "english": "Anglų",
+        "label": "Kalba",
+        "lithuanian": "Lietuvių"
+    },
+    "routes": {
+        "about": "apie-mus",
+        "account": "paskyra",
+        "address": "adresai",
+        "allProducts": "visos-prekes",
+        "blog": "tinklarastis",
+        "cart": "krepselis",
+        "category": "kategorija",
+        "checkout": "atsiskaitymas",
+        "contact": "kontaktai",
+        "faq": "duk",
+        "orderCompleted": "uzsakymas-patvirtintas",
+        "orderStatus": "uzsakymo-busena",
+        "orders": "uzsakymai",
+        "privacy": "privatumo-politika",
+        "product": "preke",
+        "profile": "profilis",
+        "register": "registracija",
+        "resetPassword": "slaptazodzio-atkurimas",
+        "returns": "grazinimas",
+        "search": "paieska",
+        "shipping": "pristatymas",
+        "signin": "prisijungti",
+        "specialOffers": "specialus-pasiulymai",
+        "wishlist": "noru-sarasas"
+    }
+}

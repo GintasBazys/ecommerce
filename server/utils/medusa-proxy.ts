@@ -1,4 +1,5 @@
 import type { H3Event } from "h3"
+import { getRequestMedusaLocale } from "#server/utils/locale"
 
 type ErrorPayload = {
     message?: string
@@ -57,6 +58,10 @@ export function createMedusaHeaders(event: H3Event, options: MedusaRequestOption
 
     if (options.includePublishableKey !== false && !headers.has("x-publishable-api-key")) {
         headers.set("x-publishable-api-key", runtimeConfig.public.PUBLISHABLE_KEY)
+    }
+
+    if (!headers.has("x-medusa-locale")) {
+        headers.set("x-medusa-locale", getRequestMedusaLocale(event))
     }
 
     const cookieHeader = options.cookie ?? getIncomingCookie(event)

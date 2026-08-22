@@ -24,6 +24,7 @@ export function useCheckoutPayment(options: {
 }) {
     const config = useRuntimeConfig()
     const router = useRouter()
+    const { localizedPath } = useLocalizedPath()
     const isLoading = shallowRef<boolean>(false)
     const isRedirectingToOrder = shallowRef<boolean>(false)
     const isShippingLoading = shallowRef<boolean>(true)
@@ -379,7 +380,7 @@ export function useCheckoutPayment(options: {
         options.guestCheckoutEmailCookie.value = null
         options.hasExplicitGuestIdentity.value = false
         await router.push({
-            name: "order-completed",
+            path: localizedPath("/order-completed"),
             query: {
                 orderId,
                 ...(payload.order?.shipping_address?.postal_code

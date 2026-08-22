@@ -5,6 +5,8 @@ import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
 const productStore = useProductStore()
 const { bestSellers } = storeToRefs(productStore)
+const { localizedPath } = useLocalizedPath()
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
 
 await callOnce(async () => {
     await productStore.fetchBestSellers(regionStoreId.value ?? "", selectedCountryCode.value ?? "", {
@@ -39,7 +41,7 @@ const { onPointerDown, onClickCapture, onDragStart } = useDragScroll(railRef)
                 </div>
 
                 <NuxtLink
-                    :to="ALL_PRODUCTS_URL_HANDLE"
+                    :to="allProductsPath"
                     class="shadow-card inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden lg:self-auto"
                 >
                     Shop popular picks

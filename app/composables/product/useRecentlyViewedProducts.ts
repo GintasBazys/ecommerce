@@ -58,6 +58,7 @@ export function useRecentlyViewedProducts(options: {
     regionStoreId: Ref<string | null | undefined>
     selectedCountryCode: Ref<string | null | undefined>
 }) {
+    const { currentLocale } = storeToRefs(useLocaleStore())
     const products = ref<ProductDTO[]>([])
     const pending = ref<boolean>(false)
     const error = ref<unknown | null>(null)
@@ -67,6 +68,7 @@ export function useRecentlyViewedProducts(options: {
         const response = await $fetch<ProductListResponse>("/api/products/products", {
             query: {
                 handles: handles.join(","),
+                locale: currentLocale.value,
                 region_id: options.regionStoreId.value,
                 country_code: options.selectedCountryCode.value,
                 view: "card",

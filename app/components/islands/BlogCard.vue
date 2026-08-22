@@ -12,7 +12,8 @@ const { article, compact = false } = defineProps<{
     compact?: boolean
 }>()
 
-const articleHref = computed<string>(() => `${BLOG_HANDLE}/${article.slug}`)
+const { localizedPath } = useLocalizedPath()
+const articleHref = computed<string>(() => localizedPath(`${BLOG_HANDLE}/${article.slug}`))
 const articleImage = computed<string>(() => article.thumbnail || FALLBACK_IMAGE)
 const articleDate = computed<string>(() => formatDate(article.publishedAt))
 </script>

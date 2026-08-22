@@ -8,6 +8,7 @@ import { BLOG_HANDLE } from "~/utils/consts"
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
+const { localizedPath } = useLocalizedPath()
 
 const limit = 6
 
@@ -66,7 +67,9 @@ const activeCategory = computed<BlogCategory | null>(() => {
 
     return categories.value.find((category) => category.slug === currentCategory.value) || null
 })
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Blog" }])
+const blogPath = computed<string>(() => localizedPath(BLOG_HANDLE))
+const homePath = computed<string>(() => localizedPath("/"))
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: homePath.value }, { label: "Blog" }])
 const pageTitle = computed<string>(() =>
     activeCategory.value ? `${activeCategory.value.name} Blog | Medusa Commerce` : "Blog | Medusa Commerce"
 )
@@ -99,7 +102,7 @@ const blogListSchema = computed<SchemaNode | null>(() => {
         itemListElement: articles.value.map((article, index) => ({
             "@type": "ListItem",
             position: offset.value + index + 1,
-            url: absoluteUrl(`${BLOG_HANDLE}/${article.slug}`),
+            url: absoluteUrl(localizedPath(`${BLOG_HANDLE}/${article.slug}`)),
             name: article.title
         }))
     }
@@ -108,8 +111,8 @@ const blogListSchema = computed<SchemaNode | null>(() => {
 const breadcrumbSchema = computed<SchemaNode>(() =>
     createBreadcrumbSchema(
         [
-            { name: "Home", path: "/" },
-            { name: "Blog", path: route.path }
+            { name: "Home", path: homePath.value },
+            { name: "Blog", path: blogPath.value }
         ],
         absoluteUrl
     )

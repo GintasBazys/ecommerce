@@ -22,6 +22,7 @@ export interface CartResponse {
 }
 
 export const useProductStore = defineStore("product", () => {
+    const { currentLocale } = storeToRefs(useLocaleStore())
     const products = ref<ProductDTO[]>([])
     const limit = ref<number>(LIMIT)
     const offset = ref<number>(0)
@@ -58,6 +59,7 @@ export const useProductStore = defineStore("product", () => {
                 query: {
                     limit: requestLimit,
                     offset: requestOffset,
+                    locale: currentLocale.value,
                     ...(options.view ? { view: options.view } : {}),
                     ...(regionId ? { region_id: regionId } : {}),
                     ...(countryCode ? { country_code: countryCode } : {})

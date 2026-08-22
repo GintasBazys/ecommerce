@@ -3,6 +3,9 @@ import type { BlogPostSummary, BlogPostsResponse } from "~/types/blog"
 
 import { BLOG_HANDLE } from "~/utils/consts"
 
+const { localizedPath } = useLocalizedPath()
+const blogPath = computed<string>(() => localizedPath(BLOG_HANDLE))
+
 const { data: latestPostsData, error: latestPostsError } = await useAsyncData("latest-blog-posts", () =>
     $fetch<BlogPostsResponse>("/api/blog/posts", {
         query: {
@@ -34,7 +37,7 @@ const latestPosts = computed<BlogPostSummary[]>(() => latestPostsData.value?.pos
                 </div>
 
                 <NuxtLink
-                    :to="BLOG_HANDLE"
+                    :to="blogPath"
                     class="shadow-card inline-flex min-h-11 items-center justify-center self-start rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden lg:self-auto"
                 >
                     Browse all posts

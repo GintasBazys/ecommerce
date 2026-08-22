@@ -4,6 +4,7 @@ import type { LocationQuery } from "vue-router"
 import type { BreadcrumbItem } from "~/types/breadcrumbs"
 import type { CategoryImage } from "~/types/category-listing"
 import { ALL_PRODUCTS_URL_HANDLE, CATEGORY_HANDLE } from "~/utils/consts"
+import { getCanonicalRouteParam, localizePath } from "~/utils/locale"
 
 type LoadCategoryPageOptions = {
     isChangingCategoryPage: Ref<boolean>
@@ -19,10 +20,14 @@ const ALL_PRODUCTS_DESCRIPTION =
 export function useCategoryPageData() {
     const route = useRoute()
     const event = useRequestEvent()
+    const { currentLocale } = storeToRefs(useLocaleStore())
     const category = ref<ProductCategoryDTO | null>(null)
     const notFoundPath = ref<string | null>(null)
 
-    const isAllProductsPage = computed<boolean>(() => String(route.params.slug || "") === ALL_PRODUCTS_SLUG)
+    const canonicalCategorySlug = computed<string>(() =>
+        getCanonicalRouteParam(route.params.slug, { parentKey: "category", locale: currentLocale.value })
+    )
+    const isAllProductsPage = computed<boolean>(() => canonicalCategorySlug.value === ALL_PRODUCTS_SLUG)
     const categoryThumbnail = computed<string | null>(() => {
         if (isAllProductsPage.value) {
             return null
@@ -35,14 +40,14 @@ export function useCategoryPageData() {
     const heroFallbackImage = computed<string>(() => (isAllProductsPage.value ? "/images/hero-premium.jpg" : "/images/hero-main.jpg"))
     const heroImage = computed<string>(() => categoryThumbnail.value || heroFallbackImage.value)
     const categoryPath = computed<string>(() =>
-        isAllProductsPage.value ? ALL_PRODUCTS_URL_HANDLE : `${CATEGORY_HANDLE}/${String(route.params.slug || "")}`
+        localizePath(isAllProductsPage.value ? ALL_PRODUCTS_URL_HANDLE : `${CATEGORY_HANDLE}/${canonicalCategorySlug.value}`, currentLocale.value)
     )
     const pageHeading = computed<string>(() => (isAllProductsPage.value ? "All Products" : category.value?.name || "Category"))
     const basePageDescription = computed<string>(() => (isAllProductsPage.value ? ALL_PRODUCTS_DESCRIPTION : category.value?.description || ""))
     const sidebarTitle = computed<string>(() => (isAllProductsPage.value ? "Refine every product" : "Refine this category"))
     const emptyStateText = computed<string>(() => "Try clearing some filters or browsing another category.")
     const heroEyebrow = computed<string>(() => (isAllProductsPage.value ? "Store catalog" : "Category"))
-    const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: pageHeading.value }])
+    const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizePath("/", currentLocale.value) }, { label: pageHeading.value }])
 
     function markNotFound(): void {
         notFoundPath.value = route.fullPath
@@ -66,7 +71,7 @@ export function useCategoryPageData() {
 
         if (!isAllProductsPage.value) {
             try {
-                category.value = await $fetch<ProductCategoryDTO | null>(`/api/categories/${String(route.params.slug || "")}`)
+                category.value = await $fetch<ProductCategoryDTO | null>(`/api/categories/${canonicalCategorySlug.value}`)
             } catch {
                 category.value = null
             }

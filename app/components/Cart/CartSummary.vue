@@ -27,6 +27,9 @@ const emit = defineEmits<{
     removePromotion: [code: string | undefined]
 }>()
 
+const { localizedPath } = useLocalizedPath()
+const checkoutPath = computed<string>(() => localizedPath("/checkout"))
+
 function onCouponInput(event: Event): void {
     const value = event.target instanceof HTMLInputElement ? event.target.value : ""
     emit("update", value)
@@ -133,7 +136,7 @@ function onCouponInput(event: Event): void {
 
         <div class="mt-5 grid gap-3">
             <NuxtLink
-                :to="isCheckoutDisabled ? undefined : '/checkout'"
+                :to="isCheckoutDisabled ? undefined : checkoutPath"
                 class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                 :class="isCheckoutDisabled ? 'pointer-events-none opacity-50' : ''"
             >

@@ -2,6 +2,7 @@
 import ProductCard from "~/components/Product/ProductCard.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 import { useSnackbar } from "~/composables/shared/useSnackbar"
+import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 definePageMeta({
     layout: "account",
@@ -13,6 +14,8 @@ useHead({ title: "Wishlist | Medusa Commerce" })
 const wishlistStore = useWishlistStore()
 const { items, itemCount, loading } = storeToRefs(wishlistStore)
 const { showSnackbar } = useSnackbar()
+const { localizedPath } = useLocalizedPath()
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
 
 await wishlistStore.loadWishlist()
 
@@ -88,7 +91,7 @@ async function removeWishlistItem(wishlistItemId: string): Promise<void> {
                 Save products from any product card and they will appear here whenever you sign in.
             </p>
             <NuxtLink
-                to="/category/all-products"
+                :to="allProductsPath"
                 class="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden"
             >
                 Start shopping

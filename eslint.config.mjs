@@ -4,7 +4,7 @@ import vueParser from "vue-eslint-parser"
 
 import withNuxt from "./.nuxt/eslint.config.mjs"
 
-export default withNuxt({
+export default withNuxt({}, {
     languageOptions: {
         parser: vueParser,
         parserOptions: {

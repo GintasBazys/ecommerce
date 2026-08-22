@@ -16,6 +16,7 @@ useHead({
 })
 
 const route = useRoute()
+const { localizedPath } = useLocalizedPath()
 const orderId = computed<string>(() => String(route.query.orderId || ""))
 const orderVerificationQuery = computed<Record<string, string>>(() => ({
     ...(route.query.email ? { email: String(route.query.email) } : {}),
@@ -54,6 +55,8 @@ const orderDate = computed<string>(() => formatDate(order.value?.created_at))
 const shippingMethod = computed<NonNullable<OrderDTO["shipping_methods"]>[number] | null>(() => order.value?.shipping_methods?.[0] ?? null)
 const orderItems = computed<NonNullable<OrderDTO["items"]>>(() => order.value?.items ?? [])
 const orderEmail = computed<string>(() => order.value?.email || customerEmail.value || "your email")
+const homePath = computed<string>(() => localizedPath("/"))
+const accountOrdersPath = computed<string>(() => localizedPath("/account/orders"))
 const supportFacts = computed<OrderSupportFact[]>(() => [
     {
         label: "Order status",
@@ -68,6 +71,10 @@ const supportFacts = computed<OrderSupportFact[]>(() => [
         value: orderDate.value || "Unavailable"
     }
 ])
+
+function getOrderStatusPath(id: string): string {
+    return localizedPath(`/order-status/${id}`)
+}
 
 watch(
     order,
@@ -134,9 +141,9 @@ function formatAddressLines(address: OrderAddress): string[] {
                             </p>
 
                             <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-                                <NuxtLink to="/" class="ui-btn-accent min-h-12 px-6"> Continue shopping </NuxtLink>
+                                <NuxtLink :to="homePath" class="ui-btn-accent min-h-12 px-6"> Continue shopping </NuxtLink>
                                 <NuxtLink
-                                    :to="`/order-status/${order.id}`"
+                                    :to="getOrderStatusPath(order.id)"
                                     class="border-brand-100 bg-brand-50 text-brand-700 hover:border-brand-200 hover:text-brand-900 focus-visible:ring-brand-100 inline-flex min-h-12 items-center justify-center rounded-full border px-6 text-sm font-semibold transition focus-visible:ring-2 focus-visible:outline-hidden"
                                 >
                                     Track this order
@@ -145,7 +152,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                                     Download invoice PDF
                                 </a>
                                 <NuxtLink
-                                    to="/account/orders"
+                                    :to="accountOrdersPath"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-hidden"
                                 >
                                     View your orders
@@ -322,13 +329,13 @@ function formatAddressLines(address: OrderAddress): string[] {
 
                                 <div class="mt-5 grid gap-3">
                                     <NuxtLink
-                                        to="/"
+                                        :to="homePath"
                                         class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                                     >
                                         Back to home
                                     </NuxtLink>
                                     <NuxtLink
-                                        :to="`/order-status/${order.id}`"
+                                        :to="getOrderStatusPath(order.id)"
                                         class="border-brand-100 bg-brand-50 text-brand-700 hover:border-brand-200 hover:text-brand-900 focus-visible:ring-brand-100 inline-flex min-h-12 items-center justify-center rounded-full border px-5 text-sm font-semibold transition focus-visible:ring-2 focus-visible:outline-hidden"
                                     >
                                         Track this order
@@ -341,7 +348,7 @@ function formatAddressLines(address: OrderAddress): string[] {
                                         Download invoice PDF
                                     </a>
                                     <NuxtLink
-                                        to="/account/orders"
+                                        :to="accountOrdersPath"
                                         class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-hidden"
                                     >
                                         View your orders

@@ -10,7 +10,7 @@ defineProps<{
     open: boolean
 }>()
 
-const selectedIds = defineModel<string[]>("selectedIds", { default: [] })
+const selectedIds = defineModel<string[]>("selectedIds", { default: () => [] })
 
 const emit = defineEmits<{
     toggle: [sectionId: string]

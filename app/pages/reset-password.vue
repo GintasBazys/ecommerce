@@ -3,6 +3,7 @@ import BaseButton from "~/components/Shared/BaseButton.vue"
 
 const route = useRoute()
 const router = useRouter()
+const { localizedPath } = useLocalizedPath()
 const token = computed<string>(() => String(route.query.token || "").trim())
 const email = computed<string>(() => String(route.query.email || "").trim())
 const password = ref<string>("")
@@ -72,7 +73,7 @@ async function handleSubmit(): Promise<void> {
         await router.replace({ path: route.path, query: {} })
 
         redirectTimer.value = setTimeout(() => {
-            void router.push("/signin")
+            void router.push(localizedPath("/signin"))
         }, 1500)
     } catch (error: unknown) {
         console.error(error)

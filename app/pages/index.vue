@@ -3,6 +3,7 @@ import { createBreadcrumbSchema, useSiteIdentity, useStructuredData } from "~/co
 
 const route = useRoute()
 const { siteName, absoluteUrl } = useSiteIdentity()
+const { localizedPath } = useLocalizedPath()
 const DeferredLatestPosts = defineAsyncComponent(() => import("@/components/About/LatestPosts.vue"))
 const DeferredLatestProducts = defineAsyncComponent(() => import("@/components/Products/LatestProducts.vue"))
 const DeferredBestSellers = defineAsyncComponent(() => import("@/components/Products/BestSellers.vue"))
@@ -25,7 +26,7 @@ useStructuredData(
         },
         createBreadcrumbSchema(
             [
-                { name: "Home", path: "/" },
+                { name: "Home", path: localizedPath("/") },
                 { name: "Shop", path: route.path }
             ],
             absoluteUrl

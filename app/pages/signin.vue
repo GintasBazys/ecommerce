@@ -15,6 +15,7 @@ definePageMeta({ layout: "default" })
 
 const router = useRouter()
 const config = useRuntimeConfig()
+const { localizedPath } = useLocalizedPath()
 
 const showResetDialog = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
@@ -128,7 +129,7 @@ async function handleLogin(): Promise<void> {
         posthog?.identify(loginEmail.value, { email: loginEmail.value })
         posthog?.capture("user_signed_in", { method: "email" })
 
-        await router.push("/")
+        await router.push(localizedPath("/"))
     } finally {
         loginIsSubmitting.value = false
     }
@@ -322,7 +323,7 @@ async function handleReset(): Promise<void> {
 
                     <p class="mt-5 text-center text-sm text-slate-600">
                         Don't have an account?
-                        <NuxtLink to="/register" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
+                        <NuxtLink :to="localizedPath('/register')" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
                             Register here
                         </NuxtLink>
                     </p>

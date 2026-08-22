@@ -10,6 +10,7 @@ definePageMeta({ layout: "default" })
 const route = useRoute()
 const router = useRouter()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const { localizedPath } = useLocalizedPath()
 
 const searchInput = ref<string>(String(route.query.q || ""))
 const queryText = computed<string>(() => String(route.query.q || "").trim())
@@ -60,6 +61,8 @@ const { data, pending, error, refresh } = await useAsyncData<SearchResponse>(
 const products = computed<ProductDTO[]>(() => data.value?.products ?? [])
 const resultCount = computed<number>(() => Number(data.value?.count ?? products.value.length))
 const canLoadMore = computed<boolean>(() => products.value.length < resultCount.value)
+const searchPath = computed<string>(() => localizedPath("/search"))
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
 
 useHead(() => ({
     title: queryText.value ? `Search results for ${queryText.value} | Medusa Commerce` : "Search products | Medusa Commerce",
@@ -79,12 +82,12 @@ async function submitSearch(): Promise<void> {
         return
     }
 
-    await router.push({ path: "/search", query: { q: nextQuery, sort: sortOption.value, in_stock_only: inStockOnly.value ? "true" : undefined } })
+    await router.push({ path: searchPath.value, query: { q: nextQuery, sort: sortOption.value, in_stock_only: inStockOnly.value ? "true" : undefined } })
 }
 
 async function updateSearchRefinement(nextQuery: Record<string, string | undefined>): Promise<void> {
     await router.push({
-        path: "/search",
+        path: searchPath.value,
         query: {
             q: queryText.value,
             sort: nextQuery.sort ?? sortOption.value,
@@ -194,7 +197,7 @@ async function loadMoreResults(): Promise<void> {
                 <div v-else-if="canSearch" class="grid justify-items-center gap-4 rounded-3xl border border-white/80 bg-white/90 px-6 py-8 text-center shadow-panel">
                     <h2 class="text-2xl font-semibold text-slate-950">No products found.</h2>
                     <p class="max-w-xl text-sm leading-6 text-slate-600">Try a different product name, category, or SKU.</p>
-                    <NuxtLink :to="ALL_PRODUCTS_URL_HANDLE" class="ui-btn-accent min-h-12 px-6">Browse products</NuxtLink>
+                    <NuxtLink :to="allProductsPath" class="ui-btn-accent min-h-12 px-6">Browse products</NuxtLink>
                 </div>
             </section>
         </div>

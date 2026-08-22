@@ -23,6 +23,10 @@ type CartResponse = {
     cart?: StoreCartLike
 }
 
+type CartUpdatePayload = {
+    shipping_address?: CartAddress
+}
+
 const CART_FIELDS = "+items.*,+shipping_methods.*"
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 
@@ -161,24 +165,25 @@ export async function retrieveExpandedCart(event: H3Event, cartId: string) {
 
 export async function syncCartCountry(event: H3Event, cart: StoreCartLike, countryCode?: string | null) {
     const normalizedCountryCode = countryCode?.toLowerCase().trim()
-    if (!normalizedCountryCode) {
-        return cart
-    }
+    const updatePayload: CartUpdatePayload = {}
 
     const currentCountryCode =
         cart.shipping_address?.country_code?.toLowerCase() ?? cart.billing_address?.country_code?.toLowerCase() ?? null
-    if (currentCountryCode === normalizedCountryCode) {
+
+    if (normalizedCountryCode && currentCountryCode !== normalizedCountryCode) {
+        updatePayload.shipping_address = {
+            ...(cart.shipping_address ?? {}),
+            country_code: normalizedCountryCode
+        }
+    }
+
+    if (!Object.keys(updatePayload).length) {
         return cart
     }
 
     await fetchMedusaJson(event, `/store/carts/${cart.id}`, {
         method: "POST",
-        body: JSON.stringify({
-            shipping_address: {
-                ...(cart.shipping_address ?? {}),
-                country_code: normalizedCountryCode
-            }
-        })
+        body: JSON.stringify(updatePayload)
     })
 
     return retrieveExpandedCart(event, cart.id)

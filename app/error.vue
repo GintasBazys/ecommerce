@@ -13,19 +13,22 @@ const props = defineProps<{
 
 const statusCode = computed<number>(() => props.error?.status || 500)
 const message = computed<string>(() => props.error?.statusText || "Internal error")
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Error" }])
-const quickLinks = [
+const { localizedPath } = useLocalizedPath()
+const homePath = computed<string>(() => localizedPath("/"))
+const specialOffersPath = computed<string>(() => localizedPath("/special-offers"))
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: homePath.value }, { label: "Error" }])
+const quickLinks = computed(() => [
     {
         title: "Back to homepage",
         description: "Return to the storefront homepage and continue browsing active collections.",
-        to: "/"
+        to: homePath.value
     },
     {
         title: "Browse offers",
         description: "Jump into current promotions and featured product listings.",
-        to: "/special-offers"
+        to: specialOffersPath.value
     }
-] as const
+])
 
 useHead(() => ({
     title: `${statusCode.value} | Medusa Commerce`,
@@ -38,7 +41,7 @@ useHead(() => ({
 }))
 
 function backToHome() {
-    clearError({ redirect: "/" })
+    clearError({ redirect: homePath.value })
 }
 </script>
 
@@ -74,7 +77,7 @@ function backToHome() {
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                                 <BaseButton type="button" variant="accent" class="min-h-12 px-6" @click="backToHome">Back to home</BaseButton>
                                 <NuxtLink
-                                    to="/special-offers"
+                                    :to="specialOffersPath"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300/80 bg-white px-6 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-hidden"
                                 >
                                     Browse offers

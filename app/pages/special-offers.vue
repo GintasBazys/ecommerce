@@ -7,10 +7,15 @@ import type { ProductListResponse } from "~/types/product"
 import CategoryPagination from "~/components/Category/CategoryPagination.vue"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
+import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const route = useRoute()
+const { localizedPath } = useLocalizedPath()
 const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "Special Offers" }])
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizedPath("/") }, { label: "Special Offers" }])
+const contactPath = computed<string>(() => localizedPath("/contact"))
+const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
+const homePath = computed<string>(() => localizedPath("/"))
 
 const limit = 12
 const browsingNotes = ["Sale products appear first", "Pricing updates automatically", "Two-up mobile browsing for faster scanning"]
@@ -131,9 +136,9 @@ useSeoMeta({
                                 polished feel as the newer storefront experience while making mobile browsing denser and faster.
                             </p>
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                                <NuxtLink to="/contact" class="ui-btn-accent min-h-12 px-6"> Ask about an offer </NuxtLink>
+                                <NuxtLink :to="contactPath" class="ui-btn-accent min-h-12 px-6"> Ask about an offer </NuxtLink>
                                 <NuxtLink
-                                    to="/category/all-products"
+                                    :to="allProductsPath"
                                     class="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-semibold text-white transition hover:bg-white/16 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-hidden"
                                 >
                                     Browse full catalog
@@ -228,7 +233,7 @@ useSeoMeta({
                         Sale products will appear here automatically once discounts are available.
                     </p>
                 </div>
-                <NuxtLink to="/" class="ui-btn-primary px-6">Browse the full shop</NuxtLink>
+                <NuxtLink :to="homePath" class="ui-btn-primary px-6">Browse the full shop</NuxtLink>
             </div>
         </div>
     </section>

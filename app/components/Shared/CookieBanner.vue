@@ -4,6 +4,8 @@ import { useCookieConsent } from "~/composables/shared/useCookieConsent"
 
 const { accept, decline, isBannerVisible } = useCookieConsent()
 const canRenderBanner = ref<boolean>(false)
+const { localizedPath } = useLocalizedPath()
+const privacyPath = computed<string>(() => localizedPath("/privacy"))
 
 onMounted(() => {
     window.setTimeout(() => {
@@ -34,7 +36,7 @@ onMounted(() => {
                         <p class="mt-2 text-sm leading-6 text-slate-600">
                             Analytics are optional and only start if you accept. Declining will not affect checkout, account access, or cart
                             features.
-                            <NuxtLink to="/privacy" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
+                            <NuxtLink :to="privacyPath" class="font-semibold text-slate-900 underline-offset-2 transition hover:underline">
                                 Read the privacy policy
                             </NuxtLink>
                         </p>

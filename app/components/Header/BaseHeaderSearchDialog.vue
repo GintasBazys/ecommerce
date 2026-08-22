@@ -24,6 +24,7 @@ const searchLoading = ref<boolean>(false)
 const searchError = ref<string | null>(null)
 const searchResults = ref<ProductDTO[]>([])
 const searchHasSearched = ref<boolean>(false)
+const { localizedPath } = useLocalizedPath()
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
 const searchTitleId = useId()
 const searchDialogModel = computed<boolean>({
@@ -115,11 +116,11 @@ async function submitSearch(): Promise<void> {
     }
 
     closeSearchDialog()
-    await navigateTo({ path: "/search", query: { q: query } })
+    await navigateTo({ path: localizedPath("/search"), query: { q: query } })
 }
 
 function getProductPath(handle?: string | null): string {
-    return handle ? `${PRODUCT_URL_HANDLE}/${handle}` : ALL_PRODUCTS_URL_HANDLE
+    return localizedPath(handle ? `${PRODUCT_URL_HANDLE}/${handle}` : ALL_PRODUCTS_URL_HANDLE)
 }
 
 function getProductMeta(product: ProductDTO): string {

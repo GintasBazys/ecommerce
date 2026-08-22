@@ -13,6 +13,12 @@ definePageMeta({
     middleware: ["auth"]
 })
 
+const { localizedPath } = useLocalizedPath()
+
+function getOrderPath(orderId: string): string {
+    return localizedPath(`/account/orders/${orderId}`)
+}
+
 useHead({ title: "Orders | Medusa Commerce" })
 
 const runtimeConfig = useRuntimeConfig()
@@ -169,7 +175,7 @@ function changePage(nextPage: number): void {
                                 {{ formatFulfillmentStatus(order.fulfillment_status) }}
                             </span>
                             <NuxtLink
-                                :to="`/account/orders/${order.id}`"
+                                :to="getOrderPath(order.id)"
                                 class="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-amber-200 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden motion-reduce:transition-none"
                             >
                                 View order

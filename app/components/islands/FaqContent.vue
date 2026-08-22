@@ -5,7 +5,11 @@ import type { FaqSection } from "~/types/content-pages"
 import AppBreadcrumbs from "~/components/Shared/AppBreadcrumbs.vue"
 import NuxtImage from "~/components/Shared/NuxtImage.vue"
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: "/" }, { label: "FAQ" }])
+const { localizedPath } = useLocalizedPath()
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizedPath("/") }, { label: "FAQ" }])
+const contactPath = computed<string>(() => localizedPath("/contact"))
+const shippingPath = computed<string>(() => localizedPath("/shipping"))
+const returnsPath = computed<string>(() => localizedPath("/returns"))
 
 const faqSections: FaqSection[] = [
     {
@@ -87,12 +91,12 @@ const supportDetails = [
                         </h1>
                         <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
                             Start here for the questions customers ask most often. If you need something more specific, our
-                            <NuxtLink to="/contact" class="text-brand-700 hover:text-brand-900 font-semibold">contact page</NuxtLink>
+                            <NuxtLink :to="contactPath" class="text-brand-700 hover:text-brand-900 font-semibold">contact page</NuxtLink>
                             is ready for follow-up.
                         </p>
                         <div class="mt-7 flex flex-wrap items-center gap-3">
-                            <NuxtLink to="/contact" class="ui-btn-primary px-7">Contact support</NuxtLink>
-                            <NuxtLink to="/shipping" class="ui-btn-secondary px-6">Shipping details</NuxtLink>
+                            <NuxtLink :to="contactPath" class="ui-btn-primary px-7">Contact support</NuxtLink>
+                            <NuxtLink :to="shippingPath" class="ui-btn-secondary px-6">Shipping details</NuxtLink>
                         </div>
                     </div>
 
@@ -223,7 +227,7 @@ const supportDetails = [
                                 <p class="mt-1">{{ detail.value }}</p>
                             </div>
                         </div>
-                        <NuxtLink to="/contact" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
+                        <NuxtLink :to="contactPath" class="ui-btn-primary mt-6 w-full justify-center px-7">Get in touch</NuxtLink>
                     </div>
 
                     <div class="rounded-panel shadow-card border border-slate-200 bg-white p-6 sm:p-8">
@@ -234,19 +238,19 @@ const supportDetails = [
                         </span>
                         <div class="mt-5 grid gap-4">
                             <NuxtLink
-                                to="/shipping"
+                                :to="shippingPath"
                                 class="hover:border-brand-200 hover:text-brand-700 rounded-card-sm border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
                             >
                                 Payment and shipping details
                             </NuxtLink>
                             <NuxtLink
-                                to="/returns"
+                                :to="returnsPath"
                                 class="hover:border-brand-200 hover:text-brand-700 rounded-card-sm border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
                             >
                                 Returns and exchange guidance
                             </NuxtLink>
                             <NuxtLink
-                                to="/contact"
+                                :to="contactPath"
                                 class="hover:border-brand-200 hover:text-brand-700 rounded-card-sm border border-slate-200 bg-slate-50/80 px-4 py-4 text-sm font-semibold text-slate-800 transition"
                             >
                                 Contact support for a direct answer
