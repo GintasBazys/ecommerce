@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite"
 
-import { NON_DEFAULT_LOCALES, localizeRoutePatternPath } from "#shared/route-slugs"
+import { NON_DEFAULT_LOCALES, localizeRoutePatternPath } from "./shared/route-slugs"
 
 const imageDomains = ["medusa-public-images.s3.eu-west-1.amazonaws.com", "api.medusa-commerce.de", "cdn.visa.com", "localhost"]
 const posthogPublicKey = process.env.NUXT_PUBLIC_POSTHOG_PUBLIC_KEY || process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || ""
