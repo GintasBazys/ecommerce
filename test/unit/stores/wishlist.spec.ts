@@ -13,6 +13,7 @@ const customerState = {
 const regionState = {
     regionStoreId: 'reg_123',
     selectedCountryCode: 'de',
+    status: 'ready',
 }
 
 let fetchMock: ReturnType<typeof vi.fn>
@@ -36,6 +37,7 @@ describe('useWishlistStore', () => {
         customerState.isAuthenticated = true
         regionState.regionStoreId = 'reg_123'
         regionState.selectedCountryCode = 'de'
+        regionState.status = 'ready'
         fetchMock = vi.fn()
         vi.stubGlobal('$fetch', fetchMock)
     })
@@ -63,6 +65,16 @@ describe('useWishlistStore', () => {
 
     it('does not fetch wishlist when customer is unauthenticated', async () => {
         customerState.isAuthenticated = false
+        const store = await createWishlistStore()
+
+        await store.loadWishlist()
+
+        expect(fetchMock).not.toHaveBeenCalled()
+        expect(store.items.value).toEqual([])
+    })
+
+    it('does not fetch wishlist before regional context is ready', async () => {
+        regionState.status = 'error'
         const store = await createWishlistStore()
 
         await store.loadWishlist()

@@ -13,6 +13,7 @@ const props = defineProps<{
     address: Address
     errors: AddressErrors
     countries: CountryOption[]
+    countryDisabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -178,6 +179,7 @@ function fieldErrorDescription(field: AddressErrorField): string | undefined {
                     :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     :aria-invalid="hasFieldError('country_code')"
                     :aria-describedby="fieldErrorDescription('country_code')"
+                    :disabled="countryDisabled"
                     @update:model-value="emit('update:field', { field: 'country_code', value: String($event) })"
                 />
                 <span v-if="errors.country_code" :id="fieldErrorId('country_code')" class="block text-sm leading-6 text-rose-600">{{ errors.country_code }}</span>

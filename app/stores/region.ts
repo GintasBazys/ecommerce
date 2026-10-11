@@ -1,4 +1,60 @@
 import type { RegionCountryDTO, RegionDTO } from "@medusajs/types"
+import { REGION_ERROR_MESSAGE } from "~/utils/region"
+
+export type RegionStatus = "idle" | "loading" | "ready" | "error"
+
+export type RegionFetchResult =
+    | { success: true }
+    | { success: false }
+
+type RegionsResponse = {
+    regions?: unknown
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null
+}
+
+function getValidatedRegions(payload: unknown): RegionDTO[] {
+    if (!isRecord(payload) || !Array.isArray(payload.regions)) {
+        return []
+    }
+
+    const regionIds = new Set<string>()
+
+    return payload.regions.flatMap((regionValue) => {
+        if (!isRecord(regionValue)) {
+            return []
+        }
+
+        const id = typeof regionValue.id === "string" ? regionValue.id.trim() : ""
+        if (!id || id.length > 255 || regionIds.has(id) || !Array.isArray(regionValue.countries)) {
+            return []
+        }
+
+        const countryCodes = new Set<string>()
+        const countries = regionValue.countries.flatMap((countryValue) => {
+            if (!isRecord(countryValue) || typeof countryValue.iso_2 !== "string") {
+                return []
+            }
+
+            const iso2 = countryValue.iso_2.toLowerCase()
+            if (!/^[a-z]{2}$/.test(iso2) || countryCodes.has(iso2)) {
+                return []
+            }
+
+            countryCodes.add(iso2)
+            return [{ ...countryValue, iso_2: iso2 } as RegionCountryDTO]
+        })
+
+        if (!countries.length) {
+            return []
+        }
+
+        regionIds.add(id)
+        return [{ ...regionValue, id, countries } as RegionDTO]
+    })
+}
 
 export const useRegionStore = defineStore("regionStore", () => {
     const cookieOptions = {
@@ -11,12 +67,15 @@ export const useRegionStore = defineStore("regionStore", () => {
     const regionIdCookie = useCookie<string | null>("region_id", cookieOptions)
     const countryCodeCookie = useCookie<string | null>("country_code", cookieOptions)
 
-    const regionStoreId = ref<string | null>(regionIdCookie.value)
-    const selectedCountryCode = ref<string | null>(countryCodeCookie.value)
+    const regionStoreId = ref<string | null>(null)
+    const selectedCountryCode = ref<string | null>(null)
     const regions = ref<RegionDTO[]>([])
+    const status = ref<RegionStatus>("idle")
+    const errorMessage = ref<string | null>(null)
+    let inFlightRequest: Promise<RegionFetchResult> | null = null
 
     const selectedRegion = computed<RegionDTO | null>(
-        () => regions.value.find((region) => region.id === regionStoreId.value) ?? regions.value[0] ?? null
+        () => regions.value.find((region) => region.id === regionStoreId.value) ?? null
     )
     const regionCountries = computed<RegionCountryDTO[]>(() => selectedRegion.value?.countries ?? [])
     const availableCountries = computed<RegionCountryDTO[]>(() => {
@@ -64,24 +123,68 @@ export const useRegionStore = defineStore("regionStore", () => {
         applyRegionSelection(nextRegion, normalizedCountryCode)
     }
 
-    const fetchRegion = async () => {
+    async function requestRegions(): Promise<RegionFetchResult> {
+        const hadReadyState = status.value === "ready" && Boolean(selectedRegion.value && selectedCountryCode.value)
+        status.value = "loading"
+        errorMessage.value = null
+
         try {
             const requestFetch = useRequestFetch()
-            const data = await requestFetch<{ regions: RegionDTO[] }>("/api/regions")
+            const data = await requestFetch<RegionsResponse>("/api/regions")
+            const nextRegions = getValidatedRegions(data)
+            const nextRegion = nextRegions.find((region) => region.id === regionIdCookie.value) ?? nextRegions[0]
 
-            regions.value = data.regions ?? []
-
-            const nextRegion = regions.value.find((region) => region.id === regionIdCookie.value) ?? regions.value[0]
-            if (!nextRegion?.id) {
-                console.error("No valid region ID found")
-                return
+            if (!nextRegion?.id || !nextRegion.countries?.length) {
+                throw new Error("Invalid regional response")
             }
 
-            applyRegionSelection(nextRegion, countryCodeCookie.value)
-        } catch (error) {
-            console.error("Failed to fetch region:", error)
+            const nextCountryCode =
+                nextRegion.countries.find((country) => country.iso_2 === countryCodeCookie.value?.toLowerCase())?.iso_2 ??
+                nextRegion.countries[0]?.iso_2 ??
+                null
+
+            if (!nextCountryCode) {
+                throw new Error("Invalid regional response")
+            }
+
+            regions.value = nextRegions
+            regionStoreId.value = nextRegion.id
+            selectedCountryCode.value = nextCountryCode
+            regionIdCookie.value = nextRegion.id
+            countryCodeCookie.value = nextCountryCode
+            status.value = "ready"
+
+            return { success: true }
+        } catch {
+            errorMessage.value = REGION_ERROR_MESSAGE
+            status.value = hadReadyState ? "ready" : "error"
+
+            return { success: false }
         }
     }
 
-    return { regionStoreId, selectedCountryCode, regions, regionCountries, availableCountries, fetchRegion, setRegion, setCountry }
+    function fetchRegion(): Promise<RegionFetchResult> {
+        if (inFlightRequest) {
+            return inFlightRequest
+        }
+
+        inFlightRequest = requestRegions().finally(() => {
+            inFlightRequest = null
+        })
+
+        return inFlightRequest
+    }
+
+    return {
+        regionStoreId,
+        selectedCountryCode,
+        regions,
+        status,
+        errorMessage,
+        regionCountries,
+        availableCountries,
+        fetchRegion,
+        setRegion,
+        setCountry
+    }
 })

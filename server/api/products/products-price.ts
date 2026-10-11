@@ -3,6 +3,7 @@ import type { ProductDTO } from "@medusajs/types"
 import { LIMIT } from "@/utils/consts"
 import { fetchAllStoreProducts, getAggregatedProductPrice } from "#server/utils/products"
 import { toUpstreamError } from "#server/utils/medusa-proxy"
+import { getRequiredRegionId } from "#server/utils/region"
 
 type VariantPriceField = "calculated_amount" | "original_amount"
 
@@ -30,13 +31,9 @@ export default defineEventHandler(async (event) => {
     const limit = parsePositiveInteger(query.limit, Number(LIMIT))
     const offset = parsePositiveInteger(query.offset, 0)
     const categoryId = query.category_id != null ? String(query.category_id) : null
-    const regionId = query.region_id ? String(query.region_id) : null
+    const regionId = getRequiredRegionId(query.region_id)
     const handle = query.handle ? String(query.handle) : null
     const order = query.order ? String(query.order) : "variants.calculated_price.calculated_amount"
-
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
-    }
 
     const isDescending = order.startsWith("-")
     const priceField = parsePriceField(order)

@@ -1,7 +1,13 @@
 export const createNewCart = async (cartStore: { $patch: (arg0: { cart: CartResponse | null }) => void }) => {
+    const regionStore = useRegionStore()
+    if (regionStore.status !== "ready" || !regionStore.regionStoreId) {
+        return null
+    }
+
     try {
         cartStore.$patch({ cart: null })
-        const response = await fetch(`/api/cart/cart?region_id=${useRegionStore().regionStoreId}&force_new=1`, {
+        const query = new URLSearchParams({ region_id: regionStore.regionStoreId, force_new: "1" })
+        const response = await fetch(`/api/cart/cart?${query.toString()}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include"

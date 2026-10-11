@@ -3,12 +3,16 @@ import { useDragScroll } from "~/composables/shared/useDragScroll"
 import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const productStore = useProductStore()
-const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode, status: regionStatus } = storeToRefs(useRegionStore())
 const { products } = storeToRefs(useProductStore())
 const { localizedPath } = useLocalizedPath()
 const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
 
 await callOnce(async () => {
+    if (regionStatus.value !== "ready") {
+        return
+    }
+
     await productStore.fetchData(regionStoreId.value ?? "", selectedCountryCode.value ?? "", {
         limit: LIMIT,
         view: "card"

@@ -6,6 +6,9 @@ import type { Address } from "~/types/interfaces"
 import CheckoutAddressFields from "~/components/Checkout/CheckoutAddressFields.vue"
 import BaseButton from "~/components/Shared/BaseButton.vue"
 
+const { currentLocale } = storeToRefs(useLocaleStore())
+const regionMessages = computed(() => getErrorMessages(currentLocale.value).region)
+
 defineProps<{
     currentStep: string
     identityCompleted: boolean
@@ -22,6 +25,9 @@ defineProps<{
     selectedBillingSavedAddressId: string
     selectedShippingSavedAddressId: string
     isSubmitting: boolean
+    isRegionReady: boolean
+    isRegionLoading: boolean
+    regionErrorMessage: string | null
 }>()
 
 const emit = defineEmits<{
@@ -107,6 +113,17 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     </div>
                 </div>
 
+                <p v-if="isRegionLoading" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600" role="status">
+                    {{ regionMessages.loadingPricing }}
+                </p>
+                <p
+                    v-else-if="!isRegionReady"
+                    class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700"
+                    role="status"
+                >
+                    {{ regionErrorMessage || regionMessages.deliveryCountries }}
+                </p>
+
                 <section
                     v-if="isSavedAddressesLoading || savedAddressesError || savedAddresses.length"
                     class="rounded-card border border-amber-200/70 bg-linear-to-br from-amber-50 to-white p-4 shadow-lg sm:p-5"
@@ -180,6 +197,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     :address="billingAddress"
                     :errors="billingErrors"
                     :countries="countries"
+                    :country-disabled="!isRegionReady"
                     @update:field="emit('update:billingField', $event)"
                 />
 
@@ -244,6 +262,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     :address="shippingAddress"
                     :errors="shippingErrors"
                     :countries="countries"
+                    :country-disabled="!isRegionReady"
                     @update:field="emit('update:shippingField', $event)"
                 />
 
@@ -261,7 +280,7 @@ function onSavedAddressChange(event: Event, target: "billing" | "shipping"): voi
                     <BaseButton
                         type="submit"
                         class="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
-                        :disabled="isSubmitting"
+                        :disabled="isSubmitting || !isRegionReady"
                     >
                         {{ isSubmitting ? "Saving..." : "Save and continue" }}
                     </BaseButton>

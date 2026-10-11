@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseHeader from "@/components/Header/BaseHeader.vue"
+import RegionAvailabilityNotice from "@/components/Shared/RegionAvailabilityNotice.vue"
 import { useSiteIdentity, useStructuredData } from "~/composables/shared/useStructuredData"
 
 const { organizationSchema, websiteSchema } = useSiteIdentity()
@@ -38,6 +39,7 @@ useStructuredData(() => [organizationSchema.value, websiteSchema.value], "global
 <template>
     <NuxtLoadingIndicator />
     <BaseHeader />
+    <RegionAvailabilityNotice />
     <NuxtLayout>
         <NuxtPage />
     </NuxtLayout>

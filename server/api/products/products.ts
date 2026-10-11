@@ -1,6 +1,7 @@
 import { LIMIT } from "@/utils/consts"
 import { getRequestMedusaLocale } from "#server/utils/locale"
 import { assertMedusaResponse, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
+import { getRequiredRegionId } from "#server/utils/region"
 
 type ProductsResponse = {
     products?: unknown[]
@@ -45,12 +46,8 @@ export default defineEventHandler(async (event) => {
     const view = query.view ? String(query.view) : "default"
     const locale = getRequestMedusaLocale(event, query.locale)
 
-    const regionId = query.region_id ? String(query.region_id) : null
+    const regionId = getRequiredRegionId(query.region_id)
     const countryCode = query.country_code ? String(query.country_code) : ""
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
-    }
-
     const fields =
         view === "card"
             ? "id,title,handle,thumbnail,subtitle,description,*images,+metadata,*collection,*type,*categories,*variants,*variants.calculated_price,+variants.inventory_quantity"

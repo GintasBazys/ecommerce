@@ -9,7 +9,9 @@ definePageMeta({ layout: "default" })
 
 const route = useRoute()
 const router = useRouter()
-const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode, status: regionStatus } = storeToRefs(useRegionStore())
+const { currentLocale } = storeToRefs(useLocaleStore())
+const regionMessages = computed(() => getErrorMessages(currentLocale.value).region)
 const { localizedPath } = useLocalizedPath()
 
 const searchInput = ref<string>(String(route.query.q || ""))
@@ -20,7 +22,10 @@ const resultLimit = computed<number>(() => {
     const limit = Number(route.query.limit || 24)
     return Number.isInteger(limit) && limit > 0 ? Math.min(limit, 96) : 24
 })
-const canSearch = computed<boolean>(() => queryText.value.length >= 3 && Boolean(regionStoreId.value && selectedCountryCode.value))
+const regionUnavailable = computed<boolean>(() => regionStatus.value === "error")
+const canSearch = computed<boolean>(
+    () => regionStatus.value === "ready" && queryText.value.length >= 3 && Boolean(regionStoreId.value && selectedCountryCode.value)
+)
 const searchKey = computed<string>(() => [
     "search-results",
     queryText.value,
@@ -141,6 +146,15 @@ async function loadMoreResults(): Promise<void> {
                 <div v-else-if="queryText.length < 3" class="rounded-3xl border border-white/80 bg-white/90 px-6 py-8 text-center shadow-panel">
                     <h2 class="text-2xl font-semibold text-slate-950">Search term is too short.</h2>
                     <p class="mt-3 text-sm leading-6 text-slate-600">Use at least 3 characters for product search.</p>
+                </div>
+
+                <div
+                    v-else-if="regionUnavailable"
+                    class="rounded-3xl border border-rose-200 bg-rose-50 px-6 py-8 text-center shadow-panel"
+                    role="status"
+                >
+                    <h2 class="text-2xl font-semibold text-slate-950">{{ regionMessages.products }}</h2>
+                    <p class="mt-3 text-sm leading-6 text-rose-700">{{ regionMessages.description }}</p>
                 </div>
 
                 <div v-else class="mb-4 flex flex-col gap-3 rounded-3xl border border-white/80 bg-white/90 p-4 shadow-card sm:flex-row sm:items-center sm:justify-between">

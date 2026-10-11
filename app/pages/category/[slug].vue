@@ -46,6 +46,7 @@ const {
     totalCount,
     loadingRef,
     errorRef,
+    regionUnavailable,
     sortLoading,
     filterLoading,
     facets,
@@ -246,6 +247,7 @@ watch(currentPage, async (page, previousPage) => {
                         :grid-is-initial-loading="gridIsInitialLoading"
                         :products="products"
                         :empty-state-text="emptyStateText"
+                        :retryable="!regionUnavailable"
                         @retry="fetchProducts('initial')"
                         @clear-all="clearAllFilters"
                     />

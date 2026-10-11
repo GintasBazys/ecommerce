@@ -4,6 +4,34 @@
         "label": "Language",
         "lithuanian": "Lithuanian"
     },
+    "errors": {
+        "fatal": {
+            "badRequest": "The request could not be completed.",
+            "forbidden": "You do not have access to this page.",
+            "generic": "We could not load this page.",
+            "notFound": "The page you requested could not be found.",
+            "server": "The storefront is temporarily unavailable. Please try again shortly.",
+            "signIn": "Please sign in to continue."
+        },
+        "region": {
+            "checkoutDescription": "We could not load delivery countries and regional prices. Please try again.",
+            "checkoutTitle": "Checkout is temporarily unavailable",
+            "description": "We could not load delivery countries and regional prices. Please try again.",
+            "deliveryCountries": "Delivery countries are temporarily unavailable. Try again before continuing.",
+            "loadingCountries": "Loading available delivery countries...",
+            "loadingPricing": "Loading delivery countries and regional prices...",
+            "offers": "Special offers could not be loaded.",
+            "offersError": "Could not load special offers right now.",
+            "offersRetry": "Try again",
+            "products": "Products could not be loaded.",
+            "recovered": "Regional pricing is available again. Reloading this page.",
+            "retry": "Retry regional pricing",
+            "retrying": "Retrying regional pricing and delivery countries.",
+            "search": "Search is unavailable until regional pricing is restored.",
+            "title": "Regional pricing is temporarily unavailable",
+            "tryingAgain": "Trying again..."
+        }
+    },
     "routes": {
         "about": "about",
         "account": "account",

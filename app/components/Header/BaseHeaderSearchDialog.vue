@@ -12,6 +12,7 @@ const props = defineProps<{
     open: boolean
     regionId: string
     selectedCountryCode: string
+    regionReady: boolean
 }>()
 
 const emit = defineEmits<{
@@ -25,6 +26,8 @@ const searchError = ref<string | null>(null)
 const searchResults = ref<ProductDTO[]>([])
 const searchHasSearched = ref<boolean>(false)
 const { localizedPath } = useLocalizedPath()
+const { currentLocale } = storeToRefs(useLocaleStore())
+const regionMessages = computed(() => getErrorMessages(currentLocale.value).region)
 const normalizedSearchQuery = computed<string>(() => searchQuery.value.trim())
 const searchTitleId = useId()
 const searchDialogModel = computed<boolean>({
@@ -44,6 +47,14 @@ const runSearch = debounce(async (value: string) => {
         return
     }
 
+    if (!props.regionReady || !props.regionId || !props.selectedCountryCode) {
+        searchResults.value = []
+        searchError.value = regionMessages.value.search
+        searchHasSearched.value = true
+        searchLoading.value = false
+        return
+    }
+
     searchLoading.value = true
     searchError.value = null
 
@@ -55,8 +66,8 @@ const runSearch = debounce(async (value: string) => {
                 "Content-Type": "application/json"
             },
             query: {
-                ...(props.regionId ? { region_id: props.regionId } : {}),
-                ...(props.selectedCountryCode ? { country_code: props.selectedCountryCode } : {})
+                region_id: props.regionId,
+                country_code: props.selectedCountryCode
             },
             body: {
                 q: value
@@ -66,7 +77,7 @@ const runSearch = debounce(async (value: string) => {
         searchResults.value = response.products.slice(0, 8)
     } catch {
         searchResults.value = []
-        searchError.value = "Search could not be loaded. Please try again."
+        searchError.value = getErrorMessages(currentLocale.value).fatal.generic
     } finally {
         searchHasSearched.value = true
         searchLoading.value = false
@@ -86,9 +97,9 @@ watch(
     async (opened) => {
         if (!opened) {
             searchQuery.value = ""
-        searchLoading.value = false
-        searchError.value = null
-        searchHasSearched.value = false
+            searchLoading.value = false
+            searchError.value = null
+            searchHasSearched.value = false
             searchResults.value = []
             runSearch.cancel()
             return
@@ -111,7 +122,7 @@ function closeSearchDialog(): void {
 async function submitSearch(): Promise<void> {
     const query = normalizedSearchQuery.value
 
-    if (query.length < 3) {
+    if (query.length < 3 || !props.regionReady || !props.regionId || !props.selectedCountryCode) {
         return
     }
 
@@ -179,7 +190,12 @@ function getProductMeta(product: ProductDTO): string {
                         placeholder="Search by product name…"
                     />
                 </label>
-                <BaseButton type="submit" variant="accent" class="min-h-12 px-5" :disabled="normalizedSearchQuery.length < 3">
+                <BaseButton
+                    type="submit"
+                    variant="accent"
+                    class="min-h-12 px-5"
+                    :disabled="normalizedSearchQuery.length < 3 || !regionReady || !regionId || !selectedCountryCode"
+                >
                     View results
                 </BaseButton>
             </form>

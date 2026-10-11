@@ -7,6 +7,15 @@ type NavigationCategory = {
     imageUrl?: string | null
 }
 
+type RegionalReadiness = {
+    status: "idle" | "loading" | "ready" | "error"
+    regionStoreId: string | null
+}
+
+export function hasReadyRegionalContext(region: RegionalReadiness): region is RegionalReadiness & { status: "ready", regionStoreId: string } {
+    return region.status === "ready" && typeof region.regionStoreId === "string" && region.regionStoreId.length > 0
+}
+
 const NON_AUTH_COOKIE_KEYS = new Set([
     "cart_id",
     "cookie_consent",
@@ -30,7 +39,7 @@ export default defineNuxtPlugin(async () => {
     const customerStore = useCustomerStore()
 
     if (!import.meta.server) {
-        if (import.meta.client && regionStore.regionStoreId) {
+        if (import.meta.client && hasReadyRegionalContext(regionStore)) {
             window.setTimeout(() => {
                 if (!cartStore.cart) {
                     void cartStore.loadCart()
@@ -52,7 +61,9 @@ export default defineNuxtPlugin(async () => {
     const requestHeaders = useRequestHeaders(["cookie", "x-forwarded-proto"])
     const cookieHeader = requestHeaders.cookie || ""
 
-    const regionPromise = regionStore.regions?.length ? Promise.resolve() : regionStore.fetchRegion()
+    const regionPromise = hasReadyRegionalContext(regionStore)
+        ? Promise.resolve({ success: true } as const)
+        : regionStore.fetchRegion()
 
     const categoriesState = useState<NavigationCategory[]>("categories", () => [])
     const categoriesPromise = (async () => {
@@ -89,9 +100,9 @@ export default defineNuxtPlugin(async () => {
         }
     })()
 
-    await regionPromise
+    const regionResult = await regionPromise
 
-    if (regionStore.regionStoreId) {
+    if (regionResult.success && hasReadyRegionalContext(regionStore)) {
         const forwardedProto = requestHeaders["x-forwarded-proto"]?.split(",")[0]?.trim().toLowerCase()
         const requestProtocol = forwardedProto || useRequestURL().protocol.replace(":", "")
         const cartIdCookie = useCookie<string | null>("cart_id", {
@@ -110,8 +121,9 @@ export default defineNuxtPlugin(async () => {
             }
 
             try {
+                const query = new URLSearchParams({ region_id: regionStore.regionStoreId })
                 const { cart } = await $fetch<{ cart: CartDTO | null | undefined }>(
-                    `/api/cart/cart?region_id=${regionStore.regionStoreId}`,
+                    `/api/cart/cart?${query.toString()}`,
                     {
                         headers: {
                             ...requestHeaders,
@@ -161,9 +173,5 @@ export default defineNuxtPlugin(async () => {
     }
     customerStore.setCustomer(customerState.value ?? null)
 
-    if (customerStore.isAuthenticated) {
-        await wishlistStore.loadWishlist()
-    } else {
-        wishlistStore.clearWishlist()
-    }
+    wishlistStore.clearWishlist()
 })

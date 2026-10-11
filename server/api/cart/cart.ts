@@ -1,13 +1,11 @@
 import { createCartForRegion, getCartCookieOptions, retrieveExpandedCart, syncCartCountry } from "#server/utils/cart"
 import { fetchMedusaResponse, toUpstreamError } from "#server/utils/medusa-proxy"
+import { getRequiredRegionId } from "#server/utils/region"
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event)
 
-    const regionId = String(query.region_id || "")
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "Region ID is required" })
-    }
+    const regionId = getRequiredRegionId(query.region_id)
 
     const forceNew = query.force_new === "1"
     const cartId = forceNew ? null : getCookie(event, "cart_id") || null

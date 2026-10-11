@@ -9,6 +9,7 @@ defineProps<{
     gridIsInitialLoading: boolean
     products: CategoryProduct[]
     emptyStateText: string
+    retryable?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -29,7 +30,7 @@ const emit = defineEmits<{
     >
         <h2 class="text-2xl leading-tight font-semibold text-slate-950">Products could not be loaded.</h2>
         <p class="max-w-120 text-sm leading-6 text-rose-700">{{ errorMessage }}</p>
-        <BaseButton type="button" variant="accent" @click="emit('retry')">Try again</BaseButton>
+        <BaseButton v-if="retryable !== false" type="button" variant="accent" @click="emit('retry')">Try again</BaseButton>
     </div>
 
     <div v-else-if="gridIsInitialLoading" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">

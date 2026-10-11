@@ -75,7 +75,12 @@ export const useWishlistStore = defineStore("wishlist", () => {
         const customerStore = useCustomerStore()
         const regionStore = useRegionStore()
 
-        if (!customerStore.isAuthenticated || !regionStore.regionStoreId || !regionStore.selectedCountryCode) {
+        if (
+            !customerStore.isAuthenticated ||
+            regionStore.status !== "ready" ||
+            !regionStore.regionStoreId ||
+            !regionStore.selectedCountryCode
+        ) {
             items.value = []
             return
         }

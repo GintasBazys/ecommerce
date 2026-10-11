@@ -70,6 +70,7 @@ function seedHeaderStores(options: HeaderStoreOptions = {}): void {
     ] as RegionDTO[]
     regionStore.regionStoreId = 'reg_eu'
     regionStore.selectedCountryCode = 'lt'
+    regionStore.status = 'ready'
 
     const cartStore = useCartStore()
     cartStore.cart = {

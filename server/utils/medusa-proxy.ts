@@ -7,10 +7,6 @@ type ErrorPayload = {
     details?: string
 }
 
-type UpstreamError = ErrorWithCode & {
-    upstreamMessage?: string
-}
-
 type MedusaRequestOptions = Omit<RequestInit, "headers"> & {
     headers?: HeadersInit
     includePublishableKey?: boolean
@@ -22,10 +18,14 @@ type ErrorWithCode = {
     statusMessage?: string
     code?: string
     name?: string
+    dependencyFailure?: "network" | "timeout"
     cause?: {
         code?: string
     }
 }
+
+const NETWORK_ERROR_CODES = new Set(["EAI_AGAIN", "ECONNREFUSED", "ECONNRESET", "ENETUNREACH", "ENOTFOUND"])
+const TIMEOUT_ERROR_CODES = new Set(["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT"])
 
 export function getIncomingCookie(event: H3Event) {
     return event.node.req.headers.cookie || ""
@@ -38,7 +38,7 @@ export function getMedusaUrl(event: H3Event, path: string) {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`
 
     if (!baseUrl) {
-        throw createError({ statusCode: 500, statusMessage: "MEDUSA_URL is not configured" })
+        throw createError({ statusCode: 500, statusMessage: "Internal server error" })
     }
 
     if (baseUrl.endsWith("/store") && normalizedPath.startsWith("/store/")) {
@@ -129,19 +129,6 @@ function isHandledError(error: unknown): error is ErrorWithCode {
     return typeof error === "object" && error !== null && ("statusCode" in error || "statusMessage" in error)
 }
 
-function getUpstreamMessage(payload: ErrorPayload | null, response: Response) {
-    return payload?.message || payload?.error || payload?.details || `${response.status} ${response.statusText}`
-}
-
-function logMedusaError(response: Response, fallbackMessage: string, upstreamMessage: string) {
-    console.error("Medusa request failed", {
-        status: response.status,
-        statusText: response.statusText,
-        fallbackMessage,
-        upstreamMessage
-    })
-}
-
 export function toUpstreamError(error: unknown, fallbackMessage: string) {
     if (isHandledError(error)) {
         return error
@@ -150,8 +137,14 @@ export function toUpstreamError(error: unknown, fallbackMessage: string) {
     const typedError = error as ErrorWithCode
     const code = typedError.cause?.code || typedError.code
 
-    if (code === "ECONNREFUSED" || code === "ENOTFOUND" || typedError.name === "AbortError") {
-        return createError({ statusCode: 503, statusMessage: "Medusa is unavailable" })
+    const isTimeout = typedError.name === "AbortError" || (code !== undefined && TIMEOUT_ERROR_CODES.has(code))
+    if (isTimeout || (code !== undefined && NETWORK_ERROR_CODES.has(code))) {
+        const dependencyError = createError({ statusCode: 503, statusMessage: "Medusa is unavailable" }) as ErrorWithCode
+        Object.defineProperty(dependencyError, "dependencyFailure", {
+            value: isTimeout ? "timeout" : "network",
+            enumerable: false
+        })
+        return dependencyError
     }
 
     return createError({ statusCode: 500, statusMessage: fallbackMessage })
@@ -163,16 +156,16 @@ export async function assertMedusaResponse(response: Response, fallbackMessage: 
     }
 
     const payload = await safeJson<ErrorPayload>(response)
-    const upstreamMessage = getUpstreamMessage(payload, response)
-
-    logMedusaError(response, fallbackMessage, upstreamMessage)
-
+    const upstreamMessage = payload?.message || payload?.error || payload?.details || `${response.status} ${response.statusText}`
     const error = createError({
-        statusCode: response.status,
+        statusCode: response.status >= 500 ? 502 : response.status,
         statusMessage: fallbackMessage
-    }) as UpstreamError
+    })
 
-    error.upstreamMessage = upstreamMessage
+    Object.defineProperty(error, "upstreamMessage", {
+        value: upstreamMessage,
+        enumerable: false
+    })
     throw error
 }
 

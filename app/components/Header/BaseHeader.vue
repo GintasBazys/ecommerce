@@ -41,7 +41,7 @@ const { isAuthenticated } = storeToRefs(useCustomerStore())
 const { itemCount } = storeToRefs(useCartStore())
 const { itemCount: wishlistCount } = storeToRefs(useWishlistStore())
 const { categories } = storeToRefs(useProductStore())
-const { regionStoreId, availableCountries, selectedCountryCode } = storeToRefs(regionStore)
+const { regionStoreId, availableCountries, selectedCountryCode, status: regionStatus } = storeToRefs(regionStore)
 const { currentLocale, languageItems, languageLabel } = storeToRefs(localeStore)
 
 const announcementMessages = computed<AnnouncementMessage[]>(() => announcementBarData.value?.announcement_messages || [])
@@ -410,6 +410,7 @@ function observeAnnouncementTextElements(): void {
             :open="searchDialog"
             :region-id="regionId"
             :selected-country-code="selectedCountryCode ?? ''"
+            :region-ready="regionStatus === 'ready'"
             @close="closeSearchDialog"
         />
     </header>

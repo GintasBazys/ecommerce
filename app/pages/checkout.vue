@@ -26,7 +26,10 @@ const regionStore = useRegionStore()
 
 const { cart } = storeToRefs(cartStore)
 const { customer, isAuthenticated } = storeToRefs(customerStore)
-const { regionCountries } = storeToRefs(regionStore)
+const { regionCountries, status: regionStatus } = storeToRefs(regionStore)
+const { currentLocale } = storeToRefs(useLocaleStore())
+const regionMessages = computed(() => getErrorMessages(currentLocale.value).region)
+const regionErrorMessage = computed<string>(() => regionMessages.value.description)
 
 const auth = useCustomerAuth()
 const config = useRuntimeConfig()
@@ -48,6 +51,9 @@ const currencyCode = computed<string>(() => checkoutCart.value?.currency_code ??
 const lineItems = computed<CartLineItemDTO[]>(() => checkoutCart.value?.items ?? [])
 const itemCount = computed<number>(() => lineItems.value.reduce((sum, item) => sum + Number(item.quantity), 0))
 const hasAuthenticatedIdentity = computed<boolean>(() => isAuthenticated.value)
+const isRegionLoading = computed<boolean>(() => regionStatus.value === "idle" || regionStatus.value === "loading")
+const isRegionReady = computed<boolean>(() => regionStatus.value === "ready")
+const isRegionError = computed<boolean>(() => regionStatus.value === "error")
 const addressCompleted = computed<boolean>(() => {
     const currentCart = checkoutCart.value
 
@@ -138,7 +144,7 @@ function returnToAccountOptions(): void {
 }
 
 async function submitAddresses(): Promise<void> {
-    if (!addresses.validateAddressForm() || !checkoutCart.value?.id) {
+    if (!isRegionReady.value || !addresses.validateAddressForm() || !checkoutCart.value?.id) {
         return
     }
 
@@ -169,8 +175,13 @@ async function submitAddresses(): Promise<void> {
 
 onMounted(async () => {
     try {
-        if (!regionCountries.value.length) {
+        if (regionStatus.value === "idle") {
             await regionStore.fetchRegion()
+        }
+
+        if (!isRegionReady.value) {
+            isBooting.value = false
+            return
         }
 
         if (!checkoutCart.value) {
@@ -265,7 +276,29 @@ watch(currentStep, async (step) => {
 <template>
     <main class="bg-linear-to-b from-blue-50 via-white to-slate-50 pt-28 pb-14 sm:pt-32 sm:pb-18">
         <div class="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-            <div v-if="isBooting" class="grid justify-items-center gap-4 px-4 py-20 text-center">
+            <div v-if="isRegionLoading" class="grid justify-items-center gap-4 px-4 py-20 text-center" role="status">
+                <span class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"></span>
+                <p class="text-sm leading-6 text-slate-600">{{ regionMessages.loadingPricing }}</p>
+            </div>
+
+            <section
+                v-else-if="isRegionError"
+                class="mx-auto max-w-2xl rounded-3xl border border-rose-200 bg-rose-50 px-5 py-6 text-center"
+                aria-labelledby="checkout-region-error-title"
+            >
+                <h1 id="checkout-region-error-title" class="text-2xl font-bold tracking-tight text-slate-950">{{ regionMessages.checkoutTitle }}</h1>
+                <p class="mt-3 text-sm leading-7 text-rose-800">
+                    {{ regionMessages.checkoutDescription }}
+                </p>
+                <a
+                    href="#region-availability-retry"
+                    class="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-rose-900 px-5 text-sm font-semibold text-white hover:bg-rose-800 focus-visible:ring-2 focus-visible:ring-rose-700 focus-visible:ring-offset-2 focus-visible:ring-offset-rose-50 focus-visible:outline-hidden"
+                >
+                    Go to retry action
+                </a>
+            </section>
+
+            <div v-else-if="isBooting" class="grid justify-items-center gap-4 px-4 py-20 text-center" role="status">
                 <span class="border-brand-200 border-t-brand-700 inline-flex h-10 w-10 animate-spin rounded-full border-4"></span>
                 <p class="text-sm leading-6 text-slate-600">Preparing your checkout...</p>
             </div>
@@ -368,6 +401,9 @@ watch(currentStep, async (step) => {
                                 :selected-billing-saved-address-id="addresses.selectedBillingSavedAddressId.value"
                                 :selected-shipping-saved-address-id="addresses.selectedShippingSavedAddressId.value"
                                 :is-submitting="isSubmitting"
+                                :is-region-ready="isRegionReady"
+                                :is-region-loading="isRegionLoading"
+                                :region-error-message="regionErrorMessage"
                                 @update:use-separate-shipping="addresses.useSeparateShipping.value = $event"
                                 @update:selected-billing-saved-address-id="addresses.updateSelectedBillingSavedAddress"
                                 @update:selected-shipping-saved-address-id="addresses.updateSelectedShippingSavedAddress"

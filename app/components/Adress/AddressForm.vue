@@ -8,7 +8,10 @@ import BaseSelect from "~/components/Shared/BaseSelect.vue"
 
 const model = defineModel<boolean>()
 const regionStore = useRegionStore()
-const { regionCountries } = storeToRefs(regionStore)
+const { regionCountries, status } = storeToRefs(regionStore)
+const { currentLocale } = storeToRefs(useLocaleStore())
+const regionMessages = computed(() => getErrorMessages(currentLocale.value).region)
+const isRetryingRegion = ref<boolean>(false)
 const addressTitleId = useId()
 const addressDescriptionId = useId()
 
@@ -118,11 +121,25 @@ const countryCodeModel = computed<string>({
     }
 })
 
+const isRegionLoading = computed<boolean>(() => status.value === "idle" || status.value === "loading")
+const isRegionReady = computed<boolean>(() => status.value === "ready")
+const isRegionError = computed<boolean>(() => status.value === "error")
+
 onMounted(async () => {
-    if (!regionCountries.value.length) {
+    if (status.value === "idle") {
         await regionStore.fetchRegion()
     }
 })
+
+async function retryRegion(): Promise<void> {
+    if (isRetryingRegion.value) {
+        return
+    }
+
+    isRetryingRegion.value = true
+    await regionStore.fetchRegion()
+    isRetryingRegion.value = false
+}
 
 function close(): void {
     model.value = false
@@ -348,14 +365,21 @@ function save(): void {
                     class="min-h-12"
                     :class="errors.country_code ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''"
                     :aria-invalid="Boolean(errors.country_code)"
-                    aria-describedby="address-country-code-error"
+                    :disabled="!isRegionReady"
+                    :aria-describedby="errors.country_code ? 'address-country-code-error' : !isRegionReady ? 'address-country-region-status' : undefined"
                 />
                 <span v-if="errors.country_code" id="address-country-code-error" class="text-sm leading-6 text-rose-600">
                     {{ errors.country_code }}
                 </span>
-                <p v-if="!regionCountries.length" class="text-sm leading-6 text-slate-500">
-                    Loading available countries...
+                <p v-if="isRegionLoading" id="address-country-region-status" class="text-sm leading-6 text-slate-500" role="status">
+                    {{ regionMessages.loadingCountries }}
                 </p>
+                <div v-else-if="isRegionError" id="address-country-region-status" class="grid justify-items-start gap-2" role="status">
+                    <p class="text-sm leading-6 text-rose-700">{{ regionMessages.deliveryCountries }}</p>
+                    <BaseButton type="button" variant="secondary" :disabled="isRetryingRegion" @click="retryRegion">
+                        {{ isRetryingRegion ? regionMessages.tryingAgain : regionMessages.retry }}
+                    </BaseButton>
+                </div>
             </div>
 
             <div class="grid gap-2">
@@ -403,7 +427,9 @@ function save(): void {
                 >
                     Cancel
                 </BaseButton>
-                <BaseButton type="submit" variant="accent" class="px-6 motion-reduce:transition-none">Save</BaseButton>
+                <BaseButton type="submit" variant="accent" class="px-6 motion-reduce:transition-none" :disabled="!isRegionReady">
+                    Save
+                </BaseButton>
             </div>
         </form>
     </BaseModal>

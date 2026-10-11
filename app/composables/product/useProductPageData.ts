@@ -18,6 +18,7 @@ export async function useProductPageData(options: {
     routePath: ComputedRef<string> | Ref<string>
     regionStoreId: Ref<string | null | undefined>
     selectedCountryCode: Ref<string | null | undefined>
+    regionStatus: Ref<"idle" | "loading" | "ready" | "error">
     absoluteUrl: (_path: string) => string
 }) {
     const { currentLocale } = storeToRefs(useLocaleStore())
@@ -29,11 +30,21 @@ export async function useProductPageData(options: {
     }))
 
     const { data, pending: productPending, error: productError, refresh: refreshProduct } = await useFetch<ProductListResponse>("/api/products/products", {
-        params: productParams
+        params: productParams,
+        immediate: options.regionStatus.value === "ready",
+        watch: false
+    })
+
+    watch(productParams, () => {
+        if (options.regionStatus.value === "ready") {
+            void refreshProduct()
+        }
     })
 
     const product = computed<ProductDTO | null>(() => data.value?.products?.[0] ?? null)
-    const productNotFound = computed<boolean>(() => !productPending.value && !productError.value && !product.value)
+    const productNotFound = computed<boolean>(
+        () => options.regionStatus.value === "ready" && !productPending.value && !productError.value && !product.value
+    )
     const productTitle = computed<string>(() => normalizeProductText(product.value?.title, "Product"))
     const productSubtitle = computed<string | undefined>(() => (isNonEmptyString(product.value?.subtitle) ? product.value.subtitle.trim() : undefined))
     const productDescription = computed<string>(() =>
@@ -81,7 +92,7 @@ export async function useProductPageData(options: {
     async function refreshRelatedProducts(): Promise<void> {
         const currentProductId = product.value?.id
 
-        if (!currentProductId || !options.regionStoreId.value || !options.selectedCountryCode.value) {
+        if (options.regionStatus.value !== "ready" || !currentProductId || !options.regionStoreId.value || !options.selectedCountryCode.value) {
             relatedData.value = { products: [] }
             return
         }

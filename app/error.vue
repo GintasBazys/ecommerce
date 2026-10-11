@@ -11,8 +11,23 @@ const props = defineProps<{
     error: NuxtError
 }>()
 
-const statusCode = computed<number>(() => props.error?.status || 500)
-const message = computed<string>(() => props.error?.statusText || "Internal error")
+const statusCode = computed<number>(() => props.error?.statusCode || props.error?.status || 500)
+const { currentLocale } = storeToRefs(useLocaleStore())
+const errorMessages = computed(() => getErrorMessages(currentLocale.value).fatal)
+const message = computed<string>(() => {
+    if (statusCode.value >= 500) {
+        return errorMessages.value.server
+    }
+
+    const approvedMessages: Record<number, string> = {
+        400: errorMessages.value.badRequest,
+        401: errorMessages.value.signIn,
+        403: errorMessages.value.forbidden,
+        404: errorMessages.value.notFound
+    }
+
+    return approvedMessages[statusCode.value] || errorMessages.value.generic
+})
 const { localizedPath } = useLocalizedPath()
 const homePath = computed<string>(() => localizedPath("/"))
 const specialOffersPath = computed<string>(() => localizedPath("/special-offers"))

@@ -37,9 +37,14 @@ export const useCartStore = defineStore("cart", () => {
     }
 
     const loadCart = async () => {
+        const regionStore = useRegionStore()
+        if (regionStore.status !== "ready" || !regionStore.regionStoreId) {
+            return
+        }
+
         try {
-            const regionId = useRegionStore().regionStoreId
-            const res = await fetch(`/api/cart/cart?region_id=${regionId}`, {
+            const query = new URLSearchParams({ region_id: regionStore.regionStoreId })
+            const res = await fetch(`/api/cart/cart?${query.toString()}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"

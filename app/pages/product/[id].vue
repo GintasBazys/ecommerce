@@ -19,7 +19,7 @@ import { getCanonicalRouteParam } from "~/utils/locale"
 const route = useRoute()
 const event = useRequestEvent()
 const { siteName, organizationId, absoluteUrl } = useSiteIdentity()
-const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode, status: regionStatus } = storeToRefs(useRegionStore())
 const { customer } = storeToRefs(useCustomerStore())
 const { localizedPath } = useLocalizedPath()
 
@@ -50,6 +50,7 @@ const {
     routePath,
     regionStoreId,
     selectedCountryCode,
+    regionStatus,
     absoluteUrl
 })
 

@@ -3,6 +3,7 @@ import type { H3Event } from "h3"
 
 import { toUpstreamError } from "#server/utils/medusa-proxy"
 import { fetchAllStoreProducts, fetchStoreProducts } from "#server/utils/products"
+import { getRequiredRegionId } from "#server/utils/region"
 
 type SearchRequestBody = {
     q?: string
@@ -135,7 +136,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: "Search query is required" })
     }
 
-    const regionId = query.region_id ? String(query.region_id) : null
+    const regionId = getRequiredRegionId(query.region_id)
     const countryCode = query.country_code ? String(query.country_code) : null
     const requestedSort = query.sort ? String(query.sort) : "relevance"
     const sort = SEARCH_SORT_OPTIONS.has(requestedSort) ? requestedSort : "relevance"

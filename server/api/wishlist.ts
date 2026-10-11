@@ -2,6 +2,7 @@ import type { ProductDTO } from "@medusajs/types"
 import type { H3Event } from "h3"
 
 import { fetchMedusaJson, fetchMedusaResponse, safeJson, toUpstreamError } from "#server/utils/medusa-proxy"
+import { getRequiredRegionId } from "#server/utils/region"
 
 type MedusaWishlistItem = {
     id: string
@@ -56,7 +57,7 @@ async function fetchWishlistProduct(event: H3Event, productId: string, regionId:
 
 async function handleGetWishlist(event: H3Event) {
     const query = getQuery(event)
-    const regionId = getRequiredString(query.region_id, "region_id")
+    const regionId = getRequiredRegionId(query.region_id)
     const countryCode = getRequiredString(query.country_code, "country_code")
 
     const response = await fetchMedusaResponse(event, "/store/wishlists", {

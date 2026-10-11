@@ -8,6 +8,7 @@ import {
     isProductInStock
 } from "#server/utils/products"
 import { toUpstreamError } from "#server/utils/medusa-proxy"
+import { getRequiredRegionId } from "#server/utils/region"
 
 const DEFAULT_ORDER = "-created_at"
 const MAX_LIMIT = 48
@@ -311,13 +312,9 @@ function requiresClientSideSort(order: string) {
 export default defineEventHandler(async (event) => {
     const query = getQuery(event)
 
-    const regionId = query.region_id ? String(query.region_id) : null
+    const regionId = getRequiredRegionId(query.region_id)
     const countryCode = query.country_code ? String(query.country_code) : null
     const categoryId = query.category_id ? String(query.category_id) : null
-
-    if (!regionId) {
-        throw createError({ statusCode: 400, statusMessage: "region_id is required" })
-    }
 
     const limit = Math.min(parsePositiveInteger(query.limit, 9), MAX_LIMIT)
     const offset = parsePositiveInteger(query.offset, 0)

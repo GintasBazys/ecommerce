@@ -4,6 +4,7 @@ import type { Ref } from "vue"
 import type { CategoryListingFilterState } from "~/composables/category/useCategoryListingFilters"
 import { createEmptyPriceRange } from "~/composables/category/useCategoryListingFilters"
 import type { CategoryPriceRange, CategoryProductsFacets, CategoryProductsResponse } from "~/types/category-listing"
+import { getErrorMessages } from "~/utils/messages"
 
 export type CategoryListingFetchSource = "initial" | "sort" | "filters" | "pagination"
 
@@ -36,11 +37,19 @@ export function useCategoryProductsFetch({
 }: UseCategoryProductsFetchOptions) {
     const products = ref<CategoryProductsResponse["products"]>([])
     const loadingRef = ref<boolean>(false)
-    const errorRef = ref<string | null>(null)
+    const requestErrorRef = ref<string | null>(null)
     const sortLoading = ref<boolean>(false)
     const filterLoading = ref<boolean>(false)
+    const { status: regionStatus } = storeToRefs(useRegionStore())
+    const { currentLocale } = storeToRefs(useLocaleStore())
 
-    const gridIsInitialLoading = computed<boolean>(() => loadingRef.value && products.value.length === 0)
+    const regionUnavailable = computed<boolean>(() => regionStatus.value === "error")
+    const errorRef = computed<string | null>(() =>
+        regionUnavailable.value ? getErrorMessages(currentLocale.value).region.description : requestErrorRef.value
+    )
+    const gridIsInitialLoading = computed<boolean>(
+        () => products.value.length === 0 && (loadingRef.value || regionStatus.value === "idle" || regionStatus.value === "loading")
+    )
 
     function resetProductState(): void {
         products.value = []
@@ -66,12 +75,12 @@ export function useCategoryProductsFetch({
     }
 
     async function fetchProducts(source: CategoryListingFetchSource = "initial", page = currentPage.value): Promise<void> {
-        if (!regionStoreId.value || (!isAllProductsPage.value && !category.value?.id)) {
+        if (regionStatus.value !== "ready" || !regionStoreId.value || !selectedCountryCode.value || (!isAllProductsPage.value && !category.value?.id)) {
             return
         }
 
         loadingRef.value = true
-        errorRef.value = null
+        requestErrorRef.value = null
         sortLoading.value = source === "sort"
         filterLoading.value = source === "filters"
 
@@ -95,7 +104,7 @@ export function useCategoryProductsFetch({
             priceRange.value = response.priceRange ?? createEmptyPriceRange()
         } catch (error) {
             console.error("Error fetching category products", error)
-            errorRef.value = "We could not load products right now. Please try again."
+            requestErrorRef.value = "We could not load products right now. Please try again."
         } finally {
             loadingRef.value = false
             sortLoading.value = false
@@ -108,6 +117,7 @@ export function useCategoryProductsFetch({
         totalCount,
         loadingRef,
         errorRef,
+        regionUnavailable,
         sortLoading,
         filterLoading,
         gridIsInitialLoading,

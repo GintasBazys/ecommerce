@@ -4,6 +4,34 @@
         "label": "Kalba",
         "lithuanian": "Lietuvių"
     },
+    "errors": {
+        "fatal": {
+            "badRequest": "Užklausos nepavyko įvykdyti.",
+            "forbidden": "Neturite prieigos prie šio puslapio.",
+            "generic": "Nepavyko įkelti šio puslapio.",
+            "notFound": "Prašomas puslapis nerastas.",
+            "server": "Parduotuvė laikinai nepasiekiama. Netrukus bandykite dar kartą.",
+            "signIn": "Norėdami tęsti, prisijunkite."
+        },
+        "region": {
+            "checkoutDescription": "Nepavyko įkelti pristatymo šalių ir regioninių kainų. Bandykite dar kartą.",
+            "checkoutTitle": "Atsiskaitymas laikinai nepasiekiamas",
+            "description": "Nepavyko įkelti pristatymo šalių ir regioninių kainų. Bandykite dar kartą.",
+            "deliveryCountries": "Pristatymo šalys laikinai nepasiekiamos. Prieš tęsdami bandykite dar kartą.",
+            "loadingCountries": "Įkeliamos galimos pristatymo šalys...",
+            "loadingPricing": "Įkeliamos pristatymo šalys ir regioninės kainos...",
+            "offers": "Nepavyko įkelti specialių pasiūlymų.",
+            "offersError": "Šiuo metu nepavyko įkelti specialių pasiūlymų.",
+            "offersRetry": "Bandyti dar kartą",
+            "products": "Nepavyko įkelti prekių.",
+            "recovered": "Regioninės kainos vėl pasiekiamos. Puslapis įkeliamas iš naujo.",
+            "retry": "Bandyti įkelti regionines kainas dar kartą",
+            "retrying": "Regionines kainas ir pristatymo šalis bandoma įkelti dar kartą.",
+            "search": "Paieška nepasiekiama, kol neatkurtos regioninės kainos.",
+            "title": "Regioninės kainos laikinai nepasiekiamos",
+            "tryingAgain": "Bandoma dar kartą..."
+        }
+    },
     "routes": {
         "about": "apie-mus",
         "account": "paskyra",

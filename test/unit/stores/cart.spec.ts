@@ -6,8 +6,9 @@ import { createSetupStore } from '../../utils/stores'
 
 type CartStore = ReturnType<typeof import('../../../app/stores/cart').useCartStore>
 
-const regionState = {
+const regionState: { regionStoreId: string | null; status: string } = {
     regionStoreId: 'reg_123',
+    status: 'ready',
 }
 
 let fetchMock: ReturnType<typeof vi.fn>
@@ -50,6 +51,7 @@ async function createCartStore(): Promise<CartStore> {
 describe('useCartStore', () => {
     beforeEach(() => {
         regionState.regionStoreId = 'reg_123'
+        regionState.status = 'ready'
         fetchMock = vi.fn()
         $fetchMock = vi.fn()
         vi.stubGlobal('fetch', fetchMock)
@@ -75,6 +77,16 @@ describe('useCartStore', () => {
         expect(store.cart.value).toEqual(loadedCart)
     })
 
+    it('does not load a cart before regional context is ready', async () => {
+        regionState.status = 'error'
+        regionState.regionStoreId = null
+        const store = await createCartStore()
+
+        await store.loadCart()
+
+        expect(fetchMock).not.toHaveBeenCalled()
+    })
+
     it('sums cart item quantities', async () => {
         const store = await createCartStore()
 
@@ -90,7 +102,7 @@ describe('useCartStore', () => {
     it('rejects line item updates when cart is not ready', async () => {
         const store = await createCartStore()
 
-        expect(store.updateLineItem(variant())).rejects.toThrow('Cart is not ready yet. Please try again.')
+        await expect(store.updateLineItem(variant())).rejects.toThrow('Cart is not ready yet. Please try again.')
         expect($fetchMock).not.toHaveBeenCalled()
     })
 
@@ -98,8 +110,8 @@ describe('useCartStore', () => {
         const store = await createCartStore()
         store.cart.value = cart()
 
-        expect(store.updateLineItem(variant({ id: null }))).rejects.toThrow('This product option is unavailable.')
-        expect(store.updateLineItem(variant({ inventory_quantity: 0 }))).rejects.toThrow('This product option is currently out of stock.')
+        await expect(store.updateLineItem(variant({ id: null }))).rejects.toThrow('This product option is unavailable.')
+        await expect(store.updateLineItem(variant({ inventory_quantity: 0 }))).rejects.toThrow('This product option is currently out of stock.')
         expect($fetchMock).not.toHaveBeenCalled()
     })
 
@@ -193,7 +205,7 @@ describe('useCartStore', () => {
         const store = await createCartStore()
         store.cart.value = cart()
 
-        expect(store.updateLineItem(variant())).rejects.toThrow('Selected quantity is unavailable')
+        await expect(store.updateLineItem(variant())).rejects.toThrow('Selected quantity is unavailable')
     })
 
     it('removes line items and stores recovery messages', async () => {

@@ -51,6 +51,11 @@ export const useProductStore = defineStore("product", () => {
     }
 
     const fetchData = async (regionId?: string, countryCode?: string, options: ProductFetchOptions = {}) => {
+        const regionStore = useRegionStore()
+        if (regionStore.status !== "ready" || !regionId || !countryCode) {
+            return
+        }
+
         const requestLimit = options.limit ?? limit.value
         const requestOffset = options.offset ?? 0
 
@@ -88,7 +93,8 @@ export const useProductStore = defineStore("product", () => {
         }
     }
     const fetchBestSellers = async (regionId?: string, countryCode?: string, options: ProductFetchOptions = {}) => {
-        if (!regionId) {
+        const regionStore = useRegionStore()
+        if (regionStore.status !== "ready" || !regionId || !countryCode) {
             return
         }
 

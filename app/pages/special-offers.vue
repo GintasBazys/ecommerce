@@ -11,7 +11,9 @@ import { ALL_PRODUCTS_URL_HANDLE } from "~/utils/consts"
 
 const route = useRoute()
 const { localizedPath } = useLocalizedPath()
-const { regionStoreId, selectedCountryCode } = storeToRefs(useRegionStore())
+const { regionStoreId, selectedCountryCode, status: regionStatus } = storeToRefs(useRegionStore())
+const { currentLocale } = storeToRefs(useLocaleStore())
+const regionMessages = computed(() => getErrorMessages(currentLocale.value).region)
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [{ label: "Home", to: localizedPath("/") }, { label: "Special Offers" }])
 const contactPath = computed<string>(() => localizedPath("/contact"))
 const allProductsPath = computed<string>(() => localizedPath(ALL_PRODUCTS_URL_HANDLE))
@@ -29,9 +31,16 @@ const productParams = computed(() => ({
     view: "card"
 }))
 
-const { data, pending, error } = await useFetch<ProductListResponse>("/api/products/on-sale", {
+const { data, pending, error, refresh } = await useFetch<ProductListResponse>("/api/products/on-sale", {
     params: productParams,
-    watch: [regionStoreId, selectedCountryCode, currentPage]
+    immediate: regionStatus.value === "ready",
+    watch: false
+})
+
+watch([regionStoreId, selectedCountryCode, currentPage], () => {
+    if (regionStatus.value === "ready") {
+        void refresh()
+    }
 })
 
 const offerProducts = computed<ProductDTO[]>(() => data.value?.products ?? [])
@@ -169,18 +178,35 @@ useSeoMeta({
 
         <div class="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:pb-20">
             <div
-                v-if="pending"
+                v-if="regionStatus === 'error'"
+                class="rounded-3xl border border-red-200 bg-red-50 px-6 py-8 text-center text-red-700 shadow-md"
+                role="status"
+            >
+                <h2 class="text-2xl font-semibold text-slate-950">{{ regionMessages.offers }}</h2>
+                <p class="mt-3 text-sm leading-6">{{ regionMessages.description }}</p>
+            </div>
+
+            <div
+                v-else-if="pending || regionStatus !== 'ready'"
                 class="grid place-items-center rounded-3xl border border-slate-200 bg-white/90 px-6 py-16 text-center shadow-lg"
             >
                 <div class="border-brand-200 border-t-brand-700 h-10 w-10 animate-spin rounded-full border-2"></div>
-                <p class="mt-4 text-sm leading-6 text-slate-600">Loading sale products...</p>
+                <p class="mt-4 text-sm leading-6 text-slate-600">{{ regionMessages.loadingPricing }}</p>
             </div>
 
             <div
                 v-else-if="error"
                 class="rounded-3xl border border-red-200 bg-red-50 px-6 py-8 text-red-700 shadow-md"
+                role="alert"
             >
-                Could not load special offers right now.
+                <p>{{ regionMessages.offersError }}</p>
+                <button
+                    type="button"
+                    class="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-red-800 px-5 text-sm font-semibold text-white hover:bg-red-900 focus-visible:ring-2 focus-visible:ring-red-800 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                    @click="refresh()"
+                >
+                    {{ regionMessages.offersRetry }}
+                </button>
             </div>
 
             <div v-else-if="offerProducts.length" class="grid gap-6">
